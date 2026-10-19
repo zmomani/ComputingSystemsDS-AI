@@ -5,7 +5,7 @@ source: https://albanna-tutorials.com/react-agent.html
 ---
 # AI Agents & ReAct — Building a Reasoning and Acting Agent from Scratch
 
-> Based on Dr. Abdulkarim Albanna's lesson "ReAct Agent Architecture — A visual guide to building a Reasoning and Acting agent from scratch" (albanna-tutorials.com). Code blocks 1–6 (environment_setup.py, agent.py, react_prompt.py, tools.py, agent_loop.py, complex_example.py) are reproduced verbatim. The final combined listing (react_agent.py) could not be fetched verbatim and is reassembled below from the verbatim parts plus the `__main__` entry point the page describes. Explanatory prose was extracted via a fetcher that paraphrases, so wording is close to but not identical to the original.
+> Based on Dr. Abdulkarim Albanna's lesson "ReAct Agent Architecture — A visual guide to building a Reasoning and Acting agent from scratch" (albanna-tutorials.com).
 
 ## 1. Introduction to ReAct Agents
 
@@ -118,19 +118,40 @@ Answer: A bulldog weights 51 lbs
 
 ## 5. Implementing the Tools
 
-Two tools: a **calculator** that uses Python's `eval()`, and a **breed-weight lookup** with fixed sample values. A dictionary (`known_actions`) maps each action name to its function. The tools are deliberately simple; real agents would connect to APIs, databases or other external systems.
+Two tools: a **calculator** that evaluates arithmetic expressions safely with Python's `ast` module (never `eval()` on model output), and a **breed-weight lookup** with fixed sample values matched case-insensitively. A dictionary (`known_actions`) maps each action name to its function. The tools are deliberately simple; real agents would connect to APIs, databases or other external systems.
 
 ```python
 # tools.py
+import ast
+import operator
+
+_OPS = {ast.Add: operator.add, ast.Sub: operator.sub, ast.Mult: operator.mul,
+        ast.Div: operator.truediv, ast.Pow: operator.pow, ast.Mod: operator.mod,
+        ast.USub: operator.neg, ast.UAdd: operator.pos}
+
+def _safe_eval(node):
+    # Walk the parsed expression tree; only numbers and arithmetic operators are allowed
+    if isinstance(node, ast.Expression):
+        return _safe_eval(node.body)
+    if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
+        return node.value
+    if isinstance(node, ast.BinOp) and type(node.op) in _OPS:
+        return _OPS[type(node.op)](_safe_eval(node.left), _safe_eval(node.right))
+    if isinstance(node, ast.UnaryOp) and type(node.op) in _OPS:
+        return _OPS[type(node.op)](_safe_eval(node.operand))
+    raise ValueError(f"Unsupported expression: {ast.unparse(node)}")
+
 def calculate(what):
-    return eval(what)
+    # Safe arithmetic evaluator (never call eval() on model output)
+    return _safe_eval(ast.parse(what.strip(), mode="eval"))
 
 def average_dog_weight(name):
-    if name in "Scottish Terrier":
+    name = name.strip().lower()   # exact, case-insensitive match (not a substring test)
+    if name == "scottish terrier":
         return("Scottish Terriers average 20 lbs")
-    elif name in "Border Collie":
+    elif name == "border collie":
         return("a Border Collies average weight is 37 lbs")
-    elif name in "Toy Poodle":
+    elif name == "toy poodle":
         return("a toy poodles average weight is 7 lbs")
     else:
         return("An average dog weights 50 lbs")
@@ -141,8 +162,6 @@ known_actions = {
 }
 ```
 
-> Teaching note: `eval()` on model output is unsafe outside a demo, and `name in "Scottish Terrier"` is a *substring* test (so `"Terrier"` matches but `"scottish terrier"` in lower case does not). Both are good discussion points for the Extensions section.
-
 ## 6. Creating the Agent Loop
 
 The `query` function starts an agent with the ReAct prompt and sends it the question. It uses a **regular expression** to find any requested `Action:` line, runs the matching tool, and sends the result back as an `Observation:`. The loop ends when the model produces no further action.
@@ -151,7 +170,7 @@ The `query` function starts an agent with the ReAct prompt and sends it the ques
 
 ```python
 # agent_loop.py
-action_re = re.compile('^Action: (\w+): (.*)$')   # python regular expression to select action
+action_re = re.compile(r'^Action: (\w+): (.*)$')   # python regular expression to select action
 
 def query(question, max_turns=5):
     i = 0
@@ -229,6 +248,8 @@ All the pieces combined into a single script with a main entry point.
 
 ```python
 # react_agent.py
+import ast
+import operator
 import re
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -292,15 +313,33 @@ Answer: A bulldog weights 51 lbs
 """.strip()
 
 
+_OPS = {ast.Add: operator.add, ast.Sub: operator.sub, ast.Mult: operator.mul,
+        ast.Div: operator.truediv, ast.Pow: operator.pow, ast.Mod: operator.mod,
+        ast.USub: operator.neg, ast.UAdd: operator.pos}
+
+def _safe_eval(node):
+    # Walk the parsed expression tree; only numbers and arithmetic operators are allowed
+    if isinstance(node, ast.Expression):
+        return _safe_eval(node.body)
+    if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
+        return node.value
+    if isinstance(node, ast.BinOp) and type(node.op) in _OPS:
+        return _OPS[type(node.op)](_safe_eval(node.left), _safe_eval(node.right))
+    if isinstance(node, ast.UnaryOp) and type(node.op) in _OPS:
+        return _OPS[type(node.op)](_safe_eval(node.operand))
+    raise ValueError(f"Unsupported expression: {ast.unparse(node)}")
+
 def calculate(what):
-    return eval(what)
+    # Safe arithmetic evaluator (never call eval() on model output)
+    return _safe_eval(ast.parse(what.strip(), mode="eval"))
 
 def average_dog_weight(name):
-    if name in "Scottish Terrier":
+    name = name.strip().lower()   # exact, case-insensitive match (not a substring test)
+    if name == "scottish terrier":
         return("Scottish Terriers average 20 lbs")
-    elif name in "Border Collie":
+    elif name == "border collie":
         return("a Border Collies average weight is 37 lbs")
-    elif name in "Toy Poodle":
+    elif name == "toy poodle":
         return("a toy poodles average weight is 7 lbs")
     else:
         return("An average dog weights 50 lbs")
@@ -310,7 +349,7 @@ known_actions = {
     "average_dog_weight": average_dog_weight
 }
 
-action_re = re.compile('^Action: (\w+): (.*)$')   # python regular expression to select action
+action_re = re.compile(r'^Action: (\w+): (.*)$')   # python regular expression to select action
 
 def query(question, max_turns=5):
     i = 0
@@ -383,8 +422,8 @@ What is their combined weight"""
 - **Dispatch table (`known_actions`)** — show the string from the regex being used as a dictionary key to select and call a Python function; show the `Unknown action` exception path.
 - **Termination conditions** — a flowchart with two exits: "no Action line → return (Answer)" and "i == max_turns → stop"; simulate a model that never answers.
 - **Temperature = 0 determinism** — compare repeated runs at T = 0 vs. T = 1 and show divergence in the Thought/Action text.
-- **Tool-call safety** — contrast `eval("37 + 20")` with `eval("__import__('os').system('ls')")` and a safe arithmetic parser (`ast.literal_eval` / a restricted evaluator).
-- **Substring-match bug in `average_dog_weight`** — show `"Terrier" in "Scottish Terrier"` is True but `"scottish terrier" in "Scottish Terrier"` is False; motivate a dictionary lookup.
+- **Tool-call safety** — contrast `eval("37 + 20")` with `eval("__import__('os').system('ls')")` and show how the `ast`-based `calculate` rejects the second (`ValueError`) while still computing the first.
+- **Exact vs. substring matching in `average_dog_weight`** — show that a substring test `"Terrier" in "Scottish Terrier"` is True but `"scottish terrier" in "Scottish Terrier"` is False; motivate the lower-cased exact comparison (or a dictionary lookup).
 
 ## Test code
 
@@ -402,15 +441,35 @@ print(action_re.match("Answer: 57 lbs"))   # None → loop would terminate
 
 ```python
 # 2. Tools + dispatch table, exercised directly
+import ast, operator
+
+_OPS = {ast.Add: operator.add, ast.Sub: operator.sub, ast.Mult: operator.mul,
+        ast.Div: operator.truediv, ast.Pow: operator.pow, ast.Mod: operator.mod,
+        ast.USub: operator.neg, ast.UAdd: operator.pos}
+
+def _safe_eval(node):
+    # Walk the parsed expression tree; only numbers and arithmetic operators are allowed
+    if isinstance(node, ast.Expression):
+        return _safe_eval(node.body)
+    if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
+        return node.value
+    if isinstance(node, ast.BinOp) and type(node.op) in _OPS:
+        return _OPS[type(node.op)](_safe_eval(node.left), _safe_eval(node.right))
+    if isinstance(node, ast.UnaryOp) and type(node.op) in _OPS:
+        return _OPS[type(node.op)](_safe_eval(node.operand))
+    raise ValueError(f"Unsupported expression: {ast.unparse(node)}")
+
 def calculate(what):
-    return eval(what)
+    # Safe arithmetic evaluator (never call eval() on model output)
+    return _safe_eval(ast.parse(what.strip(), mode="eval"))
 
 def average_dog_weight(name):
-    if name in "Scottish Terrier":
+    name = name.strip().lower()   # exact, case-insensitive match (not a substring test)
+    if name == "scottish terrier":
         return("Scottish Terriers average 20 lbs")
-    elif name in "Border Collie":
+    elif name == "border collie":
         return("a Border Collies average weight is 37 lbs")
-    elif name in "Toy Poodle":
+    elif name == "toy poodle":
         return("a toy poodles average weight is 7 lbs")
     else:
         return("An average dog weights 50 lbs")
@@ -419,12 +478,19 @@ known_actions = {"calculate": calculate, "average_dog_weight": average_dog_weigh
 for action, arg in [("average_dog_weight", "Border Collie"),
                     ("average_dog_weight", "Scottish Terrier"),
                     ("calculate", "37 + 20"),
-                    ("average_dog_weight", "scottish terrier")]:   # note the lowercase bug
+                    ("average_dog_weight", "scottish terrier"),   # lowercase still matches
+                    ("average_dog_weight", "Terrier")]:           # partial name → default
     print(f"{action}({arg!r}) -> {known_actions[action](arg)}")
+
+try:
+    calculate("__import__('os').system('ls')")    # rejected by the safe evaluator
+except ValueError as e:
+    print("blocked:", e)
 ```
 
 ```python
 # 3. Run the full ReAct loop offline with a scripted fake LLM (same Agent/query code, no OpenAI call)
+#    (run test 2 first so that calculate() is defined)
 import re
 scripted = iter([
     "Thought: I need both weights.\nAction: average_dog_weight: Border Collie\nPAUSE",
@@ -442,9 +508,9 @@ class Agent:
         self.messages.append({"role": "assistant", "content": result})
         return result
 
-known_actions = {"calculate": lambda w: eval(w),
-                 "average_dog_weight": lambda n: {"Border Collie": "a Border Collies average weight is 37 lbs",
-                                                  "Scottish Terrier": "Scottish Terriers average 20 lbs"}.get(n, "An average dog weights 50 lbs")}
+known_actions = {"calculate": calculate,                      # the safe ast-based calculate() from test 2
+                 "average_dog_weight": lambda n: {"border collie": "a Border Collies average weight is 37 lbs",
+                                                  "scottish terrier": "Scottish Terriers average 20 lbs"}.get(n.strip().lower(), "An average dog weights 50 lbs")}
 action_re = re.compile(r'^Action: (\w+): (.*)$')
 
 def query(question, max_turns=5):

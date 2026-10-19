@@ -122,17 +122,38 @@
 <span class="s2">"""</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 </code></pre></div>
 <h2 id="5-implementing-the-tools">5. Implementing the Tools</h2>
-<p>Two tools: a <strong>calculator</strong> that uses Python's <code>eval()</code>, and a <strong>breed-weight lookup</strong> with fixed sample values. A dictionary (<code>known_actions</code>) maps each action name to its function. The tools are deliberately simple; real agents would connect to APIs, databases or other external systems.</p>
+<p>Two tools: a <strong>calculator</strong> that evaluates arithmetic expressions safely with Python's <code>ast</code> module (never <code>eval()</code> on model output), and a <strong>breed-weight lookup</strong> with fixed sample values matched case-insensitively. A dictionary (<code>known_actions</code>) maps each action name to its function. The tools are deliberately simple; real agents would connect to APIs, databases or other external systems.</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># tools.py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ast</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">operator</span>
+
+<span class="n">_OPS</span> <span class="o">=</span> <span class="p">{</span><span class="n">ast</span><span class="o">.</span><span class="n">Add</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Sub</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">sub</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Mult</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">mul</span><span class="p">,</span>
+        <span class="n">ast</span><span class="o">.</span><span class="n">Div</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">truediv</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Pow</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">pow</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Mod</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">mod</span><span class="p">,</span>
+        <span class="n">ast</span><span class="o">.</span><span class="n">USub</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">neg</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">UAdd</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">pos</span><span class="p">}</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_safe_eval</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+    <span class="c1"># Walk the parsed expression tree; only numbers and arithmetic operators are allowed</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Expression</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_safe_eval</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Constant</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">BinOp</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">)</span> <span class="ow">in</span> <span class="n">_OPS</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_OPS</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">)](</span><span class="n">_safe_eval</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="p">),</span> <span class="n">_safe_eval</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">right</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">UnaryOp</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">)</span> <span class="ow">in</span> <span class="n">_OPS</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_OPS</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">)](</span><span class="n">_safe_eval</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">operand</span><span class="p">))</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unsupported expression: </span><span class="si">{</span><span class="n">ast</span><span class="o">.</span><span class="n">unparse</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
 <span class="k">def</span><span class="w"> </span><span class="nf">calculate</span><span class="p">(</span><span class="n">what</span><span class="p">):</span>
-    <span class="k">return</span> <span class="nb">eval</span><span class="p">(</span><span class="n">what</span><span class="p">)</span>
+    <span class="c1"># Safe arithmetic evaluator (never call eval() on model output)</span>
+    <span class="k">return</span> <span class="n">_safe_eval</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">what</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"eval"</span><span class="p">))</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">average_dog_weight</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="s2">"Scottish Terrier"</span><span class="p">:</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>   <span class="c1"># exact, case-insensitive match (not a substring test)</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"scottish terrier"</span><span class="p">:</span>
         <span class="k">return</span><span class="p">(</span><span class="s2">"Scottish Terriers average 20 lbs"</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="s2">"Border Collie"</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"border collie"</span><span class="p">:</span>
         <span class="k">return</span><span class="p">(</span><span class="s2">"a Border Collies average weight is 37 lbs"</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="s2">"Toy Poodle"</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"toy poodle"</span><span class="p">:</span>
         <span class="k">return</span><span class="p">(</span><span class="s2">"a toy poodles average weight is 7 lbs"</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span><span class="p">(</span><span class="s2">"An average dog weights 50 lbs"</span><span class="p">)</span>
@@ -142,16 +163,13 @@
     <span class="s2">"average_dog_weight"</span><span class="p">:</span> <span class="n">average_dog_weight</span>
 <span class="p">}</span>
 </code></pre></div>
-<blockquote>
-<p>Teaching note: <code>eval()</code> on model output is unsafe outside a demo, and <code>name in "Scottish Terrier"</code> is a <em>substring</em> test (so <code>"Terrier"</code> matches but <code>"scottish terrier"</code> in lower case does not). Both are good discussion points for the Extensions section.</p>
-</blockquote>
 <h2 id="6-creating-the-agent-loop">6. Creating the Agent Loop</h2>
 <p>The <code>query</code> function starts an agent with the ReAct prompt and sends it the question. It uses a <strong>regular expression</strong> to find any requested <code>Action:</code> line, runs the matching tool, and sends the result back as an <code>Observation:</code>. The loop ends when the model produces no further action.</p>
 <blockquote>
 <p><strong>Safety Feature:</strong> the <code>max_turns</code> limit stops the loop from running indefinitely.</p>
 </blockquote>
 <div class="highlight"><pre><span></span><code><span class="c1"># agent_loop.py</span>
-<span class="n">action_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">'^Action: (\w+): (.*)$'</span><span class="p">)</span>   <span class="c1"># python regular expression to select action</span>
+<span class="n">action_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">'^Action: (\w+): (.*)$'</span><span class="p">)</span>   <span class="c1"># python regular expression to select action</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">query</span><span class="p">(</span><span class="n">question</span><span class="p">,</span> <span class="n">max_turns</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
     <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
@@ -215,6 +233,8 @@ Answer:      The combined weight of your border collie and scottish terrier is 5
 <h2 id="8-complete-code-architecture">8. Complete Code Architecture</h2>
 <p>All the pieces combined into a single script with a main entry point.</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># react_agent.py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ast</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">operator</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">openai</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenAI</span>
@@ -278,15 +298,33 @@ Answer:      The combined weight of your border collie and scottish terrier is 5
 <span class="s2">"""</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
 
+<span class="n">_OPS</span> <span class="o">=</span> <span class="p">{</span><span class="n">ast</span><span class="o">.</span><span class="n">Add</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Sub</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">sub</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Mult</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">mul</span><span class="p">,</span>
+        <span class="n">ast</span><span class="o">.</span><span class="n">Div</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">truediv</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Pow</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">pow</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Mod</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">mod</span><span class="p">,</span>
+        <span class="n">ast</span><span class="o">.</span><span class="n">USub</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">neg</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">UAdd</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">pos</span><span class="p">}</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_safe_eval</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+    <span class="c1"># Walk the parsed expression tree; only numbers and arithmetic operators are allowed</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Expression</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_safe_eval</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Constant</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">BinOp</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">)</span> <span class="ow">in</span> <span class="n">_OPS</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_OPS</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">)](</span><span class="n">_safe_eval</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="p">),</span> <span class="n">_safe_eval</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">right</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">UnaryOp</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">)</span> <span class="ow">in</span> <span class="n">_OPS</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_OPS</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">)](</span><span class="n">_safe_eval</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">operand</span><span class="p">))</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unsupported expression: </span><span class="si">{</span><span class="n">ast</span><span class="o">.</span><span class="n">unparse</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
 <span class="k">def</span><span class="w"> </span><span class="nf">calculate</span><span class="p">(</span><span class="n">what</span><span class="p">):</span>
-    <span class="k">return</span> <span class="nb">eval</span><span class="p">(</span><span class="n">what</span><span class="p">)</span>
+    <span class="c1"># Safe arithmetic evaluator (never call eval() on model output)</span>
+    <span class="k">return</span> <span class="n">_safe_eval</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">what</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"eval"</span><span class="p">))</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">average_dog_weight</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="s2">"Scottish Terrier"</span><span class="p">:</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>   <span class="c1"># exact, case-insensitive match (not a substring test)</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"scottish terrier"</span><span class="p">:</span>
         <span class="k">return</span><span class="p">(</span><span class="s2">"Scottish Terriers average 20 lbs"</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="s2">"Border Collie"</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"border collie"</span><span class="p">:</span>
         <span class="k">return</span><span class="p">(</span><span class="s2">"a Border Collies average weight is 37 lbs"</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="s2">"Toy Poodle"</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"toy poodle"</span><span class="p">:</span>
         <span class="k">return</span><span class="p">(</span><span class="s2">"a toy poodles average weight is 7 lbs"</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span><span class="p">(</span><span class="s2">"An average dog weights 50 lbs"</span><span class="p">)</span>
@@ -296,7 +334,7 @@ Answer:      The combined weight of your border collie and scottish terrier is 5
     <span class="s2">"average_dog_weight"</span><span class="p">:</span> <span class="n">average_dog_weight</span>
 <span class="p">}</span>
 
-<span class="n">action_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">'^Action: (\w+): (.*)$'</span><span class="p">)</span>   <span class="c1"># python regular expression to select action</span>
+<span class="n">action_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">'^Action: (\w+): (.*)$'</span><span class="p">)</span>   <span class="c1"># python regular expression to select action</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">query</span><span class="p">(</span><span class="n">question</span><span class="p">,</span> <span class="n">max_turns</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
     <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
@@ -377,15 +415,35 @@ PAUSE&quot;&quot;&quot;
 actions = [action_re.match(a) for a in sample.split(&#x27;\n&#x27;) if action_re.match(a)]
 print(actions[0].groups())            # (&#x27;average_dog_weight&#x27;, &#x27;Bulldog&#x27;)
 print(action_re.match(&quot;Answer: 57 lbs&quot;))   # None → loop would terminate</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Tools + dispatch table, exercised directly</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 2. Tools + dispatch table, exercised directly
+import ast, operator
+
+_OPS = {ast.Add: operator.add, ast.Sub: operator.sub, ast.Mult: operator.mul,
+        ast.Div: operator.truediv, ast.Pow: operator.pow, ast.Mod: operator.mod,
+        ast.USub: operator.neg, ast.UAdd: operator.pos}
+
+def _safe_eval(node):
+    # Walk the parsed expression tree; only numbers and arithmetic operators are allowed
+    if isinstance(node, ast.Expression):
+        return _safe_eval(node.body)
+    if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
+        return node.value
+    if isinstance(node, ast.BinOp) and type(node.op) in _OPS:
+        return _OPS[type(node.op)](_safe_eval(node.left), _safe_eval(node.right))
+    if isinstance(node, ast.UnaryOp) and type(node.op) in _OPS:
+        return _OPS[type(node.op)](_safe_eval(node.operand))
+    raise ValueError(f&quot;Unsupported expression: {ast.unparse(node)}&quot;)
+
 def calculate(what):
-    return eval(what)
+    # Safe arithmetic evaluator (never call eval() on model output)
+    return _safe_eval(ast.parse(what.strip(), mode=&quot;eval&quot;))
 
 def average_dog_weight(name):
-    if name in &quot;Scottish Terrier&quot;:
+    name = name.strip().lower()   # exact, case-insensitive match (not a substring test)
+    if name == &quot;scottish terrier&quot;:
         return(&quot;Scottish Terriers average 20 lbs&quot;)
-    elif name in &quot;Border Collie&quot;:
+    elif name == &quot;border collie&quot;:
         return(&quot;a Border Collies average weight is 37 lbs&quot;)
-    elif name in &quot;Toy Poodle&quot;:
+    elif name == &quot;toy poodle&quot;:
         return(&quot;a toy poodles average weight is 7 lbs&quot;)
     else:
         return(&quot;An average dog weights 50 lbs&quot;)
@@ -394,8 +452,15 @@ known_actions = {&quot;calculate&quot;: calculate, &quot;average_dog_weight&quot
 for action, arg in [(&quot;average_dog_weight&quot;, &quot;Border Collie&quot;),
                     (&quot;average_dog_weight&quot;, &quot;Scottish Terrier&quot;),
                     (&quot;calculate&quot;, &quot;37 + 20&quot;),
-                    (&quot;average_dog_weight&quot;, &quot;scottish terrier&quot;)]:   # note the lowercase bug
-    print(f&quot;{action}({arg!r}) -&gt; {known_actions[action](arg)}&quot;)</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Run the full ReAct loop offline with a scripted fake LLM (same Agent/query code,</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 3. Run the full ReAct loop offline with a scripted fake LLM (same Agent/query code, no OpenAI call)
+                    (&quot;average_dog_weight&quot;, &quot;scottish terrier&quot;),   # lowercase still matches
+                    (&quot;average_dog_weight&quot;, &quot;Terrier&quot;)]:           # partial name → default
+    print(f&quot;{action}({arg!r}) -&gt; {known_actions[action](arg)}&quot;)
+
+try:
+    calculate(&quot;__import__(&#x27;os&#x27;).system(&#x27;ls&#x27;)&quot;)    # rejected by the safe evaluator
+except ValueError as e:
+    print(&quot;blocked:&quot;, e)</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Run the full ReAct loop offline with a scripted fake LLM (same Agent/query code,</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 3. Run the full ReAct loop offline with a scripted fake LLM (same Agent/query code, no OpenAI call)
+#    (run test 2 first so that calculate() is defined)
 import re
 scripted = iter([
     &quot;Thought: I need both weights.\nAction: average_dog_weight: Border Collie\nPAUSE&quot;,
@@ -413,9 +478,9 @@ class Agent:
         self.messages.append({&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: result})
         return result
 
-known_actions = {&quot;calculate&quot;: lambda w: eval(w),
-                 &quot;average_dog_weight&quot;: lambda n: {&quot;Border Collie&quot;: &quot;a Border Collies average weight is 37 lbs&quot;,
-                                                  &quot;Scottish Terrier&quot;: &quot;Scottish Terriers average 20 lbs&quot;}.get(n, &quot;An average dog weights 50 lbs&quot;)}
+known_actions = {&quot;calculate&quot;: calculate,                      # the safe ast-based calculate() from test 2
+                 &quot;average_dog_weight&quot;: lambda n: {&quot;border collie&quot;: &quot;a Border Collies average weight is 37 lbs&quot;,
+                                                  &quot;scottish terrier&quot;: &quot;Scottish Terriers average 20 lbs&quot;}.get(n.strip().lower(), &quot;An average dog weights 50 lbs&quot;)}
 action_re = re.compile(r&#x27;^Action: (\w+): (.*)$&#x27;)
 
 def query(question, max_turns=5):

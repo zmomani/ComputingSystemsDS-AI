@@ -225,7 +225,7 @@
 <li>Weights: BF16 for Scout; BF16 and FP8 for Maverick, with on-the-fly int4 quantization code provided.</li>
 </ul>
 <h3 id="example-system-prompt-for-llama4">Example System Prompt for LLAMA4</h3>
-<p>The author includes Meta's sample system prompt (summarized here; see the original page for the exact text). It sets up an "expert conversationalist who responds to the best of your ability" and asks the model to:</p>
+<p>The author includes Meta's sample system prompt. It sets up an "expert conversationalist who responds to the best of your ability" and asks the model to:</p>
 <ul>
 <li>match tone to the user's mood (listening, humor, emotional support vs. detailed help);</li>
 <li>avoid templated, preachy or moralizing language and not lecture the user;</li>
@@ -365,26 +365,26 @@
 <tr>
 <td>MTOB (half book) eng→kgv</td>
 <td>context window is 128K</td>
-<td>54.0</td>
 <td>42.2</td>
+<td>54.0</td>
 </tr>
 <tr>
 <td>MTOB (half book) kgv→eng</td>
 <td>context window is 128K</td>
-<td>46.4</td>
 <td>36.6</td>
+<td>46.4</td>
 </tr>
 <tr>
 <td>MTOB (full book) eng→kgv</td>
 <td>context window is 128K</td>
-<td>50.8</td>
 <td>39.7</td>
+<td>50.8</td>
 </tr>
 <tr>
 <td>MTOB (full book) kgv→eng</td>
 <td>context window is 128K</td>
-<td>46.7</td>
 <td>36.3</td>
+<td>46.7</td>
 </tr>
 </tbody>
 </table>
@@ -424,32 +424,28 @@
     <span class="n">device_map</span><span class="o">=</span><span class="s2">"auto"</span>
 <span class="p">)</span>
 
-<span class="c1"># Create prompt</span>
-<span class="n">prompt</span> <span class="o">=</span> <span class="s2">"""</span>
-<span class="s2">&lt;|system|&gt;</span>
-<span class="s2">You are an expert assistant that helps users with information about technology.</span>
-<span class="s2">&lt;/|system|&gt;</span>
-
-<span class="s2">&lt;|user|&gt;</span>
-<span class="s2">What are the key features of LLAMA4?</span>
-<span class="s2">&lt;/|user|&gt;</span>
-
-<span class="s2">&lt;|assistant|&gt;</span>
-<span class="s2">"""</span>
+<span class="c1"># Create prompt (the tokenizer's chat template applies Llama 4's own special tokens)</span>
+<span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"system"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="s2">"You are an expert assistant that helps users with information about technology."</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"user"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="s2">"What are the key features of LLAMA4?"</span><span class="p">},</span>
+<span class="p">]</span>
 
 <span class="c1"># Tokenize prompt</span>
-<span class="n">inputs</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">"pt"</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+<span class="n">input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">apply_chat_template</span><span class="p">(</span>
+    <span class="n">messages</span><span class="p">,</span> <span class="n">add_generation_prompt</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">"pt"</span>
+<span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
 
 <span class="c1"># Generate response</span>
 <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
-    <span class="n">inputs</span><span class="o">.</span><span class="n">input_ids</span><span class="p">,</span>
+    <span class="n">input_ids</span><span class="p">,</span>
     <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
+    <span class="n">do_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">temperature</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
     <span class="n">top_p</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="c1"># Decode and print response</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+<span class="c1"># Decode and print response (only the newly generated tokens)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">input_ids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:],</span> <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 </code></pre></div>
 <h3 id="using-with-vllm">Using with vLLM</h3>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">vllm</span><span class="w"> </span><span class="kn">import</span> <span class="n">LLM</span><span class="p">,</span> <span class="n">SamplingParams</span>
@@ -468,54 +464,52 @@
     <span class="n">max_tokens</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="c1"># Create prompt</span>
-<span class="n">prompt</span> <span class="o">=</span> <span class="s2">"""</span>
-<span class="s2">&lt;|system|&gt;</span>
-<span class="s2">You are an expert assistant that helps users with information about technology.</span>
-<span class="s2">&lt;/|system|&gt;</span>
-
-<span class="s2">&lt;|user|&gt;</span>
-<span class="s2">What are the key features of LLAMA4?</span>
-<span class="s2">&lt;/|user|&gt;</span>
-
-<span class="s2">&lt;|assistant|&gt;</span>
-<span class="s2">"""</span>
+<span class="c1"># Create prompt (vLLM applies the model's chat template)</span>
+<span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"system"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="s2">"You are an expert assistant that helps users with information about technology."</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"user"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="s2">"What are the key features of LLAMA4?"</span><span class="p">},</span>
+<span class="p">]</span>
 
 <span class="c1"># Generate response</span>
-<span class="n">outputs</span> <span class="o">=</span> <span class="n">llm</span><span class="o">.</span><span class="n">generate</span><span class="p">([</span><span class="n">prompt</span><span class="p">],</span> <span class="n">sampling_params</span><span class="p">)</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="n">llm</span><span class="o">.</span><span class="n">chat</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="n">sampling_params</span><span class="p">)</span>
 
 <span class="c1"># Print response</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="using-llama4-with-images">Using LLAMA4 with Images</h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoProcessor</span><span class="p">,</span> <span class="n">LlavaForConditionalGeneration</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoProcessor</span><span class="p">,</span> <span class="n">Llama4ForConditionalGeneration</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
 
-<span class="c1"># Load model and processor</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">LlavaForConditionalGeneration</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">"meta-llama/Llama-4-Scout-17B-16E-Instruct"</span><span class="p">)</span>
-<span class="n">processor</span> <span class="o">=</span> <span class="n">AutoProcessor</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">"meta-llama/Llama-4-Scout-17B-16E-Instruct"</span><span class="p">)</span>
+<span class="c1"># Load model and processor (requires transformers &gt;= 4.51)</span>
+<span class="n">model_id</span> <span class="o">=</span> <span class="s2">"meta-llama/Llama-4-Scout-17B-16E-Instruct"</span>
+<span class="n">processor</span> <span class="o">=</span> <span class="n">AutoProcessor</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_id</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">Llama4ForConditionalGeneration</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+    <span class="n">model_id</span><span class="p">,</span>
+    <span class="n">torch_dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bfloat16</span><span class="p">,</span>
+    <span class="n">device_map</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">,</span>
+<span class="p">)</span>
 
-<span class="c1"># Load image</span>
+<span class="c1"># Load image and create prompt (the processor downloads the image from the URL)</span>
 <span class="n">url</span> <span class="o">=</span> <span class="s2">"https://example.com/image.jpg"</span>
-<span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">raw</span><span class="p">)</span>
-
-<span class="c1"># Create prompt</span>
-<span class="n">prompt</span> <span class="o">=</span> <span class="s2">"What can you see in this image?"</span>
+<span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"user"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"image"</span><span class="p">,</span> <span class="s2">"url"</span><span class="p">:</span> <span class="n">url</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"text"</span><span class="p">,</span> <span class="s2">"text"</span><span class="p">:</span> <span class="s2">"What can you see in this image?"</span><span class="p">},</span>
+    <span class="p">]}</span>
+<span class="p">]</span>
 
 <span class="c1"># Process inputs</span>
-<span class="n">inputs</span> <span class="o">=</span> <span class="n">processor</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">"pt"</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+<span class="n">inputs</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">apply_chat_template</span><span class="p">(</span>
+    <span class="n">messages</span><span class="p">,</span> <span class="n">add_generation_prompt</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tokenize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">return_dict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">"pt"</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
 
 <span class="c1"># Generate response</span>
 <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="o">**</span><span class="n">inputs</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
 
-<span class="c1"># Decode and print response</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">processor</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="c1"># Decode and print response (only the newly generated tokens)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">processor</span><span class="o">.</span><span class="n">batch_decode</span><span class="p">(</span><span class="n">outputs</span><span class="p">[:,</span> <span class="n">inputs</span><span class="p">[</span><span class="s2">"input_ids"</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:],</span> <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
 </code></pre></div>
-<blockquote>
-<p>Note: the image example uses the <code>LlavaForConditionalGeneration</code> class; the official Transformers class for Llama 4 is <code>Llama4ForConditionalGeneration</code>. Check the current Hugging Face model card before running.</p>
-</blockquote>
 <h2 id="use-cases">Use Cases</h2>
 <ul>
 <li><strong>Software development:</strong> code generation, debugging, documentation, modernizing legacy code, understanding large codebases.</li>

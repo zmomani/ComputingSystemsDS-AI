@@ -5,7 +5,7 @@ source: https://albanna-tutorials.com/moe.html
 ---
 # Mixture of Experts in LLMs
 
-> Based on Dr. Abdulkarim Albanna's lesson "Mixture of Experts in LLMs" (albanna-tutorials.com; an Arabic version exists at moe_ar.html). All five code blocks are reproduced verbatim. Prose was extracted via a fetcher that paraphrases long passages, so wording is close to but not identical to the original; all figures and tables are as published.
+> Based on Dr. Abdulkarim Albanna's lesson "Mixture of Experts in LLMs" (albanna-tutorials.com; an Arabic version exists at moe_ar.html).
 
 ## What is Mixture of Experts (MoE)?
 
@@ -13,7 +13,7 @@ Mixture of Experts is a neural network architecture that replaces a single dense
 
 A **router** (gating network) decides which experts process each token, so only a small subset of the parameters is active at any time. Typical configurations use 8–64 experts per layer with top-2 routing, leaving roughly 20% of parameters active per token.
 
-> "MoE enables models to be pretrained with far less compute, which means you can dramatically scale up the model or dataset size with the same compute budget as a dense model." — Hugging Face blog
+> "Mixture of Experts enable models to be pretrained with far less compute, which means you can dramatically scale up the model or dataset size with the same compute budget as a dense model." — Hugging Face blog
 
 *Figure: Mixture of Experts diagram — multiple specialized expert networks with a routing mechanism that selects the best experts for each token.*
 
@@ -47,7 +47,7 @@ A **router** (gating network) decides which experts process each token, so only 
 Prevents **expert collapse**, where the router sends most tokens to one or two experts. Techniques:
 - An **auxiliary loss** that penalizes uneven routing.
 - **Expert capacity** limits on how many tokens an expert can process per batch.
-- A **router z-loss** that prevents extreme routing logits (attributed on the page to Mistral).
+- A **router z-loss** that prevents extreme routing logits (introduced in Google's ST-MoE).
 
 *Figure: MoE layer detailed (Switch layer) — the router selects experts per token and combines their outputs with learned weights.*
 
@@ -56,10 +56,10 @@ Prevents **expert collapse**, where the router sends most tokens to one or two e
 1. **Improved scalability:** models can reach hundreds of billions of parameters while activating only a fraction per token.
 2. **Computational efficiency:** DeepSeek-V3 (671B total) runs at roughly the cost of a 37B dense model per token — about **18x** parameter efficiency.
 3. **Specialized knowledge:** experts develop niches (math, code, specific languages), giving both depth and breadth.
-4. **Training efficiency:** Mixtral 8x7B matches Llama 2 70B quality with about 5x less pretraining compute per token; DeepSeek-V3 was trained in 2.788M H800 GPU-hours.
+4. **Training efficiency:** Mixtral 8x7B matches or beats Llama 2 70B quality while using about 5x fewer active parameters per token (12.9B vs. 70B); DeepSeek-V3 was trained in 2.788M H800 GPU-hours.
 5. **Flexible resource allocation:** compute is directed where each token needs it, unlike dense models that apply uniform computation.
 
-> "Mixtral outperforms Llama 2 70B on most benchmarks while using 5x fewer active parameters per token." — Mistral AI (2023)
+> "Mixtral outperforms Llama 2 70B on most benchmarks with 6x faster inference." — Mistral AI (2023)
 
 ### Dense vs. MoE comparison
 
@@ -76,19 +76,19 @@ Prevents **expert collapse**, where the router sends most tokens to one or two e
 
 ### Mixtral 8x7B / 8x22B (Mistral AI)
 - 8x7B: **46.7B total, 12.9B active** parameters; outperforms Llama 2 70B.
-- 8x22B (April 2024): **141B total, ~39B active**; 64K context; rivals GPT-4-class models on coding and reasoning. (The page elsewhere states 65B active for 8x22B — the 39B figure matches Mistral's documentation.)
+- 8x22B (April 2024): **141B total, ~39B active**; 64K context; rivals GPT-4-class models on coding and reasoning.
 - Open weights under **Apache 2.0**, token-level routing, **32K context** for 8x7B.
 - Technically: every FFN layer of a Mistral-7B-style transformer is replaced by 8 experts; the router picks the **top 2** and combines their outputs with normalized softmax weights.
 
 ### DeepSeek-V3 (2024)
-- **671B total, 37B active** parameters per token; **256 experts per layer with top-8 routing** (fine-grained experts).
+- **671B total, 37B active** parameters per token; **256 routed experts per layer with top-8 routing, plus 1 shared expert** (fine-grained experts).
 - **Multi-Head Latent Attention (MLA)** for KV-cache efficiency.
-- Trained on 14.8T tokens for about $5.5M; matches GPT-4o on coding (HumanEval 90.2%).
+- Trained on 14.8T tokens for about $5.6M (2.788M H800 GPU-hours); matches or exceeds GPT-4o on coding (HumanEval-Mul 82.6% vs. 80.5%).
 - Technically: **auxiliary-loss-free load balancing** using learned bias terms added to routing logits; FP8 mixed-precision training; a multi-token prediction auxiliary objective.
 
 ### Switch Transformer (Google, 2021)
 - Routes each token to **exactly one expert (top-1)**, keeping the design simple and reducing communication overhead.
-- Scales to **1.6 trillion parameters**; reports a 7x speedup over T5-XXL at the same compute budget.
+- Scales to **1.6 trillion parameters**; reports up to a 7x pre-training speedup over T5-Base (and 4x over T5-XXL) at the same compute budget.
 - Key ideas: expert **capacity factor**, **selective precision**, and an **auxiliary load-balancing loss**.
 
 ### MoE model timeline (2020–2025)
@@ -98,13 +98,13 @@ Prevents **expert collapse**, where the router sends most tokens to one or two e
 | GShard | Google | 2020 | — | — | Top-2, alternating MoE layers |
 | Switch Transformer | Google | 2021 | 1.6T | — | Top-1 |
 | GLaM | Google | 2021 | 1.2T | — | 64 experts per layer |
-| NLLB-MoE | Meta AI | 2022 | — | 1.5B | Translation model |
+| NLLB-MoE | Meta AI | 2022 | 54.5B | — | Translation model, top-2 |
 | Mixtral 8x7B | Mistral AI | 2023 | 46.7B | 12.9B | 8 experts, top-2 |
 | Grok-1 | xAI | 2024 | 314B | — | 8 experts, top-2 |
 | Mixtral 8x22B | Mistral AI | 2024 | 141B | 39B | 8 experts, top-2 |
 | Qwen1.5-MoE | Alibaba | 2024 | 14.3B | 2.7B | — |
 | DeepSeek-V2 | DeepSeek | 2024 | 236B | 21B | Fine-grained MoE |
-| DeepSeek-V3 | DeepSeek | 2024 | 671B | 37B | 256 experts, top-8 |
+| DeepSeek-V3 | DeepSeek | 2024 | 671B | 37B | 256 routed experts + 1 shared, top-8 |
 
 ## Code Examples: Building an MoE Layer in PyTorch
 
@@ -228,14 +228,12 @@ out, probs = moe(x)
 print(f"Input:  {x.shape}")                         # torch.Size([2, 10, 512])
 print(f"Output: {out.shape}")                       # torch.Size([2, 10, 512]) ✓
 
-# Count parameters: 8 experts × (512×2048 + 2048×512) = ~33.6M expert params
-# But only 2/8 experts activate per token = 25% active
+# Count parameters: 8 experts × (512×2048 + 2048 + 2048×512 + 512) = ~16.8M expert params
+# (plus 8×512 = 4,096 router weights). Only 2/8 experts activate per token = 25% active
 total = sum(p.numel() for p in moe.parameters())
 active = total * (moe.top_k / moe.num_experts)
 print(f"Total params: {total:,} | Active per token: {int(active):,}")
 ```
-
-> Note for students: the comment "~33.6M expert params" is off by 2x. Each expert has 512×2048 + 2048 + 2048×512 + 512 ≈ 2.1M parameters, so 8 experts hold ≈ 16.8M. Run the code and check `total` yourself.
 
 ### Step 4: Load Balancing Loss — preventing expert collapse
 
@@ -291,7 +289,7 @@ print(f"Total loss:   {total_loss.item():.4f}")
 
 ```python
 # Install: pip install transformers accelerate bitsandbytes
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 import torch
 
 # ── Option A: Mixtral 8x7B (open weights, Apache-2.0) ──────────────────────
@@ -303,7 +301,7 @@ model = AutoModelForCausalLM.from_pretrained(
     model_name,
     device_map="auto",        # spread across available GPUs/CPU
     torch_dtype=torch.float16,
-    load_in_4bit=True,        # requires bitsandbytes
+    quantization_config=BitsAndBytesConfig(load_in_4bit=True),   # requires bitsandbytes
 )
 
 # Prepare a chat-formatted prompt
@@ -343,7 +341,7 @@ for layer_idx, logits in enumerate(router_logits):
 - Router logits: `logits = W_gate · x`, with `W_gate ∈ R^{num_experts × d_model}` (no bias).
 - Router probabilities: `p = softmax(logits)` over experts.
 - Top-k renormalization: `w_j = p_j / Σ_{i∈TopK} p_i` so the k weights sum to 1.
-- Expert output: `E(x) = W_2 · ReLU(W_1 · x)`.
+- Expert output: `E(x) = W_2 · ReLU(W_1 · x + b_1) + b_2`.
 - Layer output: `y = Σ_{j∈TopK} w_j · E_j(x)`.
 - Load-balancing loss: `L_aux = N · Σ_i f_i · P_i`, where `f_i` = fraction of token assignments sent to expert i and `P_i` = mean router probability for expert i; equals 1.0 under perfectly uniform routing.
 - Total training loss: `L = L_task + 0.01 · L_aux`.

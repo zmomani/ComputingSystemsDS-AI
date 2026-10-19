@@ -5,7 +5,7 @@ source: https://albanna-tutorials.com/llama4.html
 ---
 # Large Language Models — Meta's LLAMA4 Herd
 
-> Based on Dr. Abdulkarim Albanna's lesson "LLAMA4 — Meta's Next Generation of AI" (albanna-tutorials.com). Prose sections were extracted via a fetcher that paraphrases long passages, so wording is close to but not identical to the original; all figures, tables and code are as published. The author's "Example System Prompt" block could not be retrieved verbatim and is summarized below.
+> Based on Dr. Abdulkarim Albanna's lesson "LLAMA4 — Meta's Next Generation of AI" (albanna-tutorials.com).
 
 ## Introduction
 
@@ -94,7 +94,7 @@ A very large model with 288B active and roughly 2T total parameters across 16 ex
 
 ### Example System Prompt for LLAMA4
 
-The author includes Meta's sample system prompt (summarized here; see the original page for the exact text). It sets up an "expert conversationalist who responds to the best of your ability" and asks the model to:
+The author includes Meta's sample system prompt. It sets up an "expert conversationalist who responds to the best of your ability" and asks the model to:
 
 - match tone to the user's mood (listening, humor, emotional support vs. detailed help);
 - avoid templated, preachy or moralizing language and not lecture the user;
@@ -137,10 +137,10 @@ The author includes Meta's sample system prompt (summarized here; see the origin
 
 | Benchmark | Llama 3.3 70B | Llama 4 Scout | Llama 4 Maverick |
 |---|---|---|---|
-| MTOB (half book) eng→kgv | context window is 128K | 54.0 | 42.2 |
-| MTOB (half book) kgv→eng | context window is 128K | 46.4 | 36.6 |
-| MTOB (full book) eng→kgv | context window is 128K | 50.8 | 39.7 |
-| MTOB (full book) kgv→eng | context window is 128K | 46.7 | 36.3 |
+| MTOB (half book) eng→kgv | context window is 128K | 42.2 | 54.0 |
+| MTOB (half book) kgv→eng | context window is 128K | 36.6 | 46.4 |
+| MTOB (full book) eng→kgv | context window is 128K | 39.7 | 50.8 |
+| MTOB (full book) kgv→eng | context window is 128K | 36.3 | 46.7 |
 
 ### Competitive claims
 - Maverick exceeds GPT-4o and Gemini 2.0 Flash on several categories, reached **1417 ELO** on LMArena (experimental chat version), and competes with DeepSeek v3.1 on reasoning and coding with fewer active parameters.
@@ -179,32 +179,28 @@ model = AutoModelForCausalLM.from_pretrained(
     device_map="auto"
 )
 
-# Create prompt
-prompt = """
-<|system|>
-You are an expert assistant that helps users with information about technology.
-</|system|>
-
-<|user|>
-What are the key features of LLAMA4?
-</|user|>
-
-<|assistant|>
-"""
+# Create prompt (the tokenizer's chat template applies Llama 4's own special tokens)
+messages = [
+    {"role": "system", "content": "You are an expert assistant that helps users with information about technology."},
+    {"role": "user", "content": "What are the key features of LLAMA4?"},
+]
 
 # Tokenize prompt
-inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
+input_ids = tokenizer.apply_chat_template(
+    messages, add_generation_prompt=True, return_tensors="pt"
+).to(model.device)
 
 # Generate response
 outputs = model.generate(
-    inputs.input_ids,
+    input_ids,
     max_new_tokens=512,
+    do_sample=True,
     temperature=0.7,
     top_p=0.9,
 )
 
-# Decode and print response
-print(tokenizer.decode(outputs[0], skip_special_tokens=False))
+# Decode and print response (only the newly generated tokens)
+print(tokenizer.decode(outputs[0][input_ids.shape[1]:], skip_special_tokens=True))
 ```
 
 ### Using with vLLM
@@ -226,21 +222,14 @@ sampling_params = SamplingParams(
     max_tokens=512,
 )
 
-# Create prompt
-prompt = """
-<|system|>
-You are an expert assistant that helps users with information about technology.
-</|system|>
-
-<|user|>
-What are the key features of LLAMA4?
-</|user|>
-
-<|assistant|>
-"""
+# Create prompt (vLLM applies the model's chat template)
+messages = [
+    {"role": "system", "content": "You are an expert assistant that helps users with information about technology."},
+    {"role": "user", "content": "What are the key features of LLAMA4?"},
+]
 
 # Generate response
-outputs = llm.generate([prompt], sampling_params)
+outputs = llm.chat(messages, sampling_params)
 
 # Print response
 print(outputs[0].outputs[0].text)
@@ -249,33 +238,39 @@ print(outputs[0].outputs[0].text)
 ### Using LLAMA4 with Images
 
 ```python
-from transformers import AutoProcessor, LlavaForConditionalGeneration
+from transformers import AutoProcessor, Llama4ForConditionalGeneration
 import torch
-from PIL import Image
-import requests
 
-# Load model and processor
-model = LlavaForConditionalGeneration.from_pretrained("meta-llama/Llama-4-Scout-17B-16E-Instruct")
-processor = AutoProcessor.from_pretrained("meta-llama/Llama-4-Scout-17B-16E-Instruct")
+# Load model and processor (requires transformers >= 4.51)
+model_id = "meta-llama/Llama-4-Scout-17B-16E-Instruct"
+processor = AutoProcessor.from_pretrained(model_id)
+model = Llama4ForConditionalGeneration.from_pretrained(
+    model_id,
+    torch_dtype=torch.bfloat16,
+    device_map="auto",
+)
 
-# Load image
+# Load image and create prompt (the processor downloads the image from the URL)
 url = "https://example.com/image.jpg"
-image = Image.open(requests.get(url, stream=True).raw)
-
-# Create prompt
-prompt = "What can you see in this image?"
+messages = [
+    {"role": "user", "content": [
+        {"type": "image", "url": url},
+        {"type": "text", "text": "What can you see in this image?"},
+    ]}
+]
 
 # Process inputs
-inputs = processor(prompt, image, return_tensors="pt").to(model.device)
+inputs = processor.apply_chat_template(
+    messages, add_generation_prompt=True, tokenize=True,
+    return_dict=True, return_tensors="pt",
+).to(model.device)
 
 # Generate response
 outputs = model.generate(**inputs, max_new_tokens=100)
 
-# Decode and print response
-print(processor.decode(outputs[0], skip_special_tokens=True))
+# Decode and print response (only the newly generated tokens)
+print(processor.batch_decode(outputs[:, inputs["input_ids"].shape[-1]:], skip_special_tokens=True)[0])
 ```
-
-> Note: the image example uses the `LlavaForConditionalGeneration` class; the official Transformers class for Llama 4 is `Llama4ForConditionalGeneration`. Check the current Hugging Face model card before running.
 
 ## Use Cases
 
