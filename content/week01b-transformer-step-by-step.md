@@ -7,7 +7,7 @@ source: https://albanna-tutorials.com/transformer-step-by-step.html
 
 *Intermediate · ~30 minutes · AI Applications*
 
-*Material by Dr. Abdulkarim Albanna (Dr. Abedal-Kareem Al-Banna), Assistant Professor, Data Science & AI, University of Petra — ilmy / albanna-tutorials.com. Reproduced here for teaching use with the explanatory prose kept as close to the original as the extraction allowed; all numeric values, formulas and tables are as shown on the original page.*
+*Material by Dr. Abdulkarim Albanna (Dr. Abedal-Kareem Al-Banna), Assistant Professor, Data Science & AI, University of Petra — ilmy / albanna-tutorials.com. Reproduced here for teaching use with the explanatory prose kept as close to the original; the worked-example arithmetic has been checked and recomputed where necessary.*
 
 In this guide we follow **one example sentence** through the whole Transformer, computing every stage by hand with small example numbers:
 
@@ -102,7 +102,7 @@ Scores = Q × Kᵀ
            I   love  learn
 "I"      [ 1,   1,    1 ]
 "love"   [ 1,   1,    0 ]
-"learn"  [ 0,   2,    1 ]
+"learn"  [ 1,   2,    0 ]
 ```
 
 ### Step 3.3 — Scale by √d_k
@@ -114,7 +114,7 @@ Scaled = Scores / √3
 
 "I"      [0.58, 0.58, 0.58]
 "love"   [0.58, 0.58, 0.00]
-"learn"  [0.00, 1.15, 0.58]
+"learn"  [0.58, 1.15, 0.00]
 ```
 
 ### Step 3.4 — Softmax
@@ -126,10 +126,10 @@ Attention weights
 
 "I"      [0.33, 0.33, 0.33]
 "love"   [0.39, 0.39, 0.22]
-"learn"  [0.19, 0.59, 0.22]
+"learn"  [0.30, 0.53, 0.17]
 ```
 
-Notice that **"learning" pays the most attention to "love" (0.59)** — the model has linked the two semantically related words.
+Notice that **"learning" pays the most attention to "love" (0.53)** — the model has linked the two semantically related words.
 
 ### Step 3.5 — Multiply by V
 
@@ -140,7 +140,7 @@ Output = softmax(Q × Kᵀ / √d_k) × V
 
 "I"      → [0.33, 0.33, 0.33]
 "love"   → [0.39, 0.39, 0.22]
-"learn"  → [0.19, 0.59, 0.22]
+"learn"  → [0.30, 0.53, 0.17]
 ```
 
 The complete formula:
@@ -167,10 +167,10 @@ MultiHead(Q, K, V) = Concat(head₁, …, head₈) × Wᴼ
 The example uses **2 heads** for the word "learn":
 
 ```text
-Head 1 ("learn") → [0.19, 0.59, 0.22]
+Head 1 ("learn") → [0.30, 0.53, 0.17]
 Head 2 ("learn") → [0.45, 0.10, 0.45]
 
-Concat             → [0.19, 0.59, 0.22, 0.45, 0.10, 0.45]
+Concat             → [0.30, 0.53, 0.17, 0.45, 0.10, 0.45]
 × Wᴼ (project back) → [0.30, 0.40, 0.30]
 ```
 
@@ -198,14 +198,14 @@ Worked example for "learn" (first 3 dimensions):
 
 ```text
 x (input)          = [1.31, 0.18, 0.52]
-Attention output   = [0.19, 0.59, 0.22]
-After residual     = [1.50, 0.77, 0.74]
+Attention output   = [0.30, 0.53, 0.17]
+After residual     = [1.61, 0.71, 0.69]
 
 μ (mean)           = 1.00
-σ² (variance)      = 0.12
-√(σ² + ε)          ≈ 0.35
+σ² (variance)      = 0.18
+√(σ² + ε)          ≈ 0.43
 
-LayerNorm output   = [1.43, -0.66, -0.74]
+LayerNorm output   = [1.41, -0.68, -0.73]
 ```
 
 ---
@@ -221,7 +221,7 @@ FFN(x) = max(0, x × W₁ + b₁) × W₂ + b₂
 Worked example:
 
 ```text
-Input              = [1.43, -0.66, -0.74]
+Input              = [1.41, -0.68, -0.73]
 After W₁ + b₁      = [2.1, -0.3, 1.5, -1.2]
 After ReLU         = [2.1,  0.0, 1.5,  0.0]
 After W₂ + b₂      = [0.8,  0.5, 0.3]
@@ -250,7 +250,7 @@ Scores before mask            After mask                    After softmax
           أنا  أحب  ???              أنا   أحب   ???                 أنا   أحب   ???
 "أنا"   [0.8, 0.5, 0.3]      "أنا"  [0.8,  -∞,   -∞ ]      "أنا"  [1.00, 0.00, 0.00]
 "أحب"   [0.6, 0.9, 0.4]      "أحب"  [0.6,  0.9,  -∞ ]      "أحب"  [0.43, 0.57, 0.00]
-"???"   [0.3, 0.7, 0.8]      "???"  [0.3,  0.7,  0.8]      "???"  [0.17, 0.37, 0.46]
+"???"   [0.3, 0.7, 0.8]      "???"  [0.3,  0.7,  0.8]      "???"  [0.24, 0.36, 0.40]
 ```
 
 Each word attends only to itself and the words before it.
@@ -270,7 +270,7 @@ Scores against encoder keys:
    "love"     → 0.90
    "learning" → 0.83
 
-Softmax → [0.22, 0.40, 0.38]
+Softmax → [0.26, 0.38, 0.36]
 ```
 
 The third Arabic word attends most strongly to "love" and "learning" — exactly the English words it needs to translate.

@@ -8,7 +8,7 @@ source: https://albanna-tutorials.com/transformer-qa.html
 *21 questions covering every component of the Transformer architecture.*
 *Intermediate · 21 Questions · Covers All Components · Exam Ready*
 
-*Material by Dr. Abdulkarim Albanna (Dr. Abedal-Kareem Al-Banna), Assistant Professor, Data Science & AI, University of Petra — ilmy / albanna-tutorials.com. Reproduced here for teaching use; formulas, code blocks, tables and examples are as on the original page, with the prose kept as close to the original as the extraction allowed.*
+*Material by Dr. Abdulkarim Albanna (Dr. Abedal-Kareem Al-Banna), Assistant Professor, Data Science & AI, University of Petra — ilmy / albanna-tutorials.com. Reproduced here for teaching use; formulas, tables and examples are as on the original page, with the prose kept as close to the original as possible.*
 
 ---
 

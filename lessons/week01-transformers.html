@@ -28,7 +28,6 @@
   <div class="callout sim"><div class="sim-strip"><b style="margin-right:4px">Simulations for this week:</b><button class="chip" data-sim="attention">▶ Self-attention: Q·Kᵀ → softmax → ·V</button><button class="chip" data-sim="matrix-multiply">▶ Matrix multiplication, step by step</button><button class="chip" data-sim="vectors">▶ Vectors, dot product &amp; cosine similarity</button><button class="chip" data-sim="tokenizer">▶ Subword tokenisation</button><button class="chip" data-sim="positional">▶ Positional encoding</button></div></div>
   <h2 id="part-understanding-transformer-architecture">Understanding Transformer Architecture</h2>
 <p>Companion pages linked from the lesson:</p>
-<p>In-page sections: Introduction · Evolution · Architecture · Components · Interactive Demo · Code Examples · Applications · Resources · Conclusion.</p>
 <h2 id="introduction">Introduction</h2>
 <p>The Transformer architecture was introduced in the 2017 paper <strong>"Attention Is All You Need"</strong> by Vaswani et al. Earlier sequence models processed data one step at a time; the Transformer instead uses <strong>self-attention</strong> to process an entire sequence at once. This parallelism allows Transformers to:</p>
 <ul>
@@ -409,7 +408,7 @@
 </tr>
 <tr>
 <td>DALL-E / Stable Diffusion</td>
-<td>Diffusion models with transformers</td>
+<td>Generative image models with transformer components (autoregressive in DALL-E 1, diffusion in DALL-E 2 and Stable Diffusion)</td>
 <td>Text conditioning, latent diffusion</td>
 <td>Text-to-image generation, image editing</td>
 </tr>
@@ -517,7 +516,7 @@ V = X × Wv      (Value  — the information the word passes on)
            I   love  learn
 "I"      [ 1,   1,    1 ]
 "love"   [ 1,   1,    0 ]
-"learn"  [ 0,   2,    1 ]
+"learn"  [ 1,   2,    0 ]
 </code></pre></div>
 <h3 id="step-33-scale-by-d_k">Step 3.3 — Scale by √d_k</h3>
 <p>Dividing by √d_k (√3 ≈ 1.73) keeps the scores from becoming too large, which would push softmax into saturation (outputs near 0 or 1) and slow learning:</p>
@@ -525,7 +524,7 @@ V = X × Wv      (Value  — the information the word passes on)
 
 "I"      [0.58, 0.58, 0.58]
 "love"   [0.58, 0.58, 0.00]
-"learn"  [0.00, 1.15, 0.58]
+"learn"  [0.58, 1.15, 0.00]
 </code></pre></div>
 <h3 id="step-34-softmax">Step 3.4 — Softmax</h3>
 <p>Softmax converts each row into probabilities that sum to 1:</p>
@@ -533,16 +532,16 @@ V = X × Wv      (Value  — the information the word passes on)
 
 "I"      [0.33, 0.33, 0.33]
 "love"   [0.39, 0.39, 0.22]
-"learn"  [0.19, 0.59, 0.22]
+"learn"  [0.30, 0.53, 0.17]
 </code></pre></div>
-<p>Notice that <strong>"learning" pays the most attention to "love" (0.59)</strong> — the model has linked the two semantically related words.</p>
+<p>Notice that <strong>"learning" pays the most attention to "love" (0.53)</strong> — the model has linked the two semantically related words.</p>
 <h3 id="step-35-multiply-by-v">Step 3.5 — Multiply by V</h3>
 <p>Each output is the weighted sum of the Value vectors:</p>
 <div class="highlight"><pre><span></span><code>Output = softmax(Q × Kᵀ / √d_k) × V
 
 "I"      → [0.33, 0.33, 0.33]
 "love"   → [0.39, 0.39, 0.22]
-"learn"  → [0.19, 0.59, 0.22]
+"learn"  → [0.30, 0.53, 0.17]
 </code></pre></div>
 <p>The complete formula:</p>
 <div class="highlight"><pre><span></span><code>Attention(Q, K, V) = softmax( Q × Kᵀ / √d_k ) × V
@@ -558,10 +557,10 @@ head₈ = Attention(X×Wq⁸, X×Wk⁸, X×Wv⁸)
 MultiHead(Q, K, V) = Concat(head₁, …, head₈) × Wᴼ
 </code></pre></div>
 <p>The example uses <strong>2 heads</strong> for the word "learn":</p>
-<div class="highlight"><pre><span></span><code>Head 1 ("learn") → [0.19, 0.59, 0.22]
+<div class="highlight"><pre><span></span><code>Head 1 ("learn") → [0.30, 0.53, 0.17]
 Head 2 ("learn") → [0.45, 0.10, 0.45]
 
-Concat             → [0.19, 0.59, 0.22, 0.45, 0.10, 0.45]
+Concat             → [0.30, 0.53, 0.17, 0.45, 0.10, 0.45]
 × Wᴼ (project back) → [0.30, 0.40, 0.30]
 </code></pre></div>
 <hr />
@@ -576,14 +575,14 @@ Concat             → [0.19, 0.59, 0.22, 0.45, 0.10, 0.45]
 </code></pre></div>
 <p>Worked example for "learn" (first 3 dimensions):</p>
 <div class="highlight"><pre><span></span><code>x (input)          = [1.31, 0.18, 0.52]
-Attention output   = [0.19, 0.59, 0.22]
-After residual     = [1.50, 0.77, 0.74]
+Attention output   = [0.30, 0.53, 0.17]
+After residual     = [1.61, 0.71, 0.69]
 
 μ (mean)           = 1.00
-σ² (variance)      = 0.12
-√(σ² + ε)          ≈ 0.35
+σ² (variance)      = 0.18
+√(σ² + ε)          ≈ 0.43
 
-LayerNorm output   = [1.43, -0.66, -0.74]
+LayerNorm output   = [1.41, -0.68, -0.73]
 </code></pre></div>
 <hr />
 <h2 id="6-feed-forward-network-ffn">6. Feed-Forward Network (FFN)</h2>
@@ -591,7 +590,7 @@ LayerNorm output   = [1.43, -0.66, -0.74]
 <div class="highlight"><pre><span></span><code>FFN(x) = max(0, x × W₁ + b₁) × W₂ + b₂
 </code></pre></div>
 <p>Worked example:</p>
-<div class="highlight"><pre><span></span><code>Input              = [1.43, -0.66, -0.74]
+<div class="highlight"><pre><span></span><code>Input              = [1.41, -0.68, -0.73]
 After W₁ + b₁      = [2.1, -0.3, 1.5, -1.2]
 After ReLU         = [2.1,  0.0, 1.5,  0.0]
 After W₂ + b₂      = [0.8,  0.5, 0.3]
@@ -609,7 +608,7 @@ After W₂ + b₂      = [0.8,  0.5, 0.3]
           أنا  أحب  ???              أنا   أحب   ???                 أنا   أحب   ???
 "أنا"   [0.8, 0.5, 0.3]      "أنا"  [0.8,  -∞,   -∞ ]      "أنا"  [1.00, 0.00, 0.00]
 "أحب"   [0.6, 0.9, 0.4]      "أحب"  [0.6,  0.9,  -∞ ]      "أحب"  [0.43, 0.57, 0.00]
-"???"   [0.3, 0.7, 0.8]      "???"  [0.3,  0.7,  0.8]      "???"  [0.17, 0.37, 0.46]
+"???"   [0.3, 0.7, 0.8]      "???"  [0.3,  0.7,  0.8]      "???"  [0.24, 0.36, 0.40]
 </code></pre></div>
 <p>Each word attends only to itself and the words before it.</p>
 <h3 id="72-cross-attention-encoderdecoder-attention">7.2 Cross-Attention (Encoder–Decoder Attention)</h3>
@@ -625,7 +624,7 @@ Scores against encoder keys:
    "love"     → 0.90
    "learning" → 0.83
 
-Softmax → [0.22, 0.40, 0.38]
+Softmax → [0.26, 0.38, 0.36]
 </code></pre></div>
 <p>The third Arabic word attends most strongly to "love" and "learning" — exactly the English words it needs to translate.</p>
 <h3 id="73-feed-forward-residual-layernorm">7.3 Feed-Forward + Residual + LayerNorm</h3>

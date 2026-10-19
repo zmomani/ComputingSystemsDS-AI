@@ -92,7 +92,7 @@ pip<span class="w"> </span>install<span class="w"> </span>langgraph<span class="
 pip<span class="w"> </span>install<span class="w"> </span>langchain-community<span class="w"> </span>tavily-python
 
 <span class="c1"># Verify installation</span>
-python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import langgraph; print(f'LangGraph version: {langgraph.__version__}')"</span>
+python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"from importlib.metadata import version; print(f'LangGraph version: {version(\"langgraph\")}')"</span>
 </code></pre></div>
 <h3 id="setting-up-api-keys">Setting Up API Keys</h3>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
@@ -275,7 +275,7 @@ python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import
 <h2 id="step-4-core-concepts-nodes">Step 4: Core Concepts – Nodes</h2>
 <p><strong>Nodes</strong> are plain Python functions. Each takes the current state, performs an operation, and returns a partial update.</p>
 <h3 id="node-signature">Node Signature</h3>
-<p>The function receives the <strong>full</strong> state and returns <strong>only</strong> the keys it modifies. Returning only changed keys is how LangGraph detects what changed.</p>
+<p>The function receives the <strong>full</strong> state and returns <strong>only</strong> the keys it modifies. Keys that are not returned are left unchanged.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">my_node</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">MyState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Args:</span>
@@ -312,7 +312,9 @@ python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import
 <h3 id="tool-execution-node">Tool Execution Node</h3>
 <p>Runs the tools the LLM requested and wraps each result in a <code>ToolMessage</code>. (In practice the prebuilt <code>ToolNode</code> from Step 7 does this for you.)</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.messages</span><span class="w"> </span><span class="kn">import</span> <span class="n">ToolMessage</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+<span class="c1"># tool_registry maps each tool's name to the tool object,</span>
+<span class="c1"># e.g. tool_registry = {t.name: t for t in tools}</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">tool_executor_node</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">MessagesState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Execute tools that the LLM requested."""</span>
@@ -338,6 +340,7 @@ python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import
 <p>Performs plain computation (here, text analysis) with or without an LLM call.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TypedDict</span><span class="p">,</span> <span class="n">Annotated</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">operator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_openai</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatOpenAI</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">AnalysisState</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
     <span class="n">raw_text</span><span class="p">:</span> <span class="nb">str</span>
@@ -381,7 +384,7 @@ python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import
 <span class="c1"># Node names are used when defining edges (next step!)</span>
 </code></pre></div>
 <blockquote>
-<p><strong>Common mistake:</strong> node names must be unique. A duplicate name overwrites the earlier node.</p>
+<p><strong>Common mistake:</strong> node names must be unique. Adding a second node with the same name raises a <code>ValueError</code> ("Node <code>analyze</code> already present").</p>
 <p><strong>Key takeaway:</strong> a node can do almost anything — call an LLM, run a tool, hit an API. It only has to accept state and return a partial state.</p>
 </blockquote>
 <h2 id="step-5-core-concepts-edges">Step 5: Core Concepts – Edges</h2>
@@ -406,8 +409,9 @@ python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import
 <h3 id="conditional-edges">Conditional Edges</h3>
 <p>The most powerful edge type. A <strong>routing function</strong> inspects state and returns a string; a <strong>path map</strong> turns that string into the next node. This enables branching and loops.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph.graph.message</span><span class="w"> </span><span class="kn">import</span> <span class="n">MessagesState</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">route_after_agent</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">MyState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"tools"</span><span class="p">,</span> <span class="s2">"end"</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">route_after_agent</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">MessagesState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"tools"</span><span class="p">,</span> <span class="s2">"end"</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">"""Decide what happens after the agent node runs.</span>
 
 <span class="sd">    This function inspects the state and returns a STRING</span>
@@ -1564,7 +1568,7 @@ python-dotenv&gt;=1.0.0
     <span class="n">path</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s2">"chat.urls"</span><span class="p">)),</span>
 <span class="p">]</span>
 </code></pre></div>
-<h3 id="step-6-django-urls-chaturlspy">Step 6: Django URLs (chat/urls.py)</h3>
+<h3 id="step-6-continued-app-urls-chaturlspy">Step 6 (continued): App URLs (chat/urls.py)</h3>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">views</span>
 

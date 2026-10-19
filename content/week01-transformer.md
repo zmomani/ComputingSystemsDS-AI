@@ -6,17 +6,13 @@ author: Dr. Abedal-Kareem Al-Banna (Dr. Abdulkarim Albanna), University of Petra
 ---
 # Understanding Transformer Architecture
 
-> *An interactive guide to modern neural networks.* Material by Dr. Abedal-Kareem Al-Banna (ilmy / albanna-tutorials.com). The original page was created with JavaScript, D3.js and MathJax.
->
-> **Extraction note:** The source page was read through a fetch tool that paraphrases rather than copies text, so prose below is a close paraphrase of Dr. Albanna's wording and the code blocks are faithful reconstructions from line-by-line descriptions of the originals (same class names, arguments, shapes and printed labels). Interactive D3 visualizations are described in text.
+> *An interactive guide to modern neural networks.* Material by Dr. Abedal-Kareem Al-Banna (ilmy / albanna-tutorials.com). The original page was created with JavaScript, D3.js and MathJax; its interactive visualizations are described in text below.
 
 Companion pages linked from the lesson:
 
 - Worked example, "I love learning" → "أنا أحب التعلم", with actual calculations for every Transformer operation (English): https://albanna-tutorials.com/transformer-step-by-step.html
 - Same worked example in Arabic: https://albanna-tutorials.com/transformer-step-by-step-ar.html
 - Transformer Q&A (21 questions): https://albanna-tutorials.com/transformer-qa.html
-
-In-page sections: Introduction · Evolution · Architecture · Components · Interactive Demo · Code Examples · Applications · Resources · Conclusion.
 
 ## Introduction
 
@@ -368,7 +364,7 @@ CLIP (linking text and images), text-to-image generation, image captioning, visu
 | GPT (1–4) | Decoder-only | Autoregressive training, growing model size | Text generation, creative writing, coding, chatbots |
 | T5 | Encoder–decoder | Every task framed as text-to-text | Translation, summarization, classification |
 | ViT | Encoder-only (vision) | Images treated as sequences of 16×16 patches | Image classification, object detection |
-| DALL-E / Stable Diffusion | Diffusion models with transformers | Text conditioning, latent diffusion | Text-to-image generation, image editing |
+| DALL-E / Stable Diffusion | Generative image models with transformer components (autoregressive in DALL-E 1, diffusion in DALL-E 2 and Stable Diffusion) | Text conditioning, latent diffusion | Text-to-image generation, image editing |
 
 **Model explorer — BERT.** Uses only the encoder and is trained bidirectionally. Pre-training objectives: masked language modeling and next-sentence prediction. Variants: BERT-base (12 layers) and BERT-large (24 layers). Uses: text classification, NER, question answering, sentiment analysis, document retrieval.
 
