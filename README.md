@@ -1,6 +1,6 @@
 # 606363 · Computing Systems for Data Science and AI
 
-Course website for the University of Petra section taught by **Dr. Zaid G. Momani**, built on the course materials of **Dr. Abdulkarim Albanna** ([albanna-tutorials.com/cs](https://albanna-tutorials.com/cs/)).
+Course website for the University of Petra section taught by **Dr. Zaid G. Momani**.
 
 **Live site:** https://zmomani.github.io/ComputingSystemsDS-AI/
 
@@ -59,4 +59,4 @@ Pages are static; GitHub Pages serves the repository root (see `.github/workflow
 
 ## Credits
 
-Lesson content © Dr. Abdulkarim Albanna, University of Petra — used for the same course with attribution; each lesson links to its original page. Site structure, simulations, test code and teaching notes added for this section. References: Vaswani et al. 2017; Yao et al. 2023; Ho et al. 2020; Holtzman et al. 2020; Tunstall et al. 2022; Huyen 2025.
+This site is based on the course site [albanna-tutorials.com/cs](https://albanna-tutorials.com/cs/) by Dr. Abdulkarim Albanna, used with the author's permission. Simulations, test code and teaching notes were added for this section.

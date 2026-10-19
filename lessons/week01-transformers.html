@@ -26,17 +26,8 @@
   <div class="lesson-head"><div class="eyebrow">Week 1 · ILO K1</div><h1>Transformer Architecture</h1>
   <p class="credit"><b>Topics:</b> Transformer architecture, encoder-decoder framework, Hugging Face ecosystem<br><b>Project milestone:</b> Form teams, create the GitHub repo, set up the project and API keys, write a Transformer analysis</p></div>
   <div class="callout sim"><div class="sim-strip"><b style="margin-right:4px">Simulations for this week:</b><button class="chip" data-sim="attention">▶ Self-attention: Q·Kᵀ → softmax → ·V</button><button class="chip" data-sim="matrix-multiply">▶ Matrix multiplication, step by step</button><button class="chip" data-sim="vectors">▶ Vectors, dot product &amp; cosine similarity</button><button class="chip" data-sim="tokenizer">▶ Subword tokenisation</button><button class="chip" data-sim="positional">▶ Positional encoding</button></div></div>
-  <h2 id="part-understanding-transformer-architecture">Understanding Transformer Architecture</h2><p class="credit">Source page: <a href="https://albanna-tutorials.com/transformer.html">https://albanna-tutorials.com/transformer.html</a></p>
-<blockquote>
-<p><em>An interactive guide to modern neural networks.</em> Material by Dr. Abedal-Kareem Al-Banna (ilmy / albanna-tutorials.com). The original page was created with JavaScript, D3.js and MathJax.</p>
-<p><strong>Extraction note:</strong> The source page was read through a fetch tool that paraphrases rather than copies text, so prose below is a close paraphrase of Dr. Albanna's wording and the code blocks are faithful reconstructions from line-by-line descriptions of the originals (same class names, arguments, shapes and printed labels). Interactive D3 visualizations are described in text.</p>
-</blockquote>
+  <h2 id="part-understanding-transformer-architecture">Understanding Transformer Architecture</h2>
 <p>Companion pages linked from the lesson:</p>
-<ul>
-<li>Worked example, "I love learning" → "أنا أحب التعلم", with actual calculations for every Transformer operation (English): https://albanna-tutorials.com/transformer-step-by-step.html</li>
-<li>Same worked example in Arabic: https://albanna-tutorials.com/transformer-step-by-step-ar.html</li>
-<li>Transformer Q&amp;A (21 questions): https://albanna-tutorials.com/transformer-qa.html</li>
-</ul>
 <p>In-page sections: Introduction · Evolution · Architecture · Components · Interactive Demo · Code Examples · Applications · Resources · Conclusion.</p>
 <h2 id="introduction">Introduction</h2>
 <p>The Transformer architecture was introduced in the 2017 paper <strong>"Attention Is All You Need"</strong> by Vaswani et al. Earlier sequence models processed data one step at a time; the Transformer instead uses <strong>self-attention</strong> to process an entire sequence at once. This parallelism allows Transformers to:</p>
@@ -464,9 +455,8 @@
 <li>Scalability to very large models with steady performance gains</li>
 <li>A foundation for state-of-the-art systems across many applications</li>
 </ul>
-<h2 id="part-transformer-complete-step-by-step-guide-with-one-example">&quot;Transformer — Complete Step-by-Step Guide with One Example&quot;</h2><p class="credit">Source page: <a href="https://albanna-tutorials.com/transformer-step-by-step.html">https://albanna-tutorials.com/transformer-step-by-step.html</a></p>
+<h2 id="part-transformer-complete-step-by-step-guide-with-one-example">&quot;Transformer — Complete Step-by-Step Guide with One Example&quot;</h2>
 <p><em>Intermediate · ~30 minutes · AI Applications</em></p>
-<p><em>Material by Dr. Abdulkarim Albanna (Dr. Abedal-Kareem Al-Banna), Assistant Professor, Data Science &amp; AI, University of Petra — ilmy / albanna-tutorials.com. Reproduced here for teaching use with the explanatory prose kept as close to the original as the extraction allowed; all numeric values, formulas and tables are as shown on the original page.</em></p>
 <p>In this guide we follow <strong>one example sentence</strong> through the whole Transformer, computing every stage by hand with small example numbers:</p>
 <blockquote>
 <p><strong>Input (English):</strong> I love learning
@@ -769,11 +759,10 @@ Linear → Softmax over the vocabulary:
 </table>
 <hr />
 <p><em>Prepared by Dr. Abdulkarim Albanna — AI Applications Course.</em>
-<em>Related pages on the original site: <a href="https://albanna-tutorials.com/transformer.html">Transformer Overview</a> · <a href="https://albanna-tutorials.com/transformer-qa.html">Transformer Q&amp;A</a> · <a href="https://albanna-tutorials.com/transformer-step-by-step-ar.html">الشرح بالعربي</a></em></p>
-<h2 id="part-transformer-questions-answers">&quot;Transformer: Questions &amp; Answers&quot;</h2><p class="credit">Source page: <a href="https://albanna-tutorials.com/transformer-qa.html">https://albanna-tutorials.com/transformer-qa.html</a></p>
+<em>Related pages on the original site: <a href="week01-transformers.html">Transformer Overview</a> · <a href="week01-transformers.html#part-transformer-questions-answers">Transformer Q&amp;A</a> · <a href="week01-transformers.html#part-transformer-complete-step-by-step-guide-with-one-example">الشرح بالعربي</a></em></p>
+<h2 id="part-transformer-questions-answers">&quot;Transformer: Questions &amp; Answers&quot;</h2>
 <p><em>21 questions covering every component of the Transformer architecture.</em>
 <em>Intermediate · 21 Questions · Covers All Components · Exam Ready</em></p>
-<p><em>Material by Dr. Abdulkarim Albanna (Dr. Abedal-Kareem Al-Banna), Assistant Professor, Data Science &amp; AI, University of Petra — ilmy / albanna-tutorials.com. Reproduced here for teaching use; formulas, code blocks, tables and examples are as on the original page, with the prose kept as close to the original as the extraction allowed.</em></p>
 <hr />
 <h2 id="q1-what-is-a-transformer">Q1. What is a Transformer?</h2>
 <p>A <strong>Transformer</strong> is a deep learning architecture introduced in the 2017 paper <strong>"Attention Is All You Need"</strong> by Vaswani et al. (Google).</p>
@@ -1205,10 +1194,10 @@ Step 3: Input = [START, أنا, أحب]    → predict "التعلم"
 </ul>
 <hr />
 <p><em>Prepared by Dr. Abdulkarim Albanna — AI Applications Course.</em>
-<em>Related pages on the original site: <a href="https://albanna-tutorials.com/transformer.html">Transformer Overview</a> · <a href="https://albanna-tutorials.com/transformer-step-by-step.html">Step-by-Step Guide</a> · <a href="https://albanna-tutorials.com/transformer-step-by-step-ar.html">الشرح بالعربي</a></em></p>
+<em>Related pages on the original site: <a href="week01-transformers.html">Transformer Overview</a> · <a href="week01-transformers.html#part-transformer-complete-step-by-step-guide-with-one-example">Step-by-Step Guide</a> · <a href="week01-transformers.html#part-transformer-complete-step-by-step-guide-with-one-example">الشرح بالعربي</a></em></p>
   <div class="pager"><span></span><a class="next" href="week02-text-classification.html"><small>Next</small>Week 2: Text Classification</a></div>
   <footer style="margin-top:3rem;padding-top:1rem;border-top:1px solid var(--border);font-size:.84rem;color:var(--muted)">
-Course materials by <a href="https://albanna-tutorials.com/cs/">Dr. Abdulkarim Albanna</a> (University of Petra), adapted for the section taught by Dr. Zaid G. Momani. Interactive simulations and test code added for this site. Source on <a href="https://github.com/zmomani/ComputingSystemsDS-AI">GitHub</a>.
+This site is based on the course site <a href="https://albanna-tutorials.com/cs/">albanna-tutorials.com/cs</a> by Dr. Abdulkarim Albanna, used with the author's permission.
 </footer>
 </main><aside class="rail">
   <div class="rail-tabs"><button class="active" data-panel="panel-sims">Simulations</button><button data-panel="panel-code">Test code</button></div>

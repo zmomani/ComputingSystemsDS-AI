@@ -142,8 +142,14 @@ def parse(path: Path):
         return chunk
     concepts = cut('Key concepts worth simulating')
     testcode = cut('Test code')
-    # drop the top-level H1 (we render our own header)
+    # drop the top-level H1 (we render our own header) and any author/source preamble before the first H2
     text = re.sub(r'^\s*# [^\n]*\n', '', text, count=1)
+    first = re.search(r'\n## ', text)
+    if first:
+        pre, rest = text[:first.start()], text[first.start():]
+        pre = '\n'.join(l for l in pre.split('\n') if not re.search(r'albanna|al-banna|ilmy|extraction note|material by|course site', l, re.I))
+        pre = re.sub(r'^>\s*$', '', pre, flags=re.M)
+        text = pre + rest
     return meta, text, concepts, testcode
 
 def snippets_from(testcode: str):
@@ -246,7 +252,7 @@ def scripts(depth):
 
 def footer():
     return f'''<footer style="margin-top:3rem;padding-top:1rem;border-top:1px solid var(--border);font-size:.84rem;color:var(--muted)">
-Course materials by <a href="{ORIGINAL_SITE}">{ORIGINAL_AUTHOR}</a> (University of Petra), adapted for the section taught by {INSTRUCTOR}. Interactive simulations and test code added for this site. Source on <a href="https://github.com/zmomani/ComputingSystemsDS-AI">GitHub</a>.
+This site is based on the course site <a href="{ORIGINAL_SITE}">albanna-tutorials.com/cs</a> by {ORIGINAL_AUTHOR}, used with the author's permission.
 </footer>'''
 
 # ---------------------------------------------------------------- pages
@@ -260,10 +266,24 @@ def render_body(files):
         MD.reset()
         body = MD.convert(text)
         if len(files) > 1:
-            parts.append(f'<h2 id="part-{slugify(meta.get("title", f))}">{html.escape(meta.get("title", f))}</h2><p class="credit">Source page: <a href="{meta.get("source", "")}">{meta.get("source", "")}</a></p>')
-        parts.append(body)
+            parts.append(f'<h2 id="part-{slugify(meta.get("title", f))}">{html.escape(meta.get("title", f))}</h2>')
+        parts.append(localise_links(body))
         snippets += snippets_from(testcode)
     return '\n'.join(parts), snippets
+
+URL_MAP = {
+  'transformer.html': 'week01-transformers.html', 'transformer-step-by-step.html': 'week01-transformers.html#part-transformer-complete-step-by-step-guide-with-one-example',
+  'transformer-step-by-step-ar.html': 'week01-transformers.html#part-transformer-complete-step-by-step-guide-with-one-example', 'transformer-qa.html': 'week01-transformers.html#part-transformer-questions-answers',
+  'textClassification.html': 'week02-text-classification.html', 'langchain.html': 'week04-langchain.html', 'database.html': 'week04-langchain.html#part-chat-with-databases',
+  'langgraph.html': 'week05-langgraph.html', 'llama4.html': 'week06-llms.html', 'moe.html': 'week07-moe.html', 'react-agent.html': 'week09-react-agents.html',
+  'llm_agents.html': 'week10-multi-agent.html', 'a2a.html': 'week10-multi-agent.html#part-agent-to-agent-protocols-a2a-and-mcp', 'mcp.html': 'week11-mcp.html', 'diffusion.html': 'week13-diffusion.html',
+  'cs/syllabus.html': 'syllabus.html', 'cs/project_research_assistant.html': 'project.html', 'cs/': '../index.html',
+}
+def localise_links(body):
+    def rep(m):
+        page = m.group(1)
+        return m.group(0).replace(m.group(0), m.group(0)) if page not in URL_MAP else URL_MAP[page]
+    return re.sub(r'https?://(?:www\.)?(?:albanna-tutorials\.com|ilmy\.me)/([A-Za-z0-9_./-]+)', lambda m: URL_MAP.get(m.group(1), m.group(0)), body)
 
 def slugify(s): return re.sub(r'[^a-z0-9]+', '-', s.lower()).strip('-')
 
@@ -306,7 +326,7 @@ def index_page():
   <section class="hero"><div class="eyebrow" style="font-size:.78rem;text-transform:uppercase;letter-spacing:.1em;color:var(--accent-2);font-weight:700">{COURSE_CODE} · Faculty of Information Technology · University of Petra</div>
   <h1>Computing Systems for Data Science and Artificial Intelligence</h1>
   <p class="sub">A 16-week, project-driven course from transformers to agents: LLMs, Mixture of Experts, ReAct, multi-agent systems, MCP, Large Action Models and diffusion — built around a multi-agent research assistant that competes live in Week 15.</p>
-  <p class="credit">Section taught by <b>{INSTRUCTOR}</b>. Course materials by <a href="{ORIGINAL_SITE}">{ORIGINAL_AUTHOR}</a>; this site adds interactive simulations, animations and runnable test code for each week.</p>
+  <p class="credit">Section taught by <b>{INSTRUCTOR}</b>. Every week has its lesson, interactive simulations and animations, and runnable test code.</p>
   <p><a class="btn" href="lessons/week01-transformers.html">Start with Week 1 →</a> <a class="btn secondary" href="lessons/syllabus.html">Syllabus</a> <a class="btn secondary" href="lessons/project.html">Final project</a></p></section>
 
   <h2 id="overview">Course overview</h2>
