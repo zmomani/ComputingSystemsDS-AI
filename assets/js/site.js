@@ -115,8 +115,10 @@
   $$("[data-colab-link]").forEach((a) => { if (COLAB) a.href = COLAB; else a.remove(); });
   function vscodeNote(what) {
     const d = document.createElement("div"); d.className = "colab-note";
-    d.innerHTML = `<p>${what}</p><p>It starts programs on your own computer (a local model, a server, a web app or a real browser), which neither this page nor Google Colab can do.</p>` +
-      `<p><button class="btn ghost" data-copy-editor>Copy the code</button> then paste it into VS Code and run it with the course environment.</p>`;
+    d.innerHTML = `<p>${what}</p><p>It starts a program on a machine (a local model, a server, a web app or a real browser), which neither this page nor Google Colab can do.</p>` +
+      `<p><a class="btn codespaces" href="${lesson.dataset.codespaces}" target="_blank" rel="noopener">⧉ Open in Codespaces</a> ` +
+      `<button class="btn ghost" data-copy-editor>Copy the code</button></p>` +
+      `<p class="small">Codespaces is VS Code in your browser, already set up for this course. Open <code>notebooks/</code> for this lesson's code, or paste the copied code into a new file. <a href="${lesson.dataset.guide}" target="_blank" rel="noopener">How to use it</a></p>`;
     el.out.appendChild(d);
     d.querySelector("[data-copy-editor]").addEventListener("click", (e) => copyText(editor.getValue(), e.currentTarget));
   }
@@ -126,7 +128,7 @@
     d.innerHTML = `<p>${what}</p><p>` +
       (COLAB ? `<a class="btn colab" href="${COLAB}" target="_blank" rel="noopener"><span class="colab-logo">CO</span> Run it in Google Colab</a> ` : "") +
       (browser ? `<button class="btn ghost" data-goto-browser>Run the in-browser version</button>` : "") +
-      `</p><p class="small">In Colab the examples are in the same order as on this page — run the cells from the top so earlier code is defined. Or copy the code and run it in VS Code.</p>`;
+      `</p><p class="small">In Colab the examples are in the same order as on this page — run the cells from the top so earlier code is defined. The same notebooks also open in <a href="${lesson.dataset.codespaces}" target="_blank" rel="noopener">GitHub Codespaces</a> (folder <code>notebooks/</code>).</p>`;
     el.out.appendChild(d);
     const g = d.querySelector("[data-goto-browser]");
     if (g) g.addEventListener("click", () => browser.scrollIntoView({ behavior: "smooth", block: "start" }));
@@ -251,7 +253,7 @@ builtins.input = input
       const mods = await loadPackagesFor(py, setup + "\n" + code);
       const unavailable = mods.filter((m) => !BROWSER_PKGS[m] && !py.runPython(`__import__("importlib.util").util.find_spec(${JSON.stringify(m)}) is not None`));
       if (unavailable.length) {
-        if (current.target === "vscode") vscodeNote(`This example needs <b>${unavailable.join(", ")}</b> and runs in <b>VS Code</b>.`);
+        if (current.target === "vscode") vscodeNote(`This example needs <b>${unavailable.join(", ")}</b>, so it runs in <b>GitHub Codespaces</b>.`);
         else colabNote(`This example needs <b>${unavailable.join(", ")}</b>, which cannot run inside a web browser.`);
         return;
       }
@@ -290,7 +292,7 @@ builtins.input = input
     editor.setValue(code); clearOut();
     el.title.textContent = title;
     if (setup) out("note", "This example continues an earlier one in the lesson; that code runs first, silently.\n");
-    if (local && target === "vscode") vscodeNote(`This example needs <b>${needs}</b> and runs in <b>VS Code</b>.`);
+    if (local && target === "vscode") vscodeNote(`This example needs <b>${needs}</b>, so it runs in <b>GitHub Codespaces</b>.`);
     else if (local) colabNote(`This example needs <b>${needs}</b>, so it cannot run in the browser.`);
     setTimeout(() => { editor.refresh(); editor.focus(); }, 0);
   }

@@ -192,7 +192,10 @@ kbd { font-family: var(--mono); font-size: .8em; background: #eef1f5; border: 1p
 .where-note p { margin: .2rem 0 .4rem; }
 .where-note ul { margin: .2rem 0 .3rem; padding-left: 1.2rem; }
 .where-note li { margin: .3rem 0; max-width: none; }
-.runnable .try.vscode-try { background: #1f6fb5; color: #fff; border: 0; }
+.runnable .try.vscode-try { background: #24292f; color: #fff; border: 0; text-decoration: none; }
+.btn.codespaces { background: #24292f; color: #fff; font-weight: 600; }
+.btn.codespaces:hover { background: #32383f; }
+.colab-bar a.muted { text-decoration: underline; }
 
 /* Google Colab */
 .colab-bar { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .8rem; margin: .2rem 0 .8rem; }
@@ -203,6 +206,7 @@ kbd { font-family: var(--mono); font-size: .8em; background: #eef1f5; border: 1p
 .local-btns .try { position: static; text-decoration: none; }
 .runnable .try.colab-try { background: #e8710a; color: #fff; }
 .runnable.local .copy { right: 11.4rem; }
+.runnable.local:has(.vscode-try) .copy { right: 16.2rem; }
 .runnable .code-title + .local-btns { top: 1.95rem; }
 .colab-note { color: #ffd28a; font-family: var(--font); font-size: .9rem; white-space: normal; }
 .colab-note p { margin: .2rem 0 .6rem; }

@@ -1,0 +1,37 @@
+# 606363 course environment (used by GitHub Codespaces and for local installs)
+# PyTorch: Codespaces installs the CPU build (see .devcontainer/setup.sh). On a machine with a GPU, install torch from pytorch.org first.
+torch>=2.4
+transformers>=4.46
+datasets>=3.0
+evaluate>=0.4
+accelerate>=1.0
+sentence-transformers>=3.0
+diffusers>=0.30
+tiktoken>=0.7
+seqeval>=1.2
+numpy>=1.26
+pandas>=2.2
+scikit-learn>=1.5
+matplotlib>=3.9
+# LLM apps, agents and protocols
+langchain>=0.3
+langchain-core>=0.3
+langchain-community>=0.3
+langchain-openai>=0.2
+langchain-ollama>=0.2
+langchain-text-splitters>=0.3
+langgraph>=0.2
+chromadb>=0.5
+openai>=1.40
+tavily-python>=0.5
+python-dotenv>=1.0
+mcp[cli]>=1.2
+a2a-sdk>=0.2
+# Apps, browser automation, notebooks
+django>=5.0
+streamlit>=1.38
+gradio>=4.40
+playwright>=1.47
+jupyter>=1.1
+ipykernel>=6.29
+nest-asyncio>=1.6

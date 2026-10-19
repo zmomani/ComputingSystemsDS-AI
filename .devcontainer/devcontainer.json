@@ -1,0 +1,41 @@
+{
+  "name": "606363 – Computing Systems for Data Science and AI",
+  "image": "mcr.microsoft.com/devcontainers/python:1-3.12-bookworm",
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "hostRequirements": { "cpus": 2, "memory": "8gb", "storage": "32gb" },
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "forwardPorts": [8000, 8501, 7860, 11434],
+  "portsAttributes": {
+    "8000": { "label": "Django / FastAPI app", "onAutoForward": "openBrowser" },
+    "8501": { "label": "Streamlit app", "onAutoForward": "openBrowser" },
+    "7860": { "label": "Gradio app", "onAutoForward": "openBrowser" },
+    "11434": { "label": "Ollama", "onAutoForward": "silent" }
+  },
+  "secrets": {
+    "OPENAI_API_KEY": { "description": "Your OpenAI API key (for LangChain / LangGraph / agent examples). Optional.", "documentationUrl": "https://platform.openai.com/api-keys" },
+    "TAVILY_API_KEY": { "description": "Your Tavily key for the web-search tool in the agent examples. Optional (free tier).", "documentationUrl": "https://app.tavily.com" }
+  },
+  "customizations": {
+    "codespaces": { "openFiles": ["CODESPACES.md"] },
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-toolsai.jupyter",
+        "ms-toolsai.jupyter-renderers",
+        "yzhang.markdown-all-in-one"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "jupyter.notebookFileRoot": "${workspaceFolder}",
+        "jupyter.askForKernelRestart": false,
+        "notebook.lineNumbers": "on",
+        "notebook.output.scrolling": true,
+        "files.autoSave": "afterDelay",
+        "files.exclude": { "**/__pycache__": true, "**/.ipynb_checkpoints": true, "assets": true, "lessons": true, "build": true, "index.html": true, ".nojekyll": true }
+      }
+    }
+  }
+}

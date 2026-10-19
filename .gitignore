@@ -1,2 +1,5 @@
 __pycache__/
 build/shots/
+.env
+.ipynb_checkpoints/
+db.sqlite3
