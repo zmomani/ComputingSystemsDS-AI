@@ -1965,5 +1965,212 @@
 "setup": "",
 "reason": ""
 }
+],
+"04a5a214fc27743e454d6bc8c7bae62b0e1773d04fc8456c2e13bb5089076a38": [
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'emotions' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'emotions' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'df' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'df' is not defined"
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'tokenizer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'emotions' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'tokenizer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'emotion_encoded' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'X_train' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'X_train' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'X_train' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'lr_clf' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'y_valid' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'X_train' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'trainer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'trainer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'trainer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'classification_report' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'emotions' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'trainer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'validation_results' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+}
 ]
 }

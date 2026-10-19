@@ -739,7 +739,21 @@ result = classifier(&quot;I&#x27;m so excited to see this working!&quot;)
 print(result)   # e.g. [{&#x27;label&#x27;: &#x27;joy&#x27;, &#x27;score&#x27;: 0.9874}]</code></pre></div>
 <p><strong>Hub benefits:</strong> easy sharing, version control, automatic model cards, browser inference widgets, community discussions, download statistics, Spaces for demos, and framework integrations.</p>
 <h3 id="mini-challenge-optional-gradio-demo">Mini-challenge (optional): Gradio demo</h3>
-<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-python">!pip install gradio
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="gradio" title="Needs gradio — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>!pip install gradio
+import gradio as gr
+
+def predict(text):
+    results = classifier(text, top_k=None)   # scores for all six emotions
+    return {r[&quot;label&quot;]: r[&quot;score&quot;] for r in results}
+
+demo = gr.Interface(
+    fn=predict,
+    inputs=gr.Textbox(placeholder=&quot;Enter text here...&quot;),
+    outputs=gr.Label(num_top_classes=6),
+    title=&quot;Emotion Classifier&quot;,
+    description=&quot;Classifies text into six emotions: sadness, joy, love, anger, fear, surprise.&quot;,
+)
+demo.launch()</textarea><pre><code class="language-python">!pip install gradio
 import gradio as gr
 
 def predict(text):

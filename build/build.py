@@ -132,7 +132,7 @@ def imported_modules(code):
 LOCAL_NAMES = re.compile(r'\b(torch|nn|F|transformers|langchain\w*|langgraph|ChatOpenAI|OpenAI|AutoModel\w*|AutoTokenizer|pipeline|Trainer|tf|keras|ollama|chromadb)\.')
 
 def runs_in_browser(code):
-    if LOCAL_NAMES.search(code): return False      # uses a local-only library without importing it here
+    if LOCAL_NAMES.search(code) or re.search(r'^\s*[!%]', code, re.M): return False      # uses a local-only library without importing it here
     mods = imported_modules(code)
     if any(m not in BROWSER_MODULES or m in NO_BROWSER for m in mods): return False
     if re.search(r'os\.environ|getenv\(|API_KEY|input\(|open\([\'"][^\'"]+\.(pdf|db|sqlite|png|jpg)', code): return False
@@ -164,7 +164,8 @@ def code_block_html(code, lang, title=None):
     esc = html.escape(code)
     pre = f'<pre><code class="language-{lang}">{esc}</code></pre>'
     head = f'<div class="code-title">{html.escape(title)}</div>' if title else ''
-    if lang != 'python' or re.search(r'^\s*[!%]', code, re.M):
+    shell_only = all(l.strip().startswith(('!', '%', '#')) for l in code.splitlines() if l.strip())
+    if lang != 'python' or shell_only:
         return f'<div class="codeblock">{head}<button class="copy">Copy</button>{pre}</div>'
     PAGE_BLOCKS.append((code, title))
     return f'PYBLOCK{len(PAGE_BLOCKS) - 1}XEND'
