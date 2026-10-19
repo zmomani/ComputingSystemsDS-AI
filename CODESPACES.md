@@ -8,13 +8,26 @@ Streamlit, Playwright with Chromium, and Jupyter. Nothing to install on your lap
 
 ## Where does each kind of code run?
 
+**Use this codespace for all your coursework and your project.** One environment means code that runs in a notebook
+also runs as a script — same Python, same libraries, same folder.
+
 | On the course site you see | Where it runs | Why |
 |---|---|---|
-| **▶ Try it** | In the panel, inside your browser | Plain Python, NumPy, pandas, scikit-learn and matplotlib run in the browser itself — instant, nothing to set up. |
-| **▶ Run in Colab** | Google Colab | PyTorch and Transformers examples. Colab has them preinstalled and gives a free **GPU**, which training and large models need. |
-| **⧉ Open in Codespaces** | This codespace | Code that starts programs on a machine: Ollama (a local LLM), MCP servers, the Django chat app, Playwright browser agents, Streamlit apps — and your **project**. |
+| **▶ Try it** | In the lesson page, inside your browser | Quick experiments while reading — plain Python, NumPy, pandas, scikit-learn, matplotlib. |
+| **⧉ Open in Codespaces** | This codespace | Everything else: PyTorch, Transformers, LangChain, LangGraph, MCP servers, Ollama, Django, Playwright, Streamlit — and your project. |
+| **▶ Train in Colab** | Google Colab, with a free GPU | Only the two model-training exercises (Week 2 fine-tuning, Week 13 diffusion). Free codespaces have no GPU, so training there would take hours. Save the trained model (e.g. to Google Drive or the Hugging Face Hub) and load it in your codespace. |
 
-Everything that runs in Colab also runs here (on CPU, so training is slower).
+## From notebook to script
+
+The same code can still behave differently in a notebook and in a `.py` file. Before moving notebook code into a script:
+
+1. **Restart & Run All** the notebook. If it fails, a cell depended on something you deleted or ran out of order.
+2. Remove `!pip …` and `%…` lines — they are notebook commands, not Python. Install packages in the terminal: `python -m pip install …`.
+3. A bare last line such as `df.head()` only displays in notebooks — use `print(...)` in scripts. Add `plt.show()` for plots.
+4. Async code: in a notebook write `await main()`; in a script write `asyncio.run(main())` under `if __name__ == "__main__":`.
+5. Paths: a notebook runs in its own folder, a script from the project root. Build paths with `Path(__file__).parent / "data.csv"`.
+
+Better still: put functions in `.py` files and `import` them from the notebook, so there is nothing to copy.
 
 ## First steps
 

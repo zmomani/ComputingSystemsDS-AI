@@ -115,7 +115,7 @@
   $$("[data-colab-link]").forEach((a) => { if (COLAB) a.href = COLAB; else a.remove(); });
   function vscodeNote(what) {
     const d = document.createElement("div"); d.className = "colab-note";
-    d.innerHTML = `<p>${what}</p><p>It starts a program on a machine (a local model, a server, a web app or a real browser), which neither this page nor Google Colab can do.</p>` +
+    d.innerHTML = `<p>${what}</p><p>That needs a full Python installation with the course libraries (and sometimes programs that keep running), which a web page cannot provide. The course codespace has all of it.</p>` +
       `<p><a class="btn codespaces" href="${lesson.dataset.codespaces}" target="_blank" rel="noopener">⧉ Open in Codespaces</a> ` +
       `<button class="btn ghost" data-copy-editor>Copy the code</button></p>` +
       `<p class="small">Codespaces is VS Code in your browser, already set up for this course. Open <code>notebooks/</code> for this lesson's code, or paste the copied code into a new file. <a href="${lesson.dataset.guide}" target="_blank" rel="noopener">How to use it</a></p>`;
@@ -126,9 +126,9 @@
     const browser = document.getElementById("run-in-your-browser");
     const d = document.createElement("div"); d.className = "colab-note";
     d.innerHTML = `<p>${what}</p><p>` +
-      (COLAB ? `<a class="btn colab" href="${COLAB}" target="_blank" rel="noopener"><span class="colab-logo">CO</span> Run it in Google Colab</a> ` : "") +
+      (COLAB ? `<a class="btn colab" href="${COLAB}" target="_blank" rel="noopener"><span class="colab-logo">CO</span> Train it in Google Colab (GPU)</a> ` : "") +
       (browser ? `<button class="btn ghost" data-goto-browser>Run the in-browser version</button>` : "") +
-      `</p><p class="small">In Colab the examples are in the same order as on this page — run the cells from the top so earlier code is defined. The same notebooks also open in <a href="${lesson.dataset.codespaces}" target="_blank" rel="noopener">GitHub Codespaces</a> (folder <code>notebooks/</code>).</p>`;
+      `</p><p class="small">In Colab choose Runtime → Change runtime type → T4 GPU, then run the cells from the top. Save the trained model and bring it back to your codespace.</p>`;
     el.out.appendChild(d);
     const g = d.querySelector("[data-goto-browser]");
     if (g) g.addEventListener("click", () => browser.scrollIntoView({ behavior: "smooth", block: "start" }));
@@ -253,8 +253,8 @@ builtins.input = input
       const mods = await loadPackagesFor(py, setup + "\n" + code);
       const unavailable = mods.filter((m) => !BROWSER_PKGS[m] && !py.runPython(`__import__("importlib.util").util.find_spec(${JSON.stringify(m)}) is not None`));
       if (unavailable.length) {
-        if (current.target === "vscode") vscodeNote(`This example needs <b>${unavailable.join(", ")}</b>, so it runs in <b>GitHub Codespaces</b>.`);
-        else colabNote(`This example needs <b>${unavailable.join(", ")}</b>, which cannot run inside a web browser.`);
+        if (current.target === "colab") colabNote(`This example trains a model, which needs a GPU.`);
+        else vscodeNote(`This example needs <b>${unavailable.join(", ")}</b>, so it runs in <b>GitHub Codespaces</b>.`);
         return;
       }
       const ns = py.globals.get("dict")();
@@ -292,8 +292,8 @@ builtins.input = input
     editor.setValue(code); clearOut();
     el.title.textContent = title;
     if (setup) out("note", "This example continues an earlier one in the lesson; that code runs first, silently.\n");
-    if (local && target === "vscode") vscodeNote(`This example needs <b>${needs}</b>, so it runs in <b>GitHub Codespaces</b>.`);
-    else if (local) colabNote(`This example needs <b>${needs}</b>, so it cannot run in the browser.`);
+    if (local && target === "colab") colabNote(`This example trains a model, which needs a GPU — free codespaces have none, so it would take hours there.`);
+    else if (local) vscodeNote(`This example needs <b>${needs}</b>, so it runs in <b>GitHub Codespaces</b>.`);
     setTimeout(() => { editor.refresh(); editor.focus(); }, 0);
   }
 

@@ -21,7 +21,7 @@
   <button id="btn-panel" class="btn accent" title="Show or hide the editor / animation panel">⇆ Panel</button><div class="status" id="py-status"><span class="dot"></span><span id="py-status-text">Python loads on first run</span></div>
 </header><main class="lesson panel-closed" id="lesson" data-colab="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week05-langgraph.ipynb" data-codespaces="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" data-guide="https://github.com/zmomani/ComputingSystemsDS-AI/blob/main/CODESPACES.md"><article class="lesson-content" id="lesson-content"><div class="lesson-head"><div class="eyebrow">Week 5 · ILO I1, P2</div><h1>LangGraph</h1>
 <p class="lesson-intro"><b>Topics:</b> LangGraph: nodes, edges, state, routing, checkpointing, human-in-the-loop<br><b>Project milestone:</b> StateGraph orchestrator with conditional routing, state checkpointing and 3+ connected agents</p></div>
-<div class="colab-bar"><a class="btn colab" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week05-langgraph.ipynb" target="_blank" rel="noopener"><span class="colab-logo">CO</span> Open this week's code in Google Colab</a><a class="btn codespaces" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener">⧉ Open in Codespaces</a><a class="muted small" href="https://github.com/zmomani/ComputingSystemsDS-AI/blob/main/CODESPACES.md" target="_blank" rel="noopener">Which one should I use?</a></div>
+<div class="colab-bar"><a class="btn codespaces" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener">⧉ Open this week's code in Codespaces</a><a class="muted small" href="https://github.com/zmomani/ComputingSystemsDS-AI/blob/main/CODESPACES.md" target="_blank" rel="noopener">How to use Codespaces</a></div>
 <div class="sim-strip"><div class="sim-strip-head">Animations for this week — open them in the panel</div><div class="sim-strip-items"><button class="sim-chip" data-display="langgraph"><span class="sim-chip-kind">LangGraph</span>▶ Display: LangGraph StateGraph</button><button class="sim-chip" data-display="multi-agent"><span class="sim-chip-kind">Multi-agent</span>▶ Display: Multi-agent research pipeline</button></div></div>
 <details class="contents"><summary>Contents (12 sections)</summary><ol><li><a href="#step-1-introduction-to-langgraph">Step 1: Introduction to LangGraph</a></li><li><a href="#step-2-installation-setup">Step 2: Installation &amp; Setup</a></li><li><a href="#step-3-core-concepts-state">Step 3: Core Concepts – State</a></li><li><a href="#step-4-core-concepts-nodes">Step 4: Core Concepts – Nodes</a></li><li><a href="#step-5-core-concepts-edges">Step 5: Core Concepts – Edges</a></li><li><a href="#step-6-building-your-first-graph">Step 6: Building Your First Graph</a></li><li><a href="#step-7-tool-integration">Step 7: Tool Integration</a></li><li><a href="#step-8-conditional-routing-cycles">Step 8: Conditional Routing &amp; Cycles</a></li><li><a href="#step-9-checkpointing-human-in-the-loop">Step 9: Checkpointing &amp; Human-in-the-Loop</a></li><li><a href="#step-10-complete-project-multi-agent-task-system">Step 10: Complete Project – Multi-Agent Task System</a></li><li><a href="#step-11-django-integration">Step 11: Django Integration</a></li><li><a href="#tutorial-complete-next-steps-resources">Tutorial Complete — Next Steps &amp; Resources</a></li></ol></details>
 <h2 id="step-1-introduction-to-langgraph">Step 1: Introduction to LangGraph</h2>
@@ -92,7 +92,7 @@ pip install langchain-community tavily-python
 # Verify installation
 python -c &quot;from importlib.metadata import version; print(f&#x27;LangGraph version: {version(\&quot;langgraph\&quot;)}&#x27;)&quot;</code></pre></div>
 <h3 id="setting-up-api-keys">Setting Up API Keys</h3>
-<div class="where-note"><div class="where-head">Where does this code run — and why?</div><p><b>▶ Try it</b> examples run inside your web browser, which can only run plain Python and light libraries (NumPy, pandas, scikit-learn, matplotlib). From here on some examples need more:</p><ul><li><b>LangChain, LangGraph, OpenAI and other API examples → Colab or Codespaces.</b> They send requests over the internet and need your own API key, which a page in the browser cannot use safely. Add the key as a secret (the 🔑 panel in Colab, or Settings → Codespaces → Secrets on GitHub).</li><li><b>Ollama, MCP servers, Django, Playwright and Streamlit → GitHub Codespaces.</b> These start programs on a machine — a local model, a server, a web app or a real browser — which neither this page nor Colab can do. <b>⧉ Open in Codespaces</b> gives you VS Code in your browser on a cloud machine already set up for this course (<a href="https://github.com/zmomani/ComputingSystemsDS-AI/blob/main/CODESPACES.md" target="_blank" rel="noopener">how to use it</a>).</li></ul></div><div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="dotenv" title="Needs dotenv — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>import os
+<div class="where-note"><div class="where-head">Where does this code run — and why?</div><p><b>▶ Try it</b> examples run inside this page, in your web browser — good for quick experiments with plain Python, NumPy, pandas, scikit-learn and matplotlib. From here on the examples need more:</p><ul><li><b>Everything else → GitHub Codespaces.</b> PyTorch, Transformers, LangChain, LangGraph, MCP servers, Ollama, Django, Playwright and Streamlit need a full Python installation, large libraries, or programs that keep running — a web page has none of these. <b>⧉ Open in Codespaces</b> gives you VS Code in your browser on a cloud machine already set up for this course, with this lesson's code in <code>notebooks/</code>. Use it for all your coursework and your project, so everything runs in <b>one</b> environment (<a href="https://github.com/zmomani/ComputingSystemsDS-AI/blob/main/CODESPACES.md" target="_blank" rel="noopener">how to use it</a>).</li><li><b>API keys.</b> LangChain, OpenAI and agent examples call services on the internet with your own key. Add it once as a Codespaces secret (GitHub → Settings → Codespaces → Secrets) or in the <code>.env</code> file — never in your code.</li></ul></div><div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="dotenv" title="Needs dotenv — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>import os
 
 # Option 1: Set environment variables directly
 os.environ[&quot;OPENAI_API_KEY&quot;] = &quot;sk-your-key-here&quot;
@@ -128,7 +128,7 @@ os.environ[&quot;TAVILY_API_KEY&quot;] = &quot;tvly-your-key-here&quot;</code></
 ├── checkpoint_agent.py   # Step 9: Memory &amp; human-in-the-loop
 └── multi_agent.py        # Step 10: Multi-agent system</code></pre></div>
 <h3 id="basic-imports">Basic Imports</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core, langchain_openai, langgraph" title="Needs langchain_core, langchain_openai, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># --- Graph construction ---
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="langchain_core, langchain_openai, langgraph" title="Needs langchain_core, langchain_openai, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># --- Graph construction ---
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import MessagesState
 
@@ -180,7 +180,7 @@ from langchain_core.tools import tool
 from typing import TypedDict, Annotated, Literal
 import operator</code></pre></div>
 <h3 id="verify-everything-works">Verify Everything Works</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core, langchain_openai" title="Needs langchain_core, langchain_openai — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langchain_openai import ChatOpenAI
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="langchain_core, langchain_openai" title="Needs langchain_core, langchain_openai — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
 
 # Test that the LLM is accessible
@@ -219,7 +219,7 @@ class AgentState(TypedDict):
     iteration: int      # How many times we&#x27;ve looped</code></pre></div>
 <h3 id="messagesstate-built-in">MessagesState (Built-in)</h3>
 <p>A built-in state type with a single <code>messages</code> key. New messages are <strong>appended</strong> rather than replacing the list, which is exactly what a chatbot needs. This behaviour comes from a <em>reducer</em> function.</p>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langgraph" title="Needs langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langgraph.graph.message import MessagesState
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="langgraph" title="Needs langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langgraph.graph.message import MessagesState
 
 # MessagesState is equivalent to:
 # class MessagesState(TypedDict):
@@ -245,7 +245,7 @@ class AgentState(TypedDict):
 </blockquote>
 <h3 id="custom-state-with-annotated-types-and-reducers">Custom State with Annotated Types and Reducers</h3>
 <p><code>Annotated</code> types attach a <strong>reducer</strong> that controls how updates merge. A reducer takes the current value and the update and returns the new value.</p>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core, langgraph" title="Needs langchain_core, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from typing import TypedDict, Annotated
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="langchain_core, langgraph" title="Needs langchain_core, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from typing import TypedDict, Annotated
 from langchain_core.messages import AnyMessage
 from langgraph.graph.message import add_messages
 import operator
@@ -369,7 +369,7 @@ def add_ten(state: CounterState) -&gt; dict:
 <p><strong>Nodes</strong> are plain Python functions. Each takes the current state, performs an operation, and returns a partial update.</p>
 <h3 id="node-signature">Node Signature</h3>
 <p>The function receives the <strong>full</strong> state and returns <strong>only</strong> the keys it modifies. Keys that are not returned are left unchanged.</p>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>def my_node(state: MyState) -&gt; dict:
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>def my_node(state: MyState) -&gt; dict:
     &quot;&quot;&quot;
     Args:
         state: The FULL current state of the graph.
@@ -404,7 +404,7 @@ def add_ten(state: CounterState) -&gt; dict:
     return {&quot;some_key&quot;: new_value}</code></pre></div>
 <h3 id="chatbot-node">Chatbot Node</h3>
 <p>Calls an LLM with the conversation history and returns the reply as a message.</p>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_openai, langgraph" title="Needs langchain_openai, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langgraph.graph.message import MessagesState
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="langchain_openai, langgraph" title="Needs langchain_openai, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langgraph.graph.message import MessagesState
 from langchain_openai import ChatOpenAI
 
 llm = ChatOpenAI(model=&quot;gpt-4o-mini&quot;, temperature=0)
@@ -429,7 +429,7 @@ def chatbot_node(state: MessagesState) -&gt; dict:
     return {&quot;messages&quot;: [response]}</code></pre></div>
 <h3 id="tool-execution-node">Tool Execution Node</h3>
 <p>Runs the tools the LLM requested and wraps each result in a <code>ToolMessage</code>. (In practice the prebuilt <code>ToolNode</code> from Step 7 does this for you.)</p>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core" title="Needs langchain_core — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langchain_core.messages import ToolMessage
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="langchain_core" title="Needs langchain_core — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langchain_core.messages import ToolMessage
 
 # tool_registry maps each tool&#x27;s name to the tool object,
 # e.g. tool_registry = {t.name: t for t in tools}
@@ -478,7 +478,7 @@ def tool_executor_node(state: MessagesState) -&gt; dict:
     return {&quot;messages&quot;: results}</code></pre></div>
 <h3 id="data-processing-node">Data Processing Node</h3>
 <p>Performs plain computation (here, text analysis) with or without an LLM call.</p>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_openai" title="Needs langchain_openai — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from typing import TypedDict, Annotated
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="langchain_openai" title="Needs langchain_openai — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from typing import TypedDict, Annotated
 import operator
 from langchain_openai import ChatOpenAI
 
@@ -541,7 +541,7 @@ def summarize_text(state: AnalysisState) -&gt; dict:
     return {&quot;summary&quot;: response.content}</code></pre></div>
 <h3 id="adding-nodes-to-a-graph">Adding Nodes to a Graph</h3>
 <p>Nodes are registered with a unique name string, which edges use to refer to them.</p>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langgraph" title="Needs langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langgraph.graph import StateGraph
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="langgraph" title="Needs langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langgraph.graph import StateGraph
 
 # Create the graph with your state type
 graph = StateGraph(AnalysisState)
@@ -568,7 +568,7 @@ graph.add_node(&quot;summarize&quot;, summarize_text)
 <p><strong>Edges</strong> decide which node runs next. LangGraph supports normal edges, conditional edges, and the special entry/finish points.</p>
 <h3 id="normal-edges">Normal Edges</h3>
 <p>A fixed connection: when node A finishes, node B always runs next.</p>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langgraph" title="Needs langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langgraph.graph import StateGraph, START, END
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="langgraph" title="Needs langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langgraph.graph import StateGraph, START, END
 
 graph = StateGraph(MyState)
 
@@ -596,7 +596,7 @@ graph.add_edge(&quot;generate_report&quot;, END)       # Exit point</code></pre>
 <p><strong>START and END</strong> are special markers imported as constants, not real nodes. <code>START</code> marks the entry point; <code>END</code> marks where the graph stops and returns its final state.</p>
 <h3 id="conditional-edges">Conditional Edges</h3>
 <p>The most powerful edge type. A <strong>routing function</strong> inspects state and returns a string; a <strong>path map</strong> turns that string into the next node. This enables branching and loops.</p>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langgraph" title="Needs langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from typing import Literal
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="langgraph" title="Needs langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from typing import Literal
 from langgraph.graph.message import MessagesState
 
 def route_after_agent(state: MessagesState) -&gt; Literal[&quot;tools&quot;, &quot;end&quot;]:
@@ -652,7 +652,7 @@ graph.add_conditional_edges(
 <h3 id="creating-cycles-with-conditional-edges">Creating Cycles with Conditional Edges</h3>
 <p>Routing back to an earlier node creates a cycle. The classic agent loop:</p>
 <div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">START → agent ──(tool_calls?)──► tool_node ──► agent ──► ... ──(no tool_calls)──► END</code></pre></div>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># This creates the classic ReAct agent loop:
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># This creates the classic ReAct agent loop:
 #   START -&gt; agent -&gt; (tools -&gt; agent -&gt; tools -&gt; ...) -&gt; END
 
 graph.add_edge(START, &quot;agent&quot;)
@@ -711,7 +711,7 @@ graph.add_edge(&quot;tool_node&quot;, &quot;agent&quot;)   # This creates the cy
 <h2 id="step-6-building-your-first-graph">Step 6: Building Your First Graph</h2>
 <p><strong>What we are building:</strong> a minimal chatbot that (1) takes a user message, (2) sends it to GPT-4o-mini, (3) returns the response.</p>
 <h3 id="complete-working-code">Complete Working Code</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core, langchain_openai, langgraph" title="Needs langchain_core, langchain_openai, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langgraph.graph import StateGraph, START, END
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="langchain_core, langchain_openai, langgraph" title="Needs langchain_core, langchain_openai, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import MessagesState
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
@@ -794,7 +794,7 @@ print(result[&quot;messages&quot;][-1].content)</code></pre></div>
 <p><strong>That's it!</strong> The five-part pattern — LLM, node, graph, compile, invoke — applies to every LangGraph project.</p>
 </blockquote>
 <h3 id="interactive-chat-loop">Interactive Chat Loop</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core, langchain_openai, langgraph" title="Needs langchain_core, langchain_openai, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langgraph.graph import StateGraph, START, END
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="langchain_core, langchain_openai, langgraph" title="Needs langchain_core, langchain_openai, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import MessagesState
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
@@ -861,7 +861,7 @@ while True:
 <p><strong>No memory yet:</strong> the chatbot forgets earlier messages between <code>invoke()</code> calls because each call starts fresh. Step 9 adds memory through checkpointing.</p>
 </blockquote>
 <h3 id="streaming-output">Streaming Output</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># Stream events from the graph
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># Stream events from the graph
 for event in graph.stream(
     {&quot;messages&quot;: [HumanMessage(content=&quot;Explain LangGraph in 3 sentences.&quot;)]},
     stream_mode=&quot;values&quot;,
@@ -879,7 +879,7 @@ for event in graph.stream(
 <h2 id="step-7-tool-integration">Step 7: Tool Integration</h2>
 <p>Tools turn ordinary Python functions into capabilities the LLM can request. The <strong>docstring</strong> is what tells the LLM when to use each tool.</p>
 <h3 id="defining-tools-with-tool">Defining Tools with @tool</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core" title="Needs langchain_core — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langchain_core.tools import tool
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="langchain_core" title="Needs langchain_core — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langchain_core.tools import tool
 
 @tool
 def web_search(query: str) -&gt; str:
@@ -945,7 +945,7 @@ def calculator(expression: str) -&gt; str:
 # Collect tools into a list
 tools = [web_search, calculator]</code></pre></div>
 <h3 id="binding-tools-to-the-llm">Binding Tools to the LLM</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_openai" title="Needs langchain_openai — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langchain_openai import ChatOpenAI
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="langchain_openai" title="Needs langchain_openai — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langchain_openai import ChatOpenAI
 
 llm = ChatOpenAI(model=&quot;gpt-4o-mini&quot;, temperature=0)
 
@@ -957,7 +957,7 @@ llm = ChatOpenAI(model=&quot;gpt-4o-mini&quot;, temperature=0)
 # Bind tools to the LLM - now it knows about web_search and calculator
 llm_with_tools = llm.bind_tools(tools)</code></pre></div>
 <h3 id="toolnode-automatic-tool-execution">ToolNode: Automatic Tool Execution</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langgraph" title="Needs langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langgraph.prebuilt import ToolNode
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="langgraph" title="Needs langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langgraph.prebuilt import ToolNode
 
 # Create a ToolNode from our list of tools
 tool_node = ToolNode(tools)
@@ -977,7 +977,7 @@ tool_node = ToolNode(tools)
 # 3. Execute each tool with the given arguments
 # 4. Return ToolMessage results appended to messages</code></pre></div>
 <h3 id="tools_condition-conditional-routing">tools_condition: Conditional Routing</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langgraph" title="Needs langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langgraph.prebuilt import tools_condition
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="langgraph" title="Needs langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langgraph.prebuilt import tools_condition
 
 # tools_condition returns:
 #   &quot;tools&quot;  if the last AI message has tool_calls
@@ -993,7 +993,7 @@ graph.add_conditional_edges(&quot;chatbot&quot;, tools_condition)</textarea><pre
 # Use it as a conditional edge:
 graph.add_conditional_edges(&quot;chatbot&quot;, tools_condition)</code></pre></div>
 <h3 id="complete-example-chatbot-with-tools">Complete Example: Chatbot with Tools</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core, langchain_openai, langgraph" title="Needs langchain_core, langchain_openai, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langgraph.graph import StateGraph, START, END
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="langchain_core, langchain_openai, langgraph" title="Needs langchain_core, langchain_openai, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import MessagesState
 from langgraph.prebuilt import ToolNode, tools_condition
 from langchain_openai import ChatOpenAI
@@ -1118,7 +1118,7 @@ for msg in result[&quot;messages&quot;]:
 <li><strong>Repeats</strong> until the task is complete.</li>
 </ol>
 <h3 id="the-should_continue-pattern">The should_continue Pattern</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from typing import Literal
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from typing import Literal
 
 def should_continue(state: MessagesState) -&gt; Literal[&quot;tools&quot;, &quot;__end__&quot;]:
     &quot;&quot;&quot;Decide whether to continue the agent loop or stop.
@@ -1153,7 +1153,7 @@ def should_continue(state: MessagesState) -&gt; Literal[&quot;tools&quot;, &quot
 <p><strong>Note:</strong> <code>"__end__"</code> is the internal name for the END node. You can use the <code>END</code> constant in a path map instead, and the prebuilt <code>tools_condition</code> does the same job as this custom <code>should_continue</code>.</p>
 </blockquote>
 <h3 id="building-a-react-agent-with-cycles">Building a ReAct Agent with Cycles</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core, langchain_openai, langgraph" title="Needs langchain_core, langchain_openai, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langgraph.graph import StateGraph, START, END
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="langchain_core, langchain_openai, langgraph" title="Needs langchain_core, langchain_openai, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import MessagesState
 from langgraph.prebuilt import ToolNode
 from langchain_openai import ChatOpenAI
@@ -1354,7 +1354,7 @@ for msg in result[&quot;messages&quot;]:
 </tbody>
 </table>
 <h3 id="adding-iteration-limits">Adding Iteration Limits</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>MAX_ITERATIONS = 5
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>MAX_ITERATIONS = 5
 
 def should_continue_with_limit(state: MessagesState) -&gt; Literal[&quot;tools&quot;, &quot;__end__&quot;]:
     &quot;&quot;&quot;Continue the loop, but enforce a maximum iteration count.&quot;&quot;&quot;
@@ -1402,7 +1402,7 @@ def should_continue_with_limit(state: MessagesState) -&gt; Literal[&quot;tools&q
 <li>"Time travel": replaying or inspecting earlier states</li>
 </ul>
 <h3 id="memorysaver-state-persistence">MemorySaver: State Persistence</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core, langchain_openai, langgraph" title="Needs langchain_core, langchain_openai, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langgraph.checkpoint.memory import MemorySaver
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="langchain_core, langchain_openai, langgraph" title="Needs langchain_core, langchain_openai, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import MessagesState
 from langchain_openai import ChatOpenAI
@@ -1444,7 +1444,7 @@ graph_builder.add_edge(&quot;chatbot&quot;, END)
 memory = MemorySaver()
 graph = graph_builder.compile(checkpointer=memory)</code></pre></div>
 <h3 id="thread-based-conversations">Thread-Based Conversations</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># ── Conversation with memory ──────────────────────────────
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># ── Conversation with memory ──────────────────────────────
 config = {&quot;configurable&quot;: {&quot;thread_id&quot;: &quot;user-123&quot;}}
 
 # First message
@@ -1523,7 +1523,7 @@ print(result3[&quot;messages&quot;][-1].content)
 </tr>
 </tbody>
 </table>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core, langchain_openai, langgraph" title="Needs langchain_core, langchain_openai, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langgraph.graph import StateGraph, START, END
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="langchain_core, langchain_openai, langgraph" title="Needs langchain_core, langchain_openai, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import MessagesState
 from langgraph.prebuilt import ToolNode, tools_condition
 from langgraph.checkpoint.memory import MemorySaver
@@ -1658,7 +1658,7 @@ else:
    │ (web search)(analysis)(report)
    └────┴─────┴──────────┘   (all return to Supervisor)</code></pre></div>
 <h3 id="full-working-code">Full Working Code</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core, langchain_openai, langgraph" title="Needs langchain_core, langchain_openai, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>&quot;&quot;&quot;
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="langchain_core, langchain_openai, langgraph" title="Needs langchain_core, langchain_openai, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>&quot;&quot;&quot;
 Multi-Agent Research Assistant with Supervisor Pattern
 =====================================================
 A complete LangGraph application with:
@@ -2357,7 +2357,7 @@ STATIC_URL = &quot;static/&quot;
 STATICFILES_DIRS = [BASE_DIR / &quot;static&quot;]
 DEFAULT_AUTO_FIELD = &quot;django.db.models.BigAutoField&quot;</code></pre></div>
 <h3 id="step-5-langgraph-agent-chatagentpy">Step 5: LangGraph Agent (chat/agent.py)</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="dotenv, langchain_core, langchain_openai, langgraph" title="Needs dotenv, langchain_core, langchain_openai, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>&quot;&quot;&quot;
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="dotenv, langchain_core, langchain_openai, langgraph" title="Needs dotenv, langchain_core, langchain_openai, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>&quot;&quot;&quot;
 LangGraph Agent for Django Integration
 ---------------------------------------
 A conversational AI agent with tool-calling capabilities,
@@ -2972,7 +2972,7 @@ python manage.py runserver
 </tbody>
 </table>
 <h2 id="try-it-yourself">Try it yourself</h2>
-<p class="lesson-intro"><b>▶ Try it</b> runs an example in the editor panel, inside your browser — change the code and press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to run it again. Examples that use PyTorch, Transformers, LangChain or an API cannot run in a browser: press <b>▶ Run in Colab</b> to run them in Google Colab (free, nothing to install), or copy them to VS Code.</p><h3 id="run-in-your-browser">Run in your browser</h3><p class="lesson-intro">Self-contained versions of this week's mechanisms, written with NumPy, scikit-learn or plain Python so they run here.</p><div class="runnable"><div class="code-title">A state graph with a conditional edge and a loop (pure Python, LangGraph-style)</div><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden>from typing import TypedDict
+<p class="lesson-intro"><b>▶ Try it</b> runs an example in the editor panel, inside your browser — change the code and press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to run it again. Examples that use PyTorch, Transformers, LangChain or an API cannot run in a browser: press <b>⧉ Open in Codespaces</b> and run them in the course environment (this lesson's code is in <code>notebooks/</code>).</p><h3 id="run-in-your-browser">Run in your browser</h3><p class="lesson-intro">Self-contained versions of this week's mechanisms, written with NumPy, scikit-learn or plain Python so they run here.</p><div class="runnable"><div class="code-title">A state graph with a conditional edge and a loop (pure Python, LangGraph-style)</div><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden>from typing import TypedDict
 
 class State(TypedDict):
     topic: str
@@ -3036,7 +3036,7 @@ while node != &quot;END&quot;:
     step += 1
     print(f&quot;step {step}: {node:8} -&gt; {update}&quot;)
     node = route(state) if node == &quot;grade&quot; else edges[node]
-print(&quot;\nfinal state:&quot;, state)</code></pre></div><h3 id="test-code">Test code for the course environment</h3><div class="runnable local"><div class="code-title">State + reducers with NO LLM: run the CounterState graph and watch the state merge</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langgraph" title="Needs langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 1. State + reducers with NO LLM: run the CounterState graph and watch the state merge
+print(&quot;\nfinal state:&quot;, state)</code></pre></div><h3 id="test-code">Test code for the course environment</h3><div class="runnable local"><div class="code-title">State + reducers with NO LLM: run the CounterState graph and watch the state merge</div><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="langgraph" title="Needs langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 1. State + reducers with NO LLM: run the CounterState graph and watch the state merge
 from typing import TypedDict, Annotated
 import operator
 from langgraph.graph import StateGraph, START, END
@@ -3094,7 +3094,7 @@ for event in graph.stream({&quot;value&quot;: 5, &quot;history&quot;: []}, strea
     print(event)
 # {&#x27;value&#x27;: 5, &#x27;history&#x27;: []}
 # {&#x27;value&#x27;: 10, &#x27;history&#x27;: [&#x27;doubled to 10&#x27;]}
-# {&#x27;value&#x27;: 20, &#x27;history&#x27;: [&#x27;doubled to 10&#x27;, &#x27;added 10 to get 20&#x27;]}</code></pre></div><div class="runnable local"><div class="code-title">Conditional edges and a cycle with NO LLM: loop until a counter reaches 3</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langgraph" title="Needs langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 2. Conditional edges and a cycle with NO LLM: loop until a counter reaches 3
+# {&#x27;value&#x27;: 20, &#x27;history&#x27;: [&#x27;doubled to 10&#x27;, &#x27;added 10 to get 20&#x27;]}</code></pre></div><div class="runnable local"><div class="code-title">Conditional edges and a cycle with NO LLM: loop until a counter reaches 3</div><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="langgraph" title="Needs langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 2. Conditional edges and a cycle with NO LLM: loop until a counter reaches 3
 from typing import TypedDict, Annotated, Literal
 import operator
 from langgraph.graph import StateGraph, START, END
@@ -3140,7 +3140,7 @@ graph = g.compile()
 
 print(graph.invoke({&quot;n&quot;: 0, &quot;log&quot;: []}))
 print(graph.get_graph().draw_mermaid())   # Mermaid source; paste into https://mermaid.live to view
-# (draw_ascii() needs `pip install grandalf` and cannot lay out the work -&gt; work self-loop)</code></pre></div><div class="runnable local"><div class="code-title">ReAct agent with tools (needs OPENAI_API_KEY)</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core, langchain_openai, langgraph" title="Needs langchain_core, langchain_openai, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 3. ReAct agent with tools (needs OPENAI_API_KEY)
+# (draw_ascii() needs `pip install grandalf` and cannot lay out the work -&gt; work self-loop)</code></pre></div><div class="runnable local"><div class="code-title">ReAct agent with tools (needs OPENAI_API_KEY)</div><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="langchain_core, langchain_openai, langgraph" title="Needs langchain_core, langchain_openai, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 3. ReAct agent with tools (needs OPENAI_API_KEY)
 from langgraph.graph import StateGraph, START
 from langgraph.graph.message import MessagesState
 from langgraph.prebuilt import ToolNode, tools_condition
@@ -3198,7 +3198,7 @@ graph = g.compile()
 result = graph.invoke({&quot;messages&quot;: [HumanMessage(content=&quot;What is 42 * 17? Use the tool.&quot;)]},
                       config={&quot;recursion_limit&quot;: 10})
 for m in result[&quot;messages&quot;]:
-    m.pretty_print()</code></pre></div><div class="runnable local"><div class="code-title">Memory with MemorySaver and thread IDs (needs OPENAI_API_KEY)</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core, langchain_openai, langgraph" title="Needs langchain_core, langchain_openai, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 4. Memory with MemorySaver and thread IDs (needs OPENAI_API_KEY)
+    m.pretty_print()</code></pre></div><div class="runnable local"><div class="code-title">Memory with MemorySaver and thread IDs (needs OPENAI_API_KEY)</div><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="langchain_core, langchain_openai, langgraph" title="Needs langchain_core, langchain_openai, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 4. Memory with MemorySaver and thread IDs (needs OPENAI_API_KEY)
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import MessagesState
 from langgraph.checkpoint.memory import MemorySaver
