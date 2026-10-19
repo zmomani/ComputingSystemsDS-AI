@@ -303,7 +303,7 @@ class SelfAttention(nn.Module):
 
         return self.fc_out(out)</code></pre></div>
 <h3 id="simplified-self-attention-javascript">Simplified self-attention (JavaScript)</h3>
-<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-javascript">class SelfAttention {
+<div class="runnable" data-lang="javascript"><button class="try" data-run="1" data-lang="javascript">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden>class SelfAttention {
   constructor(embedSize, heads) {
     this.embedSize = embedSize;
     this.heads = heads;
@@ -356,8 +356,8 @@ class SelfAttention(nn.Module):
   }
 
   forward(inputs, mask = null) {
-    const batchSize = inputs.length;
-    const seqLength = inputs[0].length;
+    // inputs: one sequence, shape (seqLength x embedSize)
+    const seqLength = inputs.length;
 
     // Linear projections
     const Q = this.matMul(inputs, this.wQ);
@@ -366,10 +366,11 @@ class SelfAttention(nn.Module):
 
     // (Head splitting / tensor reshaping omitted in this simplified version)
 
-    // Scores = Q * K^T, scaled by sqrt(headDim)
+    // Scores = Q * K^T, scaled by sqrt(d_k). Without head splitting the dot products run over
+    // all embedSize dimensions, so d_k = embedSize (with heads it would be headDim).
     const scores = this.matMul(Q, this.transpose(K));
     const scaledScores = scores.map(row =&gt;
-      row.map(s =&gt; s / Math.sqrt(this.headDim))
+      row.map(s =&gt; s / Math.sqrt(this.embedSize))
     );
 
     // Mask placeholder (no logic in the demo)
@@ -383,7 +384,104 @@ class SelfAttention(nn.Module):
 
     return this.matMul(output, this.wO);
   }
-}</code></pre></div>
+}
+
+// Try it: one sequence of 4 tokens, embedding size 8, 2 heads
+const attn = new SelfAttention(8, 2);
+const tokens = Array.from({ length: 4 }, () =&gt; Array.from({ length: 8 }, () =&gt; Math.random()));
+const out = attn.forward(tokens);
+console.log(&quot;input shape: &quot;, tokens.length, &quot;x&quot;, tokens[0].length);
+console.log(&quot;output shape:&quot;, out.length, &quot;x&quot;, out[0].length);
+console.log(&quot;first output vector:&quot;, out[0].map(v =&gt; v.toFixed(4)).join(&quot;, &quot;));</textarea><pre><code class="language-javascript">class SelfAttention {
+  constructor(embedSize, heads) {
+    this.embedSize = embedSize;
+    this.heads = heads;
+    this.headDim = Math.floor(embedSize / heads);
+
+    if (this.headDim * heads !== embedSize) {
+      throw new Error(&quot;Embed size must be divisible by heads&quot;);
+    }
+
+    // Weight matrices (random init, for demonstration only)
+    this.wQ = this.initializeWeights(embedSize, embedSize);
+    this.wK = this.initializeWeights(embedSize, embedSize);
+    this.wV = this.initializeWeights(embedSize, embedSize);
+    this.wO = this.initializeWeights(embedSize, embedSize);
+  }
+
+  initializeWeights(inputDim, outputDim) {
+    const w = [];
+    for (let i = 0; i &lt; inputDim; i++) {
+      w.push([]);
+      for (let j = 0; j &lt; outputDim; j++) {
+        w[i].push((Math.random() - 0.5) * 0.1);
+      }
+    }
+    return w;
+  }
+
+  matMul(a, b) {
+    const result = [];
+    for (let i = 0; i &lt; a.length; i++) {
+      result.push([]);
+      for (let j = 0; j &lt; b[0].length; j++) {
+        let sum = 0;
+        for (let k = 0; k &lt; b.length; k++) sum += a[i][k] * b[k][j];
+        result[i].push(sum);
+      }
+    }
+    return result;
+  }
+
+  softmax(arr) {
+    const max = Math.max(...arr);
+    const exps = arr.map(x =&gt; Math.exp(x - max));
+    const sum = exps.reduce((s, x) =&gt; s + x, 0);
+    return exps.map(x =&gt; x / sum);
+  }
+
+  transpose(matrix) {
+    return matrix[0].map((_, j) =&gt; matrix.map(row =&gt; row[j]));
+  }
+
+  forward(inputs, mask = null) {
+    // inputs: one sequence, shape (seqLength x embedSize)
+    const seqLength = inputs.length;
+
+    // Linear projections
+    const Q = this.matMul(inputs, this.wQ);
+    const K = this.matMul(inputs, this.wK);
+    const V = this.matMul(inputs, this.wV);
+
+    // (Head splitting / tensor reshaping omitted in this simplified version)
+
+    // Scores = Q * K^T, scaled by sqrt(d_k). Without head splitting the dot products run over
+    // all embedSize dimensions, so d_k = embedSize (with heads it would be headDim).
+    const scores = this.matMul(Q, this.transpose(K));
+    const scaledScores = scores.map(row =&gt;
+      row.map(s =&gt; s / Math.sqrt(this.embedSize))
+    );
+
+    // Mask placeholder (no logic in the demo)
+    if (mask) { /* apply mask */ }
+
+    // Softmax over each row -&gt; attention weights
+    const attentionWeights = scaledScores.map(row =&gt; this.softmax(row));
+
+    // Weighted sum of values
+    const output = this.matMul(attentionWeights, V);
+
+    return this.matMul(output, this.wO);
+  }
+}
+
+// Try it: one sequence of 4 tokens, embedding size 8, 2 heads
+const attn = new SelfAttention(8, 2);
+const tokens = Array.from({ length: 4 }, () =&gt; Array.from({ length: 8 }, () =&gt; Math.random()));
+const out = attn.forward(tokens);
+console.log(&quot;input shape: &quot;, tokens.length, &quot;x&quot;, tokens[0].length);
+console.log(&quot;output shape:&quot;, out.length, &quot;x&quot;, out[0].length);
+console.log(&quot;first output vector:&quot;, out[0].map(v =&gt; v.toFixed(4)).join(&quot;, &quot;));</code></pre></div>
 <h3 id="using-transformers-with-libraries-hugging-face">Using Transformers with libraries (Hugging Face)</h3>
 <div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="torch, transformers" title="Needs torch, transformers — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>import torch
 from transformers import AutoModel, AutoTokenizer
@@ -1522,6 +1620,7 @@ print(np.round(np.linspace(0, 1, 5), 2))</textarea></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
 <script src="../assets/vendor/codemirror/codemirror.js"></script>
 <script src="../assets/vendor/codemirror/python.js"></script>
+<script src="../assets/vendor/codemirror/javascript.js"></script>
 <script src="../assets/vendor/codemirror/matchbrackets.js"></script>
 <script src="../assets/vendor/codemirror/closebrackets.js"></script>
 <script>window.CS_PYODIDE_URL = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";</script>

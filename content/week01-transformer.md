@@ -289,8 +289,8 @@ class SelfAttention {
   }
 
   forward(inputs, mask = null) {
-    const batchSize = inputs.length;
-    const seqLength = inputs[0].length;
+    // inputs: one sequence, shape (seqLength x embedSize)
+    const seqLength = inputs.length;
 
     // Linear projections
     const Q = this.matMul(inputs, this.wQ);
@@ -299,10 +299,11 @@ class SelfAttention {
 
     // (Head splitting / tensor reshaping omitted in this simplified version)
 
-    // Scores = Q * K^T, scaled by sqrt(headDim)
+    // Scores = Q * K^T, scaled by sqrt(d_k). Without head splitting the dot products run over
+    // all embedSize dimensions, so d_k = embedSize (with heads it would be headDim).
     const scores = this.matMul(Q, this.transpose(K));
     const scaledScores = scores.map(row =>
-      row.map(s => s / Math.sqrt(this.headDim))
+      row.map(s => s / Math.sqrt(this.embedSize))
     );
 
     // Mask placeholder (no logic in the demo)
@@ -317,6 +318,14 @@ class SelfAttention {
     return this.matMul(output, this.wO);
   }
 }
+
+// Try it: one sequence of 4 tokens, embedding size 8, 2 heads
+const attn = new SelfAttention(8, 2);
+const tokens = Array.from({ length: 4 }, () => Array.from({ length: 8 }, () => Math.random()));
+const out = attn.forward(tokens);
+console.log("input shape: ", tokens.length, "x", tokens[0].length);
+console.log("output shape:", out.length, "x", out[0].length);
+console.log("first output vector:", out[0].map(v => v.toFixed(4)).join(", "));
 ```
 
 ### Using Transformers with libraries (Hugging Face)

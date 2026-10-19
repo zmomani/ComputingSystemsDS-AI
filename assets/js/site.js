@@ -139,7 +139,7 @@
       Tab: (cm) => (cm.somethingSelected() ? cm.indentSelection("add") : cm.replaceSelection("    ", "end")),
     },
   });
-  let current = { code: editor.getValue(), local: false, needs: "", setup: "" };
+  let current = { code: editor.getValue(), local: false, needs: "", setup: "", lang: "python" };
 
   const PRELUDE = `
 import sys, io, base64, builtins
@@ -210,8 +210,31 @@ builtins.input = input
     return keep.join("\n").trim();
   }
 
+  function runJavaScript(code) {
+    return new Promise((resolve) => {
+      const src = `const fmt = (a) => a.map((x) => typeof x === "string" ? x : (() => { try { return JSON.stringify(x); } catch (_) { return String(x); } })()).join(" ");
+        const send = (kind) => (...a) => postMessage({ kind, text: fmt(a) });
+        console.log = send("stdout"); console.info = send("stdout"); console.warn = send("stderr"); console.error = send("stderr");
+        onmessage = (e) => { try { (0, eval)(e.data); } catch (err) { postMessage({ kind: "stderr", text: (err && err.name ? err.name + ": " : "") + (err && err.message || err) }); } postMessage({ kind: "done" }); };`;
+      const url = URL.createObjectURL(new Blob([src], { type: "text/javascript" }));
+      const w = new Worker(url);
+      const timer = setTimeout(() => { w.terminate(); out("stderr", "Stopped: the code ran for more than 10 seconds.\n"); resolve(); }, 10000);
+      w.onmessage = (e) => { if (e.data.kind === "done") { clearTimeout(timer); w.terminate(); URL.revokeObjectURL(url); resolve(); } else out(e.data.kind, e.data.text + "\n"); };
+      w.onerror = (e) => { clearTimeout(timer); out("stderr", e.message + "\n"); w.terminate(); resolve(); };
+      w.postMessage(code);
+    });
+  }
+
   async function runEditor() {
     if (S.running) return;
+    if (current.lang === "javascript") {
+      S.running = true; el.run.disabled = true; clearOut();
+      const t0 = performance.now();
+      try { await runJavaScript(editor.getValue()); } finally { S.running = false; el.run.disabled = false; }
+      if (!el.out.querySelector(".stdout, .stderr")) out("result", "(no output — add console.log(...) to print values)\n");
+      el.runTime.textContent = ((performance.now() - t0) / 1000).toFixed(2) + " s · JavaScript";
+      return;
+    }
     S.running = true; el.run.disabled = true;
     const keepNote = el.out.querySelector(".note") && current.setup ? el.out.querySelector(".note").textContent : ""; clearOut(); if (keepNote) out("note", keepNote);
     const code = editor.getValue(), t0 = performance.now();
@@ -252,8 +275,10 @@ builtins.input = input
     } finally { S.running = false; el.run.disabled = false; }
   }
 
-  function loadIntoEditor(code, { title = "Example", local = false, needs = "", setup = "" } = {}) {
-    current = { code, local, needs, setup };
+  function loadIntoEditor(code, { title = "Example", local = false, needs = "", setup = "", lang = "python" } = {}) {
+    current = { code, local, needs, setup, lang };
+    editor.setOption("mode", lang === "javascript" ? "javascript" : "python");
+    editor.setOption("indentUnit", lang === "javascript" ? 2 : 4);
     editor.setValue(code); clearOut();
     el.title.textContent = title;
     if (setup) out("note", "This example continues an earlier one in the lesson; that code runs first, silently.\n");
@@ -269,7 +294,7 @@ builtins.input = input
     const local = b.dataset.run === "0";
     openPanel("code");
     const setupEl = box.querySelector(".setup");
-    loadIntoEditor(code, { title, local, needs: b.dataset.needs || "", setup: setupEl ? setupEl.value : "" });
+    loadIntoEditor(code, { title, local, needs: b.dataset.needs || "", setup: setupEl ? setupEl.value : "", lang: b.dataset.lang || "python" });
     if (!local) runEditor();
   }));
 

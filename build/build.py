@@ -165,6 +165,9 @@ def code_block_html(code, lang, title=None):
     pre = f'<pre><code class="language-{lang}">{esc}</code></pre>'
     head = f'<div class="code-title">{html.escape(title)}</div>' if title else ''
     shell_only = all(l.strip().startswith(('!', '%', '#')) for l in code.splitlines() if l.strip())
+    if lang == 'javascript' and not re.search(r'\b(document|window|fetch|require|localStorage|XMLHttpRequest)\b|^\s*import\s', code, re.M):
+        btn = '<button class="try" data-run="1" data-lang="javascript">▶ Try it</button>'
+        return f'<div class="runnable" data-lang="javascript">{head}{btn}<button class="copy">Copy</button><textarea class="src" hidden>{esc}</textarea>{pre}</div>'
     if lang != 'python' or shell_only:
         return f'<div class="codeblock">{head}<button class="copy">Copy</button>{pre}</div>'
     PAGE_BLOCKS.append((code, title))
@@ -472,6 +475,7 @@ def scripts(depth, workbench=False):
     sims = ''.join(f'<script src="{base}assets/js/sims/{s}.js"></script>' for s in SIM_FILES)
     cm = f'''<script src="{base}assets/vendor/codemirror/codemirror.js"></script>
 <script src="{base}assets/vendor/codemirror/python.js"></script>
+<script src="{base}assets/vendor/codemirror/javascript.js"></script>
 <script src="{base}assets/vendor/codemirror/matchbrackets.js"></script>
 <script src="{base}assets/vendor/codemirror/closebrackets.js"></script>
 <script>window.CS_PYODIDE_URL = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";</script>''' if workbench else ''
