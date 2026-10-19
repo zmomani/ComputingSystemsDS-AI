@@ -33,7 +33,7 @@
 </blockquote>
 <h2 id="2-setting-up-the-environment">2. Setting Up the Environment</h2>
 <p>Import the libraries, load the API key from a <code>.env</code> file, create an OpenAI client, and send a test message to confirm the connection works.</p>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="dotenv, httpx, openai" title="Needs dotenv, httpx, openai — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># environment_setup.py
+<div class="where-note"><div class="where-head">Where does this code run — and why?</div><p><b>▶ Try it</b> examples run inside your web browser, which can only run plain Python and light libraries (NumPy, pandas, scikit-learn, matplotlib). From here on some examples need more:</p><ul><li><b>LangChain, LangGraph, OpenAI and other API examples → Colab or VS Code.</b> They send requests over the internet and need your own API key, which a page in the browser cannot use safely. In Colab add the key with the 🔑 Secrets panel; on your computer keep it in a <code>.env</code> file.</li></ul></div><div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="dotenv, httpx, openai" title="Needs dotenv, httpx, openai — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># environment_setup.py
 import openai
 import re
 import httpx
@@ -327,7 +327,7 @@ def query(question, max_turns=5):
                      └──────────────────────────────────────────────────────────────┘</code></pre></div>
 <h2 id="7-complete-example">7. Complete Example</h2>
 <p>A multi-step question about the combined weight of two dogs. The agent looks up each breed, adds the weights, and returns the total — showing how a multi-step problem is split into smaller steps.</p>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># complex_example.py
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># complex_example.py
 question = &quot;&quot;&quot;I have 2 dogs, a border collie and a scottish terrier. \
 What is their combined weight&quot;&quot;&quot;
 
@@ -363,7 +363,7 @@ Observation: 57
 Answer:      The combined weight of your border collie and scottish terrier is 57 lbs.</code></pre></div>
 <h2 id="8-complete-code-architecture">8. Complete Code Architecture</h2>
 <p>All the pieces combined into a single script with a main entry point.</p>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="dotenv, openai" title="Needs dotenv, openai — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># react_agent.py
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="dotenv, openai" title="Needs dotenv, openai — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># react_agent.py
 import ast
 import operator
 import re
@@ -1110,7 +1110,7 @@ def query(question, max_turns=5):
         obs = known_actions[action](arg); print(&quot; -- running&quot;, action, arg); print(&quot;Observation:&quot;, obs)
         next_prompt = f&quot;Observation: {obs}&quot;
 
-print(&quot;messages in history:&quot;, query(&quot;I have 2 dogs, a border collie and a scottish terrier. What is their combined weight&quot;))</code></pre></div><div class="runnable local"><div class="code-title">Live run against OpenAI (needs OPENAI_API_KEY in .env): the lesson&#x27;s own entry point</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="dotenv, openai" title="Needs dotenv, openai — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 4. Live run against OpenAI (needs OPENAI_API_KEY in .env): the lesson&#x27;s own entry point
+print(&quot;messages in history:&quot;, query(&quot;I have 2 dogs, a border collie and a scottish terrier. What is their combined weight&quot;))</code></pre></div><div class="runnable local"><div class="code-title">Live run against OpenAI (needs OPENAI_API_KEY in .env): the lesson&#x27;s own entry point</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="dotenv, openai" title="Needs dotenv, openai — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 4. Live run against OpenAI (needs OPENAI_API_KEY in .env): the lesson&#x27;s own entry point
 #    pip install openai python-dotenv
 from dotenv import load_dotenv; _ = load_dotenv()
 from openai import OpenAI

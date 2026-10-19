@@ -395,7 +395,7 @@ LIMIT 1;</code></pre></div>
 </table>
 <h2 id="implementation-code">Implementation Code</h2>
 <h3 id="setting-up-the-environment">Setting Up the Environment</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="langchain_community, langchain_openai, langgraph" title="Needs langchain_community, langchain_openai, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># Install required packages (run in a terminal):
+<div class="where-note"><div class="where-head">Where does this code run — and why?</div><p><b>▶ Try it</b> examples run inside your web browser, which can only run plain Python and light libraries (NumPy, pandas, scikit-learn, matplotlib). From here on some examples need more:</p><ul><li><b>LangChain, LangGraph, OpenAI and other API examples → Colab or VS Code.</b> They send requests over the internet and need your own API key, which a page in the browser cannot use safely. In Colab add the key with the 🔑 Secrets panel; on your computer keep it in a <code>.env</code> file.</li><li><b>Ollama, MCP servers, Django, Playwright and Streamlit → VS Code on your computer.</b> These start programs on your own machine — a local model, a server, a web app or a real browser. Neither the browser nor Colab can run them, so use <b>Copy</b> and run them in VS Code with the course environment.</li></ul></div><div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_community, langchain_openai, langgraph" title="Needs langchain_community, langchain_openai, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># Install required packages (run in a terminal):
 #   pip install langchain langchain-community langchain-openai langgraph sqlalchemy requests
 
 # Import necessary modules
@@ -421,7 +421,7 @@ from langgraph.prebuilt import create_react_agent
 # Set your OpenAI API key
 os.environ[&quot;OPENAI_API_KEY&quot;] = &quot;your-api-key-here&quot;</code></pre></div>
 <h3 id="database-connection">Database Connection</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="requests, sqlalchemy" title="Needs requests, sqlalchemy — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># Connect to an SQLite Database
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="requests, sqlalchemy" title="Needs requests, sqlalchemy — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># Connect to an SQLite Database
 from sqlalchemy import create_engine
 from sqlalchemy.pool import StaticPool
 
@@ -481,7 +481,7 @@ def get_in_memory_db():
 engine = get_in_memory_db()
 db = SQLDatabase(engine)</code></pre></div>
 <h3 id="creating-the-langchain-agent">Creating the LangChain Agent</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="langchain_community" title="Needs langchain_community — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># Initialize Language Model
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_community" title="Needs langchain_community — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># Initialize Language Model
 llm = ChatOpenAI(model=&quot;gpt-4o&quot;, temperature=0)  # You can also use gpt-4o-mini for lower cost
 
 # Initialize SQL Database Toolkit
@@ -521,7 +521,7 @@ agent_executor = create_react_agent(
     prompt=system_message
 )</code></pre></div>
 <h3 id="django-integration-viewspy">Django Integration (views.py)</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="django" title="Needs django — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># views.py for Django integration
+<div class="runnable local"><span class="local-btns"><button class="try local vscode-try" data-run="0" data-target="vscode" data-needs="Django" title="Starts programs on your own computer — open it, copy it and run it in VS Code">💻 Run in VS Code</button></span><button class="copy">Copy</button><textarea class="src" hidden># views.py for Django integration
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -756,7 +756,7 @@ def output_parser(text):
 def chain(topic):                     # LCEL equivalent: prompt | llm | parser
     return output_parser(fake_llm(prompt_template(topic)))
 
-print(chain(&quot;MCP&quot;))</code></pre></div><h3 id="test-code">Test code for the course environment</h3><div class="runnable local"><div class="code-title">Verify installation and call a chat model directly</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="langchain_core, langchain_openai" title="Needs langchain_core, langchain_openai — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 1. Verify installation and call a chat model directly
+print(chain(&quot;MCP&quot;))</code></pre></div><h3 id="test-code">Test code for the course environment</h3><div class="runnable local"><div class="code-title">Verify installation and call a chat model directly</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core, langchain_openai" title="Needs langchain_core, langchain_openai — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 1. Verify installation and call a chat model directly
 # pip install langchain langchain-core langchain-openai
 import os
 from langchain_openai import ChatOpenAI
@@ -774,7 +774,7 @@ from langchain_core.messages import HumanMessage
 os.environ[&quot;OPENAI_API_KEY&quot;] = &quot;your-api-key-here&quot;
 
 llm = ChatOpenAI(model=&quot;gpt-4o-mini&quot;, temperature=0)
-print(llm.invoke([HumanMessage(content=&quot;In one sentence, what is LangChain?&quot;)]).content)</code></pre></div><div class="runnable local"><div class="code-title">A minimal LCEL chain: prompt template -&gt; LLM -&gt; output parser</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="langchain_core, langchain_openai" title="Needs langchain_core, langchain_openai — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 2. A minimal LCEL chain: prompt template -&gt; LLM -&gt; output parser
+print(llm.invoke([HumanMessage(content=&quot;In one sentence, what is LangChain?&quot;)]).content)</code></pre></div><div class="runnable local"><div class="code-title">A minimal LCEL chain: prompt template -&gt; LLM -&gt; output parser</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core, langchain_openai" title="Needs langchain_core, langchain_openai — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 2. A minimal LCEL chain: prompt template -&gt; LLM -&gt; output parser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_openai import ChatOpenAI
@@ -796,7 +796,7 @@ prompt = ChatPromptTemplate.from_messages([
 ])
 chain = prompt | ChatOpenAI(model=&quot;gpt-4o-mini&quot;, temperature=0) | StrOutputParser()
 
-print(chain.invoke({&quot;topic&quot;: &quot;LangChain Expression Language&quot;}))</code></pre></div><div class="runnable local"><div class="code-title">Inspect the pieces of a chain without an API key</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="langchain_core" title="Needs langchain_core — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 3. Inspect the pieces of a chain without an API key
+print(chain.invoke({&quot;topic&quot;: &quot;LangChain Expression Language&quot;}))</code></pre></div><div class="runnable local"><div class="code-title">Inspect the pieces of a chain without an API key</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core" title="Needs langchain_core — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 3. Inspect the pieces of a chain without an API key
 from langchain_core.prompts import ChatPromptTemplate
 
 prompt = ChatPromptTemplate.from_messages([
@@ -816,7 +816,7 @@ prompt = ChatPromptTemplate.from_messages([
 messages = prompt.format_messages(text=&quot;the LangChain stack&quot;, audience=&quot;first-year student&quot;)
 for m in messages:
     print(f&quot;{m.type}: {m.content}&quot;)
-print(&quot;Input variables:&quot;, prompt.input_variables)</code></pre></div><div class="runnable local"><div class="code-title">Stream tokens from a chain (streaming is first-class in LCEL)</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="langchain_core, langchain_openai" title="Needs langchain_core, langchain_openai — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 4. Stream tokens from a chain (streaming is first-class in LCEL)
+print(&quot;Input variables:&quot;, prompt.input_variables)</code></pre></div><div class="runnable local"><div class="code-title">Stream tokens from a chain (streaming is first-class in LCEL)</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core, langchain_openai" title="Needs langchain_core, langchain_openai — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 4. Stream tokens from a chain (streaming is first-class in LCEL)
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_openai import ChatOpenAI
@@ -840,7 +840,7 @@ chain = (
 )
 for chunk in chain.stream({&quot;tool&quot;: &quot;LangSmith&quot;}):
     print(chunk, end=&quot;&quot;, flush=True)
-print()</code></pre></div><div class="runnable local"><div class="code-title">Load Chinook into an in-memory SQLite DB and inspect it with SQLDatabase (no LLM needed)</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="langchain_community, requests, sqlalchemy" title="Needs langchain_community, requests, sqlalchemy — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 1. Load Chinook into an in-memory SQLite DB and inspect it with SQLDatabase (no LLM needed)
+print()</code></pre></div><div class="runnable local"><div class="code-title">Load Chinook into an in-memory SQLite DB and inspect it with SQLDatabase (no LLM needed)</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_community, requests, sqlalchemy" title="Needs langchain_community, requests, sqlalchemy — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 1. Load Chinook into an in-memory SQLite DB and inspect it with SQLDatabase (no LLM needed)
 # pip install langchain-community sqlalchemy requests
 import sqlite3, requests
 from sqlalchemy import create_engine
@@ -872,7 +872,7 @@ db = SQLDatabase(engine)
 
 print(db.dialect)
 print(db.get_usable_table_names())
-print(db.get_table_info([&quot;Customer&quot;, &quot;Invoice&quot;])[:800])</code></pre></div><div class="runnable local"><div class="code-title">Run the Process Flow SQL by hand and confirm the &quot;USA, 523.06&quot; result</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 2. Run the Process Flow SQL by hand and confirm the &quot;USA, 523.06&quot; result
+print(db.get_table_info([&quot;Customer&quot;, &quot;Invoice&quot;])[:800])</code></pre></div><div class="runnable local"><div class="code-title">Run the Process Flow SQL by hand and confirm the &quot;USA, 523.06&quot; result</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 2. Run the Process Flow SQL by hand and confirm the &quot;USA, 523.06&quot; result
 sql = &quot;&quot;&quot;
 SELECT c.Country, SUM(i.Total) AS TotalSpent
 FROM Customer c
@@ -890,7 +890,7 @@ GROUP BY c.Country
 ORDER BY TotalSpent DESC
 LIMIT 1;
 &quot;&quot;&quot;
-print(db.run(sql))</code></pre></div><div class="runnable local"><div class="code-title">Look at the four tools the SQLDatabaseToolkit exposes</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="langchain_community, langchain_openai" title="Needs langchain_community, langchain_openai — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 3. Look at the four tools the SQLDatabaseToolkit exposes
+print(db.run(sql))</code></pre></div><div class="runnable local"><div class="code-title">Look at the four tools the SQLDatabaseToolkit exposes</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_community, langchain_openai" title="Needs langchain_community, langchain_openai — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 3. Look at the four tools the SQLDatabaseToolkit exposes
 from langchain_openai import ChatOpenAI
 from langchain_community.agent_toolkits.sql.toolkit import SQLDatabaseToolkit
 
@@ -904,7 +904,7 @@ from langchain_community.agent_toolkits.sql.toolkit import SQLDatabaseToolkit
 llm = ChatOpenAI(model=&quot;gpt-4o-mini&quot;, temperature=0)
 toolkit = SQLDatabaseToolkit(db=db, llm=llm)
 for t in toolkit.get_tools():
-    print(f&quot;{t.name}: {t.description[:90]}...&quot;)</code></pre></div><div class="runnable local"><div class="code-title">Ask the SQL agent a question and watch every intermediate step</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="langchain_community, langgraph" title="Needs langchain_community, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 4. Ask the SQL agent a question and watch every intermediate step
+    print(f&quot;{t.name}: {t.description[:90]}...&quot;)</code></pre></div><div class="runnable local"><div class="code-title">Ask the SQL agent a question and watch every intermediate step</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_community, langgraph" title="Needs langchain_community, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 4. Ask the SQL agent a question and watch every intermediate step
 from langchain_community.agent_toolkits.sql.prompt import SQL_PREFIX
 from langgraph.prebuilt import create_react_agent
 

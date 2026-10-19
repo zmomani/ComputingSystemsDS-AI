@@ -409,7 +409,7 @@
 <li><strong>Integrate and deploy</strong> — connect through the provided APIs/SDKs and roll out to users or internal systems.</li>
 </ol>
 <h3 id="using-with-hugging-face">Using with Hugging Face</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="torch, transformers" title="Needs torch, transformers — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from transformers import AutoTokenizer, AutoModelForCausalLM
+<div class="where-note"><div class="where-head">Where does this code run — and why?</div><p><b>▶ Try it</b> examples run inside your web browser, which can only run plain Python and light libraries (NumPy, pandas, scikit-learn, matplotlib). From here on some examples need more:</p><ul><li><b>PyTorch, Hugging Face Transformers and other model libraries → Google Colab.</b> They are large (PyTorch alone is over 700 MB), need a full Python installation and often a GPU — a web browser has none of these. Colab already has them installed and gives a free GPU, so <b>▶ Run in Colab</b> works with nothing to set up.</li></ul></div><div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="torch, transformers" title="Needs torch, transformers — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 
 # Load tokenizer
@@ -479,7 +479,7 @@ outputs = model.generate(
 # Decode and print response (only the newly generated tokens)
 print(tokenizer.decode(outputs[0][input_ids.shape[1]:], skip_special_tokens=True))</code></pre></div>
 <h3 id="using-with-vllm">Using with vLLM</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="vllm" title="Needs vllm — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from vllm import LLM, SamplingParams
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="vllm" title="Needs vllm — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from vllm import LLM, SamplingParams
 
 # Initialize the model
 llm = LLM(
@@ -533,7 +533,7 @@ outputs = llm.chat(messages, sampling_params)
 # Print response
 print(outputs[0].outputs[0].text)</code></pre></div>
 <h3 id="using-llama4-with-images">Using LLAMA4 with Images</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="torch, transformers" title="Needs torch, transformers — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from transformers import AutoProcessor, Llama4ForConditionalGeneration
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="torch, transformers" title="Needs torch, transformers — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from transformers import AutoProcessor, Llama4ForConditionalGeneration
 import torch
 
 # Load model and processor (requires transformers &gt;= 4.51)
@@ -732,7 +732,7 @@ def sample_next(logits, temperature=0.7, top_p=0.9, rng=np.random.default_rng(0)
     return rng.choice(keep, p=q), dict(zip(keep.tolist(), q.round(3).tolist()))
 
 tok, kept = sample_next([2.0, 1.5, 1.0, 0.2, -1.0])
-print(&quot;sampled token id:&quot;, tok, &quot;| nucleus:&quot;, kept)</code></pre></div><div class="runnable local"><div class="code-title">Context-window scale: how many tokens is a document? (needs: pip install tiktoken)</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="tiktoken" title="Needs tiktoken — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 3. Context-window scale: how many tokens is a document? (needs: pip install tiktoken)
+print(&quot;sampled token id:&quot;, tok, &quot;| nucleus:&quot;, kept)</code></pre></div><div class="runnable local"><div class="code-title">Context-window scale: how many tokens is a document? (needs: pip install tiktoken)</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="tiktoken" title="Needs tiktoken — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 3. Context-window scale: how many tokens is a document? (needs: pip install tiktoken)
 import tiktoken
 enc = tiktoken.get_encoding(&quot;cl100k_base&quot;)
 text = &quot;Large language models read text as tokens, not as words or characters. &quot; * 200  # or: open(&quot;any_file.txt&quot;).read()
@@ -744,7 +744,7 @@ enc = tiktoken.get_encoding(&quot;cl100k_base&quot;)
 text = &quot;Large language models read text as tokens, not as words or characters. &quot; * 200  # or: open(&quot;any_file.txt&quot;).read()
 n = len(enc.encode(text))
 for model, ctx in [(&quot;Llama 3&quot;, 128_000), (&quot;Maverick&quot;, 1_000_000), (&quot;Scout&quot;, 10_000_000)]:
-    print(f&quot;{model:9s} window holds ~{ctx // n:,} copies of this text ({n} tokens)&quot;)</code></pre></div><div class="runnable local"><div class="code-title">Smoke test the Hugging Face loading pattern on a tiny model (CPU-friendly stand-in for Lla</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="torch, transformers" title="Needs torch, transformers — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 4. Smoke test the Hugging Face loading pattern on a tiny model (CPU-friendly stand-in for Llama 4)
+    print(f&quot;{model:9s} window holds ~{ctx // n:,} copies of this text ({n} tokens)&quot;)</code></pre></div><div class="runnable local"><div class="code-title">Smoke test the Hugging Face loading pattern on a tiny model (CPU-friendly stand-in for Lla</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="torch, transformers" title="Needs torch, transformers — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 4. Smoke test the Hugging Face loading pattern on a tiny model (CPU-friendly stand-in for Llama 4)
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 name = &quot;sshleifer/tiny-gpt2&quot;   # swap for &quot;meta-llama/Llama-4-Scout-17B-16E-Instruct&quot; on an H100

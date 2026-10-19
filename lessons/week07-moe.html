@@ -234,7 +234,7 @@
 </table>
 <h2 id="code-examples-building-an-moe-layer-in-pytorch">Code Examples: Building an MoE Layer in PyTorch</h2>
 <h3 id="step-1-the-expert-network-a-feedforward-sub-model">Step 1: The Expert Network — a feedforward sub-model</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>import torch
+<div class="where-note"><div class="where-head">Where does this code run — and why?</div><p><b>▶ Try it</b> examples run inside your web browser, which can only run plain Python and light libraries (NumPy, pandas, scikit-learn, matplotlib). From here on some examples need more:</p><ul><li><b>PyTorch, Hugging Face Transformers and other model libraries → Google Colab.</b> They are large (PyTorch alone is over 700 MB), need a full Python installation and often a GPU — a web browser has none of these. Colab already has them installed and gives a free GPU, so <b>▶ Run in Colab</b> works with nothing to set up.</li></ul></div><div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="torch" title="Needs torch — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -276,7 +276,7 @@ output = expert(tokens)
 print(f&quot;Input:  {tokens.shape}&quot;)   # [4, 512]
 print(f&quot;Output: {output.shape}&quot;)   # [4, 512] — same shape!</code></pre></div>
 <h3 id="step-2-the-router-deciding-which-experts-process-each-token">Step 2: The Router — deciding which experts process each token</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>class TopKRouter(nn.Module):
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="torch" title="Needs torch — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>class TopKRouter(nn.Module):
     &quot;&quot;&quot;Routes each token to the top-k most relevant experts.&quot;&quot;&quot;
     def __init__(self, d_model: int, num_experts: int, top_k: int = 2):
         super().__init__()
@@ -340,7 +340,7 @@ print(&quot;Expert indices per token:&quot;, indices)
 print(&quot;Expert weights per token: &quot;, weights.round(decimals=2))
 # e.g. tensor([[0.62, 0.38], [0.71, 0.29], ...])</code></pre></div>
 <h3 id="step-3-the-moe-layer-combining-router-experts">Step 3: The MoE Layer — combining router + experts</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>class MoELayer(nn.Module):
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="torch" title="Needs torch — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>class MoELayer(nn.Module):
     &quot;&quot;&quot;
     Sparse Mixture of Experts Layer.
     Replaces a single FFN in a Transformer with N expert FFNs.
@@ -458,7 +458,7 @@ total = sum(p.numel() for p in moe.parameters())
 active = total * (moe.top_k / moe.num_experts)
 print(f&quot;Total params: {total:,} | Active per token: {int(active):,}&quot;)</code></pre></div>
 <h3 id="step-4-load-balancing-loss-preventing-expert-collapse">Step 4: Load Balancing Loss — preventing expert collapse</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>def auxiliary_load_balancing_loss(
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="torch" title="Needs torch — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>def auxiliary_load_balancing_loss(
     router_probs: torch.Tensor,   # [N, num_experts] — softmax output
     expert_indices: torch.Tensor, # [N, top_k] — selected expert IDs
     num_experts: int
@@ -548,7 +548,7 @@ print(f&quot;Task loss:    {task_loss.item():.4f}&quot;)
 print(f&quot;Balance loss: {balance_loss.item():.4f}&quot;)   # ideally close to 1.0
 print(f&quot;Total loss:   {total_loss.item():.4f}&quot;)</code></pre></div>
 <h3 id="step-5-using-mixtral-deepseek-via-huggingface-transformers">Step 5: Using Mixtral / DeepSeek via HuggingFace Transformers</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="torch, transformers" title="Needs torch, transformers — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># Install: pip install transformers accelerate bitsandbytes
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="torch, transformers" title="Needs torch, transformers — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># Install: pip install transformers accelerate bitsandbytes
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 import torch
 
@@ -746,7 +746,7 @@ for t in range(n_tokens):
 params_per_expert = d_model * d_ff + d_ff * d_model
 print(&quot;\nload per expert:&quot;, load)
 print(f&quot;total expert parameters: {n_experts * params_per_expert}, used per token: {top_k * params_per_expert} &quot;
-      f&quot;({top_k / n_experts:.0%})&quot;)</code></pre></div><h3 id="test-code">Test code for the course environment</h3><div class="runnable local"><div class="code-title">The core routing step on its own: softmax → top-k → renormalize</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 1. The core routing step on its own: softmax → top-k → renormalize
+      f&quot;({top_k / n_experts:.0%})&quot;)</code></pre></div><h3 id="test-code">Test code for the course environment</h3><div class="runnable local"><div class="code-title">The core routing step on its own: softmax → top-k → renormalize</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="torch" title="Needs torch — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 1. The core routing step on its own: softmax → top-k → renormalize
 import torch, torch.nn.functional as F
 torch.manual_seed(0)
 num_experts, top_k = 8, 2
@@ -766,7 +766,7 @@ probs = F.softmax(gate(x), dim=-1)
 w, idx = torch.topk(probs, top_k, dim=-1)
 w = w / w.sum(dim=-1, keepdim=True)
 print(&quot;experts chosen per token:\n&quot;, idx)
-print(&quot;renormalized weights (rows sum to 1):\n&quot;, w.round(decimals=2), w.sum(-1))</code></pre></div><div class="runnable local"><div class="code-title">Show that an MoE layer preserves shape and uses only k/N of its expert parameters</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 2. Show that an MoE layer preserves shape and uses only k/N of its expert parameters
+print(&quot;renormalized weights (rows sum to 1):\n&quot;, w.round(decimals=2), w.sum(-1))</code></pre></div><div class="runnable local"><div class="code-title">Show that an MoE layer preserves shape and uses only k/N of its expert parameters</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="torch" title="Needs torch — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 2. Show that an MoE layer preserves shape and uses only k/N of its expert parameters
 import torch, torch.nn as nn, torch.nn.functional as F
 
 class Expert(nn.Module):
@@ -812,7 +812,7 @@ class MoE(nn.Module):
 
 moe = MoE(); y, p, idx = moe(torch.randn(2, 10, 64))
 total = sum(q.numel() for q in moe.experts.parameters())
-print(&quot;output shape:&quot;, tuple(y.shape), &quot;| expert params:&quot;, total, &quot;| active per token:&quot;, total * moe.k // moe.E)</code></pre></div><div class="runnable local"><div class="code-title">Load-balancing loss: balanced vs. collapsed routing</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 3. Load-balancing loss: balanced vs. collapsed routing
+print(&quot;output shape:&quot;, tuple(y.shape), &quot;| expert params:&quot;, total, &quot;| active per token:&quot;, total * moe.k // moe.E)</code></pre></div><div class="runnable local"><div class="code-title">Load-balancing loss: balanced vs. collapsed routing</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="torch" title="Needs torch — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 3. Load-balancing loss: balanced vs. collapsed routing
 import torch, torch.nn.functional as F
 def aux_loss(probs, idx, E):
     f = F.one_hot(idx, E).float().sum(dim=[0, 1]) / (probs.shape[0] * idx.shape[1])
@@ -834,7 +834,7 @@ uniform_p = torch.full((N, E), 1 / E); uniform_idx = torch.stack([torch.arange(N
 collapsed_p = F.one_hot(torch.zeros(N, dtype=torch.long), E).float() * 0.9 + 0.1 / E
 collapsed_idx = torch.zeros(N, 2, dtype=torch.long)
 print(&quot;balanced  :&quot;, aux_loss(uniform_p, uniform_idx, E).item())    # ≈ 1.0
-print(&quot;collapsed :&quot;, aux_loss(collapsed_p, collapsed_idx, E).item()) # &gt;&gt; 1.0</code></pre></div><div class="runnable local"><div class="code-title">Watch the auxiliary loss fix collapse during a toy training loop</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 4. Watch the auxiliary loss fix collapse during a toy training loop
+print(&quot;collapsed :&quot;, aux_loss(collapsed_p, collapsed_idx, E).item()) # &gt;&gt; 1.0</code></pre></div><div class="runnable local"><div class="code-title">Watch the auxiliary loss fix collapse during a toy training loop</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="torch" title="Needs torch — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 4. Watch the auxiliary loss fix collapse during a toy training loop
 import torch, torch.nn.functional as F
 torch.manual_seed(1)
 E, k, d = 8, 2, 32

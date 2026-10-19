@@ -113,6 +113,13 @@
   /* ------------------------------------------------ Google Colab links */
   const COLAB = lesson.dataset.colab || "";
   $$("[data-colab-link]").forEach((a) => { if (COLAB) a.href = COLAB; else a.remove(); });
+  function vscodeNote(what) {
+    const d = document.createElement("div"); d.className = "colab-note";
+    d.innerHTML = `<p>${what}</p><p>It starts programs on your own computer (a local model, a server, a web app or a real browser), which neither this page nor Google Colab can do.</p>` +
+      `<p><button class="btn ghost" data-copy-editor>Copy the code</button> then paste it into VS Code and run it with the course environment.</p>`;
+    el.out.appendChild(d);
+    d.querySelector("[data-copy-editor]").addEventListener("click", (e) => copyText(editor.getValue(), e.currentTarget));
+  }
   function colabNote(what) {
     const browser = document.getElementById("run-in-your-browser");
     const d = document.createElement("div"); d.className = "colab-note";
@@ -244,7 +251,8 @@ builtins.input = input
       const mods = await loadPackagesFor(py, setup + "\n" + code);
       const unavailable = mods.filter((m) => !BROWSER_PKGS[m] && !py.runPython(`__import__("importlib.util").util.find_spec(${JSON.stringify(m)}) is not None`));
       if (unavailable.length) {
-        colabNote(`This example needs <b>${unavailable.join(", ")}</b>, which cannot run inside a web browser.`);
+        if (current.target === "vscode") vscodeNote(`This example needs <b>${unavailable.join(", ")}</b> and runs in <b>VS Code</b>.`);
+        else colabNote(`This example needs <b>${unavailable.join(", ")}</b>, which cannot run inside a web browser.`);
         return;
       }
       const ns = py.globals.get("dict")();
@@ -275,14 +283,15 @@ builtins.input = input
     } finally { S.running = false; el.run.disabled = false; }
   }
 
-  function loadIntoEditor(code, { title = "Example", local = false, needs = "", setup = "", lang = "python" } = {}) {
-    current = { code, local, needs, setup, lang };
+  function loadIntoEditor(code, { title = "Example", local = false, needs = "", setup = "", lang = "python", target = "colab" } = {}) {
+    current = { code, local, needs, setup, lang, target };
     editor.setOption("mode", lang === "javascript" ? "javascript" : "python");
     editor.setOption("indentUnit", lang === "javascript" ? 2 : 4);
     editor.setValue(code); clearOut();
     el.title.textContent = title;
     if (setup) out("note", "This example continues an earlier one in the lesson; that code runs first, silently.\n");
-    if (local) colabNote(`This example needs <b>${needs}</b>, so it cannot run in the browser.`);
+    if (local && target === "vscode") vscodeNote(`This example needs <b>${needs}</b> and runs in <b>VS Code</b>.`);
+    else if (local) colabNote(`This example needs <b>${needs}</b>, so it cannot run in the browser.`);
     setTimeout(() => { editor.refresh(); editor.focus(); }, 0);
   }
 
@@ -294,7 +303,7 @@ builtins.input = input
     const local = b.dataset.run === "0";
     openPanel("code");
     const setupEl = box.querySelector(".setup");
-    loadIntoEditor(code, { title, local, needs: b.dataset.needs || "", setup: setupEl ? setupEl.value : "", lang: b.dataset.lang || "python" });
+    loadIntoEditor(code, { title, local, needs: b.dataset.needs || "", setup: setupEl ? setupEl.value : "", lang: b.dataset.lang || "python", target: b.dataset.target || "colab" });
     if (!local) runEditor();
   }));
 

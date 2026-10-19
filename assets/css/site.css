@@ -186,6 +186,14 @@ kbd { font-family: var(--mono); font-size: .8em; background: #eef1f5; border: 1p
 .runnable .code-title + .try, .runnable .code-title ~ .copy { top: 1.95rem; }
 .codeblock .code-title ~ .copy { top: 1.95rem; }
 
+/* "where does this code run" note */
+.where-note { margin: 1.2rem 0; border: 1px solid #c9d6e6; border-left: 4px solid var(--navy); border-radius: 0 10px 10px 0; background: #f4f7fb; padding: .7rem 1rem .5rem; font-size: .94rem; }
+.where-head { font-weight: 700; color: var(--navy); margin-bottom: .3rem; }
+.where-note p { margin: .2rem 0 .4rem; }
+.where-note ul { margin: .2rem 0 .3rem; padding-left: 1.2rem; }
+.where-note li { margin: .3rem 0; max-width: none; }
+.runnable .try.vscode-try { background: #1f6fb5; color: #fff; border: 0; }
+
 /* Google Colab */
 .colab-bar { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .8rem; margin: .2rem 0 .8rem; }
 .btn.colab { background: #fff; color: #1b1f24; border: 1px solid #c9d0da; font-weight: 600; }

@@ -281,10 +281,50 @@ def finalize(page_html, slug=None, title=None):
     def block(i):
         code, title = PAGE_BLOCKS[i]; r = res[i]
         return python_block_html(code, title, r['run'], r.get('setup', ''), r.get('reason', ''))
+    first_local = next((i for i, r in enumerate(res) if not r['run']), None)
+    if first_local is not None:
+        note = where_note([b for b, r in zip(PAGE_BLOCKS, res) if not r['run']])
+        page_html = re.sub(rf'(<p>\s*)?PYBLOCK{first_local}XEND', lambda m: note + m.group(0), page_html, count=1)
     out = re.sub(r'<p>\s*PYBLOCK(\d+)XEND\s*</p>', lambda m: block(int(m.group(1))), page_html)
     out = re.sub(r'PYBLOCK(\d+)XEND', lambda m: block(int(m.group(1))), out)
     PAGE_BLOCKS.clear()
     return out
+
+VSCODE_MODS = {'ollama', 'langchain_ollama', 'django', 'playwright', 'selenium', 'streamlit', 'uvicorn', 'fastapi', 'flask', 'gradio_client'}
+COLAB_MODS = {'torch', 'torchvision', 'transformers', 'datasets', 'diffusers', 'sentence_transformers', 'evaluate', 'accelerate',
+              'bitsandbytes', 'vllm', 'seqeval', 'gradio', 'tiktoken'}
+API_MODS = {'openai', 'anthropic', 'langchain', 'langchain_openai', 'langchain_core', 'langchain_community', 'langgraph', 'tavily',
+            'langchain_tavily', 'langchain_anthropic', 'chromadb', 'mcp', 'a2a', 'httpx', 'requests', 'dotenv'}
+
+def run_target(code):
+    """'vscode' for code that starts programs/servers on the student's computer, otherwise 'colab'."""
+    mods = imported_modules(code) | set(missing_modules(code))
+    if mods & VSCODE_MODS or SCRIPT_FILE.search(code) or re.search(r'mcp\.run\(|ChatOllama|OllamaLLM|localhost:11434', code):
+        return 'vscode'
+    return 'colab'
+
+def where_note(blocks):
+    """Short explanation shown before the first example that cannot run in the browser."""
+    mods, targets = set(), set()
+    for c, _ in blocks:
+        mods |= imported_modules(c) | set(missing_modules(c)); targets.add(run_target(c))
+    items = []
+    if mods & COLAB_MODS or ('colab' in targets and not mods & API_MODS):
+        items.append('<li><b>PyTorch, Hugging Face Transformers and other model libraries → Google Colab.</b> They are large (PyTorch alone is '
+                     'over 700 MB), need a full Python installation and often a GPU — a web browser has none of these. Colab already has them '
+                     'installed and gives a free GPU, so <b>▶ Run in Colab</b> works with nothing to set up.</li>')
+    if mods & API_MODS:
+        items.append('<li><b>LangChain, LangGraph, OpenAI and other API examples → Colab or VS Code.</b> They send requests over the internet '
+                     'and need your own API key, which a page in the browser cannot use safely. In Colab add the key with the 🔑 Secrets '
+                     'panel; on your computer keep it in a <code>.env</code> file.</li>')
+    if 'vscode' in targets:
+        items.append('<li><b>Ollama, MCP servers, Django, Playwright and Streamlit → VS Code on your computer.</b> These start programs on your '
+                     'own machine — a local model, a server, a web app or a real browser. Neither the browser nor Colab can run them, so use '
+                     '<b>Copy</b> and run them in VS Code with the course environment.</li>')
+    if not items: return ''
+    return ('<div class="where-note"><div class="where-head">Where does this code run — and why?</div>'
+            '<p><b>▶ Try it</b> examples run inside your web browser, which can only run plain Python and light libraries '
+            '(NumPy, pandas, scikit-learn, matplotlib). From here on some examples need more:</p><ul>' + ''.join(items) + '</ul></div>')
 
 def python_block_html(code, title, run, setup, reason):
     esc = html.escape(code)
@@ -295,8 +335,15 @@ def python_block_html(code, title, run, setup, reason):
         btn = f'<button class="try" data-run="1">▶ Try it</button>'
         return f'<div class="runnable">{head}{btn}<button class="copy">Copy</button><textarea class="src" hidden>{esc}</textarea>{setup_ta}{pre}</div>'
     miss = ', '.join(missing_modules(code)) or ('code from the earlier examples in this lesson' if 'NameError' in reason else 'an API key or local files')
-    btn = (f'<span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week\'s notebook)">▶ Run in Colab</a>'
-           f'<button class="try local" data-run="0" data-needs="{html.escape(miss)}" title="Needs {html.escape(miss)} — opens in the editor">✎ Editor</button></span>')
+    if run_target(code) == 'vscode':
+        vm = sorted((imported_modules(code) | set(missing_modules(code))) & VSCODE_MODS)
+        miss = (', '.join({'django': 'Django', 'playwright': 'Playwright', 'ollama': 'Ollama', 'langchain_ollama': 'Ollama', 'streamlit': 'Streamlit'}.get(m, m) for m in vm)
+                or ('Django' if re.search(r'django|INSTALLED_APPS|urlpatterns', code) else 'an MCP server' if 'mcp' in code else 'a program on your computer'))
+        btn = (f'<span class="local-btns"><button class="try local vscode-try" data-run="0" data-target="vscode" data-needs="{html.escape(miss)}" '
+               f'title="Starts programs on your own computer — open it, copy it and run it in VS Code">💻 Run in VS Code</button></span>')
+    else:
+        btn = (f'<span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week\'s notebook)">▶ Run in Colab</a>'
+               f'<button class="try local" data-run="0" data-target="colab" data-needs="{html.escape(miss)}" title="Needs {html.escape(miss)} — opens in the editor">✎ Editor</button></span>')
     return f'<div class="runnable local">{head}{btn}<button class="copy">Copy</button><textarea class="src" hidden>{esc}</textarea>{pre}</div>'
 
 def md_to_html(text):

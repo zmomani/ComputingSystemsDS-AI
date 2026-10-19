@@ -213,7 +213,7 @@
 </ul>
 <h2 id="code-implementation-examples">Code Implementation Examples</h2>
 <h3 id="self-attention-implementation-pytorch">Self-attention implementation (PyTorch)</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>import torch
+<div class="where-note"><div class="where-head">Where does this code run — and why?</div><p><b>▶ Try it</b> examples run inside your web browser, which can only run plain Python and light libraries (NumPy, pandas, scikit-learn, matplotlib). From here on some examples need more:</p><ul><li><b>PyTorch, Hugging Face Transformers and other model libraries → Google Colab.</b> They are large (PyTorch alone is over 700 MB), need a full Python installation and often a GPU — a web browser has none of these. Colab already has them installed and gives a free GPU, so <b>▶ Run in Colab</b> works with nothing to set up.</li></ul></div><div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="torch" title="Needs torch — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>import torch
 import torch.nn as nn
 import math
 
@@ -483,7 +483,7 @@ console.log(&quot;input shape: &quot;, tokens.length, &quot;x&quot;, tokens[0].l
 console.log(&quot;output shape:&quot;, out.length, &quot;x&quot;, out[0].length);
 console.log(&quot;first output vector:&quot;, out[0].map(v =&gt; v.toFixed(4)).join(&quot;, &quot;));</code></pre></div>
 <h3 id="using-transformers-with-libraries-hugging-face">Using Transformers with libraries (Hugging Face)</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="torch, transformers" title="Needs torch, transformers — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>import torch
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="torch, transformers" title="Needs torch, transformers — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>import torch
 from transformers import AutoModel, AutoTokenizer
 
 model_name = &quot;bert-base-uncased&quot;
@@ -1447,7 +1447,7 @@ Wq, Wk, Wv = (rng.normal(size=(d, d)) * 0.3 for _ in range(3))
 out, w = attention(X @ Wq, X @ Wk, X @ Wv)
 print(&quot;attention weights (rows sum to 1):\n&quot;, w.round(3))
 print(&quot;row sums:&quot;, w.sum(axis=1).round(6))
-print(&quot;output shape:&quot;, out.shape)</code></pre></div><div class="runnable local"><div class="code-title">Check the PyTorch SelfAttention module from the lesson</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 2. Check the PyTorch SelfAttention module from the lesson
+print(&quot;output shape:&quot;, out.shape)</code></pre></div><div class="runnable local"><div class="code-title">Check the PyTorch SelfAttention module from the lesson</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="torch" title="Needs torch — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 2. Check the PyTorch SelfAttention module from the lesson
 import torch
 from torch import nn
 import math
@@ -1549,7 +1549,7 @@ pe = positional_encoding(50, 64)
 plt.imshow(pe, cmap=&quot;RdBu&quot;, aspect=&quot;auto&quot;)
 plt.xlabel(&quot;dimension&quot;); plt.ylabel(&quot;position&quot;); plt.colorbar()
 plt.title(&quot;Sinusoidal positional encoding&quot;)
-plt.show()</code></pre></div><div class="runnable local"><div class="code-title">Run BERT with Hugging Face and inspect output shapes</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="torch, transformers" title="Needs torch, transformers — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 4. Run BERT with Hugging Face and inspect output shapes
+plt.show()</code></pre></div><div class="runnable local"><div class="code-title">Run BERT with Hugging Face and inspect output shapes</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="torch, transformers" title="Needs torch, transformers — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 4. Run BERT with Hugging Face and inspect output shapes
 import torch
 from transformers import AutoModel, AutoTokenizer
 
