@@ -5,7 +5,7 @@ source: https://albanna-tutorials.com/database.html
 ---
 # Chat with Databases
 
-> Material by Dr. Abedal-Kareem Al-Banna (ilmy / albanna-tutorials.com). Original page: "LangChain Database Chat" — Intermediate level, about 20 minutes. Code listings are reproduced verbatim from the page; some listings on the original use single-space indentation, which has been normalised to 4 spaces here so the code runs.
+> Material by Dr. Abedal-Kareem Al-Banna (ilmy / albanna-tutorials.com). Original page: "LangChain Database Chat" — Intermediate level, about 20 minutes. Code listings use 4-space indentation and current LangChain / LangGraph APIs.
 
 ## Introduction
 
@@ -88,7 +88,7 @@ LangChain's `SQLDatabaseToolkit` gives an AI agent a set of tools for querying a
 
 | Tool | Purpose |
 |---|---|
-| `QuerySQLDataBaseTool` | Executes SQL queries |
+| `QuerySQLDatabaseTool` | Executes SQL queries |
 | `InfoSQLDatabaseTool` | Gets schema information |
 | `ListSQLDatabaseTool` | Lists available tables |
 | `QuerySQLCheckerTool` | Validates SQL queries before execution |
@@ -125,7 +125,7 @@ Building Q&A systems over SQL databases means executing model-generated SQL, whi
 Worked example: *"Which country's customers spent the most?"*
 
 1. **User Query Input** — The user enters a natural language question about the database data.
-2. **Database Schema Analysis** — The system uses `ListSQLDatabaseTool` and `InfoSQLDatabaseTool` to understand the database structure. For this question the relevant tables are Customer, Invoice and InvoiceLine.
+2. **Database Schema Analysis** — The system uses `ListSQLDatabaseTool` and `InfoSQLDatabaseTool` to understand the database structure. For this question the relevant tables are Customer and Invoice.
 3. **SQL Query Generation** — The LLM converts the natural language question into a SQL query based on the schema:
 
 ```sql
@@ -138,7 +138,7 @@ LIMIT 1;
 ```
 
 4. **Query Validation** — The `QuerySQLCheckerTool` validates the SQL query for errors and potential improvements.
-5. **Database Execution** — The `QuerySQLDataBaseTool` executes the SQL query against the database. Result: `USA, 523.06`.
+5. **Database Execution** — The `QuerySQLDatabaseTool` executes the SQL query against the database. Result: `USA, 523.06`.
 6. **Result Interpretation** — The LLM translates the raw query results into a natural language response.
 
 ## Sample Queries
@@ -157,14 +157,14 @@ LIMIT 1;
 ### Setting Up the Environment
 
 ```python
-# Install required packages
-pip install langchain langchain-community langchain-openai langgraph
+# Install required packages (run in a terminal):
+#   pip install langchain langchain-community langchain-openai langgraph sqlalchemy requests
 
 # Import necessary modules
 import os
 from langchain_openai import ChatOpenAI
 from langchain_community.utilities import SQLDatabase
-from langchain import hub
+from langchain_community.agent_toolkits.sql.prompt import SQL_PREFIX
 from langchain_community.tools.sql_database.tool import QuerySQLDatabaseTool
 from langgraph.prebuilt import create_react_agent
 
@@ -211,7 +211,7 @@ db = SQLDatabase(engine)
 
 ```python
 # Initialize Language Model
-llm = ChatOpenAI(model="gpt-4")  # You can also use gpt-3.5-turbo for lower cost
+llm = ChatOpenAI(model="gpt-4o", temperature=0)  # You can also use gpt-4o-mini for lower cost
 
 # Initialize SQL Database Toolkit
 from langchain_community.agent_toolkits.sql.toolkit import SQLDatabaseToolkit
@@ -220,19 +220,17 @@ toolkit = SQLDatabaseToolkit(db=db, llm=llm)
 # Get the tools from the toolkit
 tools = toolkit.get_tools()
 
-# Get a prompt from LangChain Hub
-prompt_template = hub.pull("langchain-ai/sql-agent-system-prompt")
-system_message = prompt_template.format(dialect="SQLite", top_k=5)
+# Build the system prompt from LangChain's standard SQL-agent prompt
+# (the same text as the "langchain-ai/sql-agent-system-prompt" prompt on LangChain Hub)
+system_message = SQL_PREFIX.format(dialect="SQLite", top_k=5)
 
 # Create the agent
 agent_executor = create_react_agent(
     llm,
     tools,
-    state_modifier=system_message
+    prompt=system_message
 )
 ```
-
-> Note: the toolkit's tool list is documented as `QuerySQLDataBaseTool`, while the import above uses `QuerySQLDatabaseTool`. Check the exact class name in your installed LangChain version. In recent `langgraph` releases the `state_modifier` argument of `create_react_agent` has been renamed `prompt`.
 
 ### Django Integration (views.py)
 
@@ -368,7 +366,7 @@ Always implement proper permissions and validation when connecting LLMs to datab
 
 ## Key concepts worth simulating
 
-- **The six-step process flow as an animated pipeline**: question → `ListSQLDatabaseTool` / `InfoSQLDatabaseTool` (schema) → LLM writes SQL → `QuerySQLCheckerTool` → `QuerySQLDataBaseTool` executes → LLM interprets. Show the message list growing with each tool call and tool result.
+- **The six-step process flow as an animated pipeline**: question → `ListSQLDatabaseTool` / `InfoSQLDatabaseTool` (schema) → LLM writes SQL → `QuerySQLCheckerTool` → `QuerySQLDatabaseTool` executes → LLM interprets. Show the message list growing with each tool call and tool result.
 - **Schema exploration by the agent**: an ER diagram of Chinook (Customer–Invoice–InvoiceLine–Track–Album–Artist, plus Genre and Employee) where the tables the agent "touches" for a given question light up; let students pick one of the six sample queries and watch the join path highlight.
 - **Natural language → SQL side by side**: type a question, see the generated SQL, then a live result table; toggle to show how `top_k`/`LIMIT` and the dialect string in the system prompt change the query.
 - **The ReAct loop inside the SQL agent**: agent node ↔ tools node cycle; show the model deciding to call another tool after a checker error and retry.
@@ -423,11 +421,10 @@ for t in toolkit.get_tools():
 
 ```python
 # 4. Ask the SQL agent a question and watch every intermediate step
-from langchain import hub
+from langchain_community.agent_toolkits.sql.prompt import SQL_PREFIX
 from langgraph.prebuilt import create_react_agent
 
-prompt_template = hub.pull("langchain-ai/sql-agent-system-prompt")
-system_message = prompt_template.format(dialect="SQLite", top_k=5)
+system_message = SQL_PREFIX.format(dialect="SQLite", top_k=5)
 agent_executor = create_react_agent(llm, toolkit.get_tools(), prompt=system_message)
 
 for step in agent_executor.stream(

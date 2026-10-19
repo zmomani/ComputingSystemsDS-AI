@@ -7,8 +7,6 @@ author: Dr. Abedal-Kareem Al-Banna (Dr. Abdulkarim Albanna), University of Petra
 # Text Classification with Transformers
 
 > *Build Your First NLP Model.* Level: Beginner NLP · Estimated time: ~60 minutes · Stack: Hugging Face, PyTorch, Transformers, scikit-learn. Material by Dr. Abedal-Kareem Al-Banna (ilmy / albanna-tutorials.com), following the approach of Tunstall, von Werra & Wolf, *NLP with Transformers*, Chapter 2.
->
-> **Extraction note:** The source page was read through a fetch tool that paraphrases rather than copies text. Prose is a close paraphrase of Dr. Albanna's wording; the 36 code blocks are reconstructed from exact line-by-line descriptions (same checkpoint names, variable names, arguments and values). The original page does not tag code fences with a language; all are Python.
 
 ## What You'll Learn
 
@@ -45,7 +43,7 @@ Transformers are neural network architectures that changed NLP by using **attent
 
 ### Setting up your environment
 
-Required tools: Python 3.8+, PyTorch, the Hugging Face libraries, and scikit-learn for evaluation.
+Required tools: Python 3.10+, PyTorch, the Hugging Face libraries, and scikit-learn for evaluation.
 
 ```python
 !pip install transformers[torch]
@@ -150,7 +148,7 @@ print(tokenized_text)
 
 token2index = {ch: idx for idx, ch in enumerate(sorted(set(tokenized_text)))}
 print(token2index)
-# {' ': 0, 'M': 1, ... 's': 15}
+# {' ': 0, 'M': 1, 'a': 2, 'e': 3, 'i': 4, 'k': 5, 'm': 6, 'n': 7, 'r': 8, 's': 9, 'y': 10}
 ```
 
 Production systems use **subword** tokenization methods such as WordPiece (BERT), BPE (GPT) or SentencePiece.
@@ -186,6 +184,8 @@ The tokenizer output contains `input_ids` (token IDs), `attention_mask` (which t
 ### Tokenizing the entire dataset
 
 ```python
+emotions.reset_format()   # undo the pandas format set earlier
+
 def tokenize(batch):
     return tokenizer(batch["text"], padding=True, truncation=True)
 
@@ -362,12 +362,15 @@ Fine-tuning updates **all** of the model's weights on the task, usually giving b
 from transformers import AutoModelForSequenceClassification
 
 num_labels = 6
+id2label = {i: name for i, name in enumerate(labels)}
+label2id = {name: i for i, name in enumerate(labels)}
 model = (AutoModelForSequenceClassification
-         .from_pretrained(model_chk, num_labels=num_labels)
+         .from_pretrained(model_chk, num_labels=num_labels,
+                          id2label=id2label, label2id=label2id)
          .to(device))
 ```
 
-Same DistilBERT base as before, now with a randomly initialized classification head on top.
+Same DistilBERT base as before, now with a randomly initialized classification head on top. Passing `id2label`/`label2id` stores the emotion names in the model config, so the deployed model reports `joy` rather than `LABEL_1`.
 
 ### Evaluation metrics
 
@@ -398,7 +401,7 @@ training_args = TrainingArguments(
     per_device_train_batch_size=batch_size,
     per_device_eval_batch_size=batch_size,
     weight_decay=0.01,
-    evaluation_strategy="epoch",
+    eval_strategy="epoch",
     disable_tqdm=False,
     logging_steps=logging_steps,
     push_to_hub=True,
@@ -411,7 +414,7 @@ trainer = Trainer(
     compute_metrics=compute_metrics,
     train_dataset=emotion_encoded["train"],
     eval_dataset=emotion_encoded["validation"],
-    tokenizer=tokenizer,
+    processing_class=tokenizer,
 )
 ```
 
@@ -422,10 +425,10 @@ trainer = Trainer(
 | `learning_rate` | Step size for the optimizer (2e-5 is a common choice for BERT-style models) |
 | `per_device_train_batch_size` | Examples per device per step |
 | `weight_decay` | L2 regularization strength |
-| `evaluation_strategy` | When to evaluate: `"epoch"` or `"steps"` |
+| `eval_strategy` | When to evaluate: `"epoch"` or `"steps"` |
 | `push_to_hub` | Upload the model to the Hugging Face Hub during training |
 
-> **Version note:** In recent Transformers releases `evaluation_strategy` was renamed `eval_strategy` and `Trainer(tokenizer=...)` became `processing_class=...`. `push_to_hub=True` requires that you are logged in.
+> **Version note:** Transformers releases before 4.46 used the older names `evaluation_strategy` and `Trainer(tokenizer=...)`; the current names are `eval_strategy` and `processing_class=...`. `push_to_hub=True` requires that you are logged in (see Section 8).
 
 ### Training the model
 
@@ -447,8 +450,12 @@ training_args.lr_scheduler_type = "cosine"
 # 3. More epochs with early stopping
 from transformers import EarlyStoppingCallback
 training_args.num_train_epochs = 5
+training_args.save_strategy = "epoch"        # must match eval_strategy when loading the best model
 training_args.load_best_model_at_end = True
+training_args.metric_for_best_model = "f1"   # required by EarlyStoppingCallback
 trainer.add_callback(EarlyStoppingCallback(early_stopping_patience=2))
+
+# Re-run trainer.train() after each change to see its effect
 ```
 
 ## 7. Evaluating Model Performance
@@ -499,7 +506,7 @@ for i, err in enumerate(errors[:5]):
     print(f"   True: {err['true']}, Predicted: {err['predicted']}\n")
 ```
 
-**Metric definitions:** accuracy = fraction correct; precision = of predicted positives, how many are right; recall = of true positives, how many were found; F1 = harmonic mean of precision and recall.
+**Metric definitions:** accuracy = fraction correct; precision = of predicted positives, how many are right; recall = of the actual positives, how many were found; F1 = harmonic mean of precision and recall.
 
 **Common error patterns:** confusion between similar emotions (love vs joy), ambiguous text expressing several emotions, sarcasm and figurative language, cultural or contextual references.
 
@@ -540,7 +547,7 @@ from huggingface_hub import notebook_login
 notebook_login()
 ```
 
-Create an access token at https://huggingface.co/settings/tokens. In a script (not a notebook) use `huggingface-cli login` in the terminal instead.
+Create an access token at https://huggingface.co/settings/tokens. In a script (not a notebook) use `hf auth login` in the terminal instead (`huggingface-cli login` in older versions of `huggingface_hub`).
 
 ### Pushing the model to the Hub
 
@@ -583,10 +590,10 @@ Sentiment analysis and emotion detection in English text.
     f1=validation_results["eval_f1"],
 )
 
-# trainer.push_to_hub(commit_message="Update model card", model_card=model_card)
+# from huggingface_hub import ModelCard
+# ModelCard(model_card).push_to_hub("YOUR_USERNAME/distilbert-base-uncased-finetuned-emotion",
+#                                   commit_message="Update model card")
 ```
-
-> Note: the template hard-codes `train_acc=0.92`; replace it with the value you actually measured.
 
 ### Using your model
 
@@ -609,8 +616,8 @@ print(result)   # e.g. [{'label': 'joy', 'score': 0.9874}]
 import gradio as gr
 
 def predict(text):
-    result = classifier(text)[0]
-    return {result["label"]: result["score"]}
+    results = classifier(text, top_k=None)   # scores for all six emotions
+    return {r["label"]: r["score"] for r in results}
 
 demo = gr.Interface(
     fn=predict,

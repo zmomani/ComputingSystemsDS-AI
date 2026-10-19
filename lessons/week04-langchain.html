@@ -32,7 +32,7 @@
 <p>Official documentation: https://python.langchain.com/</p>
 <h2 id="the-langchain-framework">The LangChain Framework</h2>
 <p>LangChain simplifies every stage of the LLM application lifecycle, from development to productionization to deployment.</p>
-<p><img alt="LangChain Framework Diagram" src="https://python.langchain.com/svg/langchain_stack_062024.svg" /></p>
+<p><img alt="LangChain Framework Diagram" src="https://raw.githubusercontent.com/langchain-ai/langchain/v0.3/docs/static/svg/langchain_stack_062024.svg" /></p>
 <p><em>Figure: the LangChain stack — open-source libraries (langchain-core, langchain, langchain-community, LangGraph) at the base, LangSmith for productionization, and LangGraph Cloud / LangServe for deployment.</em></p>
 <h2 id="development">Development</h2>
 <p>Build your applications using LangChain's open-source building blocks, components, and third-party integrations.</p>
@@ -300,7 +300,7 @@ https://python.langchain.com/api_reference/</p>
 </thead>
 <tbody>
 <tr>
-<td><code>QuerySQLDataBaseTool</code></td>
+<td><code>QuerySQLDatabaseTool</code></td>
 <td>Executes SQL queries</td>
 </tr>
 <tr>
@@ -346,7 +346,7 @@ https://python.langchain.com/api_reference/</p>
 <p>Worked example: <em>"Which country's customers spent the most?"</em></p>
 <ol>
 <li><strong>User Query Input</strong> — The user enters a natural language question about the database data.</li>
-<li><strong>Database Schema Analysis</strong> — The system uses <code>ListSQLDatabaseTool</code> and <code>InfoSQLDatabaseTool</code> to understand the database structure. For this question the relevant tables are Customer, Invoice and InvoiceLine.</li>
+<li><strong>Database Schema Analysis</strong> — The system uses <code>ListSQLDatabaseTool</code> and <code>InfoSQLDatabaseTool</code> to understand the database structure. For this question the relevant tables are Customer and Invoice.</li>
 <li><strong>SQL Query Generation</strong> — The LLM converts the natural language question into a SQL query based on the schema:</li>
 </ol>
 <div class="highlight"><pre><span></span><code><span class="k">SELECT</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">Country</span><span class="p">,</span><span class="w"> </span><span class="k">SUM</span><span class="p">(</span><span class="n">i</span><span class="p">.</span><span class="n">Total</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">TotalSpent</span>
@@ -358,7 +358,7 @@ https://python.langchain.com/api_reference/</p>
 </code></pre></div>
 <ol start="4">
 <li><strong>Query Validation</strong> — The <code>QuerySQLCheckerTool</code> validates the SQL query for errors and potential improvements.</li>
-<li><strong>Database Execution</strong> — The <code>QuerySQLDataBaseTool</code> executes the SQL query against the database. Result: <code>USA, 523.06</code>.</li>
+<li><strong>Database Execution</strong> — The <code>QuerySQLDatabaseTool</code> executes the SQL query against the database. Result: <code>USA, 523.06</code>.</li>
 <li><strong>Result Interpretation</strong> — The LLM translates the raw query results into a natural language response.</li>
 </ol>
 <h2 id="sample-queries">Sample Queries</h2>
@@ -398,14 +398,14 @@ https://python.langchain.com/api_reference/</p>
 </table>
 <h2 id="implementation-code">Implementation Code</h2>
 <h3 id="setting-up-the-environment">Setting Up the Environment</h3>
-<div class="highlight"><pre><span></span><code><span class="c1"># Install required packages</span>
-<span class="n">pip</span> <span class="n">install</span> <span class="n">langchain</span> <span class="n">langchain</span><span class="o">-</span><span class="n">community</span> <span class="n">langchain</span><span class="o">-</span><span class="n">openai</span> <span class="n">langgraph</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># Install required packages (run in a terminal):</span>
+<span class="c1">#   pip install langchain langchain-community langchain-openai langgraph sqlalchemy requests</span>
 
 <span class="c1"># Import necessary modules</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">langchain_openai</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatOpenAI</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">langchain_community.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">SQLDatabase</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">langchain</span><span class="w"> </span><span class="kn">import</span> <span class="n">hub</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_community.agent_toolkits.sql.prompt</span><span class="w"> </span><span class="kn">import</span> <span class="n">SQL_PREFIX</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">langchain_community.tools.sql_database.tool</span><span class="w"> </span><span class="kn">import</span> <span class="n">QuerySQLDatabaseTool</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">langgraph.prebuilt</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_react_agent</span>
 
@@ -446,7 +446,7 @@ https://python.langchain.com/api_reference/</p>
 </code></pre></div>
 <h3 id="creating-the-langchain-agent">Creating the LangChain Agent</h3>
 <div class="highlight"><pre><span></span><code><span class="c1"># Initialize Language Model</span>
-<span class="n">llm</span> <span class="o">=</span> <span class="n">ChatOpenAI</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">"gpt-4"</span><span class="p">)</span>  <span class="c1"># You can also use gpt-3.5-turbo for lower cost</span>
+<span class="n">llm</span> <span class="o">=</span> <span class="n">ChatOpenAI</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">"gpt-4o"</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># You can also use gpt-4o-mini for lower cost</span>
 
 <span class="c1"># Initialize SQL Database Toolkit</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">langchain_community.agent_toolkits.sql.toolkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">SQLDatabaseToolkit</span>
@@ -455,20 +455,17 @@ https://python.langchain.com/api_reference/</p>
 <span class="c1"># Get the tools from the toolkit</span>
 <span class="n">tools</span> <span class="o">=</span> <span class="n">toolkit</span><span class="o">.</span><span class="n">get_tools</span><span class="p">()</span>
 
-<span class="c1"># Get a prompt from LangChain Hub</span>
-<span class="n">prompt_template</span> <span class="o">=</span> <span class="n">hub</span><span class="o">.</span><span class="n">pull</span><span class="p">(</span><span class="s2">"langchain-ai/sql-agent-system-prompt"</span><span class="p">)</span>
-<span class="n">system_message</span> <span class="o">=</span> <span class="n">prompt_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dialect</span><span class="o">=</span><span class="s2">"SQLite"</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="c1"># Build the system prompt from LangChain's standard SQL-agent prompt</span>
+<span class="c1"># (the same text as the "langchain-ai/sql-agent-system-prompt" prompt on LangChain Hub)</span>
+<span class="n">system_message</span> <span class="o">=</span> <span class="n">SQL_PREFIX</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dialect</span><span class="o">=</span><span class="s2">"SQLite"</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 
 <span class="c1"># Create the agent</span>
 <span class="n">agent_executor</span> <span class="o">=</span> <span class="n">create_react_agent</span><span class="p">(</span>
     <span class="n">llm</span><span class="p">,</span>
     <span class="n">tools</span><span class="p">,</span>
-    <span class="n">state_modifier</span><span class="o">=</span><span class="n">system_message</span>
+    <span class="n">prompt</span><span class="o">=</span><span class="n">system_message</span>
 <span class="p">)</span>
 </code></pre></div>
-<blockquote>
-<p>Note: the toolkit's tool list is documented as <code>QuerySQLDataBaseTool</code>, while the import above uses <code>QuerySQLDatabaseTool</code>. Check the exact class name in your installed LangChain version. In recent <code>langgraph</code> releases the <code>state_modifier</code> argument of <code>create_react_agent</code> has been renamed <code>prompt</code>.</p>
-</blockquote>
 <h3 id="django-integration-viewspy">Django Integration (views.py)</h3>
 <div class="highlight"><pre><span></span><code><span class="c1"># views.py for Django integration</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">JsonResponse</span>
@@ -674,11 +671,10 @@ llm = ChatOpenAI(model=&quot;gpt-4o-mini&quot;, temperature=0)
 toolkit = SQLDatabaseToolkit(db=db, llm=llm)
 for t in toolkit.get_tools():
     print(f&quot;{t.name}: {t.description[:90]}...&quot;)</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Ask the SQL agent a question and watch every intermediate step</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 4. Ask the SQL agent a question and watch every intermediate step
-from langchain import hub
+from langchain_community.agent_toolkits.sql.prompt import SQL_PREFIX
 from langgraph.prebuilt import create_react_agent
 
-prompt_template = hub.pull(&quot;langchain-ai/sql-agent-system-prompt&quot;)
-system_message = prompt_template.format(dialect=&quot;SQLite&quot;, top_k=5)
+system_message = SQL_PREFIX.format(dialect=&quot;SQLite&quot;, top_k=5)
 agent_executor = create_react_agent(llm, toolkit.get_tools(), prompt=system_message)
 
 for step in agent_executor.stream(

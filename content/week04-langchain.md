@@ -5,7 +5,7 @@ source: https://albanna-tutorials.com/langchain.html
 ---
 # LangChain Fundamentals
 
-> Material by Dr. Abedal-Kareem Al-Banna (ilmy / albanna-tutorials.com). Original page: "LangChain Python Tutorial" — Beginner level, about 10 minutes. The source page is an overview/orientation page with no code blocks; the test code at the end of this file was written for the course and is consistent with the libraries the page describes.
+> Material by Dr. Abedal-Kareem Al-Banna (ilmy / albanna-tutorials.com). Original page: "LangChain Python Tutorial" — Beginner level, about 10 minutes. The test code at the end of this file was written for the course.
 
 ## Welcome to LangChain Python
 
@@ -17,7 +17,7 @@ Official documentation: https://python.langchain.com/
 
 LangChain simplifies every stage of the LLM application lifecycle, from development to productionization to deployment.
 
-![LangChain Framework Diagram](https://python.langchain.com/svg/langchain_stack_062024.svg)
+![LangChain Framework Diagram](https://raw.githubusercontent.com/langchain-ai/langchain/v0.3/docs/static/svg/langchain_stack_062024.svg)
 
 *Figure: the LangChain stack — open-source libraries (langchain-core, langchain, langchain-community, LangGraph) at the base, LangSmith for productionization, and LangGraph Cloud / LangServe for deployment.*
 
