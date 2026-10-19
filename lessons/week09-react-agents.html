@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 9: AI Agents &amp; ReAct · Computing Systems for DS & AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<link rel="stylesheet" href="../assets/css/site.css">
+</head>
+<body><header class="topbar">
+  <button class="btn-icon" id="menu-toggle" aria-label="Menu">☰</button>
+  <a class="brand" href="../index.html">606363 · Computing Systems for DS & AI<small>University of Petra</small></a>
+  <span class="spacer"></span>
+  <nav class="week-nav"><a class="btn-icon" href="week08-midterm.html" title="Midterm Exam">← Wk 8</a><a class="btn-icon" href="week10-multi-agent.html" title="Multi-Agent Systems">Wk 10 →</a></nav>
+  <a class="btn-icon" href="../index.html#curriculum">Curriculum</a>
+  <a class="btn-icon" href="../index.html#simulations">Simulations</a>
+  <button class="btn-icon" id="theme-toggle" aria-label="Toggle dark mode">◐</button>
+</header><div class="layout"><aside class="sidebar">
+  <h4>Course</h4><ul class="outline"><li><a class="" href="../lessons/syllabus.html"><span class="wk">·</span><span>Course Syllabus</span></a></li><li><a class="" href="../lessons/project.html"><span class="wk">·</span><span>Final Project</span></a></li></ul>
+  <h4>16-week curriculum</h4><ul class="outline"><li><a class="" href="../lessons/week01-transformers.html"><span class="wk">01</span><span>Transformer Architecture</span></a></li><li><a class="" href="../lessons/week02-text-classification.html"><span class="wk">02</span><span>Text Classification</span></a></li><li><a class="soon" href="../lessons/week03-ner.html"><span class="wk">03</span><span>Named Entity Recognition (NER)</span></a></li><li><a class="" href="../lessons/week04-langchain.html"><span class="wk">04</span><span>LangChain Fundamentals</span></a></li><li><a class="" href="../lessons/week05-langgraph.html"><span class="wk">05</span><span>LangGraph</span></a></li><li><a class="" href="../lessons/week06-llms.html"><span class="wk">06</span><span>Large Language Models (LLMs)</span></a></li><li><a class="" href="../lessons/week07-moe.html"><span class="wk">07</span><span>Mixture of Experts (MoE)</span></a></li><li><a class="" href="../lessons/week08-midterm.html"><span class="wk">08</span><span>Midterm Exam</span></a></li><li><a class="active" href="../lessons/week09-react-agents.html"><span class="wk">09</span><span>AI Agents &amp; ReAct</span></a></li><li><a class="" href="../lessons/week10-multi-agent.html"><span class="wk">10</span><span>Multi-Agent Systems</span></a></li><li><a class="" href="../lessons/week11-mcp.html"><span class="wk">11</span><span>Model Context Protocol (MCP)</span></a></li><li><a class="soon" href="../lessons/week12-lams.html"><span class="wk">12</span><span>Large Action Models (LAMs)</span></a></li><li><a class="" href="../lessons/week13-diffusion.html"><span class="wk">13</span><span>Diffusion Models</span></a></li><li><a class="" href="../lessons/week14-project.html"><span class="wk">14</span><span>Project Development &amp; Final Testing</span></a></li><li><a class="" href="../lessons/week15-competition.html"><span class="wk">15</span><span>Competition Day &amp; Presentations</span></a></li><li><a class="" href="../lessons/week16-final.html"><span class="wk">16</span><span>Final Exam</span></a></li></ul>
+  <h4>On this page</h4><ul class="toc" id="toc"></ul>
+</aside><main class="main">
+  <div class="lesson-head"><div class="eyebrow">Week 9 · ILO K2, P2</div><h1>AI Agents &amp; ReAct</h1>
+  <p class="credit"><b>Topics:</b> AI agents, ReAct loop, tool use, short- and long-term memory<br><b>Project milestone:</b> Research Agent using ReAct with search and scraping tools, relevance scoring and ChromaDB storage; 10+ sources per topic</p></div>
+  <div class="callout sim"><div class="sim-strip"><b style="margin-right:4px">Simulations for this week:</b><button class="chip" data-sim="react-loop">▶ ReAct agent loop</button><button class="chip" data-sim="rag">▶ RAG pipeline</button></div></div>
+  <blockquote>
+<p>Based on Dr. Abdulkarim Albanna's lesson "ReAct Agent Architecture — A visual guide to building a Reasoning and Acting agent from scratch" (albanna-tutorials.com). Code blocks 1–6 (environment_setup.py, agent.py, react_prompt.py, tools.py, agent_loop.py, complex_example.py) are reproduced verbatim. The final combined listing (react_agent.py) could not be fetched verbatim and is reassembled below from the verbatim parts plus the <code>__main__</code> entry point the page describes. Explanatory prose was extracted via a fetcher that paraphrases, so wording is close to but not identical to the original.</p>
+</blockquote>
+<h2 id="1-introduction-to-react-agents">1. Introduction to ReAct Agents</h2>
+<p>The <strong>ReAct (Reasoning + Acting)</strong> pattern lets a language model solve complex tasks by alternating between <em>reasoning</em> about the problem and <em>acting</em> with tools. The model breaks a problem down, takes an action, observes the result, and uses that observation to guide its next step.</p>
+<p>The cycle is:</p>
+<div class="highlight"><pre><span></span><code>Thought → Action → Observation → Thought → … → Answer
+</code></pre></div>
+<blockquote>
+<p><strong>Key Insight:</strong> separating reasoning from tool use lets a language model handle problems that neither capability could solve alone.</p>
+</blockquote>
+<h2 id="2-setting-up-the-environment">2. Setting Up the Environment</h2>
+<p>Import the libraries, load the API key from a <code>.env</code> file, create an OpenAI client, and send a test message to confirm the connection works.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># environment_setup.py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">openai</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">httpx</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span>
+
+<span class="n">_</span> <span class="o">=</span> <span class="n">load_dotenv</span><span class="p">()</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openai</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenAI</span>
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">OpenAI</span><span class="p">()</span>
+
+<span class="c1"># Test the OpenAI client</span>
+<span class="n">chat_completion</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">"gpt-3.5-turbo"</span><span class="p">,</span>
+    <span class="n">messages</span><span class="o">=</span><span class="p">[{</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"user"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="s2">"Hello world"</span><span class="p">}]</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">chat_completion</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="3-creating-the-basic-agent-class">3. Creating the Basic Agent Class</h2>
+<p>The <code>Agent</code> class keeps the <strong>conversation history</strong> and an optional system message. The constructor sets up that state; <code>__call__</code> appends the user's message, queries the model and stores the reply; <code>execute</code> sends the full history to the API.</p>
+<blockquote>
+<p><strong>Design Pattern:</strong> the agent is <em>stateful</em> — it keeps the full conversation history internally, so each new call builds on everything that came before.</p>
+</blockquote>
+<div class="highlight"><pre><span></span><code><span class="c1"># agent.py</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Agent</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="o">=</span><span class="s2">""</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">system</span> <span class="o">=</span> <span class="n">system</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">messages</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"system"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="n">system</span><span class="p">})</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"user"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="n">message</span><span class="p">})</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"assistant"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="n">result</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">completion</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                        <span class="n">model</span><span class="o">=</span><span class="s2">"gpt-4o"</span><span class="p">,</span>
+                        <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                        <span class="n">messages</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">completion</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span>
+</code></pre></div>
+<h2 id="4-defining-the-react-prompt">4. Defining the ReAct Prompt</h2>
+<p>The system prompt teaches the model the <strong>Thought, Action, PAUSE, Observation</strong> loop, lists the available tools (a calculator and a dog-breed weight lookup), and includes a worked example session.</p>
+<blockquote>
+<p><strong>Important:</strong> the <code>PAUSE</code> keyword tells the model to stop generating after it requests an action, so the program can run the tool and feed the result back as an <code>Observation</code>.</p>
+</blockquote>
+<div class="highlight"><pre><span></span><code><span class="c1"># react_prompt.py</span>
+<span class="n">prompt</span> <span class="o">=</span> <span class="s2">"""</span>
+<span class="s2">You run in a loop of Thought, Action, PAUSE, Observation.</span>
+<span class="s2">At the end of the loop you output an Answer</span>
+<span class="s2">Use Thought to describe your thoughts about the question you have been asked.</span>
+<span class="s2">Use Action to run one of the actions available to you - then return PAUSE.</span>
+<span class="s2">Observation will be the result of running those actions.</span>
+
+<span class="s2">Your available actions are:</span>
+
+<span class="s2">calculate:</span>
+<span class="s2">e.g. calculate: 4 * 7 / 3</span>
+<span class="s2">Runs a calculation and returns the number - uses Python so be sure to use floating point syntax if necessary</span>
+
+<span class="s2">average_dog_weight:</span>
+<span class="s2">e.g. average_dog_weight: Collie</span>
+<span class="s2">returns average weight of a dog when given the breed</span>
+
+<span class="s2">Example session:</span>
+
+<span class="s2">Question: How much does a Bulldog weigh?</span>
+<span class="s2">Thought: I should look the dogs weight using average_dog_weight</span>
+<span class="s2">Action: average_dog_weight: Bulldog</span>
+<span class="s2">PAUSE</span>
+
+<span class="s2">You will be called again with this:</span>
+
+<span class="s2">Observation: A Bulldog weights 51 lbs</span>
+
+<span class="s2">You then output:</span>
+
+<span class="s2">Answer: A bulldog weights 51 lbs</span>
+<span class="s2">"""</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="5-implementing-the-tools">5. Implementing the Tools</h2>
+<p>Two tools: a <strong>calculator</strong> that uses Python's <code>eval()</code>, and a <strong>breed-weight lookup</strong> with fixed sample values. A dictionary (<code>known_actions</code>) maps each action name to its function. The tools are deliberately simple; real agents would connect to APIs, databases or other external systems.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># tools.py</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate</span><span class="p">(</span><span class="n">what</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">eval</span><span class="p">(</span><span class="n">what</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">average_dog_weight</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="s2">"Scottish Terrier"</span><span class="p">:</span>
+        <span class="k">return</span><span class="p">(</span><span class="s2">"Scottish Terriers average 20 lbs"</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="s2">"Border Collie"</span><span class="p">:</span>
+        <span class="k">return</span><span class="p">(</span><span class="s2">"a Border Collies average weight is 37 lbs"</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="s2">"Toy Poodle"</span><span class="p">:</span>
+        <span class="k">return</span><span class="p">(</span><span class="s2">"a toy poodles average weight is 7 lbs"</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span><span class="p">(</span><span class="s2">"An average dog weights 50 lbs"</span><span class="p">)</span>
+
+<span class="n">known_actions</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"calculate"</span><span class="p">:</span> <span class="n">calculate</span><span class="p">,</span>
+    <span class="s2">"average_dog_weight"</span><span class="p">:</span> <span class="n">average_dog_weight</span>
+<span class="p">}</span>
+</code></pre></div>
+<blockquote>
+<p>Teaching note: <code>eval()</code> on model output is unsafe outside a demo, and <code>name in "Scottish Terrier"</code> is a <em>substring</em> test (so <code>"Terrier"</code> matches but <code>"scottish terrier"</code> in lower case does not). Both are good discussion points for the Extensions section.</p>
+</blockquote>
+<h2 id="6-creating-the-agent-loop">6. Creating the Agent Loop</h2>
+<p>The <code>query</code> function starts an agent with the ReAct prompt and sends it the question. It uses a <strong>regular expression</strong> to find any requested <code>Action:</code> line, runs the matching tool, and sends the result back as an <code>Observation:</code>. The loop ends when the model produces no further action.</p>
+<blockquote>
+<p><strong>Safety Feature:</strong> the <code>max_turns</code> limit stops the loop from running indefinitely.</p>
+</blockquote>
+<div class="highlight"><pre><span></span><code><span class="c1"># agent_loop.py</span>
+<span class="n">action_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">'^Action: (\w+): (.*)$'</span><span class="p">)</span>   <span class="c1"># python regular expression to select action</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">query</span><span class="p">(</span><span class="n">question</span><span class="p">,</span> <span class="n">max_turns</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">bot</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+    <span class="n">next_prompt</span> <span class="o">=</span> <span class="n">question</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">max_turns</span><span class="p">:</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">bot</span><span class="p">(</span><span class="n">next_prompt</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="n">actions</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">action_re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">action_re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="n">actions</span><span class="p">:</span>
+            <span class="c1"># There is an action to run</span>
+            <span class="n">action</span><span class="p">,</span> <span class="n">action_input</span> <span class="o">=</span> <span class="n">actions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">action</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">known_actions</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"Unknown action: </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">action_input</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">" -- running </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">action_input</span><span class="p">))</span>
+            <span class="n">observation</span> <span class="o">=</span> <span class="n">known_actions</span><span class="p">[</span><span class="n">action</span><span class="p">](</span><span class="n">action_input</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">"Observation:"</span><span class="p">,</span> <span class="n">observation</span><span class="p">)</span>
+            <span class="n">next_prompt</span> <span class="o">=</span> <span class="s2">"Observation: </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">observation</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span>
+</code></pre></div>
+<p>Agent loop diagram:</p>
+<div class="highlight"><pre><span></span><code>User Question → Agent Reasoning → Action Extraction (regex) → Tool Execution → Return Observation
+                     ↑                                                              |
+                     └──────────────────────────────────────────────────────────────┘
+</code></pre></div>
+<h2 id="7-complete-example">7. Complete Example</h2>
+<p>A multi-step question about the combined weight of two dogs. The agent looks up each breed, adds the weights, and returns the total — showing how a multi-step problem is split into smaller steps.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># complex_example.py</span>
+<span class="n">question</span> <span class="o">=</span> <span class="s2">"""I have 2 dogs, a border collie and a scottish terrier. </span><span class="se">\</span>
+<span class="s2">What is their combined weight"""</span>
+
+<span class="n">query</span><span class="p">(</span><span class="n">question</span><span class="p">)</span>
+<span class="c1"># The agent will:</span>
+<span class="c1"># 1. Look up the weight of a border collie</span>
+<span class="c1"># 2. Look up the weight of a scottish terrier</span>
+<span class="c1"># 3. Calculate the sum of the weights</span>
+<span class="c1"># 4. Provide the final answer</span>
+</code></pre></div>
+<p>Example session trace:</p>
+<div class="highlight"><pre><span></span><code>Question:    I have 2 dogs, a border collie and a scottish terrier. What is their combined weight?
+Thought:     I need to find the weight of a border collie and a scottish terrier, then add them together.
+Action:      average_dog_weight: Border Collie
+PAUSE
+Observation: a Border Collies average weight is 37 lbs
+Thought:     Now I need to find the weight of a scottish terrier.
+Action:      average_dog_weight: Scottish Terrier
+PAUSE
+Observation: Scottish Terriers average 20 lbs
+Thought:     Now I can calculate the total weight by adding the two weights together: 37 + 20 = 57 lbs.
+Action:      calculate: 37 + 20
+PAUSE
+Observation: 57
+Answer:      The combined weight of your border collie and scottish terrier is 57 lbs.
+</code></pre></div>
+<h2 id="8-complete-code-architecture">8. Complete Code Architecture</h2>
+<p>All the pieces combined into a single script with a main entry point.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># react_agent.py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openai</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenAI</span>
+
+<span class="n">_</span> <span class="o">=</span> <span class="n">load_dotenv</span><span class="p">()</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">OpenAI</span><span class="p">()</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Agent</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="o">=</span><span class="s2">""</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">system</span> <span class="o">=</span> <span class="n">system</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">messages</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"system"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="n">system</span><span class="p">})</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"user"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="n">message</span><span class="p">})</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"assistant"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="n">result</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">completion</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                        <span class="n">model</span><span class="o">=</span><span class="s2">"gpt-4o"</span><span class="p">,</span>
+                        <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                        <span class="n">messages</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">completion</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span>
+
+
+<span class="n">prompt</span> <span class="o">=</span> <span class="s2">"""</span>
+<span class="s2">You run in a loop of Thought, Action, PAUSE, Observation.</span>
+<span class="s2">At the end of the loop you output an Answer</span>
+<span class="s2">Use Thought to describe your thoughts about the question you have been asked.</span>
+<span class="s2">Use Action to run one of the actions available to you - then return PAUSE.</span>
+<span class="s2">Observation will be the result of running those actions.</span>
+
+<span class="s2">Your available actions are:</span>
+
+<span class="s2">calculate:</span>
+<span class="s2">e.g. calculate: 4 * 7 / 3</span>
+<span class="s2">Runs a calculation and returns the number - uses Python so be sure to use floating point syntax if necessary</span>
+
+<span class="s2">average_dog_weight:</span>
+<span class="s2">e.g. average_dog_weight: Collie</span>
+<span class="s2">returns average weight of a dog when given the breed</span>
+
+<span class="s2">Example session:</span>
+
+<span class="s2">Question: How much does a Bulldog weigh?</span>
+<span class="s2">Thought: I should look the dogs weight using average_dog_weight</span>
+<span class="s2">Action: average_dog_weight: Bulldog</span>
+<span class="s2">PAUSE</span>
+
+<span class="s2">You will be called again with this:</span>
+
+<span class="s2">Observation: A Bulldog weights 51 lbs</span>
+
+<span class="s2">You then output:</span>
+
+<span class="s2">Answer: A bulldog weights 51 lbs</span>
+<span class="s2">"""</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate</span><span class="p">(</span><span class="n">what</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">eval</span><span class="p">(</span><span class="n">what</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">average_dog_weight</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="s2">"Scottish Terrier"</span><span class="p">:</span>
+        <span class="k">return</span><span class="p">(</span><span class="s2">"Scottish Terriers average 20 lbs"</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="s2">"Border Collie"</span><span class="p">:</span>
+        <span class="k">return</span><span class="p">(</span><span class="s2">"a Border Collies average weight is 37 lbs"</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="s2">"Toy Poodle"</span><span class="p">:</span>
+        <span class="k">return</span><span class="p">(</span><span class="s2">"a toy poodles average weight is 7 lbs"</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span><span class="p">(</span><span class="s2">"An average dog weights 50 lbs"</span><span class="p">)</span>
+
+<span class="n">known_actions</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"calculate"</span><span class="p">:</span> <span class="n">calculate</span><span class="p">,</span>
+    <span class="s2">"average_dog_weight"</span><span class="p">:</span> <span class="n">average_dog_weight</span>
+<span class="p">}</span>
+
+<span class="n">action_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">'^Action: (\w+): (.*)$'</span><span class="p">)</span>   <span class="c1"># python regular expression to select action</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">query</span><span class="p">(</span><span class="n">question</span><span class="p">,</span> <span class="n">max_turns</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">bot</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+    <span class="n">next_prompt</span> <span class="o">=</span> <span class="n">question</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">max_turns</span><span class="p">:</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">bot</span><span class="p">(</span><span class="n">next_prompt</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="n">actions</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">action_re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">action_re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="n">actions</span><span class="p">:</span>
+            <span class="c1"># There is an action to run</span>
+            <span class="n">action</span><span class="p">,</span> <span class="n">action_input</span> <span class="o">=</span> <span class="n">actions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">action</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">known_actions</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"Unknown action: </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">action_input</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">" -- running </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">action_input</span><span class="p">))</span>
+            <span class="n">observation</span> <span class="o">=</span> <span class="n">known_actions</span><span class="p">[</span><span class="n">action</span><span class="p">](</span><span class="n">action_input</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">"Observation:"</span><span class="p">,</span> <span class="n">observation</span><span class="p">)</span>
+            <span class="n">next_prompt</span> <span class="o">=</span> <span class="s2">"Observation: </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">observation</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">question</span> <span class="o">=</span> <span class="s2">"""I have 2 dogs, a border collie and a scottish terrier. </span><span class="se">\</span>
+<span class="s2">What is their combined weight"""</span>
+    <span class="n">query</span><span class="p">(</span><span class="n">question</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="9-extensions">9. Extensions</h2>
+<ul>
+<li><strong>More tools:</strong> web search, API calls, database queries.</li>
+<li><strong>Robust error handling</strong> for tool failures and invalid input.</li>
+<li><strong>Memory:</strong> persistent memory across conversations.</li>
+<li><strong>Prompt refinement</strong> to improve reasoning and tool use.</li>
+<li><strong>Smarter tool selection</strong> logic for choosing which tool fits a given context.</li>
+<li><strong>Multiple actions per turn</strong> for better efficiency.</li>
+</ul>
+<blockquote>
+<p><strong>Advanced Implementation:</strong> for more sophisticated agents, a framework such as <strong>LangChain</strong> offers many of these extensions ready-made.</p>
+</blockquote>
+<h2 id="10-key-takeaways">10. Key Takeaways</h2>
+<ol>
+<li>Pairing <strong>reasoning with tool use</strong> gives a strong problem-solving pattern.</li>
+<li>The <strong>iterative loop</strong> breaks complex problems into smaller steps.</li>
+<li>A well-written <strong>system prompt</strong> strongly shapes model behaviour.</li>
+<li><strong>External tools</strong> greatly expand what a language model can do.</li>
+<li><strong>Regular expressions</strong> offer a simple way to parse actions from model output.</li>
+<li>The <strong>Agent class</strong> preserves conversation state across the interaction.</li>
+</ol>
+<h2 id="key-terms">Key Terms</h2>
+<ul>
+<li><strong>ReAct (Reasoning + Acting):</strong> a framework where an LLM alternates between reasoning about a task and taking actions with tools.</li>
+<li><strong>Thought:</strong> the agent's reasoning about the current state and next step.</li>
+<li><strong>Action:</strong> a tool call the agent selects and emits, followed by <code>PAUSE</code>.</li>
+<li><strong>Observation:</strong> the result of running an action, fed back to the agent.</li>
+<li><strong>PAUSE:</strong> the keyword telling the model to stop generating so the system can run the tool.</li>
+<li><strong>Answer:</strong> the final output, produced when no further action is needed.</li>
+<li><strong>known_actions:</strong> dictionary mapping action names to Python functions.</li>
+<li><strong>max_turns:</strong> iteration cap that prevents endless loops.</li>
+</ul>
+  <div class="pager"><a href="week08-midterm.html"><small>Previous</small>Week 8: Midterm Exam</a><a class="next" href="week10-multi-agent.html"><small>Next</small>Week 10: Multi-Agent Systems</a></div>
+  <footer style="margin-top:3rem;padding-top:1rem;border-top:1px solid var(--border);font-size:.84rem;color:var(--muted)">
+Course materials by <a href="https://albanna-tutorials.com/cs/">Dr. Abdulkarim Albanna</a> (University of Petra), adapted for the section taught by Dr. Zaid G. Momani. Interactive simulations and test code added for this site. Source on <a href="https://github.com/zmomani/ComputingSystemsDS-AI">GitHub</a>.
+</footer>
+</main><aside class="rail">
+  <div class="rail-tabs"><button class="active" data-panel="panel-sims">Simulations</button><button data-panel="panel-code">Test code</button></div>
+  <div class="rail-panel active" id="panel-sims"><p class="rail-intro">Interactive teaching aids for this week. Each opens full-size with step controls and teaching notes.</p><button class="sim-card" data-sim="react-loop"><span class="sim-kind">Agents · animation</span><span class="sim-title">ReAct agent loop</span><span class="sim-desc">Thought → Action → Observation on a growing scratchpad, including a tool error.</span></button><button class="sim-card" data-sim="rag"><span class="sim-kind">LangChain · animation</span><span class="sim-title">RAG pipeline</span><span class="sim-desc">Load → split → embed → store → query → top-k → grounded prompt, in 2-D embedding space.</span></button></div>
+  <div class="rail-panel" id="panel-code"><p class="rail-intro"><b>Run ▶</b> executes pure-Python/NumPy snippets in your browser (Pyodide). Snippets marked <i>local</i> need the course environment (PyTorch, Transformers, LangChain…) — copy them into VS Code.</p><div class="snippet"><div class="snippet-head"><span>Regex action extraction, no API key needed</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 1. Regex action extraction, no API key needed
+import re
+action_re = re.compile(r&#x27;^Action: (\w+): (.*)$&#x27;)
+sample = &quot;&quot;&quot;Thought: I should look the dogs weight using average_dog_weight
+Action: average_dog_weight: Bulldog
+PAUSE&quot;&quot;&quot;
+actions = [action_re.match(a) for a in sample.split(&#x27;\n&#x27;) if action_re.match(a)]
+print(actions[0].groups())            # (&#x27;average_dog_weight&#x27;, &#x27;Bulldog&#x27;)
+print(action_re.match(&quot;Answer: 57 lbs&quot;))   # None → loop would terminate</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Tools + dispatch table, exercised directly</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 2. Tools + dispatch table, exercised directly
+def calculate(what):
+    return eval(what)
+
+def average_dog_weight(name):
+    if name in &quot;Scottish Terrier&quot;:
+        return(&quot;Scottish Terriers average 20 lbs&quot;)
+    elif name in &quot;Border Collie&quot;:
+        return(&quot;a Border Collies average weight is 37 lbs&quot;)
+    elif name in &quot;Toy Poodle&quot;:
+        return(&quot;a toy poodles average weight is 7 lbs&quot;)
+    else:
+        return(&quot;An average dog weights 50 lbs&quot;)
+
+known_actions = {&quot;calculate&quot;: calculate, &quot;average_dog_weight&quot;: average_dog_weight}
+for action, arg in [(&quot;average_dog_weight&quot;, &quot;Border Collie&quot;),
+                    (&quot;average_dog_weight&quot;, &quot;Scottish Terrier&quot;),
+                    (&quot;calculate&quot;, &quot;37 + 20&quot;),
+                    (&quot;average_dog_weight&quot;, &quot;scottish terrier&quot;)]:   # note the lowercase bug
+    print(f&quot;{action}({arg!r}) -&gt; {known_actions[action](arg)}&quot;)</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Run the full ReAct loop offline with a scripted fake LLM (same Agent/query code,</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 3. Run the full ReAct loop offline with a scripted fake LLM (same Agent/query code, no OpenAI call)
+import re
+scripted = iter([
+    &quot;Thought: I need both weights.\nAction: average_dog_weight: Border Collie\nPAUSE&quot;,
+    &quot;Thought: Now the terrier.\nAction: average_dog_weight: Scottish Terrier\nPAUSE&quot;,
+    &quot;Thought: Add them.\nAction: calculate: 37 + 20\nPAUSE&quot;,
+    &quot;Answer: The combined weight is 57 lbs.&quot;,
+])
+
+class Agent:
+    def __init__(self, system=&quot;&quot;):
+        self.messages = [{&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: system}] if system else []
+    def __call__(self, message):
+        self.messages.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: message})
+        result = next(scripted)                     # stand-in for client.chat.completions.create
+        self.messages.append({&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: result})
+        return result
+
+known_actions = {&quot;calculate&quot;: lambda w: eval(w),
+                 &quot;average_dog_weight&quot;: lambda n: {&quot;Border Collie&quot;: &quot;a Border Collies average weight is 37 lbs&quot;,
+                                                  &quot;Scottish Terrier&quot;: &quot;Scottish Terriers average 20 lbs&quot;}.get(n, &quot;An average dog weights 50 lbs&quot;)}
+action_re = re.compile(r&#x27;^Action: (\w+): (.*)$&#x27;)
+
+def query(question, max_turns=5):
+    bot, next_prompt = Agent(&quot;ReAct prompt&quot;), question
+    for i in range(max_turns):
+        result = bot(next_prompt); print(result)
+        actions = [action_re.match(a) for a in result.split(&#x27;\n&#x27;) if action_re.match(a)]
+        if not actions:
+            return len(bot.messages)
+        action, arg = actions[0].groups()
+        obs = known_actions[action](arg); print(&quot; -- running&quot;, action, arg); print(&quot;Observation:&quot;, obs)
+        next_prompt = f&quot;Observation: {obs}&quot;
+
+print(&quot;messages in history:&quot;, query(&quot;I have 2 dogs, a border collie and a scottish terrier. What is their combined weight&quot;))</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Live run against OpenAI (needs OPENAI_API_KEY in .env): the lesson&#x27;s own entry p</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 4. Live run against OpenAI (needs OPENAI_API_KEY in .env): the lesson&#x27;s own entry point
+#    pip install openai python-dotenv
+from dotenv import load_dotenv; _ = load_dotenv()
+from openai import OpenAI
+client = OpenAI()
+# paste the Agent class, prompt, tools, known_actions and query() from section 8 here, then:
+# query(&quot;I have 2 dogs, a border collie and a scottish terrier. What is their combined weight&quot;)</code></pre><div class="out"></div></div></div>
+</aside></div><div class="sim-overlay" id="sim-overlay" role="dialog" aria-modal="true">
+  <div class="sim-window"><div class="sim-head"><div><div class="sim-kind" id="sim-kind"></div><h3 id="sim-title"></h3></div><span class="spacer"></span><button class="btn-xs" id="sim-close">✕ Close (Esc)</button></div><div class="sim-body" id="sim-body"></div></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script>document.addEventListener('DOMContentLoaded',()=>{if(window.hljs)hljs.highlightAll();if(window.renderMathInElement)renderMathInElement(document.body,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});});</script>
+<script src="../assets/js/sims/core.js"></script>
+<script src="../assets/js/sims/matrix-multiply.js"></script><script src="../assets/js/sims/vectors.js"></script><script src="../assets/js/sims/attention.js"></script><script src="../assets/js/sims/tokenizer.js"></script><script src="../assets/js/sims/positional.js"></script><script src="../assets/js/sims/classifier.js"></script><script src="../assets/js/sims/bio-tagging.js"></script><script src="../assets/js/sims/rag.js"></script><script src="../assets/js/sims/langgraph.js"></script><script src="../assets/js/sims/sampling.js"></script><script src="../assets/js/sims/moe.js"></script><script src="../assets/js/sims/react-loop.js"></script><script src="../assets/js/sims/multi-agent.js"></script><script src="../assets/js/sims/mcp.js"></script><script src="../assets/js/sims/lam.js"></script><script src="../assets/js/sims/diffusion.js"></script>
+<script src="../assets/js/site.js"></script>
+</body></html>

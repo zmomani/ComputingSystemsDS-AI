@@ -1,0 +1,705 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 4: LangChain Fundamentals · Computing Systems for DS & AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<link rel="stylesheet" href="../assets/css/site.css">
+</head>
+<body><header class="topbar">
+  <button class="btn-icon" id="menu-toggle" aria-label="Menu">☰</button>
+  <a class="brand" href="../index.html">606363 · Computing Systems for DS & AI<small>University of Petra</small></a>
+  <span class="spacer"></span>
+  <nav class="week-nav"><a class="btn-icon" href="week03-ner.html" title="Named Entity Recognition (NER)">← Wk 3</a><a class="btn-icon" href="week05-langgraph.html" title="LangGraph">Wk 5 →</a></nav>
+  <a class="btn-icon" href="../index.html#curriculum">Curriculum</a>
+  <a class="btn-icon" href="../index.html#simulations">Simulations</a>
+  <button class="btn-icon" id="theme-toggle" aria-label="Toggle dark mode">◐</button>
+</header><div class="layout"><aside class="sidebar">
+  <h4>Course</h4><ul class="outline"><li><a class="" href="../lessons/syllabus.html"><span class="wk">·</span><span>Course Syllabus</span></a></li><li><a class="" href="../lessons/project.html"><span class="wk">·</span><span>Final Project</span></a></li></ul>
+  <h4>16-week curriculum</h4><ul class="outline"><li><a class="" href="../lessons/week01-transformers.html"><span class="wk">01</span><span>Transformer Architecture</span></a></li><li><a class="" href="../lessons/week02-text-classification.html"><span class="wk">02</span><span>Text Classification</span></a></li><li><a class="soon" href="../lessons/week03-ner.html"><span class="wk">03</span><span>Named Entity Recognition (NER)</span></a></li><li><a class="active" href="../lessons/week04-langchain.html"><span class="wk">04</span><span>LangChain Fundamentals</span></a></li><li><a class="" href="../lessons/week05-langgraph.html"><span class="wk">05</span><span>LangGraph</span></a></li><li><a class="" href="../lessons/week06-llms.html"><span class="wk">06</span><span>Large Language Models (LLMs)</span></a></li><li><a class="" href="../lessons/week07-moe.html"><span class="wk">07</span><span>Mixture of Experts (MoE)</span></a></li><li><a class="" href="../lessons/week08-midterm.html"><span class="wk">08</span><span>Midterm Exam</span></a></li><li><a class="" href="../lessons/week09-react-agents.html"><span class="wk">09</span><span>AI Agents &amp; ReAct</span></a></li><li><a class="" href="../lessons/week10-multi-agent.html"><span class="wk">10</span><span>Multi-Agent Systems</span></a></li><li><a class="" href="../lessons/week11-mcp.html"><span class="wk">11</span><span>Model Context Protocol (MCP)</span></a></li><li><a class="soon" href="../lessons/week12-lams.html"><span class="wk">12</span><span>Large Action Models (LAMs)</span></a></li><li><a class="" href="../lessons/week13-diffusion.html"><span class="wk">13</span><span>Diffusion Models</span></a></li><li><a class="" href="../lessons/week14-project.html"><span class="wk">14</span><span>Project Development &amp; Final Testing</span></a></li><li><a class="" href="../lessons/week15-competition.html"><span class="wk">15</span><span>Competition Day &amp; Presentations</span></a></li><li><a class="" href="../lessons/week16-final.html"><span class="wk">16</span><span>Final Exam</span></a></li></ul>
+  <h4>On this page</h4><ul class="toc" id="toc"></ul>
+</aside><main class="main">
+  <div class="lesson-head"><div class="eyebrow">Week 4 · ILO K1, P1</div><h1>LangChain Fundamentals</h1>
+  <p class="credit"><b>Topics:</b> LangChain chains, prompts, memory, loaders, splitters, vector stores, RAG<br><b>Project milestone:</b> Prompt templates for each agent, document loaders, ChromaDB store, basic RAG chain</p></div>
+  <div class="callout sim"><div class="sim-strip"><b style="margin-right:4px">Simulations for this week:</b><button class="chip" data-sim="rag">▶ RAG pipeline</button><button class="chip" data-sim="vectors">▶ Vectors, dot product &amp; cosine similarity</button></div></div>
+  <h2 id="part-langchain-fundamentals">LangChain Fundamentals</h2><p class="credit">Source page: <a href="https://albanna-tutorials.com/langchain.html">https://albanna-tutorials.com/langchain.html</a></p>
+<blockquote>
+<p>Material by Dr. Abedal-Kareem Al-Banna (ilmy / albanna-tutorials.com). Original page: "LangChain Python Tutorial" — Beginner level, about 10 minutes. The source page is an overview/orientation page with no code blocks; the test code at the end of this file was written for the course and is consistent with the libraries the page describes.</p>
+</blockquote>
+<h2 id="welcome-to-langchain-python">Welcome to LangChain Python</h2>
+<p>A framework for developing applications powered by large language models (LLMs).</p>
+<p>Official documentation: https://python.langchain.com/</p>
+<h2 id="the-langchain-framework">The LangChain Framework</h2>
+<p>LangChain simplifies every stage of the LLM application lifecycle, from development to productionization to deployment.</p>
+<p><img alt="LangChain Framework Diagram" src="https://python.langchain.com/svg/langchain_stack_062024.svg" /></p>
+<p><em>Figure: the LangChain stack — open-source libraries (langchain-core, langchain, langchain-community, LangGraph) at the base, LangSmith for productionization, and LangGraph Cloud / LangServe for deployment.</em></p>
+<h2 id="development">Development</h2>
+<p>Build your applications using LangChain's open-source building blocks, components, and third-party integrations.</p>
+<h3 id="building-blocks-lcel">Building Blocks (LCEL)</h3>
+<p>Create composable chains with LangChain Expression Language, providing flexibility and reusability.</p>
+<p>Reference: https://python.langchain.com/docs/concepts/#langchain-expression-language-lcel</p>
+<h3 id="langgraph">LangGraph</h3>
+<p>Build stateful agents with first-class streaming and human-in-the-loop support for complex applications.</p>
+<p>Reference: https://python.langchain.com/docs/concepts/#langgraph</p>
+<h2 id="productionization">Productionization</h2>
+<p>Use LangSmith to inspect, monitor and evaluate your chains, so that you can continuously optimize and deploy with confidence.</p>
+<h3 id="langsmith">LangSmith</h3>
+<p>A developer platform that lets you debug, test, evaluate, and monitor LLM applications.</p>
+<p>Reference: https://docs.smith.langchain.com/</p>
+<h2 id="deployment">Deployment</h2>
+<p>Turn your LangGraph applications into production-ready APIs and Assistants with LangGraph Cloud.</p>
+<h3 id="langgraph-cloud">LangGraph Cloud</h3>
+<p>Deploy your LangGraph applications as production-ready APIs and Assistants.</p>
+<p>Reference: https://langchain-ai.github.io/langgraph/cloud/</p>
+<h2 id="langchain-libraries">LangChain Libraries</h2>
+<p>The framework consists of the following open-source libraries:</p>
+<table>
+<thead>
+<tr>
+<th>Library</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>langchain-core</strong></td>
+<td>Base abstractions and LangChain Expression Language that form the foundation of LangChain.</td>
+</tr>
+<tr>
+<td><strong>langchain-community</strong></td>
+<td>Third party integrations enabling connections to external services and tools.</td>
+</tr>
+<tr>
+<td><strong>langchain</strong></td>
+<td>Chains, agents, and retrieval strategies that make up an application's cognitive architecture.</td>
+</tr>
+<tr>
+<td><strong>LangGraph</strong></td>
+<td>Build robust and stateful multi-actor applications with LLMs by modeling steps as edges and nodes in a graph.</td>
+</tr>
+<tr>
+<td><strong>LangServe</strong></td>
+<td>Deploy LangChain chains as REST APIs for easy integration with other services.</td>
+</tr>
+<tr>
+<td><strong>LangSmith</strong></td>
+<td>A developer platform that lets you debug, test, evaluate, and monitor LLM applications.</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Note: these docs focus on the Python LangChain library. For the JavaScript version see https://js.langchain.com/.</p>
+</blockquote>
+<h2 id="tutorials">Tutorials</h2>
+<p>If you're looking to build something specific or are more of a hands-on learner, check out our tutorials section.</p>
+<h3 id="build-a-simple-llm-application">Build a Simple LLM Application</h3>
+<p>Learn how to create a basic application powered by large language models.
+https://python.langchain.com/docs/tutorials/llm_chain/</p>
+<h3 id="build-a-chatbot">Build a Chatbot</h3>
+<p>Create your own conversational AI assistant using LangChain's components.
+https://python.langchain.com/docs/tutorials/chatbot/</p>
+<h3 id="build-an-agent">Build an Agent</h3>
+<p>Develop intelligent agents that can perform tasks and make decisions autonomously.
+https://python.langchain.com/docs/tutorials/agents/</p>
+<h3 id="introduction-to-langgraph">Introduction to LangGraph</h3>
+<p>Learn how to use LangGraph to build stateful, multi-actor applications with LLMs.
+https://langchain-ai.github.io/langgraph/tutorials/introduction/</p>
+<p>All tutorials: https://python.langchain.com/docs/tutorials/</p>
+<h2 id="guides-reference">Guides &amp; Reference</h2>
+<h3 id="how-to-guides">How-to guides</h3>
+<p>Short answers to "How do I….?" types of questions. These guides help you quickly accomplish common tasks.
+https://python.langchain.com/docs/how_to/ — LangGraph how-tos: https://langchain-ai.github.io/langgraph/how-tos/</p>
+<h3 id="conceptual-guide">Conceptual guide</h3>
+<p>Introductions to all the key parts of LangChain you'll need to know! High level explanations of all LangChain concepts.
+https://python.langchain.com/docs/concepts/ — LangGraph concepts: https://langchain-ai.github.io/langgraph/concepts/</p>
+<h3 id="api-reference">API reference</h3>
+<p>Full documentation of all classes and methods in the LangChain Python packages.
+https://python.langchain.com/api_reference/</p>
+<h2 id="additional-resources">Additional Resources</h2>
+<ul>
+<li><strong>LangSmith</strong> — Trace and evaluate your language model applications and intelligent agents to help you move from prototype to production. https://docs.smith.langchain.com/</li>
+<li><strong>LangGraph</strong> — Build stateful, multi-actor applications with LLMs. Integrates smoothly with LangChain, but can be used without it. https://langchain-ai.github.io/langgraph</li>
+<li><strong>Versions</strong> — See what changed in v0.3, learn how to migrate legacy code, read up on versioning policies, and more. https://python.langchain.com/docs/versions/v0_3/</li>
+<li><strong>Security</strong> — Read up on security best practices to make sure you're developing safely with LangChain. https://python.langchain.com/docs/security/</li>
+<li><strong>Integrations</strong> — LangChain is part of a rich ecosystem of tools that integrate with our framework and build on top of it. https://python.langchain.com/docs/integrations/providers/</li>
+<li><strong>Contributing</strong> — Check out the developer's guide for guidelines on contributing and help getting your dev environment set up. https://python.langchain.com/docs/contributing/</li>
+</ul>
+<h2 id="quick-links">Quick Links</h2>
+<ul>
+<li>LangChain docs: https://python.langchain.com/</li>
+<li>Tutorials: https://python.langchain.com/docs/tutorials/</li>
+<li>How-to guides: https://python.langchain.com/docs/how_to/</li>
+<li>Concepts: https://python.langchain.com/docs/concepts/</li>
+<li>API reference: https://python.langchain.com/api_reference/</li>
+<li>GitHub: https://github.com/langchain-ai/langchain</li>
+</ul>
+<h2 id="part-chat-with-databases">Chat with Databases</h2><p class="credit">Source page: <a href="https://albanna-tutorials.com/database.html">https://albanna-tutorials.com/database.html</a></p>
+<blockquote>
+<p>Material by Dr. Abedal-Kareem Al-Banna (ilmy / albanna-tutorials.com). Original page: "LangChain Database Chat" — Intermediate level, about 20 minutes. Code listings are reproduced verbatim from the page; some listings on the original use single-space indentation, which has been normalised to 4 spaces here so the code runs.</p>
+</blockquote>
+<h2 id="introduction">Introduction</h2>
+<p>LangChain provides powerful tools to interact with your databases using natural language. This application demonstrates how to create a chat interface that allows users to query databases in conversational language instead of writing SQL.</p>
+<p><strong>Why use LangChain for database interactions?</strong></p>
+<ul>
+<li>Query databases using natural language</li>
+<li>Convert user questions to optimized SQL</li>
+<li>Interpret results in human-readable format</li>
+<li>Handle follow-up questions with context</li>
+<li>Protect against SQL injection with built-in safeguards</li>
+</ul>
+<h2 id="chat-interface">Chat Interface</h2>
+<p>A sample conversation with the demo assistant over the Chinook sample database (a digital music store):</p>
+<blockquote>
+<p><strong>Assistant:</strong> Hello! I'm your database assistant. I can help you query the sample Chinook database.</p>
+<p><strong>User:</strong> Which country's customers spent the most?</p>
+<p><strong>Assistant:</strong> Looking at the data, customers from the USA spent the most, with a total of $523.06.</p>
+<p><strong>User:</strong> Who are the top 3 best selling artists?</p>
+<p><strong>Assistant:</strong> The top 3 best selling artists are:
+1. Iron Maiden - 140 units sold
+2. U2 - 107 units sold
+3. Metallica - 91 units sold</p>
+</blockquote>
+<h2 id="database-schema">Database Schema</h2>
+<p>The Chinook schema is organised around these main tables.</p>
+<h3 id="customer">Customer</h3>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CustomerId</td>
+<td>INTEGER</td>
+<td>Primary key</td>
+</tr>
+<tr>
+<td>FirstName</td>
+<td>NVARCHAR(40)</td>
+<td>Not null</td>
+</tr>
+<tr>
+<td>LastName</td>
+<td>NVARCHAR(20)</td>
+<td>Not null</td>
+</tr>
+<tr>
+<td>Country</td>
+<td>NVARCHAR(40)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Email</td>
+<td>NVARCHAR(60)</td>
+<td>Not null</td>
+</tr>
+</tbody>
+</table>
+<h3 id="invoice">Invoice</h3>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>InvoiceId</td>
+<td>INTEGER</td>
+<td>Primary key</td>
+</tr>
+<tr>
+<td>CustomerId</td>
+<td>INTEGER</td>
+<td>Foreign key → Customer</td>
+</tr>
+<tr>
+<td>InvoiceDate</td>
+<td>DATETIME</td>
+<td>Not null</td>
+</tr>
+<tr>
+<td>BillingCountry</td>
+<td>NVARCHAR(40)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Total</td>
+<td>NUMERIC(10,2)</td>
+<td>Not null</td>
+</tr>
+</tbody>
+</table>
+<h3 id="artist">Artist</h3>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ArtistId</td>
+<td>INTEGER</td>
+<td>Primary key</td>
+</tr>
+<tr>
+<td>Name</td>
+<td>NVARCHAR(120)</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h3 id="album">Album</h3>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AlbumId</td>
+<td>INTEGER</td>
+<td>Primary key</td>
+</tr>
+<tr>
+<td>Title</td>
+<td>NVARCHAR(160)</td>
+<td>Not null</td>
+</tr>
+<tr>
+<td>ArtistId</td>
+<td>INTEGER</td>
+<td>Foreign key → Artist</td>
+</tr>
+</tbody>
+</table>
+<h3 id="key-relationships">Key relationships</h3>
+<ul>
+<li>Each Customer can have many Invoices.</li>
+<li>Each Artist can have many Albums.</li>
+<li>Each Album can have many Tracks.</li>
+<li>Tracks and Invoices are linked through InvoiceLine — each invoice line connects one Invoice to one Track.</li>
+</ul>
+<h2 id="how-langchain-connects-to-databases">How LangChain Connects to Databases</h2>
+<p>LangChain's <code>SQLDatabaseToolkit</code> gives an AI agent a set of tools for querying and working with SQL databases:</p>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>QuerySQLDataBaseTool</code></td>
+<td>Executes SQL queries</td>
+</tr>
+<tr>
+<td><code>InfoSQLDatabaseTool</code></td>
+<td>Gets schema information</td>
+</tr>
+<tr>
+<td><code>ListSQLDatabaseTool</code></td>
+<td>Lists available tables</td>
+</tr>
+<tr>
+<td><code>QuerySQLCheckerTool</code></td>
+<td>Validates SQL queries before execution</td>
+</tr>
+</tbody>
+</table>
+<h3 id="the-role-of-the-language-model">The role of the language model</h3>
+<p>The LLM acts as the bridge between natural language and SQL. It:</p>
+<ol>
+<li>Interprets the user's question.</li>
+<li>Writes a valid SQL query based on the schema.</li>
+<li>Reviews the query for errors or security issues.</li>
+<li>Turns raw results into a readable answer.</li>
+<li>Keeps conversation context for follow-up questions.</li>
+</ol>
+<h3 id="architecture-overview-system-components">Architecture Overview — System Components</h3>
+<ul>
+<li><strong>Database Connection:</strong> SQLAlchemy connection to your database (SQLite, MySQL, PostgreSQL, etc.)</li>
+<li><strong>LLM Integration:</strong> Connection to OpenAI, Anthropic, or other LLM APIs</li>
+<li><strong>LangChain Tools:</strong> Specialized tools for SQL query generation and validation</li>
+<li><strong>Agent Framework:</strong> LangChain's agent system for orchestrating complex interactions</li>
+<li><strong>Chat Interface:</strong> Frontend for user interactions with the system</li>
+</ul>
+<h2 id="security-considerations">Security Considerations</h2>
+<p>Building Q&amp;A systems over SQL databases means executing model-generated SQL, which carries inherent risk. Recommendations:</p>
+<ul>
+<li>Always use read-only database connections when possible</li>
+<li>Scope database permissions as narrowly as possible</li>
+<li>Consider implementing additional validation layers</li>
+<li>Monitor query patterns and implement rate limiting</li>
+</ul>
+<h2 id="process-flow">Process Flow</h2>
+<p>Worked example: <em>"Which country's customers spent the most?"</em></p>
+<ol>
+<li><strong>User Query Input</strong> — The user enters a natural language question about the database data.</li>
+<li><strong>Database Schema Analysis</strong> — The system uses <code>ListSQLDatabaseTool</code> and <code>InfoSQLDatabaseTool</code> to understand the database structure. For this question the relevant tables are Customer, Invoice and InvoiceLine.</li>
+<li><strong>SQL Query Generation</strong> — The LLM converts the natural language question into a SQL query based on the schema:</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="k">SELECT</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">Country</span><span class="p">,</span><span class="w"> </span><span class="k">SUM</span><span class="p">(</span><span class="n">i</span><span class="p">.</span><span class="n">Total</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">TotalSpent</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">Customer</span><span class="w"> </span><span class="k">c</span>
+<span class="k">JOIN</span><span class="w"> </span><span class="n">Invoice</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">CustomerId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">.</span><span class="n">CustomerId</span>
+<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="k">c</span><span class="p">.</span><span class="n">Country</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">TotalSpent</span><span class="w"> </span><span class="k">DESC</span>
+<span class="k">LIMIT</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+</code></pre></div>
+<ol start="4">
+<li><strong>Query Validation</strong> — The <code>QuerySQLCheckerTool</code> validates the SQL query for errors and potential improvements.</li>
+<li><strong>Database Execution</strong> — The <code>QuerySQLDataBaseTool</code> executes the SQL query against the database. Result: <code>USA, 523.06</code>.</li>
+<li><strong>Result Interpretation</strong> — The LLM translates the raw query results into a natural language response.</li>
+</ol>
+<h2 id="sample-queries">Sample Queries</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Tags</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Which country's customers spent the most?</td>
+<td>Sales · Geography · Aggregation</td>
+</tr>
+<tr>
+<td>Who are the top 3 best selling artists?</td>
+<td>Artists · Sales · Ranking</td>
+</tr>
+<tr>
+<td>What's the most popular music genre by sales?</td>
+<td>Genres · Popularity · Analysis</td>
+</tr>
+<tr>
+<td>Which customer has purchased the most tracks?</td>
+<td>Customers · Purchases · Loyalty</td>
+</tr>
+<tr>
+<td>What was the highest sales month in 2021?</td>
+<td>Time · Sales · Seasonal</td>
+</tr>
+<tr>
+<td>Which employee has the highest sales through their customers?</td>
+<td>Employees · Customers · Relationships</td>
+</tr>
+</tbody>
+</table>
+<h2 id="implementation-code">Implementation Code</h2>
+<h3 id="setting-up-the-environment">Setting Up the Environment</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Install required packages</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">langchain</span> <span class="n">langchain</span><span class="o">-</span><span class="n">community</span> <span class="n">langchain</span><span class="o">-</span><span class="n">openai</span> <span class="n">langgraph</span>
+
+<span class="c1"># Import necessary modules</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_openai</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatOpenAI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_community.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">SQLDatabase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain</span><span class="w"> </span><span class="kn">import</span> <span class="n">hub</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_community.tools.sql_database.tool</span><span class="w"> </span><span class="kn">import</span> <span class="n">QuerySQLDatabaseTool</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph.prebuilt</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_react_agent</span>
+
+<span class="c1"># Set your OpenAI API key</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"OPENAI_API_KEY"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"your-api-key-here"</span>
+</code></pre></div>
+<h3 id="database-connection">Database Connection</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Connect to an SQLite Database</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_engine</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy.pool</span><span class="w"> </span><span class="kn">import</span> <span class="n">StaticPool</span>
+
+<span class="c1"># For an existing SQLite database</span>
+<span class="n">db_path</span> <span class="o">=</span> <span class="s2">"chinook.db"</span>  <span class="c1"># Path to your SQLite database</span>
+<span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="sa">f</span><span class="s2">"sqlite:///</span><span class="si">{</span><span class="n">db_path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="n">db</span> <span class="o">=</span> <span class="n">SQLDatabase</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+
+<span class="c1"># Alternatively, for in-memory testing with example data</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_in_memory_db</span><span class="p">():</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">sqlite3</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+
+    <span class="n">url</span> <span class="o">=</span> <span class="s2">"https://raw.githubusercontent.com/lerocha/chinook-database/master/ChinookDatabase/DataSources/Chinook_Sqlite.sql"</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">sql_script</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span>
+
+    <span class="n">connection</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">":memory:"</span><span class="p">,</span> <span class="n">check_same_thread</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">connection</span><span class="o">.</span><span class="n">executescript</span><span class="p">(</span><span class="n">sql_script</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">create_engine</span><span class="p">(</span>
+        <span class="s2">"sqlite://"</span><span class="p">,</span>
+        <span class="n">creator</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">connection</span><span class="p">,</span>
+        <span class="n">poolclass</span><span class="o">=</span><span class="n">StaticPool</span><span class="p">,</span>
+        <span class="n">connect_args</span><span class="o">=</span><span class="p">{</span><span class="s2">"check_same_thread"</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+    <span class="p">)</span>
+
+<span class="n">engine</span> <span class="o">=</span> <span class="n">get_in_memory_db</span><span class="p">()</span>
+<span class="n">db</span> <span class="o">=</span> <span class="n">SQLDatabase</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="creating-the-langchain-agent">Creating the LangChain Agent</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Initialize Language Model</span>
+<span class="n">llm</span> <span class="o">=</span> <span class="n">ChatOpenAI</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">"gpt-4"</span><span class="p">)</span>  <span class="c1"># You can also use gpt-3.5-turbo for lower cost</span>
+
+<span class="c1"># Initialize SQL Database Toolkit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_community.agent_toolkits.sql.toolkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">SQLDatabaseToolkit</span>
+<span class="n">toolkit</span> <span class="o">=</span> <span class="n">SQLDatabaseToolkit</span><span class="p">(</span><span class="n">db</span><span class="o">=</span><span class="n">db</span><span class="p">,</span> <span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">)</span>
+
+<span class="c1"># Get the tools from the toolkit</span>
+<span class="n">tools</span> <span class="o">=</span> <span class="n">toolkit</span><span class="o">.</span><span class="n">get_tools</span><span class="p">()</span>
+
+<span class="c1"># Get a prompt from LangChain Hub</span>
+<span class="n">prompt_template</span> <span class="o">=</span> <span class="n">hub</span><span class="o">.</span><span class="n">pull</span><span class="p">(</span><span class="s2">"langchain-ai/sql-agent-system-prompt"</span><span class="p">)</span>
+<span class="n">system_message</span> <span class="o">=</span> <span class="n">prompt_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dialect</span><span class="o">=</span><span class="s2">"SQLite"</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="c1"># Create the agent</span>
+<span class="n">agent_executor</span> <span class="o">=</span> <span class="n">create_react_agent</span><span class="p">(</span>
+    <span class="n">llm</span><span class="p">,</span>
+    <span class="n">tools</span><span class="p">,</span>
+    <span class="n">state_modifier</span><span class="o">=</span><span class="n">system_message</span>
+<span class="p">)</span>
+</code></pre></div>
+<blockquote>
+<p>Note: the toolkit's tool list is documented as <code>QuerySQLDataBaseTool</code>, while the import above uses <code>QuerySQLDatabaseTool</code>. Check the exact class name in your installed LangChain version. In recent <code>langgraph</code> releases the <code>state_modifier</code> argument of <code>create_react_agent</code> has been renamed <code>prompt</code>.</p>
+</blockquote>
+<h3 id="django-integration-viewspy">Django Integration (views.py)</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># views.py for Django integration</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">JsonResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.views.decorators.csrf</span><span class="w"> </span><span class="kn">import</span> <span class="n">csrf_exempt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+<span class="nd">@csrf_exempt</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">chat_with_db</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">'POST'</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+            <span class="n">user_message</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'message'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>
+
+            <span class="c1"># Process the user message with our agent</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">agent_executor</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span>
+                <span class="p">{</span><span class="s2">"messages"</span><span class="p">:</span> <span class="p">[(</span><span class="s2">"user"</span><span class="p">,</span> <span class="n">user_message</span><span class="p">)]}</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Extract the final AI message</span>
+            <span class="n">ai_message</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s2">"messages"</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">content</span>
+
+            <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span>
+                <span class="s1">'success'</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s1">'message'</span><span class="p">:</span> <span class="n">ai_message</span>
+            <span class="p">})</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span>
+                <span class="s1">'success'</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s1">'error'</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="p">})</span>
+
+    <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span>
+        <span class="s1">'success'</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s1">'error'</span><span class="p">:</span> <span class="s1">'Only POST requests are supported'</span>
+    <span class="p">})</span>
+</code></pre></div>
+<h3 id="frontend-javascript">Frontend JavaScript</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// JavaScript for the chat interface</span>
+<span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'DOMContentLoaded'</span><span class="p">,</span><span class="w"> </span><span class="kd">function</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">messageInput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">'.chat-input input'</span><span class="p">);</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">sendButton</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">'.chat-input button'</span><span class="p">);</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">messagesContainer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">'.chat-messages'</span><span class="p">);</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">sampleQueries</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">document</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="s1">'.sample-query'</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// Function to add a message to the chat</span>
+<span class="w">    </span><span class="kd">function</span><span class="w"> </span><span class="nx">addMessage</span><span class="p">(</span><span class="nx">message</span><span class="p">,</span><span class="w"> </span><span class="nx">isUser</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">messageDiv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">'div'</span><span class="p">);</span>
+<span class="w">        </span><span class="nx">messageDiv</span><span class="p">.</span><span class="nx">className</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">isUser</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s1">'user-message'</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s1">'bot-message'</span><span class="p">;</span>
+<span class="w">        </span><span class="nx">messageDiv</span><span class="p">.</span><span class="nx">innerHTML</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">message</span><span class="p">;</span>
+<span class="w">        </span><span class="nx">messagesContainer</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">messageDiv</span><span class="p">);</span>
+<span class="w">        </span><span class="nx">messagesContainer</span><span class="p">.</span><span class="nx">scrollTop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">messagesContainer</span><span class="p">.</span><span class="nx">scrollHeight</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// Function to send a message to the backend</span>
+<span class="w">    </span><span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">sendMessage</span><span class="p">(</span><span class="nx">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">addMessage</span><span class="p">(</span><span class="nx">message</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// Show loading indicator</span>
+<span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">loadingDiv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">'div'</span><span class="p">);</span>
+<span class="w">        </span><span class="nx">loadingDiv</span><span class="p">.</span><span class="nx">className</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'bot-message'</span><span class="p">;</span>
+<span class="w">        </span><span class="nx">loadingDiv</span><span class="p">.</span><span class="nx">innerHTML</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'&lt;i class="fas fa-spinner fa-spin"&gt;&lt;/i&gt; Thinking...'</span><span class="p">;</span>
+<span class="w">        </span><span class="nx">messagesContainer</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">loadingDiv</span><span class="p">);</span>
+
+<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">fetch</span><span class="p">(</span><span class="s1">'/chat_with_db/'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nx">method</span><span class="o">:</span><span class="w"> </span><span class="s1">'POST'</span><span class="p">,</span>
+<span class="w">                </span><span class="nx">headers</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="s1">'Content-Type'</span><span class="o">:</span><span class="w"> </span><span class="s1">'application/json'</span><span class="p">,</span>
+<span class="w">                </span><span class="p">},</span>
+<span class="w">                </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span><span class="w"> </span><span class="nx">message</span><span class="o">:</span><span class="w"> </span><span class="nx">message</span><span class="w"> </span><span class="p">}),</span>
+<span class="w">            </span><span class="p">});</span>
+
+<span class="w">            </span><span class="kd">const</span><span class="w"> </span><span class="nx">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">json</span><span class="p">();</span>
+
+<span class="w">            </span><span class="c1">// Remove loading indicator</span>
+<span class="w">            </span><span class="nx">messagesContainer</span><span class="p">.</span><span class="nx">removeChild</span><span class="p">(</span><span class="nx">loadingDiv</span><span class="p">);</span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">success</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nx">addMessage</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">message</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nx">addMessage</span><span class="p">(</span><span class="s1">'Error: '</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">data</span><span class="p">.</span><span class="nx">error</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="nx">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// Remove loading indicator</span>
+<span class="w">            </span><span class="nx">messagesContainer</span><span class="p">.</span><span class="nx">removeChild</span><span class="p">(</span><span class="nx">loadingDiv</span><span class="p">);</span>
+<span class="w">            </span><span class="nx">addMessage</span><span class="p">(</span><span class="s1">'An error occurred while connecting to the server.'</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// Event listener for send button</span>
+<span class="w">    </span><span class="nx">sendButton</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'click'</span><span class="p">,</span><span class="w"> </span><span class="kd">function</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">messageInput</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">trim</span><span class="p">();</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nx">sendMessage</span><span class="p">(</span><span class="nx">message</span><span class="p">);</span>
+<span class="w">            </span><span class="nx">messageInput</span><span class="p">.</span><span class="nx">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">''</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">});</span>
+
+<span class="w">    </span><span class="c1">// Event listener for enter key</span>
+<span class="w">    </span><span class="nx">messageInput</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'keypress'</span><span class="p">,</span><span class="w"> </span><span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">key</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'Enter'</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">const</span><span class="w"> </span><span class="nx">message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">messageInput</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">trim</span><span class="p">();</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nx">sendMessage</span><span class="p">(</span><span class="nx">message</span><span class="p">);</span>
+<span class="w">                </span><span class="nx">messageInput</span><span class="p">.</span><span class="nx">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">''</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">});</span>
+
+<span class="w">    </span><span class="c1">// Event listeners for sample queries</span>
+<span class="w">    </span><span class="nx">sampleQueries</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">query</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">query</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'click'</span><span class="p">,</span><span class="w"> </span><span class="kd">function</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">const</span><span class="w"> </span><span class="nx">questionText</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">'p'</span><span class="p">).</span><span class="nx">textContent</span><span class="p">;</span>
+<span class="w">            </span><span class="nx">messageInput</span><span class="p">.</span><span class="nx">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">questionText</span><span class="p">;</span>
+<span class="w">            </span><span class="nx">messageInput</span><span class="p">.</span><span class="nx">focus</span><span class="p">();</span>
+<span class="w">        </span><span class="p">});</span>
+<span class="w">    </span><span class="p">});</span>
+<span class="p">});</span>
+</code></pre></div>
+<h2 id="closing-note">Closing note</h2>
+<p>Always implement proper permissions and validation when connecting LLMs to databases.</p>
+<p><em>Built with LangChain, Python, and modern web technologies.</em></p>
+  <div class="pager"><a href="week03-ner.html"><small>Previous</small>Week 3: Named Entity Recognition (NER)</a><a class="next" href="week05-langgraph.html"><small>Next</small>Week 5: LangGraph</a></div>
+  <footer style="margin-top:3rem;padding-top:1rem;border-top:1px solid var(--border);font-size:.84rem;color:var(--muted)">
+Course materials by <a href="https://albanna-tutorials.com/cs/">Dr. Abdulkarim Albanna</a> (University of Petra), adapted for the section taught by Dr. Zaid G. Momani. Interactive simulations and test code added for this site. Source on <a href="https://github.com/zmomani/ComputingSystemsDS-AI">GitHub</a>.
+</footer>
+</main><aside class="rail">
+  <div class="rail-tabs"><button class="active" data-panel="panel-sims">Simulations</button><button data-panel="panel-code">Test code</button></div>
+  <div class="rail-panel active" id="panel-sims"><p class="rail-intro">Interactive teaching aids for this week. Each opens full-size with step controls and teaching notes.</p><button class="sim-card" data-sim="rag"><span class="sim-kind">LangChain · animation</span><span class="sim-title">RAG pipeline</span><span class="sim-desc">Load → split → embed → store → query → top-k → grounded prompt, in 2-D embedding space.</span></button><button class="sim-card" data-sim="vectors"><span class="sim-kind">Linear algebra · interactive</span><span class="sim-title">Vectors, dot product &amp; cosine similarity</span><span class="sim-desc">Drag two vectors; see u+v, u·v, θ and cos θ — the geometry behind embeddings.</span></button></div>
+  <div class="rail-panel" id="panel-code"><p class="rail-intro"><b>Run ▶</b> executes pure-Python/NumPy snippets in your browser (Pyodide). Snippets marked <i>local</i> need the course environment (PyTorch, Transformers, LangChain…) — copy them into VS Code.</p><div class="snippet"><div class="snippet-head"><span>Verify installation and call a chat model directly</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 1. Verify installation and call a chat model directly
+# pip install langchain langchain-core langchain-openai
+import os
+from langchain_openai import ChatOpenAI
+from langchain_core.messages import HumanMessage
+
+os.environ[&quot;OPENAI_API_KEY&quot;] = &quot;your-api-key-here&quot;
+
+llm = ChatOpenAI(model=&quot;gpt-4o-mini&quot;, temperature=0)
+print(llm.invoke([HumanMessage(content=&quot;In one sentence, what is LangChain?&quot;)]).content)</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>A minimal LCEL chain: prompt template -&gt; LLM -&gt; output parser</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 2. A minimal LCEL chain: prompt template -&gt; LLM -&gt; output parser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_openai import ChatOpenAI
+
+prompt = ChatPromptTemplate.from_messages([
+    (&quot;system&quot;, &quot;You are a concise tutor for a data-science course.&quot;),
+    (&quot;human&quot;, &quot;Explain {topic} in two sentences.&quot;),
+])
+chain = prompt | ChatOpenAI(model=&quot;gpt-4o-mini&quot;, temperature=0) | StrOutputParser()
+
+print(chain.invoke({&quot;topic&quot;: &quot;LangChain Expression Language&quot;}))</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Inspect the pieces of a chain without an API key</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 3. Inspect the pieces of a chain without an API key
+from langchain_core.prompts import ChatPromptTemplate
+
+prompt = ChatPromptTemplate.from_messages([
+    (&quot;system&quot;, &quot;You are a helpful assistant.&quot;),
+    (&quot;human&quot;, &quot;Summarize {text} for a {audience}.&quot;),
+])
+messages = prompt.format_messages(text=&quot;the LangChain stack&quot;, audience=&quot;first-year student&quot;)
+for m in messages:
+    print(f&quot;{m.type}: {m.content}&quot;)
+print(&quot;Input variables:&quot;, prompt.input_variables)</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Stream tokens from a chain (streaming is first-class in LCEL)</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 4. Stream tokens from a chain (streaming is first-class in LCEL)
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_openai import ChatOpenAI
+
+chain = (
+    ChatPromptTemplate.from_template(&quot;List three uses of {tool} as bullet points.&quot;)
+    | ChatOpenAI(model=&quot;gpt-4o-mini&quot;)
+    | StrOutputParser()
+)
+for chunk in chain.stream({&quot;tool&quot;: &quot;LangSmith&quot;}):
+    print(chunk, end=&quot;&quot;, flush=True)
+print()</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Load Chinook into an in-memory SQLite DB and inspect it with SQLDatabase (no LLM</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 1. Load Chinook into an in-memory SQLite DB and inspect it with SQLDatabase (no LLM needed)
+# pip install langchain-community sqlalchemy requests
+import sqlite3, requests
+from sqlalchemy import create_engine
+from sqlalchemy.pool import StaticPool
+from langchain_community.utilities import SQLDatabase
+
+url = &quot;https://raw.githubusercontent.com/lerocha/chinook-database/master/ChinookDatabase/DataSources/Chinook_Sqlite.sql&quot;
+conn = sqlite3.connect(&quot;:memory:&quot;, check_same_thread=False)
+conn.executescript(requests.get(url).text)
+engine = create_engine(&quot;sqlite://&quot;, creator=lambda: conn, poolclass=StaticPool,
+                       connect_args={&quot;check_same_thread&quot;: False})
+db = SQLDatabase(engine)
+
+print(db.dialect)
+print(db.get_usable_table_names())
+print(db.get_table_info([&quot;Customer&quot;, &quot;Invoice&quot;])[:800])</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Run the Process Flow SQL by hand and confirm the &quot;USA, 523.06&quot; result</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 2. Run the Process Flow SQL by hand and confirm the &quot;USA, 523.06&quot; result
+sql = &quot;&quot;&quot;
+SELECT c.Country, SUM(i.Total) AS TotalSpent
+FROM Customer c
+JOIN Invoice i ON c.CustomerId = i.CustomerId
+GROUP BY c.Country
+ORDER BY TotalSpent DESC
+LIMIT 1;
+&quot;&quot;&quot;
+print(db.run(sql))</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Look at the four tools the SQLDatabaseToolkit exposes</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 3. Look at the four tools the SQLDatabaseToolkit exposes
+from langchain_openai import ChatOpenAI
+from langchain_community.agent_toolkits.sql.toolkit import SQLDatabaseToolkit
+
+llm = ChatOpenAI(model=&quot;gpt-4o-mini&quot;, temperature=0)
+toolkit = SQLDatabaseToolkit(db=db, llm=llm)
+for t in toolkit.get_tools():
+    print(f&quot;{t.name}: {t.description[:90]}...&quot;)</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Ask the SQL agent a question and watch every intermediate step</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 4. Ask the SQL agent a question and watch every intermediate step
+from langchain import hub
+from langgraph.prebuilt import create_react_agent
+
+prompt_template = hub.pull(&quot;langchain-ai/sql-agent-system-prompt&quot;)
+system_message = prompt_template.format(dialect=&quot;SQLite&quot;, top_k=5)
+agent_executor = create_react_agent(llm, toolkit.get_tools(), prompt=system_message)
+
+for step in agent_executor.stream(
+    {&quot;messages&quot;: [(&quot;user&quot;, &quot;Who are the top 3 best selling artists?&quot;)]},
+    stream_mode=&quot;values&quot;,
+):
+    step[&quot;messages&quot;][-1].pretty_print()</code></pre><div class="out"></div></div></div>
+</aside></div><div class="sim-overlay" id="sim-overlay" role="dialog" aria-modal="true">
+  <div class="sim-window"><div class="sim-head"><div><div class="sim-kind" id="sim-kind"></div><h3 id="sim-title"></h3></div><span class="spacer"></span><button class="btn-xs" id="sim-close">✕ Close (Esc)</button></div><div class="sim-body" id="sim-body"></div></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script>document.addEventListener('DOMContentLoaded',()=>{if(window.hljs)hljs.highlightAll();if(window.renderMathInElement)renderMathInElement(document.body,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});});</script>
+<script src="../assets/js/sims/core.js"></script>
+<script src="../assets/js/sims/matrix-multiply.js"></script><script src="../assets/js/sims/vectors.js"></script><script src="../assets/js/sims/attention.js"></script><script src="../assets/js/sims/tokenizer.js"></script><script src="../assets/js/sims/positional.js"></script><script src="../assets/js/sims/classifier.js"></script><script src="../assets/js/sims/bio-tagging.js"></script><script src="../assets/js/sims/rag.js"></script><script src="../assets/js/sims/langgraph.js"></script><script src="../assets/js/sims/sampling.js"></script><script src="../assets/js/sims/moe.js"></script><script src="../assets/js/sims/react-loop.js"></script><script src="../assets/js/sims/multi-agent.js"></script><script src="../assets/js/sims/mcp.js"></script><script src="../assets/js/sims/lam.js"></script><script src="../assets/js/sims/diffusion.js"></script>
+<script src="../assets/js/site.js"></script>
+</body></html>

@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Course Syllabus · Computing Systems for DS & AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<link rel="stylesheet" href="../assets/css/site.css">
+</head>
+<body><header class="topbar">
+  <button class="btn-icon" id="menu-toggle" aria-label="Menu">☰</button>
+  <a class="brand" href="../index.html">606363 · Computing Systems for DS & AI<small>University of Petra</small></a>
+  <span class="spacer"></span>
+  <nav class="week-nav"></nav>
+  <a class="btn-icon" href="../index.html#curriculum">Curriculum</a>
+  <a class="btn-icon" href="../index.html#simulations">Simulations</a>
+  <button class="btn-icon" id="theme-toggle" aria-label="Toggle dark mode">◐</button>
+</header><div class="layout"><aside class="sidebar">
+  <h4>Course</h4><ul class="outline"><li><a class="active" href="../lessons/syllabus.html"><span class="wk">·</span><span>Course Syllabus</span></a></li><li><a class="" href="../lessons/project.html"><span class="wk">·</span><span>Final Project</span></a></li></ul>
+  <h4>16-week curriculum</h4><ul class="outline"><li><a class="" href="../lessons/week01-transformers.html"><span class="wk">01</span><span>Transformer Architecture</span></a></li><li><a class="" href="../lessons/week02-text-classification.html"><span class="wk">02</span><span>Text Classification</span></a></li><li><a class="soon" href="../lessons/week03-ner.html"><span class="wk">03</span><span>Named Entity Recognition (NER)</span></a></li><li><a class="" href="../lessons/week04-langchain.html"><span class="wk">04</span><span>LangChain Fundamentals</span></a></li><li><a class="" href="../lessons/week05-langgraph.html"><span class="wk">05</span><span>LangGraph</span></a></li><li><a class="" href="../lessons/week06-llms.html"><span class="wk">06</span><span>Large Language Models (LLMs)</span></a></li><li><a class="" href="../lessons/week07-moe.html"><span class="wk">07</span><span>Mixture of Experts (MoE)</span></a></li><li><a class="" href="../lessons/week08-midterm.html"><span class="wk">08</span><span>Midterm Exam</span></a></li><li><a class="" href="../lessons/week09-react-agents.html"><span class="wk">09</span><span>AI Agents &amp; ReAct</span></a></li><li><a class="" href="../lessons/week10-multi-agent.html"><span class="wk">10</span><span>Multi-Agent Systems</span></a></li><li><a class="" href="../lessons/week11-mcp.html"><span class="wk">11</span><span>Model Context Protocol (MCP)</span></a></li><li><a class="soon" href="../lessons/week12-lams.html"><span class="wk">12</span><span>Large Action Models (LAMs)</span></a></li><li><a class="" href="../lessons/week13-diffusion.html"><span class="wk">13</span><span>Diffusion Models</span></a></li><li><a class="" href="../lessons/week14-project.html"><span class="wk">14</span><span>Project Development &amp; Final Testing</span></a></li><li><a class="" href="../lessons/week15-competition.html"><span class="wk">15</span><span>Competition Day &amp; Presentations</span></a></li><li><a class="" href="../lessons/week16-final.html"><span class="wk">16</span><span>Final Exam</span></a></li></ul>
+  <h4>On this page</h4><ul class="toc" id="toc"></ul>
+</aside><main class="main"><div class="lesson-head"><div class="eyebrow">606363</div><h1>Course Syllabus</h1></div><blockquote>
+<p>Syllabus by Dr. Abed Alkarim Banna (Dr. Abdulkarim Albanna), Faculty of Information Technology, University of Petra. Content below is a close paraphrase of the original page (read through a paraphrasing fetch tool); all numbers, weights, weeks and references are preserved as stated. The original page contains no code.</p>
+</blockquote>
+<h2 id="course-information">Course Information</h2>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Detail</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Course number</td>
+<td>606363</td>
+</tr>
+<tr>
+<td>Course title</td>
+<td>Computing Systems for Data Science and AI</td>
+</tr>
+<tr>
+<td>Semester</td>
+<td>Second semester, 2025–2026</td>
+</tr>
+<tr>
+<td>Faculty</td>
+<td>Faculty of Information Technology, University of Petra</td>
+</tr>
+<tr>
+<td>Credit hours</td>
+<td>3</td>
+</tr>
+<tr>
+<td>Prerequisite</td>
+<td>606362</td>
+</tr>
+<tr>
+<td>Course coordinator</td>
+<td>Dr. Abed Alkarim Banna</td>
+</tr>
+</tbody>
+</table>
+<h2 id="course-description">Course Description</h2>
+<p>The course covers the full stack for building modern AI systems: from transformer models and NLP (text classification, named entity recognition) through large language models, mixture-of-experts architectures and agent frameworks (LangChain, LangGraph), to AI agents, multi-agent systems, the Model Context Protocol (MCP), large action models and diffusion models. Students learn through hands-on, competition-based projects that integrate every topic into one working system.</p>
+<h2 id="course-objectives">Course Objectives</h2>
+<ol>
+<li>Understand transformer architectures and their use in NLP and named entity recognition.</li>
+<li>Study large language models, mixture-of-experts models and prompt engineering.</li>
+<li>Build applications with LangChain (retrieval-augmented generation) and LangGraph (agent orchestration).</li>
+<li>Design agents using the ReAct (reasoning and acting) framework.</li>
+<li>Understand multi-agent systems, design patterns and communication protocols.</li>
+<li>Explore large action models that act autonomously.</li>
+<li>Understand generative AI through diffusion models.</li>
+</ol>
+<h2 id="intended-learning-outcomes-ilos">Intended Learning Outcomes (ILOs)</h2>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Domain</th>
+<th>Outcome</th>
+<th>Assessed by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>K1, K2</td>
+<td>Knowledge</td>
+<td>Explain transformers, LLMs, mixture-of-experts, agent architectures, ReAct and multi-agent systems</td>
+<td>Final exam</td>
+</tr>
+<tr>
+<td>I1</td>
+<td>Intellectual</td>
+<td>Design LangGraph agent workflows with reasoning, tool use and collaboration</td>
+<td>Mid exam</td>
+</tr>
+<tr>
+<td>P1, P2</td>
+<td>Practical</td>
+<td>Apply fine-tuned BERT and GPT models to NER and classification; build RAG applications; build agents and multi-agent systems</td>
+<td>Project rubric</td>
+</tr>
+<tr>
+<td>T1</td>
+<td>Transferable</td>
+<td>Apply systematic thinking to designing and deploying AI applications</td>
+<td>Mid exam</td>
+</tr>
+</tbody>
+</table>
+<h2 id="weekly-schedule">Weekly Schedule</h2>
+<table>
+<thead>
+<tr>
+<th>Week</th>
+<th>Topic</th>
+<th>Subtopics / details</th>
+<th>ILO</th>
+<th>Readings</th>
+<th>Assignments / project deliverables</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Transformer Architecture</td>
+<td>Encoder–decoder framework; evolution of transformers; Hugging Face ecosystem (models, datasets, tokenizers, pipelines)</td>
+<td>K1</td>
+<td>Ref 1 Ch.1; Ref 7</td>
+<td>Form teams, create GitHub repo, Transformer Analysis document</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Text Classification</td>
+<td>Transformer-based classification; sentiment and multi-class tasks; feature extraction vs. fine-tuning; evaluation metrics</td>
+<td>K1, P1</td>
+<td>Ref 1 Ch.2</td>
+<td>Classification Agent: categorize sources by type and relevance</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Named Entity Recognition (NER)</td>
+<td>Token classification with BERT; BIO/IOB tagging; multilingual NER; fine-tuning BERT for custom NER</td>
+<td>P1, T1</td>
+<td>Ref 1 Ch.4</td>
+<td>NER Agent: extract entities (people, orgs, tech, dates) from sources</td>
+</tr>
+<tr>
+<td>4</td>
+<td>LangChain Fundamentals</td>
+<td>Chains, prompt templates, memory, output parsers; document loaders, text splitters, vector stores; RAG</td>
+<td>K1, P1</td>
+<td>Ref 4</td>
+<td>Agent prompts, document loaders, ChromaDB vector store setup</td>
+</tr>
+<tr>
+<td>5</td>
+<td>LangGraph</td>
+<td>Agent orchestration as graphs; nodes, edges, state, conditional routing; stateful cyclical graphs; checkpointing; human-in-the-loop</td>
+<td>I1, P2</td>
+<td>Ref 4 (LangGraph)</td>
+<td>LangGraph StateGraph skeleton with all agent nodes connected</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Large Language Models (LLMs)</td>
+<td>GPT-4, LLaMA, Gemini, Claude, Mistral, DeepSeek; open vs. closed models; prompt engineering; local models with Ollama</td>
+<td>K1, K2</td>
+<td>Ref 3; Lectures</td>
+<td>LLM config per agent, benchmark 2+ models, token cost tracking</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Mixture of Experts (MoE)</td>
+<td>Sparse activation; router/gating network; expert networks; Top-K routing; Switch Transformer, Mixtral, DeepSeek-MoE</td>
+<td>K1, T1</td>
+<td>Ref 5; Papers</td>
+<td><strong>CHECKPOINT 1:</strong> demo NLP pipeline + MoE analysis report</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Midterm Exam (Weeks 1–7)</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>9</td>
+<td>AI Agents &amp; ReAct</td>
+<td>Agent architecture (LLM, tools, memory, planning); ReAct (Thought → Action → Observation); tool use; agent memory</td>
+<td>K2, P2</td>
+<td>Ref 2; Ref 4; Ref 6</td>
+<td>Research Agent with ReAct loop, Tavily search, web scraping</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Multi-Agent Systems</td>
+<td>Agentic design patterns; sequential, parallel, hierarchical workflows; LangGraph, CrewAI, AutoGen; A2A protocols</td>
+<td>K2, I1, P2</td>
+<td>Ref 3; Ref 4; Ref 6</td>
+<td>Full pipeline: Analyzer + Writer + Critic agents, revision loop</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Model Context Protocol (MCP)</td>
+<td>MCP architecture (hosts, clients, servers); resources, tools, prompts, sampling; building MCP servers</td>
+<td>K2, P2</td>
+<td>Lectures; MCP docs</td>
+<td><strong>CHECKPOINT 2:</strong> full multi-agent pipeline + 2 MCP tool servers</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Large Action Models (LAMs)</td>
+<td>LLM → agent → LAM; examples: Rabbit R1, Anthropic Computer Use, OpenAI Operator; function calling; browser automation</td>
+<td>K2, P2, T1</td>
+<td>Ref 6; Lectures</td>
+<td>Browser Agent (LAM): web navigation, form filling, data extraction</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Diffusion Models</td>
+<td>Diffusion fundamentals; forward/reverse process; denoising architectures; Stable Diffusion, DALL-E; practical generation</td>
+<td>K1, P1</td>
+<td>Ref 8; Lectures</td>
+<td>Illustration Agent (diffusion-based figures) + Streamlit UI</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Project Development</td>
+<td>Final development, end-to-end testing, bug fixes, documentation, instructor consultation</td>
+<td>P1, P2</td>
+<td>—</td>
+<td>5 test reports, README, technical docs, demo video, slides</td>
+</tr>
+<tr>
+<td>15</td>
+<td>Competition Day</td>
+<td>Live head-to-head competition: 3 unseen topics, 30 min/topic; judging panel; 10-min presentations; peer review</td>
+<td>P1, P2, T1</td>
+<td>—</td>
+<td><strong>COMPETITION:</strong> live run + presentation + peer review</td>
+</tr>
+<tr>
+<td>15–16</td>
+<td>Final Exam</td>
+<td>—</td>
+<td>K1, K2, I1, T1</td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h2 id="project-competition-based-learning">Project: Competition-Based Learning</h2>
+<p>Teams of 2–3 students build a <strong>Multi-Agent Research Assistant</strong> that integrates every course topic (see the project page, <code>project.md</code>). Each team builds its own system and the systems compete head-to-head.</p>
+<h3 id="checkpoints">Checkpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Week</th>
+<th>Checkpoint</th>
+<th>What to demo</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>7</td>
+<td>Checkpoint 1: NLP Pipeline</td>
+<td>Classification Agent, NER Agent, Research Agent with search; transformer analysis document; MoE comparison report</td>
+<td>Instructor feedback</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Checkpoint 2: Full Pipeline + MCP</td>
+<td>Complete pipeline (Research → Classify → NER → Analyze → Write → Critic) with MCP tool servers and revision loop</td>
+<td>Instructor + peer feedback</td>
+</tr>
+<tr>
+<td>15</td>
+<td>Competition Day</td>
+<td>3 unseen topics revealed live; all systems run simultaneously (30 min/topic); anonymized reports scored by a judging panel; 10-minute team presentation</td>
+<td>Graded (judging panel)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="competition-scoring-rubric-100-points-per-report">Competition scoring rubric (100 points per report)</h3>
+<table>
+<thead>
+<tr>
+<th>Criterion</th>
+<th>Points</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Report quality</td>
+<td>20</td>
+<td>Coherence, depth, clarity, structure</td>
+</tr>
+<tr>
+<td>Source coverage</td>
+<td>15</td>
+<td>Number and diversity of sources (minimum 10), proper citations</td>
+</tr>
+<tr>
+<td>Entity extraction (NER)</td>
+<td>10</td>
+<td>Accuracy of extracted people, organizations, technologies</td>
+</tr>
+<tr>
+<td>Source classification</td>
+<td>10</td>
+<td>Correct categorization by type, domain, relevance</td>
+</tr>
+<tr>
+<td>Illustrations</td>
+<td>10</td>
+<td>Relevance and quality of diffusion-generated figures</td>
+</tr>
+<tr>
+<td>Speed</td>
+<td>10</td>
+<td>Pipeline completion time (faster scores higher, within 30 min)</td>
+</tr>
+<tr>
+<td>Cost efficiency</td>
+<td>5</td>
+<td>Total API token cost per report (lower scores higher)</td>
+</tr>
+<tr>
+<td>Error handling</td>
+<td>5</td>
+<td>Handling of API errors, bad sources, timeouts</td>
+</tr>
+<tr>
+<td>Innovation</td>
+<td>15</td>
+<td>MoE routing, advanced MCP tools, LAM actions</td>
+</tr>
+</tbody>
+</table>
+<h3 id="competition-awards-bonus-points">Competition awards (bonus points)</h3>
+<table>
+<thead>
+<tr>
+<th>Award</th>
+<th>Bonus</th>
+<th>Criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1st place (Gold)</td>
+<td>+5</td>
+<td>Highest overall competition score</td>
+</tr>
+<tr>
+<td>2nd place (Silver)</td>
+<td>+3</td>
+<td>Second-highest score</td>
+</tr>
+<tr>
+<td>3rd place (Bronze)</td>
+<td>+2</td>
+<td>Third-highest score</td>
+</tr>
+<tr>
+<td>Best Innovation</td>
+<td>+2</td>
+<td>Most creative technical features (stackable with placement)</td>
+</tr>
+<tr>
+<td>Best Report Quality</td>
+<td>+2</td>
+<td>Highest report-quality score (stackable with placement)</td>
+</tr>
+<tr>
+<td>Fastest System</td>
+<td>+1</td>
+<td>Fastest average pipeline completion time</td>
+</tr>
+</tbody>
+</table>
+<h2 id="assessment">Assessment</h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Weight</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Project (competition-based learning)</strong></td>
+<td><strong>30%</strong></td>
+</tr>
+<tr>
+<td>— Weekly deliverables</td>
+<td>10%</td>
+</tr>
+<tr>
+<td>— Competition score (average across 3 unseen topics)</td>
+<td>8%</td>
+</tr>
+<tr>
+<td>— Architecture &amp; topic coverage</td>
+<td>4%</td>
+</tr>
+<tr>
+<td>— Code quality &amp; documentation</td>
+<td>3%</td>
+</tr>
+<tr>
+<td>— Live presentation</td>
+<td>3%</td>
+</tr>
+<tr>
+<td>— Peer review (feedback on 2 other teams' reports)</td>
+<td>2%</td>
+</tr>
+<tr>
+<td><strong>Mid exam (Weeks 1–7)</strong></td>
+<td><strong>30%</strong></td>
+</tr>
+<tr>
+<td><strong>Final exam</strong></td>
+<td><strong>40%</strong></td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>100%</strong></td>
+</tr>
+</tbody>
+</table>
+<h2 id="course-policies">Course Policies</h2>
+<ul>
+<li><strong>Attendance:</strong> University regulations apply.</li>
+<li><strong>Academic honesty:</strong> Academic dishonesty is not tolerated at the University of Petra. Violations are disciplined under University rules and regulations.</li>
+<li><strong>Make-up exams:</strong> Only students with valid excuses may take make-up exams. Excuses must be signed by the Faculty Dean, and the student must arrange an exam date with the instructor before the next regular exam.</li>
+<li><strong>Late work:</strong> Assignments are due on the specified date. Marks are deducted for late work, which is accepted for no more than 3 days after the deadline.</li>
+<li><strong>Quizzes:</strong> No make-up quizzes under any circumstances.</li>
+</ul>
+<h2 id="references">References</h2>
+<table>
+<thead>
+<tr>
+<th>Ref</th>
+<th>Authors</th>
+<th>Title</th>
+<th>Year</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Lewis Tunstall, Leandro von Werra, Thomas Wolf</td>
+<td><em>Natural Language Processing with Transformers</em>, Revised Edition (O'Reilly)</td>
+<td>2022</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Shunyu Yao et al.</td>
+<td><em>ReAct: Synergizing Reasoning and Acting in Language Models</em> (paper)</td>
+<td>2023</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Chip Huyen</td>
+<td><em>AI Engineering</em> (O'Reilly)</td>
+<td>2025</td>
+</tr>
+<tr>
+<td>4</td>
+<td>—</td>
+<td>LangChain &amp; LangGraph documentation — https://langchain.com</td>
+<td>—</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Hugging Face</td>
+<td>"Mixture of Experts Explained" (blog) and related papers</td>
+<td>—</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Maarten Grootendorst</td>
+<td><em>A Visual Guide to LLM Agents</em></td>
+<td>2025</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Ashish Vaswani et al.</td>
+<td><em>Attention Is All You Need</em> (paper)</td>
+<td>2017</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Calvin Luo</td>
+<td><em>Understanding Diffusion Models: A Unified Perspective</em> (paper)</td>
+<td>2022</td>
+</tr>
+</tbody>
+</table><footer style="margin-top:3rem;padding-top:1rem;border-top:1px solid var(--border);font-size:.84rem;color:var(--muted)">
+Course materials by <a href="https://albanna-tutorials.com/cs/">Dr. Abdulkarim Albanna</a> (University of Petra), adapted for the section taught by Dr. Zaid G. Momani. Interactive simulations and test code added for this site. Source on <a href="https://github.com/zmomani/ComputingSystemsDS-AI">GitHub</a>.
+</footer></main><aside class="rail">
+  <div class="rail-tabs"><button class="active" data-panel="panel-sims">Simulations</button><button data-panel="panel-code">Test code</button></div>
+  <div class="rail-panel active" id="panel-sims"><p class="rail-intro">Interactive teaching aids for this week. Each opens full-size with step controls and teaching notes.</p><p class="rail-intro">No simulation for this page.</p></div>
+  <div class="rail-panel" id="panel-code"><p class="rail-intro"><b>Run ▶</b> executes pure-Python/NumPy snippets in your browser (Pyodide). Snippets marked <i>local</i> need the course environment (PyTorch, Transformers, LangChain…) — copy them into VS Code.</p><div class="snippet"><div class="snippet-head"><span>Final-grade calculator following the syllabus weights</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 1. Final-grade calculator following the syllabus weights
+weights = {
+    &quot;weekly_deliverables&quot;: 10, &quot;competition_score&quot;: 8, &quot;architecture_coverage&quot;: 4,
+    &quot;code_quality_docs&quot;: 3, &quot;live_presentation&quot;: 3, &quot;peer_review&quot;: 2,
+    &quot;mid_exam&quot;: 30, &quot;final_exam&quot;: 40,
+}
+assert sum(weights.values()) == 100
+
+def final_grade(scores_pct):
+    &quot;&quot;&quot;scores_pct: component -&gt; score as a percentage (0-100).&quot;&quot;&quot;
+    return sum(weights[k] * scores_pct[k] / 100 for k in weights)
+
+print(final_grade({k: 85 for k in weights}))   # 85.0</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Competition report score from the 100-point rubric, plus bonus awards</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 2. Competition report score from the 100-point rubric, plus bonus awards
+rubric = {&quot;report_quality&quot;: 20, &quot;source_coverage&quot;: 15, &quot;entity_extraction&quot;: 10,
+          &quot;source_classification&quot;: 10, &quot;illustrations&quot;: 10, &quot;speed&quot;: 10,
+          &quot;cost_efficiency&quot;: 5, &quot;error_handling&quot;: 5, &quot;innovation&quot;: 15}
+bonus = {&quot;gold&quot;: 5, &quot;silver&quot;: 3, &quot;bronze&quot;: 2, &quot;innovation&quot;: 2, &quot;report_quality&quot;: 2, &quot;fastest&quot;: 1}
+
+def report_score(fractions):
+    &quot;&quot;&quot;fractions: criterion -&gt; fraction of points earned (0-1).&quot;&quot;&quot;
+    return sum(rubric[c] * fractions.get(c, 0) for c in rubric)
+
+team = {c: 0.8 for c in rubric}
+topics = [report_score(team) for _ in range(3)]          # three unseen topics
+avg = sum(topics) / 3
+print(f&quot;average competition score: {avg:.1f}/100, with Gold + Innovation bonus: {avg + bonus[&#x27;gold&#x27;] + bonus[&#x27;innovation&#x27;]:.1f}&quot;)</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Weekly schedule as structured data (for a timeline widget)</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 3. Weekly schedule as structured data (for a timeline widget)
+schedule = [
+    (1, &quot;Transformer Architecture&quot;, &quot;Form teams, GitHub repo, Transformer Analysis document&quot;),
+    (2, &quot;Text Classification&quot;, &quot;Classification Agent&quot;),
+    (3, &quot;Named Entity Recognition&quot;, &quot;NER Agent&quot;),
+    (4, &quot;LangChain Fundamentals&quot;, &quot;Prompts, loaders, ChromaDB&quot;),
+    (5, &quot;LangGraph&quot;, &quot;StateGraph skeleton&quot;),
+    (6, &quot;Large Language Models&quot;, &quot;LLM config, benchmark 2+ models, token cost tracking&quot;),
+    (7, &quot;Mixture of Experts&quot;, &quot;CHECKPOINT 1&quot;),
+    (8, &quot;Midterm Exam&quot;, &quot;&quot;),
+    (9, &quot;AI Agents &amp; ReAct&quot;, &quot;Research Agent&quot;),
+    (10, &quot;Multi-Agent Systems&quot;, &quot;Analyzer + Writer + Critic&quot;),
+    (11, &quot;Model Context Protocol&quot;, &quot;CHECKPOINT 2: 2 MCP servers&quot;),
+    (12, &quot;Large Action Models&quot;, &quot;Browser Agent&quot;),
+    (13, &quot;Diffusion Models&quot;, &quot;Illustration Agent + Streamlit UI&quot;),
+    (14, &quot;Project Development&quot;, &quot;5 test reports, docs, video, slides&quot;),
+    (15, &quot;Competition Day&quot;, &quot;Live run + presentation + peer review&quot;),
+]
+for week, topic, deliverable in schedule:
+    print(f&quot;Week {week:&gt;2}: {topic:&lt;28} {deliverable}&quot;)</code></pre><div class="out"></div></div></div>
+</aside></div><div class="sim-overlay" id="sim-overlay" role="dialog" aria-modal="true">
+  <div class="sim-window"><div class="sim-head"><div><div class="sim-kind" id="sim-kind"></div><h3 id="sim-title"></h3></div><span class="spacer"></span><button class="btn-xs" id="sim-close">✕ Close (Esc)</button></div><div class="sim-body" id="sim-body"></div></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script>document.addEventListener('DOMContentLoaded',()=>{if(window.hljs)hljs.highlightAll();if(window.renderMathInElement)renderMathInElement(document.body,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});});</script>
+<script src="../assets/js/sims/core.js"></script>
+<script src="../assets/js/sims/matrix-multiply.js"></script><script src="../assets/js/sims/vectors.js"></script><script src="../assets/js/sims/attention.js"></script><script src="../assets/js/sims/tokenizer.js"></script><script src="../assets/js/sims/positional.js"></script><script src="../assets/js/sims/classifier.js"></script><script src="../assets/js/sims/bio-tagging.js"></script><script src="../assets/js/sims/rag.js"></script><script src="../assets/js/sims/langgraph.js"></script><script src="../assets/js/sims/sampling.js"></script><script src="../assets/js/sims/moe.js"></script><script src="../assets/js/sims/react-loop.js"></script><script src="../assets/js/sims/multi-agent.js"></script><script src="../assets/js/sims/mcp.js"></script><script src="../assets/js/sims/lam.js"></script><script src="../assets/js/sims/diffusion.js"></script>
+<script src="../assets/js/site.js"></script>
+</body></html>

@@ -1,0 +1,617 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 6: Large Language Models (LLMs) · Computing Systems for DS & AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<link rel="stylesheet" href="../assets/css/site.css">
+</head>
+<body><header class="topbar">
+  <button class="btn-icon" id="menu-toggle" aria-label="Menu">☰</button>
+  <a class="brand" href="../index.html">606363 · Computing Systems for DS & AI<small>University of Petra</small></a>
+  <span class="spacer"></span>
+  <nav class="week-nav"><a class="btn-icon" href="week05-langgraph.html" title="LangGraph">← Wk 5</a><a class="btn-icon" href="week07-moe.html" title="Mixture of Experts (MoE)">Wk 7 →</a></nav>
+  <a class="btn-icon" href="../index.html#curriculum">Curriculum</a>
+  <a class="btn-icon" href="../index.html#simulations">Simulations</a>
+  <button class="btn-icon" id="theme-toggle" aria-label="Toggle dark mode">◐</button>
+</header><div class="layout"><aside class="sidebar">
+  <h4>Course</h4><ul class="outline"><li><a class="" href="../lessons/syllabus.html"><span class="wk">·</span><span>Course Syllabus</span></a></li><li><a class="" href="../lessons/project.html"><span class="wk">·</span><span>Final Project</span></a></li></ul>
+  <h4>16-week curriculum</h4><ul class="outline"><li><a class="" href="../lessons/week01-transformers.html"><span class="wk">01</span><span>Transformer Architecture</span></a></li><li><a class="" href="../lessons/week02-text-classification.html"><span class="wk">02</span><span>Text Classification</span></a></li><li><a class="soon" href="../lessons/week03-ner.html"><span class="wk">03</span><span>Named Entity Recognition (NER)</span></a></li><li><a class="" href="../lessons/week04-langchain.html"><span class="wk">04</span><span>LangChain Fundamentals</span></a></li><li><a class="" href="../lessons/week05-langgraph.html"><span class="wk">05</span><span>LangGraph</span></a></li><li><a class="active" href="../lessons/week06-llms.html"><span class="wk">06</span><span>Large Language Models (LLMs)</span></a></li><li><a class="" href="../lessons/week07-moe.html"><span class="wk">07</span><span>Mixture of Experts (MoE)</span></a></li><li><a class="" href="../lessons/week08-midterm.html"><span class="wk">08</span><span>Midterm Exam</span></a></li><li><a class="" href="../lessons/week09-react-agents.html"><span class="wk">09</span><span>AI Agents &amp; ReAct</span></a></li><li><a class="" href="../lessons/week10-multi-agent.html"><span class="wk">10</span><span>Multi-Agent Systems</span></a></li><li><a class="" href="../lessons/week11-mcp.html"><span class="wk">11</span><span>Model Context Protocol (MCP)</span></a></li><li><a class="soon" href="../lessons/week12-lams.html"><span class="wk">12</span><span>Large Action Models (LAMs)</span></a></li><li><a class="" href="../lessons/week13-diffusion.html"><span class="wk">13</span><span>Diffusion Models</span></a></li><li><a class="" href="../lessons/week14-project.html"><span class="wk">14</span><span>Project Development &amp; Final Testing</span></a></li><li><a class="" href="../lessons/week15-competition.html"><span class="wk">15</span><span>Competition Day &amp; Presentations</span></a></li><li><a class="" href="../lessons/week16-final.html"><span class="wk">16</span><span>Final Exam</span></a></li></ul>
+  <h4>On this page</h4><ul class="toc" id="toc"></ul>
+</aside><main class="main">
+  <div class="lesson-head"><div class="eyebrow">Week 6 · ILO K1, K2</div><h1>Large Language Models (LLMs)</h1>
+  <p class="credit"><b>Topics:</b> LLM evolution, model families, open vs. closed models, prompting, Ollama<br><b>Project milestone:</b> Configure LLM parameters, benchmark 2+ models, track token usage and cost</p></div>
+  <div class="callout sim"><div class="sim-strip"><b style="margin-right:4px">Simulations for this week:</b><button class="chip" data-sim="sampling">▶ Temperature, top-k, top-p</button><button class="chip" data-sim="tokenizer">▶ Subword tokenisation</button><button class="chip" data-sim="attention">▶ Self-attention: Q·Kᵀ → softmax → ·V</button></div></div>
+  <blockquote>
+<p>Based on Dr. Abdulkarim Albanna's lesson "LLAMA4 — Meta's Next Generation of AI" (albanna-tutorials.com). Prose sections were extracted via a fetcher that paraphrases long passages, so wording is close to but not identical to the original; all figures, tables and code are as published. The author's "Example System Prompt" block could not be retrieved verbatim and is summarized below.</p>
+</blockquote>
+<h2 id="introduction">Introduction</h2>
+<p>LLAMA4 is Meta's most advanced family of large language models to date: <strong>natively multimodal, open-weight</strong> models that process text and images in a single backbone and use a <strong>mixture-of-experts (MoE)</strong> design for efficiency. The lesson is written as an approximately 30-minute read.</p>
+<h2 id="why-llama4-matters">Why LLAMA4 Matters</h2>
+<ul>
+<li>The first open-weight, natively multimodal models with an industry-leading context window.</li>
+<li>A mixture-of-experts architecture that activates only part of the model for each token, improving efficiency.</li>
+<li>LLAMA4 Scout offers a context window of <strong>up to 10 million tokens</strong>.</li>
+<li>Claimed to outperform GPT-4o and Gemini 2.0 on a range of benchmarks.</li>
+<li>Pre-trained on <strong>200 languages</strong>, with 12 major languages officially supported.</li>
+</ul>
+<h2 id="what-is-llama4">What Is LLAMA4?</h2>
+<ul>
+<li>Released <strong>April 5, 2025</strong> as the successor to Llama 3 and the <strong>first Llama family to use mixture-of-experts</strong>.</li>
+<li>The "herd" consists of three models: <strong>Scout</strong>, <strong>Maverick</strong>, and <strong>Behemoth</strong> (still in training).</li>
+<li>Uses <strong>early fusion</strong> to combine text and vision tokens in one model backbone from the start, rather than bolting a vision module onto a text model.</li>
+<li>Compared with Llama 3: context of up to 10M tokens (vs. 128K) and training on about 40T tokens (vs. about 15T).</li>
+<li>Available under the <strong>Llama 4 Community License</strong> for commercial and research use.</li>
+</ul>
+<h2 id="the-models-scout-maverick-and-behemoth">The Models: Scout, Maverick and Behemoth</h2>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Active Parameters</th>
+<th>Total Parameters</th>
+<th>Experts</th>
+<th>Context Window</th>
+<th>Training Tokens</th>
+<th>Hardware</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LLAMA4 Scout</td>
+<td>17 billion</td>
+<td>109 billion</td>
+<td>16</td>
+<td>10 million tokens</td>
+<td>~40 trillion</td>
+<td>Single H100 GPU with int4 quantization</td>
+<td>Available</td>
+</tr>
+<tr>
+<td>LLAMA4 Maverick</td>
+<td>17 billion</td>
+<td>400 billion</td>
+<td>128</td>
+<td>1 million tokens</td>
+<td>~22 trillion</td>
+<td>Single H100 DGX host with FP8 quantization</td>
+<td>Available</td>
+</tr>
+<tr>
+<td>LLAMA4 Behemoth</td>
+<td>288 billion</td>
+<td>~2 trillion</td>
+<td>16</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>Still in training</td>
+</tr>
+</tbody>
+</table>
+<h3 id="llama4-scout">LLAMA4 Scout</h3>
+<p>The efficiency-focused model: 17B active / 109B total parameters, 16 experts, 10M-token context, ~40T training tokens; runs on a single H100 GPU with int4 quantization.</p>
+<p><strong>Best for:</strong> extremely long context, hardware-constrained deployments, large documents or codebases, and a balance of performance and efficiency.</p>
+<h3 id="llama4-maverick">LLAMA4 Maverick</h3>
+<p>The performance-focused model: 17B active / 400B total parameters, 128 experts, 1M-token context, ~22T training tokens; runs on a single H100 DGX host with FP8 quantization. In Maverick, each token is routed to <strong>one shared expert plus one of the 128 routed experts</strong>.</p>
+<p><strong>Best for:</strong> top multimodal performance, advanced reasoning and coding, production-grade assistants, and deployments with stronger infrastructure.</p>
+<h3 id="llama4-behemoth">LLAMA4 Behemoth</h3>
+<p>A very large model with 288B active and roughly 2T total parameters across 16 experts. Still in training; it serves as a <strong>teacher model</strong> that the smaller models are distilled from. Meta claims it beats GPT-4.5, Claude Sonnet 3.7 and Gemini 2.0 Pro on STEM benchmarks.</p>
+<h2 id="key-features">Key Features</h2>
+<ul>
+<li><strong>Mixture-of-experts:</strong> each token activates only a subset of parameters, improving compute efficiency.</li>
+<li><strong>Native multimodality:</strong> early fusion integrates text and vision tokens without specialized connector modules.</li>
+<li><strong>Long context:</strong> Scout's 10M-token window is roughly 80x Llama 3's 128K.</li>
+<li><strong>Multilingual support:</strong> pre-trained on 200 languages with about 10x more multilingual tokens than Llama 3.</li>
+<li><strong>Code generation:</strong> stronger coding ability, with claimed gains over GPT-4o on many coding benchmarks.</li>
+<li><strong>Image grounding:</strong> strong visual question answering and object localization in images.</li>
+<li><strong>Efficient inference:</strong> quantization (int4 / FP8) allows deployment on consumer-grade hardware with little performance loss.</li>
+<li><strong>Safety:</strong> built-in safety protections, reduced political bias and improved refusal handling.</li>
+<li><strong>iRoPE architecture:</strong> interleaved attention layers <em>without</em> positional embeddings enable very long context.</li>
+<li><strong>Inference-time temperature scaling of attention:</strong> helps the model generalize to inputs far longer than those seen in training.</li>
+</ul>
+<h2 id="technical-specifications">Technical Specifications</h2>
+<table>
+<thead>
+<tr>
+<th>Specification</th>
+<th>LLAMA4 Scout</th>
+<th>LLAMA4 Maverick</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Model Architecture</td>
+<td>Auto-regressive with MoE, early-fusion multimodal</td>
+<td>Auto-regressive with MoE, early-fusion multimodal</td>
+</tr>
+<tr>
+<td>Active Parameters</td>
+<td>17 billion</td>
+<td>17 billion</td>
+</tr>
+<tr>
+<td>Total Parameters</td>
+<td>109 billion</td>
+<td>400 billion</td>
+</tr>
+<tr>
+<td>Expert Structure</td>
+<td>16 experts</td>
+<td>128 experts</td>
+</tr>
+<tr>
+<td>Context Window</td>
+<td>10 million tokens</td>
+<td>1 million tokens</td>
+</tr>
+<tr>
+<td>Pretraining Tokens</td>
+<td>~40 trillion</td>
+<td>~22 trillion</td>
+</tr>
+<tr>
+<td>Supported Languages</td>
+<td>Arabic, English, French, German, Hindi, Indonesian, Italian, Portuguese, Spanish, Tagalog, Thai, Vietnamese</td>
+<td>same</td>
+</tr>
+<tr>
+<td>Input Modalities</td>
+<td>Multilingual text and images</td>
+<td>Multilingual text and images</td>
+</tr>
+<tr>
+<td>Output Modalities</td>
+<td>Multilingual text and code</td>
+<td>Multilingual text and code</td>
+</tr>
+<tr>
+<td>Multi-image Support</td>
+<td>Up to 8 images tested, 48 in training</td>
+<td>Up to 8 images tested, 48 in training</td>
+</tr>
+<tr>
+<td>Knowledge Cutoff</td>
+<td>August 2024</td>
+<td>August 2024</td>
+</tr>
+<tr>
+<td>Hardware Requirements</td>
+<td>Single H100 GPU with int4 quantization</td>
+<td>Single H100 DGX host with FP8 quantization</td>
+</tr>
+<tr>
+<td>License</td>
+<td>Llama 4 Community License</td>
+<td>Llama 4 Community License</td>
+</tr>
+</tbody>
+</table>
+<h3 id="training-compute-and-emissions">Training compute and emissions</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scout training compute</td>
+<td>5.0M GPU hours on H100-80GB (TDP 700W)</td>
+</tr>
+<tr>
+<td>Maverick training compute</td>
+<td>2.38M GPU hours on H100-80GB (TDP 700W)</td>
+</tr>
+<tr>
+<td>Training precision</td>
+<td>FP8</td>
+</tr>
+<tr>
+<td>Location-based emissions</td>
+<td>1,999 tons CO2eq</td>
+</tr>
+<tr>
+<td>Market-based emissions</td>
+<td>0 tons CO2eq (100% renewable energy)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>The vision encoder is based on <strong>MetaCLIP</strong>, trained separately in conjunction with a frozen Llama model.</li>
+<li>Weights: BF16 for Scout; BF16 and FP8 for Maverick, with on-the-fly int4 quantization code provided.</li>
+</ul>
+<h3 id="example-system-prompt-for-llama4">Example System Prompt for LLAMA4</h3>
+<p>The author includes Meta's sample system prompt (summarized here; see the original page for the exact text). It sets up an "expert conversationalist who responds to the best of your ability" and asks the model to:</p>
+<ul>
+<li>match tone to the user's mood (listening, humor, emotional support vs. detailed help);</li>
+<li>avoid templated, preachy or moralizing language and not lecture the user;</li>
+<li>engage with political and social topics rather than refusing;</li>
+<li>identify itself as Llama 4 with a knowledge cutoff of August 2024;</li>
+<li>list the 12 supported languages and respond in the user's language by default.</li>
+</ul>
+<h2 id="benchmarks">Benchmarks</h2>
+<h3 id="pre-trained-model-benchmarks">Pre-trained model benchmarks</h3>
+<table>
+<thead>
+<tr>
+<th>Benchmark</th>
+<th>Llama 3.1 70B</th>
+<th>Llama 4 Scout</th>
+<th>Llama 4 Maverick</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MMLU</td>
+<td>79.3</td>
+<td>79.6</td>
+<td>85.5</td>
+</tr>
+<tr>
+<td>MMLU-Pro</td>
+<td>53.8</td>
+<td>58.2</td>
+<td>62.9</td>
+</tr>
+<tr>
+<td>MATH</td>
+<td>41.6</td>
+<td>50.3</td>
+<td>61.2</td>
+</tr>
+<tr>
+<td>MBPP (Code)</td>
+<td>66.4</td>
+<td>67.8</td>
+<td>77.6</td>
+</tr>
+<tr>
+<td>TydiQA</td>
+<td>29.9</td>
+<td>31.5</td>
+<td>31.7</td>
+</tr>
+</tbody>
+</table>
+<h3 id="instruction-tuned-model-benchmarks">Instruction-tuned model benchmarks</h3>
+<table>
+<thead>
+<tr>
+<th>Benchmark</th>
+<th>Llama 3.3 70B</th>
+<th>Llama 4 Scout</th>
+<th>Llama 4 Maverick</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MMLU Pro</td>
+<td>68.9</td>
+<td>74.3</td>
+<td>80.5</td>
+</tr>
+<tr>
+<td>GPQA Diamond</td>
+<td>50.5</td>
+<td>57.2</td>
+<td>69.8</td>
+</tr>
+<tr>
+<td>LiveCodeBench</td>
+<td>33.3</td>
+<td>32.8</td>
+<td>43.4</td>
+</tr>
+<tr>
+<td>MGSM</td>
+<td>91.1</td>
+<td>90.6</td>
+<td>92.3</td>
+</tr>
+</tbody>
+</table>
+<h3 id="multimodal-benchmarks">Multimodal benchmarks</h3>
+<table>
+<thead>
+<tr>
+<th>Benchmark</th>
+<th>Llama 4 Scout</th>
+<th>Llama 4 Maverick</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MMMU</td>
+<td>69.4</td>
+<td>73.4</td>
+</tr>
+<tr>
+<td>MMMU Pro</td>
+<td>52.2</td>
+<td>59.6</td>
+</tr>
+<tr>
+<td>MathVista</td>
+<td>70.7</td>
+<td>73.7</td>
+</tr>
+<tr>
+<td>ChartQA</td>
+<td>88.8</td>
+<td>90.0</td>
+</tr>
+<tr>
+<td>DocVQA</td>
+<td>94.4</td>
+<td>94.4</td>
+</tr>
+</tbody>
+</table>
+<h3 id="long-context-benchmarks-mtob-machine-translation-from-one-book">Long-context benchmarks (MTOB — Machine Translation from One Book)</h3>
+<table>
+<thead>
+<tr>
+<th>Benchmark</th>
+<th>Llama 3.3 70B</th>
+<th>Llama 4 Scout</th>
+<th>Llama 4 Maverick</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MTOB (half book) eng→kgv</td>
+<td>context window is 128K</td>
+<td>54.0</td>
+<td>42.2</td>
+</tr>
+<tr>
+<td>MTOB (half book) kgv→eng</td>
+<td>context window is 128K</td>
+<td>46.4</td>
+<td>36.6</td>
+</tr>
+<tr>
+<td>MTOB (full book) eng→kgv</td>
+<td>context window is 128K</td>
+<td>50.8</td>
+<td>39.7</td>
+</tr>
+<tr>
+<td>MTOB (full book) kgv→eng</td>
+<td>context window is 128K</td>
+<td>46.7</td>
+<td>36.3</td>
+</tr>
+</tbody>
+</table>
+<h3 id="competitive-claims">Competitive claims</h3>
+<ul>
+<li>Maverick exceeds GPT-4o and Gemini 2.0 Flash on several categories, reached <strong>1417 ELO</strong> on LMArena (experimental chat version), and competes with DeepSeek v3.1 on reasoning and coding with fewer active parameters.</li>
+<li>Scout outperforms Gemma 3, Gemini 2.0 Flash-Lite and Mistral 3.1 across many benchmarks.</li>
+<li>Behemoth beats GPT-4.5, Claude Sonnet 3.7 and Gemini 2.0 Pro on STEM tasks.</li>
+</ul>
+<p>These are the publisher's (Meta's) own claims; verify against the official model cards.</p>
+<h2 id="how-to-use-llama4">How to Use LLAMA4</h2>
+<h3 id="deployment-options">Deployment options</h3>
+<ul>
+<li><strong>Cloud platforms:</strong> AWS, Azure, Google Cloud, Hugging Face, Together AI.</li>
+<li><strong>Direct download:</strong> from llama.com, Hugging Face or GitHub to run on your own infrastructure (typically an H100 or equivalent).</li>
+<li><strong>Pre-built apps:</strong> Meta AI, WhatsApp, Messenger and Instagram Direct, with no setup needed.</li>
+</ul>
+<h3 id="getting-started-steps">Getting-started steps</h3>
+<ol>
+<li><strong>Choose a deployment method</strong> — cloud, local installation or a pre-built app, depending on needs and technical capacity.</li>
+<li><strong>Select a model</strong> — Scout for long context and efficiency, Maverick for stronger performance and reasoning.</li>
+<li><strong>Set up the environment</strong> — for self-hosting, confirm hardware (H100 or equivalent) and follow installation instructions.</li>
+<li><strong>Optimize for your use case</strong> — configure system prompts, adjust generation parameters, add safety measures.</li>
+<li><strong>Integrate and deploy</strong> — connect through the provided APIs/SDKs and roll out to users or internal systems.</li>
+</ol>
+<h3 id="using-with-hugging-face">Using with Hugging Face</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoTokenizer</span><span class="p">,</span> <span class="n">AutoModelForCausalLM</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+
+<span class="c1"># Load tokenizer</span>
+<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">"meta-llama/Llama-4-Scout-17B-16E-Instruct"</span><span class="p">)</span>
+
+<span class="c1"># Load model</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+    <span class="s2">"meta-llama/Llama-4-Scout-17B-16E-Instruct"</span><span class="p">,</span>
+    <span class="n">torch_dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bfloat16</span><span class="p">,</span>
+    <span class="n">device_map</span><span class="o">=</span><span class="s2">"auto"</span>
+<span class="p">)</span>
+
+<span class="c1"># Create prompt</span>
+<span class="n">prompt</span> <span class="o">=</span> <span class="s2">"""</span>
+<span class="s2">&lt;|system|&gt;</span>
+<span class="s2">You are an expert assistant that helps users with information about technology.</span>
+<span class="s2">&lt;/|system|&gt;</span>
+
+<span class="s2">&lt;|user|&gt;</span>
+<span class="s2">What are the key features of LLAMA4?</span>
+<span class="s2">&lt;/|user|&gt;</span>
+
+<span class="s2">&lt;|assistant|&gt;</span>
+<span class="s2">"""</span>
+
+<span class="c1"># Tokenize prompt</span>
+<span class="n">inputs</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">"pt"</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+<span class="c1"># Generate response</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+    <span class="n">inputs</span><span class="o">.</span><span class="n">input_ids</span><span class="p">,</span>
+    <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+    <span class="n">top_p</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Decode and print response</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+</code></pre></div>
+<h3 id="using-with-vllm">Using with vLLM</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">vllm</span><span class="w"> </span><span class="kn">import</span> <span class="n">LLM</span><span class="p">,</span> <span class="n">SamplingParams</span>
+
+<span class="c1"># Initialize the model</span>
+<span class="n">llm</span> <span class="o">=</span> <span class="n">LLM</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">"meta-llama/Llama-4-Maverick-17B-128E-Instruct"</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="o">=</span><span class="s2">"bfloat16"</span><span class="p">,</span>
+    <span class="n">gpu_memory_utilization</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Create sampling parameters</span>
+<span class="n">sampling_params</span> <span class="o">=</span> <span class="n">SamplingParams</span><span class="p">(</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+    <span class="n">top_p</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+    <span class="n">max_tokens</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Create prompt</span>
+<span class="n">prompt</span> <span class="o">=</span> <span class="s2">"""</span>
+<span class="s2">&lt;|system|&gt;</span>
+<span class="s2">You are an expert assistant that helps users with information about technology.</span>
+<span class="s2">&lt;/|system|&gt;</span>
+
+<span class="s2">&lt;|user|&gt;</span>
+<span class="s2">What are the key features of LLAMA4?</span>
+<span class="s2">&lt;/|user|&gt;</span>
+
+<span class="s2">&lt;|assistant|&gt;</span>
+<span class="s2">"""</span>
+
+<span class="c1"># Generate response</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="n">llm</span><span class="o">.</span><span class="n">generate</span><span class="p">([</span><span class="n">prompt</span><span class="p">],</span> <span class="n">sampling_params</span><span class="p">)</span>
+
+<span class="c1"># Print response</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="using-llama4-with-images">Using LLAMA4 with Images</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoProcessor</span><span class="p">,</span> <span class="n">LlavaForConditionalGeneration</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+
+<span class="c1"># Load model and processor</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">LlavaForConditionalGeneration</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">"meta-llama/Llama-4-Scout-17B-16E-Instruct"</span><span class="p">)</span>
+<span class="n">processor</span> <span class="o">=</span> <span class="n">AutoProcessor</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">"meta-llama/Llama-4-Scout-17B-16E-Instruct"</span><span class="p">)</span>
+
+<span class="c1"># Load image</span>
+<span class="n">url</span> <span class="o">=</span> <span class="s2">"https://example.com/image.jpg"</span>
+<span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">raw</span><span class="p">)</span>
+
+<span class="c1"># Create prompt</span>
+<span class="n">prompt</span> <span class="o">=</span> <span class="s2">"What can you see in this image?"</span>
+
+<span class="c1"># Process inputs</span>
+<span class="n">inputs</span> <span class="o">=</span> <span class="n">processor</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">"pt"</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+<span class="c1"># Generate response</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="o">**</span><span class="n">inputs</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+<span class="c1"># Decode and print response</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">processor</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+</code></pre></div>
+<blockquote>
+<p>Note: the image example uses the <code>LlavaForConditionalGeneration</code> class; the official Transformers class for Llama 4 is <code>Llama4ForConditionalGeneration</code>. Check the current Hugging Face model card before running.</p>
+</blockquote>
+<h2 id="use-cases">Use Cases</h2>
+<ul>
+<li><strong>Software development:</strong> code generation, debugging, documentation, modernizing legacy code, understanding large codebases.</li>
+<li><strong>Data analysis:</strong> interpreting charts, summarizing data, identifying trends, analyzing financial reports.</li>
+<li><strong>Education and research:</strong> personalized tutoring, research synthesis, educational content, literature analysis.</li>
+<li><strong>Healthcare:</strong> medical literature review, image analysis assistance, record summarization, trial documentation.</li>
+<li><strong>Content creation:</strong> long-form writing, image and video analysis, marketing material, multilingual adaptation.</li>
+<li><strong>Scout-specific (long context):</strong> analyzing whole books or many papers at once, comparing lengthy documents, understanding full codebases, maintaining very long conversation history.</li>
+<li><strong>Enterprise:</strong> multimodal customer support, contract review, knowledge-base enrichment, business intelligence.</li>
+<li><strong>Creative:</strong> screenplay development, visual inspiration, interactive storytelling, art or music critique.</li>
+<li><strong>Personal:</strong> note-taking, photo management, multi-subject learning, travel planning with visual input.</li>
+</ul>
+<h2 id="faq">FAQ</h2>
+<p><strong>What makes LLAMA4 different from earlier Llama models?</strong> It is the first Llama to use mixture-of-experts, it is natively multimodal, it supports up to 10M-token context (vs. 128K), and it was trained on up to 40T tokens.</p>
+<p><strong>How do I choose between Scout and Maverick?</strong> Choose Scout for very long context or limited hardware. Choose Maverick for top multimodal performance, advanced reasoning and production deployments with more capable infrastructure.</p>
+<p><strong>What hardware is needed?</strong> Scout runs on a single H100 with int4 quantization. Maverick needs a single H100 DGX host with FP8 quantization. Cloud providers are an alternative to self-hosting.</p>
+<p><strong>Which languages are supported?</strong> Twelve officially (Arabic, English, French, German, Hindi, Indonesian, Italian, Portuguese, Spanish, Tagalog, Thai, Vietnamese), though pre-training covered 200 languages.</p>
+<p><strong>Is it available for commercial use?</strong> Yes, under the Llama 4 Community License, subject to its terms and Meta's acceptable use policy.</p>
+<p><strong>When will Behemoth be released?</strong> No date has been announced. It is still in training and serves as a teacher model for Scout and Maverick.</p>
+<h2 id="figures-on-the-original-page">Figures on the original page</h2>
+<ol>
+<li>Meta's LLAMA4 Models — The Next Generation of AI</li>
+<li>LLAMA4 Mixture-of-Experts Architecture</li>
+<li>LLAMA4 Benchmark Comparison with Competing Models</li>
+<li>LLAMA4 Scout's Long Context Capability Visualization</li>
+<li>LLAMA4 Behemoth Architecture Overview</li>
+<li>LLAMA4 Performance on Image Understanding Benchmarks</li>
+<li>LLAMA4 Setting New Standards in AI Performance</li>
+<li>LLAMA4 Powering Various Real-World Applications</li>
+<li>Meta AI interface powered by LLAMA4</li>
+</ol>
+<h2 id="resources">Resources</h2>
+<ul>
+<li>Official site and downloads: https://www.llama.com — https://www.llama.com/llama-downloads/</li>
+<li>Documentation: https://www.llama.com/docs/</li>
+<li>Technical blog: https://ai.meta.com/blog/llama-4-multimodal-intelligence/</li>
+<li>GitHub: https://github.com/meta-llama</li>
+<li>Hugging Face: https://huggingface.co/meta-llama</li>
+<li>Meta AI: https://meta.ai/</li>
+<li>Community: https://discord.gg/meta-llama</li>
+</ul>
+  <div class="pager"><a href="week05-langgraph.html"><small>Previous</small>Week 5: LangGraph</a><a class="next" href="week07-moe.html"><small>Next</small>Week 7: Mixture of Experts (MoE)</a></div>
+  <footer style="margin-top:3rem;padding-top:1rem;border-top:1px solid var(--border);font-size:.84rem;color:var(--muted)">
+Course materials by <a href="https://albanna-tutorials.com/cs/">Dr. Abdulkarim Albanna</a> (University of Petra), adapted for the section taught by Dr. Zaid G. Momani. Interactive simulations and test code added for this site. Source on <a href="https://github.com/zmomani/ComputingSystemsDS-AI">GitHub</a>.
+</footer>
+</main><aside class="rail">
+  <div class="rail-tabs"><button class="active" data-panel="panel-sims">Simulations</button><button data-panel="panel-code">Test code</button></div>
+  <div class="rail-panel active" id="panel-sims"><p class="rail-intro">Interactive teaching aids for this week. Each opens full-size with step controls and teaching notes.</p><button class="sim-card" data-sim="sampling"><span class="sim-kind">LLMs · simulation</span><span class="sim-title">Temperature, top-k, top-p</span><span class="sim-desc">Probability bars that sharpen or flatten; truncate and sample the next token.</span></button><button class="sim-card" data-sim="tokenizer"><span class="sim-kind">Transformers · interactive</span><span class="sim-title">Subword tokenisation</span><span class="sim-desc">Type text, see WordPiece-style tokens, IDs and the embedding lookup.</span></button><button class="sim-card" data-sim="attention"><span class="sim-kind">Transformers · animation</span><span class="sim-title">Self-attention: Q·Kᵀ → softmax → ·V</span><span class="sim-desc">Five stages of scaled dot-product attention on a 4-token sentence, with heatmaps.</span></button></div>
+  <div class="rail-panel" id="panel-code"><p class="rail-intro"><b>Run ▶</b> executes pure-Python/NumPy snippets in your browser (Pyodide). Snippets marked <i>local</i> need the course environment (PyTorch, Transformers, LangChain…) — copy them into VS Code.</p><div class="snippet"><div class="snippet-head"><span>Active-parameter math for MoE models (no GPU needed)</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 1. Active-parameter math for MoE models (no GPU needed)
+models = {
+    &quot;Scout&quot;:    dict(total=109e9, experts=16,  active=17e9),
+    &quot;Maverick&quot;: dict(total=400e9, experts=128, active=17e9),
+    &quot;Behemoth&quot;: dict(total=2e12,  experts=16,  active=288e9),
+}
+for name, m in models.items():
+    frac = m[&quot;active&quot;] / m[&quot;total&quot;]
+    print(f&quot;{name:9s} active/total = {frac:6.1%}  &quot;
+          f&quot;(~{m[&#x27;total&#x27;]*2/1e9:.0f} GB in BF16, ~{m[&#x27;total&#x27;]*0.5/1e9:.0f} GB in int4)&quot;)</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Softmax sampling with temperature and top-p (nucleus), as used in the generate()</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 2. Softmax sampling with temperature and top-p (nucleus), as used in the generate() calls
+import numpy as np
+
+def sample_next(logits, temperature=0.7, top_p=0.9, rng=np.random.default_rng(0)):
+    z = np.asarray(logits) / temperature
+    p = np.exp(z - z.max()); p /= p.sum()
+    order = np.argsort(-p)
+    cum = np.cumsum(p[order])
+    keep = order[: np.searchsorted(cum, top_p) + 1]
+    q = p[keep] / p[keep].sum()
+    return rng.choice(keep, p=q), dict(zip(keep.tolist(), q.round(3).tolist()))
+
+tok, kept = sample_next([2.0, 1.5, 1.0, 0.2, -1.0])
+print(&quot;sampled token id:&quot;, tok, &quot;| nucleus:&quot;, kept)</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Context-window scale: how many tokens is a document? (needs: pip install tiktoke</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 3. Context-window scale: how many tokens is a document? (needs: pip install tiktoken)
+import tiktoken
+enc = tiktoken.get_encoding(&quot;cl100k_base&quot;)
+text = open(__file__).read()  # any file you like
+n = len(enc.encode(text))
+for model, ctx in [(&quot;Llama 3&quot;, 128_000), (&quot;Maverick&quot;, 1_000_000), (&quot;Scout&quot;, 10_000_000)]:
+    print(f&quot;{model:9s} window holds ~{ctx // n:,} copies of this file ({n} tokens)&quot;)</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Smoke test the Hugging Face loading pattern on a tiny model (CPU-friendly stand-</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 4. Smoke test the Hugging Face loading pattern on a tiny model (CPU-friendly stand-in for Llama 4)
+from transformers import AutoTokenizer, AutoModelForCausalLM
+import torch
+name = &quot;sshleifer/tiny-gpt2&quot;   # swap for &quot;meta-llama/Llama-4-Scout-17B-16E-Instruct&quot; on an H100
+tok = AutoTokenizer.from_pretrained(name)
+model = AutoModelForCausalLM.from_pretrained(name, torch_dtype=torch.float32)
+inputs = tok(&quot;What are the key features of LLAMA4?&quot;, return_tensors=&quot;pt&quot;)
+out = model.generate(inputs.input_ids, max_new_tokens=20, do_sample=True, temperature=0.7, top_p=0.9)
+print(tok.decode(out[0], skip_special_tokens=True))</code></pre><div class="out"></div></div></div>
+</aside></div><div class="sim-overlay" id="sim-overlay" role="dialog" aria-modal="true">
+  <div class="sim-window"><div class="sim-head"><div><div class="sim-kind" id="sim-kind"></div><h3 id="sim-title"></h3></div><span class="spacer"></span><button class="btn-xs" id="sim-close">✕ Close (Esc)</button></div><div class="sim-body" id="sim-body"></div></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script>document.addEventListener('DOMContentLoaded',()=>{if(window.hljs)hljs.highlightAll();if(window.renderMathInElement)renderMathInElement(document.body,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});});</script>
+<script src="../assets/js/sims/core.js"></script>
+<script src="../assets/js/sims/matrix-multiply.js"></script><script src="../assets/js/sims/vectors.js"></script><script src="../assets/js/sims/attention.js"></script><script src="../assets/js/sims/tokenizer.js"></script><script src="../assets/js/sims/positional.js"></script><script src="../assets/js/sims/classifier.js"></script><script src="../assets/js/sims/bio-tagging.js"></script><script src="../assets/js/sims/rag.js"></script><script src="../assets/js/sims/langgraph.js"></script><script src="../assets/js/sims/sampling.js"></script><script src="../assets/js/sims/moe.js"></script><script src="../assets/js/sims/react-loop.js"></script><script src="../assets/js/sims/multi-agent.js"></script><script src="../assets/js/sims/mcp.js"></script><script src="../assets/js/sims/lam.js"></script><script src="../assets/js/sims/diffusion.js"></script>
+<script src="../assets/js/site.js"></script>
+</body></html>

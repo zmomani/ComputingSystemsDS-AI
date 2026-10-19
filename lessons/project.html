@@ -1,0 +1,679 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Final Project: Multi-Agent Research Assistant · Computing Systems for DS & AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<link rel="stylesheet" href="../assets/css/site.css">
+</head>
+<body><header class="topbar">
+  <button class="btn-icon" id="menu-toggle" aria-label="Menu">☰</button>
+  <a class="brand" href="../index.html">606363 · Computing Systems for DS & AI<small>University of Petra</small></a>
+  <span class="spacer"></span>
+  <nav class="week-nav"></nav>
+  <a class="btn-icon" href="../index.html#curriculum">Curriculum</a>
+  <a class="btn-icon" href="../index.html#simulations">Simulations</a>
+  <button class="btn-icon" id="theme-toggle" aria-label="Toggle dark mode">◐</button>
+</header><div class="layout"><aside class="sidebar">
+  <h4>Course</h4><ul class="outline"><li><a class="" href="../lessons/syllabus.html"><span class="wk">·</span><span>Course Syllabus</span></a></li><li><a class="active" href="../lessons/project.html"><span class="wk">·</span><span>Final Project</span></a></li></ul>
+  <h4>16-week curriculum</h4><ul class="outline"><li><a class="" href="../lessons/week01-transformers.html"><span class="wk">01</span><span>Transformer Architecture</span></a></li><li><a class="" href="../lessons/week02-text-classification.html"><span class="wk">02</span><span>Text Classification</span></a></li><li><a class="soon" href="../lessons/week03-ner.html"><span class="wk">03</span><span>Named Entity Recognition (NER)</span></a></li><li><a class="" href="../lessons/week04-langchain.html"><span class="wk">04</span><span>LangChain Fundamentals</span></a></li><li><a class="" href="../lessons/week05-langgraph.html"><span class="wk">05</span><span>LangGraph</span></a></li><li><a class="" href="../lessons/week06-llms.html"><span class="wk">06</span><span>Large Language Models (LLMs)</span></a></li><li><a class="" href="../lessons/week07-moe.html"><span class="wk">07</span><span>Mixture of Experts (MoE)</span></a></li><li><a class="" href="../lessons/week08-midterm.html"><span class="wk">08</span><span>Midterm Exam</span></a></li><li><a class="" href="../lessons/week09-react-agents.html"><span class="wk">09</span><span>AI Agents &amp; ReAct</span></a></li><li><a class="" href="../lessons/week10-multi-agent.html"><span class="wk">10</span><span>Multi-Agent Systems</span></a></li><li><a class="" href="../lessons/week11-mcp.html"><span class="wk">11</span><span>Model Context Protocol (MCP)</span></a></li><li><a class="soon" href="../lessons/week12-lams.html"><span class="wk">12</span><span>Large Action Models (LAMs)</span></a></li><li><a class="" href="../lessons/week13-diffusion.html"><span class="wk">13</span><span>Diffusion Models</span></a></li><li><a class="" href="../lessons/week14-project.html"><span class="wk">14</span><span>Project Development &amp; Final Testing</span></a></li><li><a class="" href="../lessons/week15-competition.html"><span class="wk">15</span><span>Competition Day &amp; Presentations</span></a></li><li><a class="" href="../lessons/week16-final.html"><span class="wk">16</span><span>Final Exam</span></a></li></ul>
+  <h4>On this page</h4><ul class="toc" id="toc"></ul>
+</aside><main class="main"><div class="lesson-head"><div class="eyebrow">606363</div><h1>Final Project: Multi-Agent Research Assistant</h1></div><div class="callout sim"><div class="sim-strip"><b style="margin-right:4px">Related simulations:</b><button class="chip" data-sim="multi-agent">▶ Multi-agent research pipeline</button><button class="chip" data-sim="langgraph">▶ LangGraph StateGraph</button><button class="chip" data-sim="react-loop">▶ ReAct agent loop</button></div></div><blockquote>
+<p><em>Automated Research, Writing &amp; Review System.</em> Course 606363, Computing Systems for Data Science and AI, 2nd semester 2025–2026. Instructor: Dr. Abdulkarim Albanna, Faculty of Information Technology, Data Science and AI, University of Petra.</p>
+<p><strong>Team size:</strong> 2–3 students · <strong>Difficulty:</strong> Advanced · <strong>Deadline:</strong> Week 14 · <strong>Competition Day:</strong> Week 15</p>
+<p>Content is a close paraphrase of Dr. Albanna's page (read via a paraphrasing fetch tool); all numbers, names, agent specs and rubric values are preserved. The <code>ResearchState</code> schema is reconstructed field-for-field from the original.</p>
+</blockquote>
+<h2 id="1-project-overview">1. Project Overview</h2>
+<p>Teams build a <strong>multi-agent system</strong> in which specialized agents collaborate to produce a reviewed, cited research report on any topic. The input is a research question; the output is a Markdown/PDF report with <strong>named-entity extraction</strong>, <strong>source classification</strong>, <strong>browser-based data collection</strong> and <strong>AI-generated illustrations</strong>.</p>
+<p><strong>The problem.</strong> Real research involves searching, reading, classifying sources, extracting entities, organizing findings, writing, illustrating and reviewing. The project automates this pipeline, with each agent handling one stage under a central orchestrator.</p>
+<p><strong>Deliverables.</strong> A working application, source code, documentation, a transformer analysis report, a presentation and a demo video.</p>
+<h2 id="2-mapping-to-course-topics">2. Mapping to Course Topics</h2>
+<table>
+<thead>
+<tr>
+<th>Week</th>
+<th>Topic</th>
+<th>Project component</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Transformers</td>
+<td>Document the architecture of the chosen LLM backbone</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Text classification</td>
+<td>Classification Agent: source categorization</td>
+</tr>
+<tr>
+<td>3</td>
+<td>NER</td>
+<td>NER Agent: entity extraction</td>
+</tr>
+<tr>
+<td>4</td>
+<td>LangChain</td>
+<td>Chains, prompts, output parsers, document loaders</td>
+</tr>
+<tr>
+<td>5</td>
+<td>LangGraph</td>
+<td>Orchestration (StateGraph)</td>
+</tr>
+<tr>
+<td>6</td>
+<td>LLMs</td>
+<td>Model configuration and tuning per agent</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Mixture of Experts</td>
+<td>MoE analysis; optional Mixtral integration</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Midterm</td>
+<td>(no project deliverable)</td>
+</tr>
+<tr>
+<td>9</td>
+<td>ReAct</td>
+<td>Research Agent</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Multi-agent systems</td>
+<td>Full integration, revision loop</td>
+</tr>
+<tr>
+<td>11</td>
+<td>MCP</td>
+<td>Tool protocol: MCP servers and clients</td>
+</tr>
+<tr>
+<td>12</td>
+<td>LAMs</td>
+<td>Browser Agent (browser automation)</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Diffusion models</td>
+<td>Illustration Agent</td>
+</tr>
+<tr>
+<td>14</td>
+<td>—</td>
+<td>Testing, documentation, presentation</td>
+</tr>
+<tr>
+<td>15</td>
+<td>—</td>
+<td>Competition Day</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-system-architecture">3. System Architecture</h2>
+<div class="highlight"><pre><span></span><code>                    ┌──────────────────────────────┐
+   User input ───►  │  ORCHESTRATOR (LangGraph      │
+  (research topic)  │  StateGraph, conditional edges)│
+                    └──────────────┬───────────────┘
+          ┌──────────────┬─────────┼─────────┬──────────────┐
+          ▼              ▼         ▼         ▼              ▼
+   ┌────────────┐ ┌────────────┐ ┌─────┐ ┌─────────┐ ┌──────────┐
+   │  Research  │ │Classifica- │ │ NER │ │ Browser │ │ Analyzer │
+   │ Agent      │ │tion Agent  │ │Agent│ │ Agent   │ │ Agent    │
+   │ (ReAct+MCP)│ │            │ │     │ │ (LAM)   │ │ (CoT)    │
+   └─────┬──────┘ └─────┬──────┘ └──┬──┘ └────┬────┘ └────┬─────┘
+         └──────────────┴───────────┴─────────┴───────────┘
+                                    ▼
+                           ┌─────────────────┐
+                           │  Writer Agent   │◄──────────────┐
+                           └────────┬────────┘               │
+                                    ▼                        │ REVISE
+                        ┌──────────────────────┐             │ (score &lt; 7,
+                        │  Illustration Agent  │             │  max 3 cycles)
+                        │  (Stable Diffusion / │             │
+                        │   DALL-E)            │             │
+                        └──────────┬───────────┘             │
+                                   ▼                         │
+                           ┌─────────────────┐               │
+                           │  Critic Agent   │───────────────┘
+                           │  (Reflection,   │
+                           │   score 1–10)   │
+                           └────────┬────────┘
+                                    │ APPROVE (score ≥ 7)
+                                    ▼
+                          Final Report (Markdown / PDF)
+</code></pre></div>
+<p>Flow: the user's topic enters the <strong>Orchestrator</strong> (a LangGraph <code>StateGraph</code>). It fans out to the <strong>Research</strong>, <strong>Classification</strong>, <strong>NER</strong>, <strong>Browser</strong> and <strong>Analyzer</strong> agents, whose outputs converge on the <strong>Writer</strong>. The draft passes to the <strong>Illustration Agent</strong>, then to the <strong>Critic</strong>, which either approves (producing the final report) or sends the draft back to the Writer for revision.</p>
+<h2 id="4-technology-stack">4. Technology Stack</h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Options</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Transformer backbone</td>
+<td>Transformer LLMs such as GPT-4, Claude or Mixtral; students must document the architecture</td>
+</tr>
+<tr>
+<td>Agent orchestration</td>
+<td>LangGraph (stateful graph, conditional edges)</td>
+</tr>
+<tr>
+<td>Chain framework</td>
+<td>LangChain (chains, prompts, output parsers, document loaders)</td>
+</tr>
+<tr>
+<td>LLM</td>
+<td>OpenAI GPT-4 or Claude API; Ollama for local models; optional Mixtral (MoE)</td>
+</tr>
+<tr>
+<td>Text classification</td>
+<td>LLM-based classifier, or fine-tuned transformer (BERT)</td>
+</tr>
+<tr>
+<td>NER</td>
+<td>spaCy NER pipeline, or LLM-based structured extraction</td>
+</tr>
+<tr>
+<td>Web search</td>
+<td>Tavily Search API or Brave Search API</td>
+</tr>
+<tr>
+<td>Web scraping</td>
+<td>BeautifulSoup or Trafilatura</td>
+</tr>
+<tr>
+<td>Browser automation (LAM)</td>
+<td>Playwright or Selenium: form filling, navigation, structured extraction</td>
+</tr>
+<tr>
+<td>Tool protocol</td>
+<td>Model Context Protocol (MCP)</td>
+</tr>
+<tr>
+<td>Image generation</td>
+<td>Stable Diffusion API or DALL-E</td>
+</tr>
+<tr>
+<td>Vector store</td>
+<td>ChromaDB</td>
+</tr>
+<tr>
+<td>Output format</td>
+<td>Markdown with embedded images → PDF via markdown2 + WeasyPrint</td>
+</tr>
+<tr>
+<td>UI</td>
+<td>Streamlit or Gradio</td>
+</tr>
+<tr>
+<td>Language</td>
+<td>Python 3.12+</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-agent-specifications">5. Agent Specifications</h2>
+<h3 id="51-orchestrator-manager">5.1 Orchestrator (Manager)</h3>
+<ul>
+<li><strong>Input:</strong> research topic from the user.</li>
+<li><strong>Output:</strong> routing decisions, revision loops, finalization.</li>
+<li><strong>Tools:</strong> LangGraph <code>StateGraph</code> with conditional edges.</li>
+<li><strong>Responsibilities:</strong> define research scope; route tasks to agents; manage shared state; decide whether to revise or finalize; implement human-in-the-loop checkpoints.</li>
+</ul>
+<h3 id="52-research-agent-react">5.2 Research Agent (ReAct)</h3>
+<ul>
+<li><strong>Input:</strong> <code>topic</code>, <code>sub_questions</code>.</li>
+<li><strong>Output:</strong> <code>raw_sources</code> entries <code>{url, title, content, score}</code>.</li>
+<li><strong>Tools (via MCP server):</strong> Web Search (Tavily or Brave), Web Scraper (BeautifulSoup or Trafilatura), URL Reader.</li>
+<li><strong>Responsibilities:</strong> generate search queries; search multiple sources; scrape pages; score relevance 1–10 with an LLM; keep URLs for citation. Runs a Thought → Action → Observation loop until enough sources are gathered.</li>
+</ul>
+<h3 id="53-classification-agent">5.3 Classification Agent</h3>
+<ul>
+<li><strong>Input:</strong> <code>raw_sources</code>.</li>
+<li><strong>Output:</strong> <code>classified_sources</code> <code>{url, title, category, relevance}</code> plus a classification summary.</li>
+<li><strong>Tools:</strong> LLM-based classifier or fine-tuned BERT.</li>
+<li><strong>Responsibilities:</strong> assign topic labels (e.g. technical, review, tutorial, opinion, dataset); rate relevance high / medium / low; filter off-topic sources.</li>
+</ul>
+<h3 id="54-ner-agent-entity-extractor">5.4 NER Agent (Entity Extractor)</h3>
+<ul>
+<li><strong>Input:</strong> collected and classified sources.</li>
+<li><strong>Output:</strong> <code>entities</code> <code>{text, label, source_url, frequency}</code> and <code>entity_relationships</code> <code>{entity1, entity2, relation, context}</code>.</li>
+<li><strong>Tools:</strong> spaCy NER pipeline or LLM extraction with structured output.</li>
+<li><strong>Responsibilities:</strong> extract people, organizations, technologies, dates and locations; build an entity registry; track co-occurrences; report frequencies.</li>
+</ul>
+<h3 id="55-browser-agent-lam">5.5 Browser Agent (LAM)</h3>
+<ul>
+<li><strong>Input:</strong> target pages and academic databases.</li>
+<li><strong>Output:</strong> <code>browser_results</code> <code>{url, action, extracted_data}</code>.</li>
+<li><strong>Tools:</strong> Playwright or Selenium with LLM planning.</li>
+<li><strong>Responsibilities:</strong> render JavaScript-heavy pages; fill search forms (Google Scholar, Semantic Scholar); extract table data; download PDFs and datasets; handle authentication when credentials are provided.</li>
+</ul>
+<h3 id="56-analyzer-agent">5.6 Analyzer Agent</h3>
+<ul>
+<li><strong>Input:</strong> classified sources and entities.</li>
+<li><strong>Output:</strong> <code>organized_findings</code> <code>{theme, findings, sources, entities}</code> and an <code>outline</code>.</li>
+<li><strong>Pattern:</strong> Chain-of-Thought.</li>
+<li><strong>Responsibilities:</strong> identify 4–6 themes; group findings by topic; detect contradictions between sources; rank findings; build a report outline that includes entity relationships.</li>
+</ul>
+<h3 id="57-writer-agent">5.7 Writer Agent</h3>
+<ul>
+<li><strong>Input:</strong> <code>outline</code>, <code>organized_findings</code>.</li>
+<li><strong>Output:</strong> <code>draft</code> in Markdown, with image placeholders and prompts for the Illustration Agent.</li>
+<li><strong>Tools:</strong> structured output and citation formatting.</li>
+<li><strong>Responsibilities:</strong> write introduction, body, conclusion and executive summary with inline citations; weave in extracted entities.</li>
+</ul>
+<h3 id="58-illustration-agent">5.8 Illustration Agent</h3>
+<ul>
+<li><strong>Input:</strong> image prompts from the Writer.</li>
+<li><strong>Output:</strong> <code>illustrations</code> <code>{section, prompt, image_path}</code>.</li>
+<li><strong>Tools:</strong> Stable Diffusion API or DALL-E.</li>
+<li><strong>Responsibilities:</strong> generate diagrams, architecture illustrations and data visualizations; optimize prompts for an academic style; embed images in the report.</li>
+</ul>
+<h3 id="59-critic-agent">5.9 Critic Agent</h3>
+<ul>
+<li><strong>Input:</strong> draft, sources, entities, classification labels.</li>
+<li><strong>Output:</strong> <code>critic_feedback</code>, <code>critic_score</code>, decision.</li>
+<li><strong>Pattern:</strong> Reflection.</li>
+<li><strong>Responsibilities:</strong> check accuracy against sources; find coverage gaps; verify entity and label use; score 1–10 on accuracy, completeness, clarity, citations and visual quality. <strong>Score ≥ 7 → APPROVE; otherwise → REVISE</strong> with specific feedback, returning the draft to the Writer. Maximum <strong>3 revision cycles</strong>.</li>
+</ul>
+<h2 id="6-shared-state-schema">6. Shared State Schema</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">TypedDict</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ResearchState</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+    <span class="c1"># Input</span>
+    <span class="n">topic</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">sub_questions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+
+    <span class="c1"># Research Agent</span>
+    <span class="n">raw_sources</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>            <span class="c1"># {url, title, content, score}</span>
+
+    <span class="c1"># Classification Agent</span>
+    <span class="n">classified_sources</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>     <span class="c1"># {url, title, category, relevance}</span>
+
+    <span class="c1"># NER Agent</span>
+    <span class="n">entities</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>               <span class="c1"># {text, label, source_url, frequency}</span>
+    <span class="n">entity_relationships</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>   <span class="c1"># {entity1, entity2, relation, context}</span>
+
+    <span class="c1"># Browser Agent (LAM)</span>
+    <span class="n">browser_results</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>        <span class="c1"># {url, action, extracted_data}</span>
+
+    <span class="c1"># Analyzer Agent</span>
+    <span class="n">organized_findings</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>     <span class="c1"># {theme, findings, sources, entities}</span>
+    <span class="n">outline</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="c1"># Writer Agent</span>
+    <span class="n">draft</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="c1"># Illustration Agent</span>
+    <span class="n">illustrations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>          <span class="c1"># {section, prompt, image_path}</span>
+
+    <span class="c1"># Critic Agent</span>
+    <span class="n">critic_feedback</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">critic_score</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">revision_count</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">final_report</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+
+    <span class="c1"># Course-topic artefacts</span>
+    <span class="n">transformer_config</span><span class="p">:</span> <span class="nb">dict</span>
+    <span class="n">moe_analysis</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">status</span><span class="p">:</span> <span class="nb">str</span>
+</code></pre></div>
+<h2 id="7-competition-format-competition-based-learning">7. Competition Format (Competition-Based Learning)</h2>
+<p>Each team builds its own system; teams compete head-to-head on identical tasks.</p>
+<ul>
+<li><strong>Checkpoint 1 (Week 7):</strong> demo of the NLP pipeline (classification, NER, research agent). Instructor feedback only, unscored.</li>
+<li><strong>Checkpoint 2 (Week 11):</strong> demo of the full multi-agent pipeline with MCP. Peer-feedback round.</li>
+<li><strong>Competition Day (Week 15):</strong>
+  1. The instructor reveals <strong>3 unseen research topics</strong>, the same for all teams.
+  2. All teams run their systems simultaneously.
+  3. Each system produces 3 reports, <strong>30 minutes per topic</strong>.
+  4. Reports are anonymized and given to a judging panel: the instructor plus 2 external judges or peer teams.
+  5. Each team gives a <strong>10-minute live presentation</strong> of its architecture and a demo.
+  6. Judges score reports and presentations independently; scores are averaged across judges and topics.</li>
+</ul>
+<h3 id="scoring-rubric-100-points-per-report">Scoring rubric (100 points per report)</h3>
+<table>
+<thead>
+<tr>
+<th>Criterion</th>
+<th>Points</th>
+<th>What is judged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Report quality</td>
+<td>20</td>
+<td>Coherence, depth, clarity, structure</td>
+</tr>
+<tr>
+<td>Source coverage</td>
+<td>15</td>
+<td>At least 10 relevant, diverse sources; proper citations</td>
+</tr>
+<tr>
+<td>Entity extraction (NER)</td>
+<td>10</td>
+<td>Accuracy of people, organizations, technologies</td>
+</tr>
+<tr>
+<td>Source classification</td>
+<td>10</td>
+<td>Correct type / domain / relevance labels</td>
+</tr>
+<tr>
+<td>Illustrations</td>
+<td>10</td>
+<td>Relevance and quality of generated figures</td>
+</tr>
+<tr>
+<td>Speed</td>
+<td>10</td>
+<td>Completion time (faster is better, within 30 min)</td>
+</tr>
+<tr>
+<td>Cost efficiency</td>
+<td>5</td>
+<td>Total API token cost (lower is better)</td>
+</tr>
+<tr>
+<td>Error handling</td>
+<td>5</td>
+<td>API errors, bad sources, timeouts</td>
+</tr>
+<tr>
+<td>Innovation</td>
+<td>15</td>
+<td>MoE routing, advanced MCP tools, LAM actions, multi-model strategies</td>
+</tr>
+</tbody>
+</table>
+<h3 id="prizes-and-bonus-points">Prizes and bonus points</h3>
+<table>
+<thead>
+<tr>
+<th>Award</th>
+<th>Bonus</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1st place (Gold)</td>
+<td>+5</td>
+</tr>
+<tr>
+<td>2nd place (Silver)</td>
+<td>+3</td>
+</tr>
+<tr>
+<td>3rd place (Bronze)</td>
+<td>+2</td>
+</tr>
+<tr>
+<td>Innovation Award (stackable)</td>
+<td>+2</td>
+</tr>
+<tr>
+<td>Best Report Quality Award (stackable)</td>
+<td>+2</td>
+</tr>
+<tr>
+<td>Speed Award</td>
+<td>+1</td>
+</tr>
+</tbody>
+</table>
+<h3 id="academic-integrity">Academic integrity</h3>
+<p>Code must be the team's original work. Open-source libraries and LLM APIs are allowed; copying other teams' agent logic or prompts is prohibited. Violations lead to disqualification and a failing grade.</p>
+<h2 id="8-phase-by-phase-timeline">8. Phase-by-Phase Timeline</h2>
+<h3 id="phase-1-transformer-foundations-and-text-classification-weeks-12">Phase 1 — Transformer foundations and text classification (Weeks 1–2)</h3>
+<ul>
+<li>1.1 Written analysis of the transformer architecture of the chosen backbone</li>
+<li>1.2 Project repository with <code>requirements.txt</code></li>
+<li>1.3 <code>.env</code> with credentials and documented model configuration</li>
+<li>1.4 Working development environment</li>
+<li>1.5 Working source classifier</li>
+<li>1.6 Classification accuracy report</li>
+</ul>
+<h3 id="phase-2-ner-and-langchain-setup-weeks-34">Phase 2 — NER and LangChain setup (Weeks 3–4)</h3>
+<ul>
+<li>2.1 NER pipeline for people, organizations, technologies and dates</li>
+<li>2.2 Structured entity database with co-occurrence tracking</li>
+<li>2.3 Reusable LangChain chain components</li>
+<li>2.4 Multi-format document ingestion pipeline</li>
+<li>2.5 Complete <code>ResearchState</code> schema</li>
+</ul>
+<h3 id="phase-3-langgraph-orchestration-and-llm-configuration-weeks-56">Phase 3 — LangGraph orchestration and LLM configuration (Weeks 5–6)</h3>
+<ul>
+<li>3.1 Connected graph with conditional edges</li>
+<li>3.2 Working orchestration flow</li>
+<li>3.3 Documented LLM configuration per agent</li>
+<li>3.4 LLM benchmark comparison table (2+ models, token cost tracking)</li>
+<li>3.5 Searchable ChromaDB vector store</li>
+</ul>
+<h3 id="phase-4-moe-analysis-and-research-agent-week-7-then-week-9">Phase 4 — MoE analysis and Research Agent (Week 7, then Week 9)</h3>
+<ul>
+<li>4.1 Written MoE analysis: dense vs. sparse (Week 7)</li>
+<li>4.2 MoE integration or comparative benchmark, optional (Week 7)</li>
+<li>4.3 ReAct research agent (Week 9)</li>
+<li>4.4 Working search with result parsing (Week 9)</li>
+<li>4.5 Full-text extraction from URLs (Week 9)</li>
+<li>4.6 Autonomous iterative search (Week 9)</li>
+</ul>
+<p><em>Week 7: Checkpoint 1. Week 8: Midterm exam.</em></p>
+<h3 id="phase-5-multi-agent-integration-and-mcp-weeks-1011">Phase 5 — Multi-agent integration and MCP (Weeks 10–11)</h3>
+<ul>
+<li>5.1 End-to-end multi-agent pipeline</li>
+<li>5.2 Organized findings with entity-enriched themes</li>
+<li>5.3 Complete draft with inline citations</li>
+<li>5.4 Review loop with a maximum of 3 revision cycles</li>
+<li>5.5 MCP-compliant tool definitions for search, scrape, classify and NER</li>
+<li>5.6 MCP client integration so agents call tools through a standard protocol</li>
+</ul>
+<p><em>Week 11: Checkpoint 2.</em></p>
+<h3 id="phase-6-browser-agent-lam-and-diffusion-models-weeks-1213">Phase 6 — Browser Agent (LAM) and diffusion models (Weeks 12–13)</h3>
+<ul>
+<li>6.1 Playwright agent that navigates, fills forms and extracts data</li>
+<li>6.2 Automated paper search and metadata extraction</li>
+<li>6.3 Illustration agent producing diagrams and figures</li>
+<li>6.4 Prompt optimization for academic illustrations</li>
+<li>6.5 Reports with embedded generated images</li>
+<li>6.6 Streamlit web UI with real-time progress indicators showing agent activity</li>
+<li>6.7 Expandable panels showing agent reasoning (transparent decision log)</li>
+</ul>
+<h3 id="phase-7-testing-documentation-and-presentation-week-14">Phase 7 — Testing, documentation and presentation (Week 14)</h3>
+<ul>
+<li>7.1 Five complete reports on diverse topics, with illustrations</li>
+<li>7.2 Benchmarks: time, token cost, MoE vs. dense</li>
+<li>7.3 Component metrics: NER, classification, illustration quality</li>
+<li>7.4 README, technical documentation, transformer analysis</li>
+<li>7.5 Slides and a 5-minute video walkthrough</li>
+</ul>
+<p><em>Week 15: Competition Day.</em></p>
+<h2 id="9-submission-requirements">9. Submission Requirements</h2>
+<ul>
+<li>[ ] GitHub repository with clean commit history and README</li>
+<li>[ ] Transformer analysis of the chosen LLM backbone</li>
+<li>[ ] MoE vs. dense comparison report with benchmarks</li>
+<li>[ ] Technical report: architecture, design decisions, NER and classification evaluation, challenges, results</li>
+<li>[ ] Demo video (5 minutes) showing NER, classification, browser actions and illustrations</li>
+<li>[ ] Three sample research reports on different topics, with entity summaries, classification reports and illustrations</li>
+<li>[ ] Live presentation (15 minutes with Q&amp;A)</li>
+<li>[ ] Week 7 Checkpoint 1 demo (NLP pipeline)</li>
+<li>[ ] Week 11 Checkpoint 2 demo (full pipeline with MCP) and peer-feedback round</li>
+<li>[ ] Peer review of two other teams' reports</li>
+<li>[ ] <strong>Deadline: Week 14</strong></li>
+</ul>
+<blockquote>
+<p>The page lists 5 test reports in Phase 7 and 3 sample reports in the submission checklist, and a 15-minute presentation here vs. 10 minutes on Competition Day. Confirm with the instructor.</p>
+</blockquote>
+<h2 id="10-project-grading">10. Project Grading</h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Weight</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Competition score</td>
+<td>40%</td>
+<td>Average across the 3 unseen topics</td>
+</tr>
+<tr>
+<td>Architecture &amp; topic coverage</td>
+<td>20%</td>
+<td>All 12 course topics represented</td>
+</tr>
+<tr>
+<td>Code quality &amp; documentation</td>
+<td>15%</td>
+<td></td>
+</tr>
+<tr>
+<td>Live presentation</td>
+<td>15%</td>
+<td>10-minute demo plus Q&amp;A</td>
+</tr>
+<tr>
+<td>Peer review</td>
+<td>10%</td>
+<td>Each team reviews two other teams; graded on review quality</td>
+</tr>
+</tbody>
+</table>
+<p>(These are the weights <em>within</em> the project; the project itself is 30% of the course grade — see the syllabus.)</p>
+<h2 id="11-expected-output-example">11. Expected Output Example</h2>
+<div class="highlight"><pre><span></span><code><span class="gh"># Research Report: &lt;topic&gt;</span>
+
+<span class="gu">## Executive Summary</span>
+...
+
+<span class="gu">## Named Entities Identified</span>
+| Entity | Type | Frequency | Sources |
+|---|---|---|---|
+
+<span class="gu">## Source Classification Summary</span>
+| Category | Count | Avg. relevance |
+|---|---|---|
+
+<span class="gu">## 1. Introduction</span>
+<span class="gu">## 2. Background</span>
+<span class="gu">## 3. Key Themes</span>
+<span class="gu">## 4. Comparative Analysis</span>
+[Figure 1: MoE vs Dense Model Efficiency Comparison -- generated illustration]
+<span class="gu">## 5. Contradictions and Open Questions</span>
+<span class="gu">## 6. Discussion</span>
+<span class="gu">## 7. Conclusion</span>
+
+<span class="gu">## References</span>
+[1] ...
+</code></pre></div>
+<h2 id="12-useful-links">12. Useful Links</h2>
+<ul>
+<li>spaCy: https://spacy.io</li>
+<li>LangChain: https://python.langchain.com</li>
+<li>LangGraph: https://langchain-ai.github.io/langgraph/</li>
+<li>Model Context Protocol: https://modelcontextprotocol.io</li>
+<li>Playwright: https://playwright.dev</li>
+<li>Stability AI: https://stability.ai</li>
+<li>Tavily: https://tavily.com</li>
+<li>Course home: https://albanna-tutorials.com/cs/ · Syllabus: https://albanna-tutorials.com/cs/syllabus.html</li>
+<li>Instructor: abanna@uop.edu.jo · GitHub https://github.com/abedbanna · Hugging Face https://huggingface.co/abedbanna</li>
+</ul><footer style="margin-top:3rem;padding-top:1rem;border-top:1px solid var(--border);font-size:.84rem;color:var(--muted)">
+Course materials by <a href="https://albanna-tutorials.com/cs/">Dr. Abdulkarim Albanna</a> (University of Petra), adapted for the section taught by Dr. Zaid G. Momani. Interactive simulations and test code added for this site. Source on <a href="https://github.com/zmomani/ComputingSystemsDS-AI">GitHub</a>.
+</footer></main><aside class="rail">
+  <div class="rail-tabs"><button class="active" data-panel="panel-sims">Simulations</button><button data-panel="panel-code">Test code</button></div>
+  <div class="rail-panel active" id="panel-sims"><p class="rail-intro">Interactive teaching aids for this week. Each opens full-size with step controls and teaching notes.</p><button class="sim-card" data-sim="multi-agent"><span class="sim-kind">Multi-agent · animation</span><span class="sim-title">Multi-agent research pipeline</span><span class="sim-desc">The course project: six agents, a human checkpoint and a Writer–Critic loop.</span></button><button class="sim-card" data-sim="langgraph"><span class="sim-kind">LangGraph · animation</span><span class="sim-title">LangGraph StateGraph</span><span class="sim-desc">State flowing through nodes, conditional edges, a loop, an interrupt and checkpoints.</span></button><button class="sim-card" data-sim="react-loop"><span class="sim-kind">Agents · animation</span><span class="sim-title">ReAct agent loop</span><span class="sim-desc">Thought → Action → Observation on a growing scratchpad, including a tool error.</span></button></div>
+  <div class="rail-panel" id="panel-code"><p class="rail-intro"><b>Run ▶</b> executes pure-Python/NumPy snippets in your browser (Pyodide). Snippets marked <i>local</i> need the course environment (PyTorch, Transformers, LangChain…) — copy them into VS Code.</p><div class="snippet"><div class="snippet-head"><span>Minimal LangGraph skeleton with the Critic revision loop</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 1. Minimal LangGraph skeleton with the Critic revision loop
+#    pip install langgraph typing_extensions
+from typing import List, Optional
+from typing_extensions import TypedDict
+from langgraph.graph import StateGraph, START, END
+
+class ResearchState(TypedDict, total=False):
+    topic: str
+    draft: str
+    critic_score: Optional[int]
+    critic_feedback: Optional[str]
+    revision_count: int
+    final_report: Optional[str]
+
+def writer(state):
+    n = state.get(&quot;revision_count&quot;, 0)
+    return {&quot;draft&quot;: f&quot;Draft v{n+1} on &#x27;{state[&#x27;topic&#x27;]}&#x27;&quot;}
+
+def critic(state):
+    score = 5 + state.get(&quot;revision_count&quot;, 0)          # toy critic: improves each round
+    return {&quot;critic_score&quot;: score, &quot;critic_feedback&quot;: &quot;add citations&quot; if score &lt; 7 else &quot;ok&quot;,
+            &quot;revision_count&quot;: state.get(&quot;revision_count&quot;, 0) + 1}
+
+def route(state):
+    if state[&quot;critic_score&quot;] &gt;= 7 or state[&quot;revision_count&quot;] &gt;= 3:
+        return &quot;finalize&quot;
+    return &quot;writer&quot;
+
+def finalize(state):
+    return {&quot;final_report&quot;: state[&quot;draft&quot;]}
+
+g = StateGraph(ResearchState)
+g.add_node(&quot;writer&quot;, writer); g.add_node(&quot;critic&quot;, critic); g.add_node(&quot;finalize&quot;, finalize)
+g.add_edge(START, &quot;writer&quot;); g.add_edge(&quot;writer&quot;, &quot;critic&quot;)
+g.add_conditional_edges(&quot;critic&quot;, route, {&quot;writer&quot;: &quot;writer&quot;, &quot;finalize&quot;: &quot;finalize&quot;})
+g.add_edge(&quot;finalize&quot;, END)
+app = g.compile()
+
+print(app.invoke({&quot;topic&quot;: &quot;Mixture of Experts&quot;, &quot;revision_count&quot;: 0}))</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>NER Agent prototype with spaCy  (pip install spacy &amp;&amp; python -m spacy download e</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 2. NER Agent prototype with spaCy  (pip install spacy &amp;&amp; python -m spacy download en_core_web_sm)
+import spacy
+from collections import Counter
+
+nlp = spacy.load(&quot;en_core_web_sm&quot;)
+text = (&quot;In 2017 Vaswani and colleagues at Google introduced the Transformer. &quot;
+        &quot;OpenAI later released GPT-4, while Mistral AI built Mixtral, a mixture-of-experts model.&quot;)
+doc = nlp(text)
+
+entities = [{&quot;text&quot;: e.text, &quot;label&quot;: e.label_} for e in doc.ents]
+print(entities)
+print(Counter(e[&quot;label&quot;] for e in entities))</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Classification Agent prototype using a zero-shot transformer</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 3. Classification Agent prototype using a zero-shot transformer
+from transformers import pipeline
+
+clf = pipeline(&quot;zero-shot-classification&quot;, model=&quot;facebook/bart-large-mnli&quot;)
+categories = [&quot;technical&quot;, &quot;review&quot;, &quot;tutorial&quot;, &quot;opinion&quot;, &quot;dataset&quot;]
+source = &quot;This step-by-step guide shows how to fine-tune DistilBERT for emotion classification.&quot;
+out = clf(source, candidate_labels=categories)
+print(dict(zip(out[&quot;labels&quot;], [round(s, 3) for s in out[&quot;scores&quot;]])))</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Competition score: average of 3 topics over the 100-point rubric</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 4. Competition score: average of 3 topics over the 100-point rubric
+rubric = {&quot;report_quality&quot;: 20, &quot;source_coverage&quot;: 15, &quot;entity_extraction&quot;: 10,
+          &quot;source_classification&quot;: 10, &quot;illustrations&quot;: 10, &quot;speed&quot;: 10,
+          &quot;cost_efficiency&quot;: 5, &quot;error_handling&quot;: 5, &quot;innovation&quot;: 15}
+
+def score_report(earned_fraction: dict) -&gt; float:
+    return sum(rubric[k] * earned_fraction.get(k, 0.0) for k in rubric)
+
+topic_scores = [score_report({k: f for k in rubric}) for f in (0.75, 0.8, 0.9)]
+print(&quot;per topic:&quot;, topic_scores, &quot;average:&quot;, round(sum(topic_scores) / 3, 1))</code></pre><div class="out"></div></div></div>
+</aside></div><div class="sim-overlay" id="sim-overlay" role="dialog" aria-modal="true">
+  <div class="sim-window"><div class="sim-head"><div><div class="sim-kind" id="sim-kind"></div><h3 id="sim-title"></h3></div><span class="spacer"></span><button class="btn-xs" id="sim-close">✕ Close (Esc)</button></div><div class="sim-body" id="sim-body"></div></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script>document.addEventListener('DOMContentLoaded',()=>{if(window.hljs)hljs.highlightAll();if(window.renderMathInElement)renderMathInElement(document.body,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});});</script>
+<script src="../assets/js/sims/core.js"></script>
+<script src="../assets/js/sims/matrix-multiply.js"></script><script src="../assets/js/sims/vectors.js"></script><script src="../assets/js/sims/attention.js"></script><script src="../assets/js/sims/tokenizer.js"></script><script src="../assets/js/sims/positional.js"></script><script src="../assets/js/sims/classifier.js"></script><script src="../assets/js/sims/bio-tagging.js"></script><script src="../assets/js/sims/rag.js"></script><script src="../assets/js/sims/langgraph.js"></script><script src="../assets/js/sims/sampling.js"></script><script src="../assets/js/sims/moe.js"></script><script src="../assets/js/sims/react-loop.js"></script><script src="../assets/js/sims/multi-agent.js"></script><script src="../assets/js/sims/mcp.js"></script><script src="../assets/js/sims/lam.js"></script><script src="../assets/js/sims/diffusion.js"></script>
+<script src="../assets/js/site.js"></script>
+</body></html>

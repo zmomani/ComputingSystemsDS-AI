@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 2: Text Classification · Computing Systems for DS & AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<link rel="stylesheet" href="../assets/css/site.css">
+</head>
+<body><header class="topbar">
+  <button class="btn-icon" id="menu-toggle" aria-label="Menu">☰</button>
+  <a class="brand" href="../index.html">606363 · Computing Systems for DS & AI<small>University of Petra</small></a>
+  <span class="spacer"></span>
+  <nav class="week-nav"><a class="btn-icon" href="week01-transformers.html" title="Transformer Architecture">← Wk 1</a><a class="btn-icon" href="week03-ner.html" title="Named Entity Recognition (NER)">Wk 3 →</a></nav>
+  <a class="btn-icon" href="../index.html#curriculum">Curriculum</a>
+  <a class="btn-icon" href="../index.html#simulations">Simulations</a>
+  <button class="btn-icon" id="theme-toggle" aria-label="Toggle dark mode">◐</button>
+</header><div class="layout"><aside class="sidebar">
+  <h4>Course</h4><ul class="outline"><li><a class="" href="../lessons/syllabus.html"><span class="wk">·</span><span>Course Syllabus</span></a></li><li><a class="" href="../lessons/project.html"><span class="wk">·</span><span>Final Project</span></a></li></ul>
+  <h4>16-week curriculum</h4><ul class="outline"><li><a class="" href="../lessons/week01-transformers.html"><span class="wk">01</span><span>Transformer Architecture</span></a></li><li><a class="active" href="../lessons/week02-text-classification.html"><span class="wk">02</span><span>Text Classification</span></a></li><li><a class="soon" href="../lessons/week03-ner.html"><span class="wk">03</span><span>Named Entity Recognition (NER)</span></a></li><li><a class="" href="../lessons/week04-langchain.html"><span class="wk">04</span><span>LangChain Fundamentals</span></a></li><li><a class="" href="../lessons/week05-langgraph.html"><span class="wk">05</span><span>LangGraph</span></a></li><li><a class="" href="../lessons/week06-llms.html"><span class="wk">06</span><span>Large Language Models (LLMs)</span></a></li><li><a class="" href="../lessons/week07-moe.html"><span class="wk">07</span><span>Mixture of Experts (MoE)</span></a></li><li><a class="" href="../lessons/week08-midterm.html"><span class="wk">08</span><span>Midterm Exam</span></a></li><li><a class="" href="../lessons/week09-react-agents.html"><span class="wk">09</span><span>AI Agents &amp; ReAct</span></a></li><li><a class="" href="../lessons/week10-multi-agent.html"><span class="wk">10</span><span>Multi-Agent Systems</span></a></li><li><a class="" href="../lessons/week11-mcp.html"><span class="wk">11</span><span>Model Context Protocol (MCP)</span></a></li><li><a class="soon" href="../lessons/week12-lams.html"><span class="wk">12</span><span>Large Action Models (LAMs)</span></a></li><li><a class="" href="../lessons/week13-diffusion.html"><span class="wk">13</span><span>Diffusion Models</span></a></li><li><a class="" href="../lessons/week14-project.html"><span class="wk">14</span><span>Project Development &amp; Final Testing</span></a></li><li><a class="" href="../lessons/week15-competition.html"><span class="wk">15</span><span>Competition Day &amp; Presentations</span></a></li><li><a class="" href="../lessons/week16-final.html"><span class="wk">16</span><span>Final Exam</span></a></li></ul>
+  <h4>On this page</h4><ul class="toc" id="toc"></ul>
+</aside><main class="main">
+  <div class="lesson-head"><div class="eyebrow">Week 2 · ILO K1, P1</div><h1>Text Classification</h1>
+  <p class="credit"><b>Topics:</b> Text classification, sentiment analysis, feature extraction vs. fine-tuning, evaluation metrics<br><b>Project milestone:</b> Classification Agent that labels sources by type and relevance; evaluate on 20+ sources</p></div>
+  <div class="callout sim"><div class="sim-strip"><b style="margin-right:4px">Simulations for this week:</b><button class="chip" data-sim="classifier">▶ Decision boundary, threshold &amp; F1</button><button class="chip" data-sim="tokenizer">▶ Subword tokenisation</button><button class="chip" data-sim="vectors">▶ Vectors, dot product &amp; cosine similarity</button></div></div>
+  <blockquote>
+<p><em>Build Your First NLP Model.</em> Level: Beginner NLP · Estimated time: ~60 minutes · Stack: Hugging Face, PyTorch, Transformers, scikit-learn. Material by Dr. Abedal-Kareem Al-Banna (ilmy / albanna-tutorials.com), following the approach of Tunstall, von Werra &amp; Wolf, <em>NLP with Transformers</em>, Chapter 2.</p>
+<p><strong>Extraction note:</strong> The source page was read through a fetch tool that paraphrases rather than copies text. Prose is a close paraphrase of Dr. Albanna's wording; the 36 code blocks are reconstructed from exact line-by-line descriptions (same checkpoint names, variable names, arguments and values). The original page does not tag code fences with a language; all are Python.</p>
+</blockquote>
+<h2 id="what-youll-learn">What You'll Learn</h2>
+<p>By the end of this tutorial you will be able to:</p>
+<ul>
+<li>Load and explore datasets from the Hugging Face Hub</li>
+<li>Tokenize and prepare text for a transformer</li>
+<li>Extract features from pre-trained models</li>
+<li>Build a simple baseline classifier</li>
+<li>Fine-tune a transformer model</li>
+<li>Deploy your model to the Hugging Face Hub</li>
+</ul>
+<p><strong>Goal:</strong> a working <strong>emotion classification model</strong> that identifies the emotion expressed in a piece of text.</p>
+<p><strong>Prerequisites:</strong> no prior knowledge of transformers is needed; basic Python and machine-learning familiarity helps.</p>
+<h2 id="1-what-are-transformers">1. What are Transformers?</h2>
+<p>Transformers are neural network architectures that changed NLP by using <strong>attention</strong>. Attention lets a model weigh the context of each word far more effectively than earlier approaches.</p>
+<p><strong>Key features</strong></p>
+<ul>
+<li><strong>Attention mechanism:</strong> the model focuses on the most relevant parts of the input.</li>
+<li><strong>Pre-training and fine-tuning:</strong> the model first learns general language, then adapts to a specific task.</li>
+<li><strong>Parallelization:</strong> the whole sequence is processed at once, unlike RNNs which go step by step.</li>
+<li><strong>Transfer learning:</strong> knowledge learned from huge datasets carries over to your specific task.</li>
+</ul>
+<p><strong>Popular transformer models</strong></p>
+<ul>
+<li><strong>BERT</strong> — Bidirectional Encoder Representations from Transformers</li>
+<li><strong>DistilBERT</strong> — a lighter, faster BERT variant with similar performance</li>
+<li><strong>RoBERTa</strong> — a BERT variant with an optimized training recipe</li>
+<li><strong>GPT models</strong> — Generative Pre-trained Transformers</li>
+</ul>
+<h3 id="setting-up-your-environment">Setting up your environment</h3>
+<p>Required tools: Python 3.8+, PyTorch, the Hugging Face libraries, and scikit-learn for evaluation.</p>
+<div class="highlight"><pre><span></span><code><span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">transformers</span><span class="p">[</span><span class="n">torch</span><span class="p">]</span>
+<span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">datasets</span>
+<span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">scikit</span><span class="o">-</span><span class="n">learn</span>
+<span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">huggingface_hub</span>
+<span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">pandas</span>
+<span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">matplotlib</span>
+<span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">torch</span>
+</code></pre></div>
+<blockquote>
+<p><strong>Tip:</strong> If installation fails, consult the library's installation guide. Google Colab is a good option because most of these libraries are pre-installed.</p>
+</blockquote>
+<h3 id="mini-challenge-verify-your-setup">Mini-challenge: verify your setup</h3>
+<p>Import <code>torch</code>, <code>transformers</code> and <code>datasets</code> and print each version to confirm everything imports successfully.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">transformers</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datasets</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"PyTorch version: </span><span class="si">{</span><span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Transformers version: </span><span class="si">{</span><span class="n">transformers</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Datasets version: </span><span class="si">{</span><span class="n">datasets</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="2-loading-and-exploring-the-dataset">2. Loading and Exploring the Dataset</h2>
+<p>The Hugging Face <strong>Datasets</strong> library gives easy access to many public datasets. This tutorial uses the <strong>emotion</strong> dataset (<code>dair-ai/emotion</code>): English tweets labeled with one of six emotions.</p>
+<h3 id="loading-the-dataset">Loading the dataset</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dataset</span>
+
+<span class="n">emotions</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">"dair-ai/emotion"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">emotions</span><span class="p">)</span>
+</code></pre></div>
+<p>The dataset has <strong>train</strong>, <strong>validation</strong> and <strong>test</strong> splits. Each example has a <code>text</code> field and an integer <code>label</code> from 0 to 5.</p>
+<h3 id="examining-dataset-structure">Examining dataset structure</h3>
+<div class="highlight"><pre><span></span><code><span class="n">emotions</span><span class="p">[</span><span class="s2">"train"</span><span class="p">]</span><span class="o">.</span><span class="n">features</span>
+<span class="n">emotions</span><span class="p">[</span><span class="s2">"train"</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span>
+<span class="n">emotions</span><span class="p">[</span><span class="s2">"train"</span><span class="p">][</span><span class="s2">"text"</span><span class="p">][:</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">emotions</span><span class="p">[</span><span class="s2">"train"</span><span class="p">][</span><span class="s2">"label"</span><span class="p">][:</span><span class="mi">2</span><span class="p">]</span>
+</code></pre></div>
+<p>Label names, in order: <strong>sadness (0), joy (1), love (2), anger (3), fear (4), surprise (5)</strong>.</p>
+<h3 id="converting-to-pandas">Converting to pandas</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="n">emotions</span><span class="o">.</span><span class="n">set_format</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">"pandas"</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">emotions</span><span class="p">[</span><span class="s2">"train"</span><span class="p">][:]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">convert_label_int_2_string</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">emotions</span><span class="p">[</span><span class="s2">"train"</span><span class="p">]</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s2">"label"</span><span class="p">]</span><span class="o">.</span><span class="n">int2str</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+<span class="n">df</span><span class="p">[</span><span class="s2">"label_name"</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">"label"</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">convert_label_int_2_string</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div>
+<h3 id="visualizing-the-data">Visualizing the data</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="n">df</span><span class="p">[</span><span class="s2">"label_name"</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">ascending</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">barh</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Distribution of Emotions in Dataset"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Count"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Emotion"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div>
+<p>This chart reveals the class distribution and any <strong>class imbalance</strong> (joy and sadness dominate; surprise and love are rare).</p>
+<h3 id="mini-challenge-class-percentages">Mini-challenge: class percentages</h3>
+<p>Compute the percentage of each emotion in the training set and identify the most and least common emotions. This tells you whether the model will need class-imbalance handling.</p>
+<div class="highlight"><pre><span></span><code><span class="n">percentages</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">"label_name"</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">percentages</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="3-tokenization-and-data-preparation">3. Tokenization and Data Preparation</h2>
+<p><strong>Tokenization</strong> splits text into tokens and maps each token to a numeric ID so the model can process it.</p>
+<h3 id="what-is-tokenization-character-level-example">What is tokenization? (character-level example)</h3>
+<div class="highlight"><pre><span></span><code><span class="n">text</span> <span class="o">=</span> <span class="s2">"My name is kareem"</span>
+<span class="n">tokenized_text</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">tokenized_text</span><span class="p">)</span>
+
+<span class="n">token2index</span> <span class="o">=</span> <span class="p">{</span><span class="n">ch</span><span class="p">:</span> <span class="n">idx</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">ch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">tokenized_text</span><span class="p">)))}</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">token2index</span><span class="p">)</span>
+<span class="c1"># {' ': 0, 'M': 1, ... 's': 15}</span>
+</code></pre></div>
+<p>Production systems use <strong>subword</strong> tokenization methods such as WordPiece (BERT), BPE (GPT) or SentencePiece.</p>
+<h3 id="using-hugging-face-tokenizers">Using Hugging Face tokenizers</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoTokenizer</span>
+
+<span class="n">model_ckp</span> <span class="o">=</span> <span class="s2">"distilbert-base-uncased"</span>
+<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_ckp</span><span class="p">)</span>
+
+<span class="n">text</span> <span class="o">=</span> <span class="s2">"My name is kareem"</span>
+<span class="n">encoded_text</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">encoded_text</span><span class="p">)</span>
+
+<span class="n">tokens</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">convert_ids_to_tokens</span><span class="p">(</span><span class="n">encoded_text</span><span class="o">.</span><span class="n">input_ids</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">convert_tokens_to_string</span><span class="p">(</span><span class="n">tokens</span><span class="p">))</span>
+</code></pre></div>
+<h3 id="tokenizer-properties">Tokenizer properties</h3>
+<div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">vocab_size</span><span class="p">)</span>          <span class="c1"># vocabulary size</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">model_input_names</span><span class="p">)</span>   <span class="c1"># inputs the model expects</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">model_max_length</span><span class="p">)</span>    <span class="c1"># maximum sequence length</span>
+</code></pre></div>
+<p>The tokenizer output contains <code>input_ids</code> (token IDs), <code>attention_mask</code> (which tokens to attend to), and special tokens such as <code>[CLS]</code> and <code>[SEP]</code>.</p>
+<h3 id="tokenizing-the-entire-dataset">Tokenizing the entire dataset</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">tokenize</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s2">"text"</span><span class="p">],</span> <span class="n">padding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">truncation</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">emotion_encoded</span> <span class="o">=</span> <span class="n">emotions</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">tokenize</span><span class="p">,</span> <span class="n">batched</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">emotion_encoded</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+</code></pre></div>
+<ul>
+<li><code>padding=True</code> pads to the longest sequence in the batch (<code>padding="max_length"</code> pads to the model's max length instead). Padding adds special tokens so sequences in a batch have equal length.</li>
+<li><code>truncation=True</code> shortens sequences that exceed the model's maximum length. This prevents errors but may cut information.</li>
+<li><code>batched=True</code> processes the data in batches; <code>batch_size=None</code> treats the whole split as one batch.</li>
+<li>New columns <code>input_ids</code> and <code>attention_mask</code> are added alongside the originals.</li>
+</ul>
+<h3 id="mini-challenge-tokenize-a-custom-sentence">Mini-challenge: tokenize a custom sentence</h3>
+<p>Tokenize <em>"I am feeling both happy and sad at the same time."</em>, print the IDs and tokens, and identify which words split into subword pieces. This is a useful debugging skill.</p>
+<div class="highlight"><pre><span></span><code><span class="n">sentence</span> <span class="o">=</span> <span class="s2">"I am feeling both happy and sad at the same time."</span>
+<span class="n">encoded</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">sentence</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">encoded</span><span class="o">.</span><span class="n">input_ids</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">convert_ids_to_tokens</span><span class="p">(</span><span class="n">encoded</span><span class="o">.</span><span class="n">input_ids</span><span class="p">))</span>
+</code></pre></div>
+<h2 id="4-feature-extraction-from-pre-trained-models">4. Feature Extraction from Pre-trained Models</h2>
+<p>Instead of fine-tuning, you can use a pre-trained model as a <strong>frozen feature extractor</strong> and train a simpler classifier on its outputs. This is faster and less resource-intensive.</p>
+<h3 id="loading-the-pre-trained-model">Loading the pre-trained model</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoModel</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+
+<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">"cuda"</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">"cpu"</span><span class="p">)</span>
+<span class="n">model_chk</span> <span class="o">=</span> <span class="s2">"distilbert-base-uncased"</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">AutoModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_chk</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>   <span class="c1"># base model, no classification head</span>
+</code></pre></div>
+<p><strong>Hidden states.</strong> The model produces a contextual vector (hidden state) for every token. The final layer carries the most task-relevant information. The first token, <code>[CLS]</code>, is often used as a summary of the whole sentence, so we take its final-layer representation.</p>
+<h3 id="feature-extraction-function">Feature extraction function</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">extract_hidden_states</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
+    <span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">batch</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">model_input_names</span><span class="p">}</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="n">last_hidden_state</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">inputs</span><span class="p">)</span><span class="o">.</span><span class="n">last_hidden_state</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"hidden_state"</span><span class="p">:</span> <span class="n">last_hidden_state</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()}</span>
+</code></pre></div>
+<h3 id="processing-the-dataset">Processing the dataset</h3>
+<div class="highlight"><pre><span></span><code><span class="n">emotion_encoded</span><span class="o">.</span><span class="n">set_format</span><span class="p">(</span><span class="s2">"torch"</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"input_ids"</span><span class="p">,</span> <span class="s2">"attention_mask"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">])</span>
+<span class="n">emotions_hidden</span> <span class="o">=</span> <span class="n">emotion_encoded</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">extract_hidden_states</span><span class="p">,</span> <span class="n">batched</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">X_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">emotions_hidden</span><span class="p">[</span><span class="s2">"train"</span><span class="p">][</span><span class="s2">"hidden_state"</span><span class="p">])</span>
+<span class="n">X_valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">emotions_hidden</span><span class="p">[</span><span class="s2">"validation"</span><span class="p">][</span><span class="s2">"hidden_state"</span><span class="p">])</span>
+<span class="n">y_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">emotions_hidden</span><span class="p">[</span><span class="s2">"train"</span><span class="p">][</span><span class="s2">"label"</span><span class="p">])</span>
+<span class="n">y_valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">emotions_hidden</span><span class="p">[</span><span class="s2">"validation"</span><span class="p">][</span><span class="s2">"label"</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Training features shape: </span><span class="si">{</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Validation features shape: </span><span class="si">{</span><span class="n">X_valid</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>Benefits:</strong> faster than fine-tuning, less compute, still uses pre-trained knowledge, works well on small datasets.
+<strong>Limitations:</strong> features are not tuned to the task, may miss task-specific nuances, and the performance ceiling is usually lower than fine-tuning.</p>
+<h3 id="mini-challenge-inspect-the-features">Mini-challenge: inspect the features</h3>
+<div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Feature vector size: </span><span class="si">{</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="n">labels</span> <span class="o">=</span> <span class="n">emotions</span><span class="p">[</span><span class="s2">"train"</span><span class="p">]</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s2">"label"</span><span class="p">]</span><span class="o">.</span><span class="n">names</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">emotion</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
+    <span class="n">mean_vec</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">[</span><span class="n">y_train</span> <span class="o">==</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">emotion</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">mean_vec</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span><span class="si">}</span><span class="s2"> ..."</span><span class="p">)</span>
+
+<span class="c1"># Optional visualization</span>
+<span class="c1"># !pip install umap-learn</span>
+<span class="c1"># import umap</span>
+<span class="c1"># reducer = umap.UMAP()</span>
+<span class="c1"># X_2d = reducer.fit_transform(X_train)</span>
+<span class="c1"># plt.scatter(X_2d[:, 0], X_2d[:, 1], c=y_train, cmap="viridis", s=2)</span>
+<span class="c1"># plt.colorbar()</span>
+<span class="c1"># plt.show()</span>
+</code></pre></div>
+<p>The visualization shows whether the <code>[CLS]</code> features already separate the emotions.</p>
+<h2 id="5-creating-a-baseline-model-with-logistic-regression">5. Creating a Baseline Model with Logistic Regression</h2>
+<p>Always set a performance benchmark before fine-tuning.</p>
+<h3 id="dummy-classifier">Dummy classifier</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.dummy</span><span class="w"> </span><span class="kn">import</span> <span class="n">DummyClassifier</span>
+
+<span class="n">dummy_clf</span> <span class="o">=</span> <span class="n">DummyClassifier</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s2">"most_frequent"</span><span class="p">)</span>
+<span class="n">dummy_clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">dummy_score</span> <span class="o">=</span> <span class="n">dummy_clf</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Dummy classifier accuracy: </span><span class="si">{</span><span class="n">dummy_score</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="logistic-regression">Logistic regression</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogisticRegression</span>
+
+<span class="n">lr_clf</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">max_iter</span><span class="o">=</span><span class="mi">3000</span><span class="p">)</span>
+<span class="n">lr_clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">lr_score</span> <span class="o">=</span> <span class="n">lr_clf</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Logistic regression accuracy: </span><span class="si">{</span><span class="n">lr_score</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Improvement over dummy: </span><span class="si">{</span><span class="n">lr_score</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">dummy_score</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="confusion-matrix">Confusion matrix</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfusionMatrixDisplay</span><span class="p">,</span> <span class="n">confusion_matrix</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_confusion_matrix</span><span class="p">(</span><span class="n">y_preds</span><span class="p">,</span> <span class="n">y_true</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
+    <span class="n">cm</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_preds</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="s2">"true"</span><span class="p">)</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+    <span class="n">disp</span> <span class="o">=</span> <span class="n">ConfusionMatrixDisplay</span><span class="p">(</span><span class="n">confusion_matrix</span><span class="o">=</span><span class="n">cm</span><span class="p">,</span> <span class="n">display_labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+    <span class="n">disp</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="s2">"Blues"</span><span class="p">,</span> <span class="n">values_format</span><span class="o">=</span><span class="s2">".2f"</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">colorbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Normalized confusion matrix"</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">y_preds</span> <span class="o">=</span> <span class="n">lr_clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_valid</span><span class="p">)</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="n">emotions</span><span class="p">[</span><span class="s2">"train"</span><span class="p">]</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s2">"label"</span><span class="p">]</span><span class="o">.</span><span class="n">names</span>
+<span class="n">plot_confusion_matrix</span><span class="p">(</span><span class="n">y_preds</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+</code></pre></div>
+<p>The matrix shows which emotions are confused with one another.</p>
+<h3 id="additional-metrics">Additional metrics</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">classification_report</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">classification_report</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">y_preds</span><span class="p">,</span> <span class="n">target_names</span><span class="o">=</span><span class="n">labels</span><span class="p">))</span>
+</code></pre></div>
+<p><strong>Why build a baseline?</strong> It sets minimum expectations, is quick to build, reveals which classes are easy or hard, and gives a reference point. A suspiciously strong baseline may indicate dataset issues; similar scores across models point to feature limits; class imbalance usually shows up here.</p>
+<h3 id="mini-challenge-random-forest">Mini-challenge: random forest</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.ensemble</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomForestClassifier</span>
+
+<span class="n">rf_clf</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">rf_clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">rf_score</span> <span class="o">=</span> <span class="n">rf_clf</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Random forest accuracy: </span><span class="si">{</span><span class="n">rf_score</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">  (logistic regression: </span><span class="si">{</span><span class="n">lr_score</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+
+<span class="n">rf_preds</span> <span class="o">=</span> <span class="n">rf_clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_valid</span><span class="p">)</span>
+<span class="n">rf_report</span> <span class="o">=</span> <span class="n">classification_report</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">rf_preds</span><span class="p">,</span> <span class="n">target_names</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">rf_report</span><span class="p">)</span>
+</code></pre></div>
+<p>Which emotions does the random forest predict better?</p>
+<h2 id="6-fine-tuning-a-transformer-model">6. Fine-tuning a Transformer Model</h2>
+<p>Fine-tuning updates <strong>all</strong> of the model's weights on the task, usually giving better results than frozen features.</p>
+<h3 id="loading-a-classification-model">Loading a classification model</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoModelForSequenceClassification</span>
+
+<span class="n">num_labels</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">model</span> <span class="o">=</span> <span class="p">(</span><span class="n">AutoModelForSequenceClassification</span>
+         <span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_chk</span><span class="p">,</span> <span class="n">num_labels</span><span class="o">=</span><span class="n">num_labels</span><span class="p">)</span>
+         <span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">))</span>
+</code></pre></div>
+<p>Same DistilBERT base as before, now with a randomly initialized classification head on top.</p>
+<h3 id="evaluation-metrics">Evaluation metrics</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">accuracy_score</span><span class="p">,</span> <span class="n">f1_score</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_metrics</span><span class="p">(</span><span class="n">pred</span><span class="p">):</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">pred</span><span class="o">.</span><span class="n">label_ids</span>
+    <span class="n">preds</span> <span class="o">=</span> <span class="n">pred</span><span class="o">.</span><span class="n">predictions</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">f1</span> <span class="o">=</span> <span class="n">f1_score</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">preds</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s2">"weighted"</span><span class="p">)</span>
+    <span class="n">acc</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">preds</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"accuracy"</span><span class="p">:</span> <span class="n">acc</span><span class="p">,</span> <span class="s2">"f1"</span><span class="p">:</span> <span class="n">f1</span><span class="p">}</span>
+</code></pre></div>
+<h3 id="setting-up-the-trainer">Setting up the Trainer</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trainer</span><span class="p">,</span> <span class="n">TrainingArguments</span>
+
+<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">64</span>
+<span class="n">logging_steps</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">emotion_encoded</span><span class="p">[</span><span class="s2">"train"</span><span class="p">])</span> <span class="o">//</span> <span class="n">batch_size</span>
+<span class="n">model_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">model_chk</span><span class="si">}</span><span class="s2">-finetuned-emotion"</span>
+
+<span class="n">training_args</span> <span class="o">=</span> <span class="n">TrainingArguments</span><span class="p">(</span>
+    <span class="n">output_dir</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span>
+    <span class="n">num_train_epochs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">learning_rate</span><span class="o">=</span><span class="mf">2e-5</span><span class="p">,</span>
+    <span class="n">per_device_train_batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+    <span class="n">per_device_eval_batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+    <span class="n">weight_decay</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+    <span class="n">evaluation_strategy</span><span class="o">=</span><span class="s2">"epoch"</span><span class="p">,</span>
+    <span class="n">disable_tqdm</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">logging_steps</span><span class="o">=</span><span class="n">logging_steps</span><span class="p">,</span>
+    <span class="n">push_to_hub</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">log_level</span><span class="o">=</span><span class="s2">"error"</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">trainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+    <span class="n">args</span><span class="o">=</span><span class="n">training_args</span><span class="p">,</span>
+    <span class="n">compute_metrics</span><span class="o">=</span><span class="n">compute_metrics</span><span class="p">,</span>
+    <span class="n">train_dataset</span><span class="o">=</span><span class="n">emotion_encoded</span><span class="p">[</span><span class="s2">"train"</span><span class="p">],</span>
+    <span class="n">eval_dataset</span><span class="o">=</span><span class="n">emotion_encoded</span><span class="p">[</span><span class="s2">"validation"</span><span class="p">],</span>
+    <span class="n">tokenizer</span><span class="o">=</span><span class="n">tokenizer</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>output_dir</code></td>
+<td>Where checkpoints and logs are saved</td>
+</tr>
+<tr>
+<td><code>num_train_epochs</code></td>
+<td>Number of passes over the training data</td>
+</tr>
+<tr>
+<td><code>learning_rate</code></td>
+<td>Step size for the optimizer (2e-5 is a common choice for BERT-style models)</td>
+</tr>
+<tr>
+<td><code>per_device_train_batch_size</code></td>
+<td>Examples per device per step</td>
+</tr>
+<tr>
+<td><code>weight_decay</code></td>
+<td>L2 regularization strength</td>
+</tr>
+<tr>
+<td><code>evaluation_strategy</code></td>
+<td>When to evaluate: <code>"epoch"</code> or <code>"steps"</code></td>
+</tr>
+<tr>
+<td><code>push_to_hub</code></td>
+<td>Upload the model to the Hugging Face Hub during training</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Version note:</strong> In recent Transformers releases <code>evaluation_strategy</code> was renamed <code>eval_strategy</code> and <code>Trainer(tokenizer=...)</code> became <code>processing_class=...</code>. <code>push_to_hub=True</code> requires that you are logged in.</p>
+</blockquote>
+<h3 id="training-the-model">Training the model</h3>
+<div class="highlight"><pre><span></span><code><span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+</code></pre></div>
+<p>Training runs for the configured epochs, reports metrics after each epoch, saves checkpoints and shows a progress bar.</p>
+<h3 id="mini-challenge-tuning-experiments">Mini-challenge: tuning experiments</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># 1. Try a different learning rate</span>
+<span class="n">training_args</span><span class="o">.</span><span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">5e-5</span>
+
+<span class="c1"># 2. Try a different scheduler</span>
+<span class="n">training_args</span><span class="o">.</span><span class="n">lr_scheduler_type</span> <span class="o">=</span> <span class="s2">"cosine"</span>
+
+<span class="c1"># 3. More epochs with early stopping</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarlyStoppingCallback</span>
+<span class="n">training_args</span><span class="o">.</span><span class="n">num_train_epochs</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">training_args</span><span class="o">.</span><span class="n">load_best_model_at_end</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">trainer</span><span class="o">.</span><span class="n">add_callback</span><span class="p">(</span><span class="n">EarlyStoppingCallback</span><span class="p">(</span><span class="n">early_stopping_patience</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+</code></pre></div>
+<h2 id="7-evaluating-model-performance">7. Evaluating Model Performance</h2>
+<h3 id="evaluating-on-the-validation-set">Evaluating on the validation set</h3>
+<div class="highlight"><pre><span></span><code><span class="n">validation_results</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">evaluate</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Validation accuracy: </span><span class="si">{</span><span class="n">validation_results</span><span class="p">[</span><span class="s1">'eval_accuracy'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Validation F1: </span><span class="si">{</span><span class="n">validation_results</span><span class="p">[</span><span class="s1">'eval_f1'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Improvement over logistic regression: </span><span class="si">{</span><span class="n">validation_results</span><span class="p">[</span><span class="s1">'eval_accuracy'</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">lr_score</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="confusion-matrix_1">Confusion matrix</h3>
+<div class="highlight"><pre><span></span><code><span class="n">preds_output</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">emotion_encoded</span><span class="p">[</span><span class="s2">"validation"</span><span class="p">])</span>
+<span class="n">y_preds</span> <span class="o">=</span> <span class="n">preds_output</span><span class="o">.</span><span class="n">predictions</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">y_valid</span> <span class="o">=</span> <span class="n">preds_output</span><span class="o">.</span><span class="n">label_ids</span>
+<span class="n">plot_confusion_matrix</span><span class="p">(</span><span class="n">y_preds</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="detailed-classification-report">Detailed classification report</h3>
+<div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="n">classification_report</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">y_preds</span><span class="p">,</span> <span class="n">target_names</span><span class="o">=</span><span class="n">labels</span><span class="p">))</span>
+</code></pre></div>
+<p>Look for classes with low precision or recall.</p>
+<h3 id="error-analysis">Error analysis</h3>
+<div class="highlight"><pre><span></span><code><span class="n">validation_texts</span> <span class="o">=</span> <span class="n">emotions</span><span class="p">[</span><span class="s2">"validation"</span><span class="p">][</span><span class="s2">"text"</span><span class="p">]</span>
+<span class="n">validation_labels</span> <span class="o">=</span> <span class="n">emotions</span><span class="p">[</span><span class="s2">"validation"</span><span class="p">][</span><span class="s2">"label"</span><span class="p">]</span>
+
+<span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">true</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">y_preds</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">)):</span>
+    <span class="k">if</span> <span class="n">pred</span> <span class="o">!=</span> <span class="n">true</span><span class="p">:</span>
+        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s2">"text"</span><span class="p">:</span> <span class="n">validation_texts</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+            <span class="s2">"true"</span><span class="p">:</span> <span class="n">labels</span><span class="p">[</span><span class="n">true</span><span class="p">],</span>
+            <span class="s2">"predicted"</span><span class="p">:</span> <span class="n">labels</span><span class="p">[</span><span class="n">pred</span><span class="p">],</span>
+        <span class="p">})</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">err</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">errors</span><span class="p">[:</span><span class="mi">5</span><span class="p">]):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">. Text: </span><span class="si">{</span><span class="n">err</span><span class="p">[</span><span class="s1">'text'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   True: </span><span class="si">{</span><span class="n">err</span><span class="p">[</span><span class="s1">'true'</span><span class="p">]</span><span class="si">}</span><span class="s2">, Predicted: </span><span class="si">{</span><span class="n">err</span><span class="p">[</span><span class="s1">'predicted'</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>Metric definitions:</strong> accuracy = fraction correct; precision = of predicted positives, how many are right; recall = of true positives, how many were found; F1 = harmonic mean of precision and recall.</p>
+<p><strong>Common error patterns:</strong> confusion between similar emotions (love vs joy), ambiguous text expressing several emotions, sarcasm and figurative language, cultural or contextual references.</p>
+<h3 id="mini-challenge-predict-on-custom-text">Mini-challenge: predict on custom text</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">predict_emotion</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="n">inputs</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">"pt"</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">inputs</span><span class="p">)</span>
+    <span class="n">probs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">outputs</span><span class="o">.</span><span class="n">logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">predicted_class</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+    <span class="n">confidence</span> <span class="o">=</span> <span class="n">probs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">predicted_class</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"emotion"</span><span class="p">:</span> <span class="n">labels</span><span class="p">[</span><span class="n">predicted_class</span><span class="p">],</span>
+        <span class="s2">"confidence"</span><span class="p">:</span> <span class="n">confidence</span><span class="p">,</span>
+        <span class="s2">"all_probs"</span><span class="p">:</span> <span class="p">{</span><span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span> <span class="n">probs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">))},</span>
+    <span class="p">}</span>
+
+<span class="n">test_texts</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">"I can't believe I aced my exam!"</span><span class="p">,</span>
+    <span class="s2">"I miss my family so much right now."</span><span class="p">,</span>
+    <span class="s2">"That driver just cut me off! So rude!"</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">test_texts</span><span class="p">:</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">predict_emotion</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Text: </span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Predicted: </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'emotion'</span><span class="p">]</span><span class="si">}</span><span class="s2"> (confidence: </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'confidence'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"All probabilities: </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'all_probs'</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="8-deploying-the-model-to-hugging-face-hub">8. Deploying the Model to Hugging Face Hub</h2>
+<h3 id="setting-up-your-hugging-face-account">Setting up your Hugging Face account</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">huggingface_hub</span><span class="w"> </span><span class="kn">import</span> <span class="n">notebook_login</span>
+<span class="n">notebook_login</span><span class="p">()</span>
+</code></pre></div>
+<p>Create an access token at https://huggingface.co/settings/tokens. In a script (not a notebook) use <code>huggingface-cli login</code> in the terminal instead.</p>
+<h3 id="pushing-the-model-to-the-hub">Pushing the model to the Hub</h3>
+<div class="highlight"><pre><span></span><code><span class="n">trainer</span><span class="o">.</span><span class="n">push_to_hub</span><span class="p">(</span><span class="n">commit_message</span><span class="o">=</span><span class="s2">"Training completed!"</span><span class="p">)</span>
+</code></pre></div>
+<p>This uploads the model weights, tokenizer configuration, model configuration and a README model card. The model appears at <code>https://huggingface.co/YOUR_USERNAME/distilbert-base-uncased-finetuned-emotion</code>.</p>
+<h3 id="creating-a-model-card">Creating a model card</h3>
+<div class="highlight"><pre><span></span><code><span class="n">model_card</span> <span class="o">=</span> <span class="s2">"""</span>
+<span class="s2"># Emotion Classification Model</span>
+
+<span class="s2">This model classifies text into six emotions: sadness, joy, love, anger, fear, and surprise.</span>
+
+<span class="s2">## Model Description</span>
+<span class="s2">- Architecture: DistilBERT (distilbert-base-uncased)</span>
+<span class="s2">- Fine-tuned on the DAIR.AI Emotion dataset</span>
+<span class="s2">- Training accuracy: </span><span class="si">{train_acc:.4f}</span>
+<span class="s2">- Validation accuracy: </span><span class="si">{val_acc:.4f}</span>
+<span class="s2">- F1 score: </span><span class="si">{f1:.4f}</span>
+
+<span class="s2">## Intended Usage</span>
+<span class="s2">Sentiment analysis and emotion detection in English text.</span>
+
+<span class="s2">## Limitations</span>
+<span class="s2">- English only</span>
+<span class="s2">- May struggle with sarcasm and ambiguous emotions</span>
+<span class="s2">- May underperform on very short texts</span>
+
+<span class="s2">## Training Procedure</span>
+<span class="s2">- 2 epochs</span>
+<span class="s2">- Learning rate: 2e-5</span>
+<span class="s2">- Batch size: 64</span>
+<span class="s2">"""</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">train_acc</span><span class="o">=</span><span class="mf">0.92</span><span class="p">,</span>   <span class="c1"># replace with your actual training accuracy</span>
+    <span class="n">val_acc</span><span class="o">=</span><span class="n">validation_results</span><span class="p">[</span><span class="s2">"eval_accuracy"</span><span class="p">],</span>
+    <span class="n">f1</span><span class="o">=</span><span class="n">validation_results</span><span class="p">[</span><span class="s2">"eval_f1"</span><span class="p">],</span>
+<span class="p">)</span>
+
+<span class="c1"># trainer.push_to_hub(commit_message="Update model card", model_card=model_card)</span>
+</code></pre></div>
+<blockquote>
+<p>Note: the template hard-codes <code>train_acc=0.92</code>; replace it with the value you actually measured.</p>
+</blockquote>
+<h3 id="using-your-model">Using your model</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">pipeline</span>
+
+<span class="n">model_name</span> <span class="o">=</span> <span class="s2">"YOUR_USERNAME/distilbert-base-uncased-finetuned-emotion"</span>   <span class="c1"># replace YOUR_USERNAME</span>
+<span class="n">classifier</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="s2">"text-classification"</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model_name</span><span class="p">)</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">classifier</span><span class="p">(</span><span class="s2">"I'm so excited to see this working!"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>   <span class="c1"># e.g. [{'label': 'joy', 'score': 0.9874}]</span>
+</code></pre></div>
+<p><strong>Hub benefits:</strong> easy sharing, version control, automatic model cards, browser inference widgets, community discussions, download statistics, Spaces for demos, and framework integrations.</p>
+<h3 id="mini-challenge-optional-gradio-demo">Mini-challenge (optional): Gradio demo</h3>
+<div class="highlight"><pre><span></span><code><span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">gradio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gradio</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gr</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">classifier</span><span class="p">(</span><span class="n">text</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">result</span><span class="p">[</span><span class="s2">"label"</span><span class="p">]:</span> <span class="n">result</span><span class="p">[</span><span class="s2">"score"</span><span class="p">]}</span>
+
+<span class="n">demo</span> <span class="o">=</span> <span class="n">gr</span><span class="o">.</span><span class="n">Interface</span><span class="p">(</span>
+    <span class="n">fn</span><span class="o">=</span><span class="n">predict</span><span class="p">,</span>
+    <span class="n">inputs</span><span class="o">=</span><span class="n">gr</span><span class="o">.</span><span class="n">Textbox</span><span class="p">(</span><span class="n">placeholder</span><span class="o">=</span><span class="s2">"Enter text here..."</span><span class="p">),</span>
+    <span class="n">outputs</span><span class="o">=</span><span class="n">gr</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">num_top_classes</span><span class="o">=</span><span class="mi">6</span><span class="p">),</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">"Emotion Classifier"</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">"Classifies text into six emotions: sadness, joy, love, anger, fear, surprise."</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">demo</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
+</code></pre></div>
+<p>The demo can be hosted permanently on Hugging Face Spaces.</p>
+<h2 id="9-next-steps-and-conclusion">9. Next Steps and Conclusion</h2>
+<p><strong>What you learned:</strong> loading datasets, tokenizing, extracting features, building scikit-learn baselines, fine-tuning for classification, evaluating with metrics and plots, and deploying to the Hub.</p>
+<p><strong>Improving your model</strong></p>
+<ul>
+<li><strong>Different architectures:</strong> RoBERTa, BERT, or others</li>
+<li><strong>Hyperparameter tuning:</strong> grid or random search over learning rate, batch size, epochs</li>
+<li><strong>Data augmentation:</strong> synonym replacement, random insertion, swapping</li>
+<li><strong>Class imbalance:</strong> weighted loss, oversampling, synthetic examples</li>
+</ul>
+<p><strong>Advanced topics:</strong> prompt engineering, multi-task learning, few-shot learning, model distillation.</p>
+<p><strong>Project ideas:</strong> multi-label emotion detection, emotion-intensity prediction, a sentiment dashboard for social media or customer feedback, cross-lingual emotion detection.</p>
+<p><strong>Resources</strong></p>
+<ul>
+<li>Hugging Face Transformers docs: https://huggingface.co/docs/transformers/index</li>
+<li>Hugging Face Datasets docs: https://huggingface.co/docs/datasets/index</li>
+<li>scikit-learn docs: https://scikit-learn.org/stable/documentation.html</li>
+<li>Hugging Face NLP Course: https://huggingface.co/learn/nlp-course/chapter1/1</li>
+<li>DeepLearning.AI short courses: https://www.deeplearning.ai/short-courses/</li>
+<li>fast.ai: https://www.fast.ai/</li>
+<li>Hugging Face Forums: https://discuss.huggingface.co/</li>
+<li>r/MachineLearning: https://www.reddit.com/r/MachineLearning/</li>
+<li>Stack Overflow (huggingface-transformers tag): https://stackoverflow.com/questions/tagged/huggingface-transformers</li>
+</ul>
+<p>Congratulations on building your first text classification model. Back to course: https://albanna-tutorials.com/cs/index.html · All courses: https://albanna-tutorials.com/courses.html</p>
+  <div class="pager"><a href="week01-transformers.html"><small>Previous</small>Week 1: Transformer Architecture</a><a class="next" href="week03-ner.html"><small>Next</small>Week 3: Named Entity Recognition (NER)</a></div>
+  <footer style="margin-top:3rem;padding-top:1rem;border-top:1px solid var(--border);font-size:.84rem;color:var(--muted)">
+Course materials by <a href="https://albanna-tutorials.com/cs/">Dr. Abdulkarim Albanna</a> (University of Petra), adapted for the section taught by Dr. Zaid G. Momani. Interactive simulations and test code added for this site. Source on <a href="https://github.com/zmomani/ComputingSystemsDS-AI">GitHub</a>.
+</footer>
+</main><aside class="rail">
+  <div class="rail-tabs"><button class="active" data-panel="panel-sims">Simulations</button><button data-panel="panel-code">Test code</button></div>
+  <div class="rail-panel active" id="panel-sims"><p class="rail-intro">Interactive teaching aids for this week. Each opens full-size with step controls and teaching notes.</p><button class="sim-card" data-sim="classifier"><span class="sim-kind">Classification · simulation</span><span class="sim-title">Decision boundary, threshold &amp; F1</span><span class="sim-desc">Train a linear classifier live over 2-D embeddings; slide the threshold.</span></button><button class="sim-card" data-sim="tokenizer"><span class="sim-kind">Transformers · interactive</span><span class="sim-title">Subword tokenisation</span><span class="sim-desc">Type text, see WordPiece-style tokens, IDs and the embedding lookup.</span></button><button class="sim-card" data-sim="vectors"><span class="sim-kind">Linear algebra · interactive</span><span class="sim-title">Vectors, dot product &amp; cosine similarity</span><span class="sim-desc">Drag two vectors; see u+v, u·v, θ and cos θ — the geometry behind embeddings.</span></button></div>
+  <div class="rail-panel" id="panel-code"><p class="rail-intro"><b>Run ▶</b> executes pure-Python/NumPy snippets in your browser (Pyodide). Snippets marked <i>local</i> need the course environment (PyTorch, Transformers, LangChain…) — copy them into VS Code.</p><div class="snippet"><div class="snippet-head"><span>Dataset + tokenizer sanity check (no training)</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 1. Dataset + tokenizer sanity check (no training)
+from datasets import load_dataset
+from transformers import AutoTokenizer
+
+emotions = load_dataset(&quot;dair-ai/emotion&quot;)
+labels = emotions[&quot;train&quot;].features[&quot;label&quot;].names
+print(emotions)
+print(labels)
+
+tokenizer = AutoTokenizer.from_pretrained(&quot;distilbert-base-uncased&quot;)
+enc = tokenizer(&quot;I am feeling both happy and sad at the same time.&quot;)
+print(enc.input_ids)
+print(tokenizer.convert_ids_to_tokens(enc.input_ids))</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>[CLS] feature extraction + logistic-regression baseline on a small subset</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 2. [CLS] feature extraction + logistic-regression baseline on a small subset
+import numpy as np, torch
+from transformers import AutoModel
+from sklearn.linear_model import LogisticRegression
+from sklearn.dummy import DummyClassifier
+
+device = torch.device(&quot;cuda&quot; if torch.cuda.is_available() else &quot;cpu&quot;)
+model = AutoModel.from_pretrained(&quot;distilbert-base-uncased&quot;).to(device).eval()
+
+def cls_features(texts, bs=32):
+    feats = []
+    for i in range(0, len(texts), bs):
+        batch = tokenizer(texts[i:i+bs], padding=True, truncation=True, return_tensors=&quot;pt&quot;).to(device)
+        with torch.no_grad():
+            feats.append(model(**batch).last_hidden_state[:, 0].cpu().numpy())
+    return np.vstack(feats)
+
+train = emotions[&quot;train&quot;].shuffle(seed=0).select(range(1000))
+valid = emotions[&quot;validation&quot;].select(range(300))
+X_train, y_train = cls_features(train[&quot;text&quot;]), np.array(train[&quot;label&quot;])
+X_valid, y_valid = cls_features(valid[&quot;text&quot;]), np.array(valid[&quot;label&quot;])
+print(&quot;feature shape:&quot;, X_train.shape)
+
+dummy = DummyClassifier(strategy=&quot;most_frequent&quot;).fit(X_train, y_train)
+lr = LogisticRegression(max_iter=3000).fit(X_train, y_train)
+print(f&quot;dummy: {dummy.score(X_valid, y_valid):.3f}   logistic regression: {lr.score(X_valid, y_valid):.3f}&quot;)</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Quick fine-tune on a subset (1 epoch) and evaluate</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 3. Quick fine-tune on a subset (1 epoch) and evaluate
+from transformers import AutoModelForSequenceClassification, Trainer, TrainingArguments
+from sklearn.metrics import accuracy_score, f1_score
+
+def tokenize(batch):
+    return tokenizer(batch[&quot;text&quot;], padding=True, truncation=True)
+
+small = emotions[&quot;train&quot;].shuffle(seed=0).select(range(2000)).map(tokenize, batched=True)
+small_val = emotions[&quot;validation&quot;].select(range(500)).map(tokenize, batched=True)
+
+def compute_metrics(pred):
+    preds = pred.predictions.argmax(-1)
+    return {&quot;accuracy&quot;: accuracy_score(pred.label_ids, preds),
+            &quot;f1&quot;: f1_score(pred.label_ids, preds, average=&quot;weighted&quot;)}
+
+clf = AutoModelForSequenceClassification.from_pretrained(&quot;distilbert-base-uncased&quot;, num_labels=6).to(device)
+args = TrainingArguments(output_dir=&quot;distilbert-emotion-test&quot;, num_train_epochs=1, learning_rate=2e-5,
+                         per_device_train_batch_size=32, per_device_eval_batch_size=32,
+                         weight_decay=0.01, eval_strategy=&quot;epoch&quot;, report_to=&quot;none&quot;, log_level=&quot;error&quot;)
+trainer = Trainer(model=clf, args=args, compute_metrics=compute_metrics,
+                  train_dataset=small, eval_dataset=small_val, processing_class=tokenizer)
+trainer.train()
+print(trainer.evaluate())</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Predict emotion with confidence from the fine-tuned model</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 4. Predict emotion with confidence from the fine-tuned model
+def predict_emotion(text):
+    inputs = tokenizer(text, return_tensors=&quot;pt&quot;).to(device)
+    with torch.no_grad():
+        probs = torch.softmax(clf(**inputs).logits, dim=-1)[0]
+    idx = int(probs.argmax())
+    return labels[idx], float(probs[idx]), {l: round(float(p), 3) for l, p in zip(labels, probs)}
+
+for t in [&quot;I can&#x27;t believe I aced my exam!&quot;,
+          &quot;I miss my family so much right now.&quot;,
+          &quot;That driver just cut me off! So rude!&quot;]:
+    print(t, &quot;-&gt;&quot;, predict_emotion(t))</code></pre><div class="out"></div></div></div>
+</aside></div><div class="sim-overlay" id="sim-overlay" role="dialog" aria-modal="true">
+  <div class="sim-window"><div class="sim-head"><div><div class="sim-kind" id="sim-kind"></div><h3 id="sim-title"></h3></div><span class="spacer"></span><button class="btn-xs" id="sim-close">✕ Close (Esc)</button></div><div class="sim-body" id="sim-body"></div></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script>document.addEventListener('DOMContentLoaded',()=>{if(window.hljs)hljs.highlightAll();if(window.renderMathInElement)renderMathInElement(document.body,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});});</script>
+<script src="../assets/js/sims/core.js"></script>
+<script src="../assets/js/sims/matrix-multiply.js"></script><script src="../assets/js/sims/vectors.js"></script><script src="../assets/js/sims/attention.js"></script><script src="../assets/js/sims/tokenizer.js"></script><script src="../assets/js/sims/positional.js"></script><script src="../assets/js/sims/classifier.js"></script><script src="../assets/js/sims/bio-tagging.js"></script><script src="../assets/js/sims/rag.js"></script><script src="../assets/js/sims/langgraph.js"></script><script src="../assets/js/sims/sampling.js"></script><script src="../assets/js/sims/moe.js"></script><script src="../assets/js/sims/react-loop.js"></script><script src="../assets/js/sims/multi-agent.js"></script><script src="../assets/js/sims/mcp.js"></script><script src="../assets/js/sims/lam.js"></script><script src="../assets/js/sims/diffusion.js"></script>
+<script src="../assets/js/site.js"></script>
+</body></html>

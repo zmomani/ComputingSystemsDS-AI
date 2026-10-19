@@ -1,0 +1,1313 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 1: Transformer Architecture · Computing Systems for DS & AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<link rel="stylesheet" href="../assets/css/site.css">
+</head>
+<body><header class="topbar">
+  <button class="btn-icon" id="menu-toggle" aria-label="Menu">☰</button>
+  <a class="brand" href="../index.html">606363 · Computing Systems for DS & AI<small>University of Petra</small></a>
+  <span class="spacer"></span>
+  <nav class="week-nav"><a class="btn-icon" href="week02-text-classification.html" title="Text Classification">Wk 2 →</a></nav>
+  <a class="btn-icon" href="../index.html#curriculum">Curriculum</a>
+  <a class="btn-icon" href="../index.html#simulations">Simulations</a>
+  <button class="btn-icon" id="theme-toggle" aria-label="Toggle dark mode">◐</button>
+</header><div class="layout"><aside class="sidebar">
+  <h4>Course</h4><ul class="outline"><li><a class="" href="../lessons/syllabus.html"><span class="wk">·</span><span>Course Syllabus</span></a></li><li><a class="" href="../lessons/project.html"><span class="wk">·</span><span>Final Project</span></a></li></ul>
+  <h4>16-week curriculum</h4><ul class="outline"><li><a class="active" href="../lessons/week01-transformers.html"><span class="wk">01</span><span>Transformer Architecture</span></a></li><li><a class="" href="../lessons/week02-text-classification.html"><span class="wk">02</span><span>Text Classification</span></a></li><li><a class="soon" href="../lessons/week03-ner.html"><span class="wk">03</span><span>Named Entity Recognition (NER)</span></a></li><li><a class="" href="../lessons/week04-langchain.html"><span class="wk">04</span><span>LangChain Fundamentals</span></a></li><li><a class="" href="../lessons/week05-langgraph.html"><span class="wk">05</span><span>LangGraph</span></a></li><li><a class="" href="../lessons/week06-llms.html"><span class="wk">06</span><span>Large Language Models (LLMs)</span></a></li><li><a class="" href="../lessons/week07-moe.html"><span class="wk">07</span><span>Mixture of Experts (MoE)</span></a></li><li><a class="" href="../lessons/week08-midterm.html"><span class="wk">08</span><span>Midterm Exam</span></a></li><li><a class="" href="../lessons/week09-react-agents.html"><span class="wk">09</span><span>AI Agents &amp; ReAct</span></a></li><li><a class="" href="../lessons/week10-multi-agent.html"><span class="wk">10</span><span>Multi-Agent Systems</span></a></li><li><a class="" href="../lessons/week11-mcp.html"><span class="wk">11</span><span>Model Context Protocol (MCP)</span></a></li><li><a class="soon" href="../lessons/week12-lams.html"><span class="wk">12</span><span>Large Action Models (LAMs)</span></a></li><li><a class="" href="../lessons/week13-diffusion.html"><span class="wk">13</span><span>Diffusion Models</span></a></li><li><a class="" href="../lessons/week14-project.html"><span class="wk">14</span><span>Project Development &amp; Final Testing</span></a></li><li><a class="" href="../lessons/week15-competition.html"><span class="wk">15</span><span>Competition Day &amp; Presentations</span></a></li><li><a class="" href="../lessons/week16-final.html"><span class="wk">16</span><span>Final Exam</span></a></li></ul>
+  <h4>On this page</h4><ul class="toc" id="toc"></ul>
+</aside><main class="main">
+  <div class="lesson-head"><div class="eyebrow">Week 1 · ILO K1</div><h1>Transformer Architecture</h1>
+  <p class="credit"><b>Topics:</b> Transformer architecture, encoder-decoder framework, Hugging Face ecosystem<br><b>Project milestone:</b> Form teams, create the GitHub repo, set up the project and API keys, write a Transformer analysis</p></div>
+  <div class="callout sim"><div class="sim-strip"><b style="margin-right:4px">Simulations for this week:</b><button class="chip" data-sim="attention">▶ Self-attention: Q·Kᵀ → softmax → ·V</button><button class="chip" data-sim="matrix-multiply">▶ Matrix multiplication, step by step</button><button class="chip" data-sim="vectors">▶ Vectors, dot product &amp; cosine similarity</button><button class="chip" data-sim="tokenizer">▶ Subword tokenisation</button><button class="chip" data-sim="positional">▶ Positional encoding</button></div></div>
+  <h2 id="part-understanding-transformer-architecture">Understanding Transformer Architecture</h2><p class="credit">Source page: <a href="https://albanna-tutorials.com/transformer.html">https://albanna-tutorials.com/transformer.html</a></p>
+<blockquote>
+<p><em>An interactive guide to modern neural networks.</em> Material by Dr. Abedal-Kareem Al-Banna (ilmy / albanna-tutorials.com). The original page was created with JavaScript, D3.js and MathJax.</p>
+<p><strong>Extraction note:</strong> The source page was read through a fetch tool that paraphrases rather than copies text, so prose below is a close paraphrase of Dr. Albanna's wording and the code blocks are faithful reconstructions from line-by-line descriptions of the originals (same class names, arguments, shapes and printed labels). Interactive D3 visualizations are described in text.</p>
+</blockquote>
+<p>Companion pages linked from the lesson:</p>
+<ul>
+<li>Worked example, "I love learning" → "أنا أحب التعلم", with actual calculations for every Transformer operation (English): https://albanna-tutorials.com/transformer-step-by-step.html</li>
+<li>Same worked example in Arabic: https://albanna-tutorials.com/transformer-step-by-step-ar.html</li>
+<li>Transformer Q&amp;A (21 questions): https://albanna-tutorials.com/transformer-qa.html</li>
+</ul>
+<p>In-page sections: Introduction · Evolution · Architecture · Components · Interactive Demo · Code Examples · Applications · Resources · Conclusion.</p>
+<h2 id="introduction">Introduction</h2>
+<p>The Transformer architecture was introduced in the 2017 paper <strong>"Attention Is All You Need"</strong> by Vaswani et al. Earlier sequence models processed data one step at a time; the Transformer instead uses <strong>self-attention</strong> to process an entire sequence at once. This parallelism allows Transformers to:</p>
+<ul>
+<li>Capture long-range dependencies more effectively</li>
+<li>Train faster through parallel processing</li>
+<li>Scale to larger datasets and model sizes</li>
+<li>Reach state-of-the-art results on many NLP tasks</li>
+</ul>
+<p><strong>Key innovations</strong></p>
+<ol>
+<li>Self-attention mechanism</li>
+<li>Multi-head attention</li>
+<li>Positional encodings</li>
+<li>Layer normalization</li>
+<li>Residual connections</li>
+</ol>
+<p><strong>Models built on the Transformer</strong></p>
+<ul>
+<li>Large language models (GPT, LLaMA)</li>
+<li>Bidirectional encoders (BERT, RoBERTa)</li>
+<li>Text-to-image models (DALL-E, Stable Diffusion)</li>
+<li>Multimodal systems (CLIP, Flamingo)</li>
+</ul>
+<p><em>Interactive element on the original page:</em> an animated architecture overview, plus links to the "I love learning" worked example above.</p>
+<h2 id="evolution-of-sequence-models">Evolution of Sequence Models</h2>
+<h3 id="recurrent-neural-networks-rnns">Recurrent Neural Networks (RNNs)</h3>
+<ul>
+<li>Slow, because they process sequences step by step</li>
+<li>Suffer from vanishing or exploding gradients</li>
+<li>Have a limited context window</li>
+<li>Struggle with long-range dependencies</li>
+</ul>
+<h3 id="long-short-term-memory-lstm">Long Short-Term Memory (LSTM)</h3>
+<ul>
+<li>Handle long-term dependencies better than vanilla RNNs</li>
+<li>Use gates to regulate information flow</li>
+<li>Reduce the vanishing-gradient problem</li>
+<li>Remain sequential and computationally expensive</li>
+</ul>
+<h3 id="transformer">Transformer</h3>
+<ul>
+<li>Process sequences in parallel</li>
+<li>Use self-attention to model global context</li>
+<li>Scale efficiently with computing resources</li>
+<li>Avoid recurrence, which makes deeper architectures practical</li>
+</ul>
+<h3 id="performance-comparison-interactive">Performance comparison (interactive)</h3>
+<p>The original page provides an interactive comparison widget with controls for <strong>sequence length</strong> (short, medium, long) and <strong>task</strong> (machine translation, text summarization, text classification, question answering) that contrasts the three model families.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>RNN</th>
+<th>LSTM</th>
+<th>Transformer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Processing</td>
+<td>Sequential</td>
+<td>Sequential</td>
+<td>Parallel</td>
+</tr>
+<tr>
+<td>Long-range dependencies</td>
+<td>Poor</td>
+<td>Better (gated)</td>
+<td>Strong (global self-attention)</td>
+</tr>
+<tr>
+<td>Gradient issues</td>
+<td>Vanishing / exploding</td>
+<td>Reduced</td>
+<td>Largely avoided (residuals + LayerNorm)</td>
+</tr>
+<tr>
+<td>Context</td>
+<td>Limited window</td>
+<td>Longer, still bounded</td>
+<td>Whole sequence</td>
+</tr>
+<tr>
+<td>Scalability</td>
+<td>Low</td>
+<td>Moderate</td>
+<td>High</td>
+</tr>
+</tbody>
+</table>
+<h2 id="transformer-architecture">Transformer Architecture</h2>
+<p>The Transformer consists of an <strong>encoder</strong> and a <strong>decoder</strong>, each built from a stack of identical layers. Every layer contains <strong>multi-head self-attention</strong> and a <strong>position-wise feed-forward network</strong>, wrapped with residual connections and layer normalization. (The original diagram has buttons to highlight the encoder, decoder and attention paths.)</p>
+<h3 id="encoder">Encoder</h3>
+<ul>
+<li>Stacks N identical layers (N = 6 in the original paper)</li>
+<li>Each layer has two sub-layers: multi-head self-attention and a position-wise feed-forward network</li>
+<li>Residual connections and layer normalization surround each sub-layer</li>
+<li>Outputs a sequence of contextualized representations</li>
+</ul>
+<h3 id="decoder">Decoder</h3>
+<ul>
+<li>Also stacks N identical layers</li>
+<li>Each layer has three sub-layers: <strong>masked</strong> multi-head self-attention, multi-head attention over the encoder output (cross-attention), and a position-wise feed-forward network</li>
+<li>Masking preserves the autoregressive property (a position may not attend to future positions)</li>
+<li>Outputs probabilities for predicting the next token</li>
+</ul>
+<p>Positional encodings are added to the input embeddings before the first layer. The feed-forward inner dimension is typically 4× the model dimension.</p>
+<h3 id="mathematical-formulation">Mathematical formulation</h3>
+<p>Scaled dot-product attention:</p>
+<div class="arithmatex">\[\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V\]</div>
+<p>Multi-head attention:</p>
+<div class="arithmatex">\[\text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}_1, \ldots, \text{head}_h)W^O\]</div>
+<div class="arithmatex">\[\text{where } \text{head}_i = \text{Attention}(QW_i^Q, KW_i^K, VW_i^V)\]</div>
+<p>Position-wise feed-forward network:</p>
+<div class="arithmatex">\[\text{FFN}(x) = \max(0, xW_1 + b_1)W_2 + b_2\]</div>
+<p>Layer normalization:</p>
+<div class="arithmatex">\[\text{LayerNorm}(x) = \gamma \cdot \frac{x - \mu}{\sqrt{\sigma^2 + \epsilon}} + \beta\]</div>
+<h2 id="key-components">Key Components</h2>
+<h3 id="self-attention-mechanism">Self-attention mechanism</h3>
+<p>Self-attention lets every position in a sequence attend to every other position. Step by step:</p>
+<ol>
+<li>Each token is projected into a <strong>query</strong> (Q), <strong>key</strong> (K) and <strong>value</strong> (V) vector through learned linear projections.</li>
+<li>Compatibility scores are computed between each query and all keys (dot product).</li>
+<li>Softmax turns the scores into attention weights.</li>
+<li>Each output is the weighted sum of the value vectors using those weights.</li>
+</ol>
+<p>The scaling by √d_k keeps the dot products from growing large and pushing softmax into regions with extremely small gradients.</p>
+<p><em>Interactive visualization:</em> sentence <strong>"The cat sat on the mat because it was comfortable."</strong> Clicking a word shows how strongly it attends to every other word (e.g. "it" attending to "cat"/"mat").</p>
+<h3 id="multi-head-attention">Multi-head attention</h3>
+<p>Instead of a single attention function, the model runs <strong>h</strong> attention heads in parallel, each with its own projection matrices, so it can attend to information from different representation subspaces at once. Benefits:</p>
+<ul>
+<li>Captures several kinds of relationships simultaneously</li>
+<li>Some heads focus on syntax, others on meaning</li>
+<li>Greater representational power</li>
+<li>An ensemble-like effect within a single layer</li>
+</ul>
+<p><em>Interactive visualization:</em> sentence <strong>"The movie was great but too long."</strong> with four toggleable heads:</p>
+<table>
+<thead>
+<tr>
+<th>Head</th>
+<th>Focus</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Head 1</td>
+<td>Subject–object relationships</td>
+</tr>
+<tr>
+<td>Head 2</td>
+<td>Adjective–noun relationships</td>
+</tr>
+<tr>
+<td>Head 3</td>
+<td>Entity recognition</td>
+</tr>
+<tr>
+<td>Head 4</td>
+<td>Conjunction relationships</td>
+</tr>
+</tbody>
+</table>
+<h3 id="positional-encoding">Positional encoding</h3>
+<p>Because the Transformer has no recurrence or convolution, it needs explicit information about token order. Sinusoidal positional encodings are added to the input embeddings:</p>
+<div class="arithmatex">\[PE_{(pos, 2i)} = \sin\left(pos / 10000^{2i/d_{model}}\right)\]</div>
+<div class="arithmatex">\[PE_{(pos, 2i+1)} = \cos\left(pos / 10000^{2i/d_{model}}\right)\]</div>
+<p>where <em>pos</em> is the token position and <em>i</em> is the dimension index. Sinusoids at different frequencies let the model learn to attend by relative position.</p>
+<p><em>Interactive visualization:</em> a heatmap with positions as rows and dimensions as columns. Sequence length can be set to 5, 25 or 50 and the encoding dimension to 8, 32 or 64.</p>
+<h3 id="feed-forward-networks">Feed-forward networks</h3>
+<p>Each encoder and decoder layer contains a fully connected network applied independently and identically at each position: two linear transformations with a ReLU between them.</p>
+<div class="arithmatex">\[\text{FFN}(x) = \max(0, xW_1 + b_1)W_2 + b_2\]</div>
+<ul>
+<li>The inner (hidden) dimension is typically 4× the model dimension</li>
+<li>It adds non-linearity and substantially increases model capacity</li>
+</ul>
+<p><em>Interactive visualization:</em> an input slider from −3 to 3, hidden-layer size 1×, 4× or 8×, showing the input, the output after the first layer (post-ReLU) and the final output.</p>
+<h2 id="interactive-demonstration">Interactive Demonstration</h2>
+<p><strong>Sequence processing demo.</strong> Sentence: <em>"The transformer model revolutionized natural language processing with its attention mechanism."</em> Controls: Process Sentence, Previous Step, Next Step, Auto Play, Reset. The demo walks through tokenization → embedding → positional encoding → attention → feed-forward → output, one step at a time.</p>
+<p><strong>Attention patterns by task.</strong></p>
+<ul>
+<li><strong>Translation:</strong> how attention aligns source and target words when translating.</li>
+<li><strong>Summarization:</strong> how the model concentrates attention on the key information in a passage.</li>
+<li><strong>Question answering:</strong> how the model locates the answer span inside a context passage.</li>
+</ul>
+<h2 id="code-implementation-examples">Code Implementation Examples</h2>
+<h3 id="self-attention-implementation-pytorch">Self-attention implementation (PyTorch)</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">SelfAttention</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">embed_size</span><span class="p">,</span> <span class="n">heads</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">embed_size</span> <span class="o">=</span> <span class="n">embed_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">heads</span> <span class="o">=</span> <span class="n">heads</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">head_dim</span> <span class="o">=</span> <span class="n">embed_size</span> <span class="o">//</span> <span class="n">heads</span>
+
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">head_dim</span> <span class="o">*</span> <span class="n">heads</span> <span class="o">==</span> <span class="n">embed_size</span><span class="p">,</span> <span class="s2">"Embed size must be divisible by heads"</span>
+
+        <span class="c1"># Linear projections for queries, keys, values and the output</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q_linear</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">embed_size</span><span class="p">,</span> <span class="n">embed_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">k_linear</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">embed_size</span><span class="p">,</span> <span class="n">embed_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v_linear</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">embed_size</span><span class="p">,</span> <span class="n">embed_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc_out</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">embed_size</span><span class="p">,</span> <span class="n">embed_size</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># Project and split into heads: (batch, seq, heads, head_dim) -&gt; (batch, heads, seq, head_dim)</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q_linear</span><span class="p">(</span><span class="n">query</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">heads</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">head_dim</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_linear</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">heads</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">head_dim</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v_linear</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">heads</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">head_dim</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+        <span class="c1"># Scaled dot-product scores: (batch, heads, seq_q, seq_k)</span>
+        <span class="n">scores</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">k</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">head_dim</span><span class="p">)</span>
+
+        <span class="c1"># Optional mask (used in the decoder)</span>
+        <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">scores</span> <span class="o">=</span> <span class="n">scores</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s2">"-1e20"</span><span class="p">))</span>
+
+        <span class="c1"># Attention weights</span>
+        <span class="n">attention</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Weighted sum of values: (batch, heads, seq, head_dim)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">attention</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+        <span class="c1"># Merge heads: (batch, seq, heads, head_dim) -&gt; (batch, seq, embed_size)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">embed_size</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc_out</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="simplified-self-attention-javascript">Simplified self-attention (JavaScript)</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nx">SelfAttention</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kr">constructor</span><span class="p">(</span><span class="nx">embedSize</span><span class="p">,</span><span class="w"> </span><span class="nx">heads</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">embedSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">embedSize</span><span class="p">;</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">heads</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">heads</span><span class="p">;</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">headDim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">embedSize</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nx">heads</span><span class="p">);</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">headDim</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">heads</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="nx">embedSize</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="s2">"Embed size must be divisible by heads"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// Weight matrices (random init, for demonstration only)</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">wQ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">initializeWeights</span><span class="p">(</span><span class="nx">embedSize</span><span class="p">,</span><span class="w"> </span><span class="nx">embedSize</span><span class="p">);</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">wK</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">initializeWeights</span><span class="p">(</span><span class="nx">embedSize</span><span class="p">,</span><span class="w"> </span><span class="nx">embedSize</span><span class="p">);</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">wV</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">initializeWeights</span><span class="p">(</span><span class="nx">embedSize</span><span class="p">,</span><span class="w"> </span><span class="nx">embedSize</span><span class="p">);</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">wO</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">initializeWeights</span><span class="p">(</span><span class="nx">embedSize</span><span class="p">,</span><span class="w"> </span><span class="nx">embedSize</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="nx">initializeWeights</span><span class="p">(</span><span class="nx">inputDim</span><span class="p">,</span><span class="w"> </span><span class="nx">outputDim</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[];</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">let</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nx">inputDim</span><span class="p">;</span><span class="w"> </span><span class="nx">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nx">w</span><span class="p">.</span><span class="nx">push</span><span class="p">([]);</span>
+<span class="w">      </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">let</span><span class="w"> </span><span class="nx">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span><span class="w"> </span><span class="nx">j</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nx">outputDim</span><span class="p">;</span><span class="w"> </span><span class="nx">j</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">w</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">push</span><span class="p">((</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">0.5</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.1</span><span class="p">);</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">w</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="nx">matMul</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="nx">b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[];</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">let</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nx">a</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span><span class="w"> </span><span class="nx">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nx">result</span><span class="p">.</span><span class="nx">push</span><span class="p">([]);</span>
+<span class="w">      </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">let</span><span class="w"> </span><span class="nx">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span><span class="w"> </span><span class="nx">j</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nx">b</span><span class="p">[</span><span class="mf">0</span><span class="p">].</span><span class="nx">length</span><span class="p">;</span><span class="w"> </span><span class="nx">j</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="nx">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">let</span><span class="w"> </span><span class="nx">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span><span class="w"> </span><span class="nx">k</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nx">b</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span><span class="w"> </span><span class="nx">k</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="nx">sum</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="nx">a</span><span class="p">[</span><span class="nx">i</span><span class="p">][</span><span class="nx">k</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">b</span><span class="p">[</span><span class="nx">k</span><span class="p">][</span><span class="nx">j</span><span class="p">];</span>
+<span class="w">        </span><span class="nx">result</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">push</span><span class="p">(</span><span class="nx">sum</span><span class="p">);</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">result</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="nx">softmax</span><span class="p">(</span><span class="nx">arr</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(...</span><span class="nx">arr</span><span class="p">);</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">exps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">arr</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">x</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nb">Math</span><span class="p">.</span><span class="nx">exp</span><span class="p">(</span><span class="nx">x</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nx">max</span><span class="p">));</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">exps</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">s</span><span class="p">,</span><span class="w"> </span><span class="nx">x</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">s</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">x</span><span class="p">,</span><span class="w"> </span><span class="mf">0</span><span class="p">);</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">exps</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">x</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">x</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nx">sum</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="nx">transpose</span><span class="p">(</span><span class="nx">matrix</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">matrix</span><span class="p">[</span><span class="mf">0</span><span class="p">].</span><span class="nx">map</span><span class="p">((</span><span class="nx">_</span><span class="p">,</span><span class="w"> </span><span class="nx">j</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">matrix</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">row</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">row</span><span class="p">[</span><span class="nx">j</span><span class="p">]));</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="nx">forward</span><span class="p">(</span><span class="nx">inputs</span><span class="p">,</span><span class="w"> </span><span class="nx">mask</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">batchSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">inputs</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">seqLength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">inputs</span><span class="p">[</span><span class="mf">0</span><span class="p">].</span><span class="nx">length</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// Linear projections</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">Q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">matMul</span><span class="p">(</span><span class="nx">inputs</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">wQ</span><span class="p">);</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">K</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">matMul</span><span class="p">(</span><span class="nx">inputs</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">wK</span><span class="p">);</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">V</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">matMul</span><span class="p">(</span><span class="nx">inputs</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">wV</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// (Head splitting / tensor reshaping omitted in this simplified version)</span>
+
+<span class="w">    </span><span class="c1">// Scores = Q * K^T, scaled by sqrt(headDim)</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">scores</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">matMul</span><span class="p">(</span><span class="nx">Q</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">transpose</span><span class="p">(</span><span class="nx">K</span><span class="p">));</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">scaledScores</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">scores</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">row</span><span class="w"> </span><span class="p">=&gt;</span>
+<span class="w">      </span><span class="nx">row</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">s</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">s</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nb">Math</span><span class="p">.</span><span class="nx">sqrt</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">headDim</span><span class="p">))</span>
+<span class="w">    </span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// Mask placeholder (no logic in the demo)</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">mask</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* apply mask */</span><span class="w"> </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// Softmax over each row -&gt; attention weights</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">attentionWeights</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">scaledScores</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">row</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">softmax</span><span class="p">(</span><span class="nx">row</span><span class="p">));</span>
+
+<span class="w">    </span><span class="c1">// Weighted sum of values</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">matMul</span><span class="p">(</span><span class="nx">attentionWeights</span><span class="p">,</span><span class="w"> </span><span class="nx">V</span><span class="p">);</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">matMul</span><span class="p">(</span><span class="nx">output</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">wO</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="using-transformers-with-libraries-hugging-face">Using Transformers with libraries (Hugging Face)</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoModel</span><span class="p">,</span> <span class="n">AutoTokenizer</span>
+
+<span class="n">model_name</span> <span class="o">=</span> <span class="s2">"bert-base-uncased"</span>
+<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">AutoModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
+
+<span class="n">text</span> <span class="o">=</span> <span class="s2">"Understanding transformers is fascinating."</span>
+<span class="n">inputs</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">"pt"</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+    <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">inputs</span><span class="p">)</span>
+
+<span class="n">last_hidden_state</span> <span class="o">=</span> <span class="n">outputs</span><span class="o">.</span><span class="n">last_hidden_state</span>
+<span class="n">pooled_output</span> <span class="o">=</span> <span class="n">outputs</span><span class="o">.</span><span class="n">pooler_output</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Hidden state shape: </span><span class="si">{</span><span class="n">last_hidden_state</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>  <span class="c1"># [batch_size, sequence_length, hidden_size]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Pooled output shape: </span><span class="si">{</span><span class="n">pooled_output</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>     <span class="c1"># [batch_size, hidden_size]</span>
+</code></pre></div>
+<h2 id="applications">Applications</h2>
+<h3 id="natural-language-processing">Natural language processing</h3>
+<p>Machine translation (e.g. Google Translate), text summarization, sentiment analysis, named entity recognition, question answering, and text generation with GPT models.</p>
+<h3 id="computer-vision">Computer vision</h3>
+<p>Vision Transformers (ViT), image classification, object detection, image segmentation, image generation (DALL-E, Stable Diffusion), and video understanding.</p>
+<h3 id="multimodal-ai">Multimodal AI</h3>
+<p>CLIP (linking text and images), text-to-image generation, image captioning, visual question answering, audio-visual understanding, and multimodal chatbots.</p>
+<h3 id="notable-transformer-based-models">Notable transformer-based models</h3>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Architecture type</th>
+<th>Key features</th>
+<th>Applications</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BERT</td>
+<td>Encoder-only</td>
+<td>Bidirectional training with masked-token prediction</td>
+<td>Text classification, NER, question answering</td>
+</tr>
+<tr>
+<td>GPT (1–4)</td>
+<td>Decoder-only</td>
+<td>Autoregressive training, growing model size</td>
+<td>Text generation, creative writing, coding, chatbots</td>
+</tr>
+<tr>
+<td>T5</td>
+<td>Encoder–decoder</td>
+<td>Every task framed as text-to-text</td>
+<td>Translation, summarization, classification</td>
+</tr>
+<tr>
+<td>ViT</td>
+<td>Encoder-only (vision)</td>
+<td>Images treated as sequences of 16×16 patches</td>
+<td>Image classification, object detection</td>
+</tr>
+<tr>
+<td>DALL-E / Stable Diffusion</td>
+<td>Diffusion models with transformers</td>
+<td>Text conditioning, latent diffusion</td>
+<td>Text-to-image generation, image editing</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Model explorer — BERT.</strong> Uses only the encoder and is trained bidirectionally. Pre-training objectives: masked language modeling and next-sentence prediction. Variants: BERT-base (12 layers) and BERT-large (24 layers). Uses: text classification, NER, question answering, sentiment analysis, document retrieval.</p>
+<h2 id="further-resources">Further Resources</h2>
+<h3 id="key-academic-papers">Key academic papers</h3>
+<ul>
+<li>Vaswani et al. (2017), "Attention Is All You Need" — the original Transformer paper. https://arxiv.org/abs/1706.03762</li>
+<li>Devlin et al. (2018), "BERT: Pre-training of Deep Bidirectional Transformers" — introduced BERT. https://arxiv.org/abs/1810.04805</li>
+<li>Brown et al. (2020), "Language Models are Few-Shot Learners" — introduced GPT-3. https://arxiv.org/abs/2005.14165</li>
+<li>Dosovitskiy et al. (2020), "An Image is Worth 16x16 Words" — the ViT paper. https://arxiv.org/abs/2010.11929</li>
+</ul>
+<h3 id="tutorials-and-courses">Tutorials and courses</h3>
+<ul>
+<li>The Illustrated Transformer (Jay Alammar), visual guide. http://jalammar.github.io/illustrated-transformer/</li>
+<li>"Attention Is All You Need" video explanation. https://www.youtube.com/watch?v=TQQlZhbC5ps</li>
+<li>Hugging Face NLP Course (free, practical). https://huggingface.co/course</li>
+<li>DeepLearning.AI NLP Specialization. https://www.deeplearning.ai/courses/</li>
+</ul>
+<h3 id="libraries-and-implementations">Libraries and implementations</h3>
+<ul>
+<li>Hugging Face Transformers, the most popular library for pre-trained models. https://github.com/huggingface/transformers</li>
+<li>PyTorch native transformer layers. https://pytorch.org/docs/stable/nn.html#transformer-layers</li>
+<li>TensorFlow transformer tutorial. https://www.tensorflow.org/text/tutorials/transformer</li>
+</ul>
+<h3 id="community-and-discussion">Community and discussion</h3>
+<ul>
+<li>Hugging Face Forums: https://discuss.huggingface.co/</li>
+<li>r/MachineLearning: https://www.reddit.com/r/MachineLearning/</li>
+<li>AI Stack Exchange: https://ai.stackexchange.com/</li>
+<li>
+<h1 id="nlproc-on-twitter-httpstwittercomhashtagnlproc">NLProc on Twitter: https://twitter.com/hashtag/NLProc</h1>
+</li>
+</ul>
+<h2 id="conclusion">Conclusion</h2>
+<p>Transformers have changed AI, enabling advances in language understanding, generation and multimodal reasoning. The self-attention design is both effective and scalable. Main advantages:</p>
+<ul>
+<li>Parallel sequence processing, overcoming the limits of RNNs</li>
+<li>Effective capture of long-range dependencies through self-attention</li>
+<li>A flexible architecture that applies well beyond NLP</li>
+<li>Scalability to very large models with steady performance gains</li>
+<li>A foundation for state-of-the-art systems across many applications</li>
+</ul>
+<h2 id="part-transformer-complete-step-by-step-guide-with-one-example">&quot;Transformer — Complete Step-by-Step Guide with One Example&quot;</h2><p class="credit">Source page: <a href="https://albanna-tutorials.com/transformer-step-by-step.html">https://albanna-tutorials.com/transformer-step-by-step.html</a></p>
+<p><em>Intermediate · ~30 minutes · AI Applications</em></p>
+<p><em>Material by Dr. Abdulkarim Albanna (Dr. Abedal-Kareem Al-Banna), Assistant Professor, Data Science &amp; AI, University of Petra — ilmy / albanna-tutorials.com. Reproduced here for teaching use with the explanatory prose kept as close to the original as the extraction allowed; all numeric values, formulas and tables are as shown on the original page.</em></p>
+<p>In this guide we follow <strong>one example sentence</strong> through the whole Transformer, computing every stage by hand with small example numbers:</p>
+<blockquote>
+<p><strong>Input (English):</strong> I love learning
+<strong>Output (Arabic):</strong> أنا أحب التعلم</p>
+</blockquote>
+<p>Real models use large vectors (d_model = 512). To keep the arithmetic readable, the example uses vectors of size 4 (embedding) and size 3 (attention).</p>
+<hr />
+<h2 id="1-input-embedding">1. Input Embedding</h2>
+<p>Each word is first converted into a vector of numbers (its <strong>embedding</strong>). These values are learned during training, so words with similar meanings end up with similar vectors.</p>
+<p>In the example each word becomes a vector of <strong>4 dimensions</strong> (real models use 512):</p>
+<div class="highlight"><pre><span></span><code>"I"        → [0.2, 0.5, 0.1, 0.8]
+"love"     → [0.9, 0.3, 0.7, 0.2]
+"learning" → [0.4, 0.6, 0.5, 0.9]
+</code></pre></div>
+<hr />
+<h2 id="2-positional-encoding">2. Positional Encoding</h2>
+<p>The Transformer processes all words <strong>in parallel</strong>, so it has no built-in notion of word order. To tell the model <em>where</em> each word is, a position vector is <strong>added</strong> to each embedding.</p>
+<p>The position vectors are built with sine and cosine functions:</p>
+<div class="highlight"><pre><span></span><code>PE(pos, 2i)   = sin( pos / 10000^(2i/d) )
+PE(pos, 2i+1) = cos( pos / 10000^(2i/d) )
+</code></pre></div>
+<ul>
+<li><code>pos</code> = position of the word in the sentence (0, 1, 2, …)</li>
+<li><code>i</code> = index of the dimension</li>
+<li><code>d</code> = model dimension</li>
+</ul>
+<p>Early dimensions change quickly from one position to the next and later dimensions change slowly — like the hands of a clock — so every position gets a unique pattern.</p>
+<p>Positional encoding vectors for our 3 positions (d = 4):</p>
+<div class="highlight"><pre><span></span><code>PE₀ ("I",        pos 0) → [0.00,  1.00, 0.00, 1.00]
+PE₁ ("love",     pos 1) → [0.84,  0.54, 0.01, 1.00]
+PE₂ ("learning", pos 2) → [0.91, -0.42, 0.02, 1.00]
+</code></pre></div>
+<p>Embedding + Positional Encoding:</p>
+<div class="highlight"><pre><span></span><code>"I"        → [0.2, 0.5, 0.1, 0.8] + [0.00,  1.00, 0.00, 1.00] = [0.20, 1.50, 0.10, 1.80]
+"love"     → [0.9, 0.3, 0.7, 0.2] + [0.84,  0.54, 0.01, 1.00] = [1.74, 0.84, 0.71, 1.20]
+"learning" → [0.4, 0.6, 0.5, 0.9] + [0.91, -0.42, 0.02, 1.00] = [1.31, 0.18, 0.52, 1.90]
+</code></pre></div>
+<p>These three vectors are the input <strong>X</strong> to the encoder.</p>
+<hr />
+<h2 id="3-self-attention">3. Self-Attention</h2>
+<p>Self-attention lets each word ask: <em>"which other words in the sentence matter for my meaning?"</em></p>
+<h3 id="step-31-create-query-key-and-value">Step 3.1 — Create Query, Key and Value</h3>
+<p>Each input vector is multiplied by three learned weight matrices:</p>
+<div class="highlight"><pre><span></span><code>Q = X × Wq      (Query  — what the word is looking for)
+K = X × Wk      (Key    — what the word offers to be matched against)
+V = X × Wv      (Value  — the information the word passes on)
+</code></pre></div>
+<p>For readability the example uses simplified vectors of size 3 (d_k = 3):</p>
+<div class="highlight"><pre><span></span><code>            Q            K            V
+"I"      [1, 0, 1]    [0, 1, 1]    [1, 0, 0]
+"love"   [0, 1, 0]    [1, 1, 0]    [0, 1, 0]
+"learn"  [1, 1, 0]    [0, 0, 1]    [0, 0, 1]
+</code></pre></div>
+<h3 id="step-32-attention-scores-q-kt">Step 3.2 — Attention scores: Q × Kᵀ</h3>
+<p>Each Query is dot-multiplied with every Key:</p>
+<div class="highlight"><pre><span></span><code>Scores = Q × Kᵀ
+
+           I   love  learn
+"I"      [ 1,   1,    1 ]
+"love"   [ 1,   1,    0 ]
+"learn"  [ 0,   2,    1 ]
+</code></pre></div>
+<h3 id="step-33-scale-by-d_k">Step 3.3 — Scale by √d_k</h3>
+<p>Dividing by √d_k (√3 ≈ 1.73) keeps the scores from becoming too large, which would push softmax into saturation (outputs near 0 or 1) and slow learning:</p>
+<div class="highlight"><pre><span></span><code>Scaled = Scores / √3
+
+"I"      [0.58, 0.58, 0.58]
+"love"   [0.58, 0.58, 0.00]
+"learn"  [0.00, 1.15, 0.58]
+</code></pre></div>
+<h3 id="step-34-softmax">Step 3.4 — Softmax</h3>
+<p>Softmax converts each row into probabilities that sum to 1:</p>
+<div class="highlight"><pre><span></span><code>Attention weights
+
+"I"      [0.33, 0.33, 0.33]
+"love"   [0.39, 0.39, 0.22]
+"learn"  [0.19, 0.59, 0.22]
+</code></pre></div>
+<p>Notice that <strong>"learning" pays the most attention to "love" (0.59)</strong> — the model has linked the two semantically related words.</p>
+<h3 id="step-35-multiply-by-v">Step 3.5 — Multiply by V</h3>
+<p>Each output is the weighted sum of the Value vectors:</p>
+<div class="highlight"><pre><span></span><code>Output = softmax(Q × Kᵀ / √d_k) × V
+
+"I"      → [0.33, 0.33, 0.33]
+"love"   → [0.39, 0.39, 0.22]
+"learn"  → [0.19, 0.59, 0.22]
+</code></pre></div>
+<p>The complete formula:</p>
+<div class="highlight"><pre><span></span><code>Attention(Q, K, V) = softmax( Q × Kᵀ / √d_k ) × V
+</code></pre></div>
+<hr />
+<h2 id="4-multi-head-attention">4. Multi-Head Attention</h2>
+<p>Instead of running attention once, the Transformer runs it <strong>several times in parallel</strong>. Each run is a <strong>head</strong> with its own Wq, Wk, Wv, and each head learns a different kind of relationship — e.g. grammar, nearby words, or meaning. The original model uses <strong>8 heads</strong>.</p>
+<div class="highlight"><pre><span></span><code>head₁ = Attention(X×Wq¹, X×Wk¹, X×Wv¹)
+head₂ = Attention(X×Wq², X×Wk², X×Wv²)
+...
+head₈ = Attention(X×Wq⁸, X×Wk⁸, X×Wv⁸)
+
+MultiHead(Q, K, V) = Concat(head₁, …, head₈) × Wᴼ
+</code></pre></div>
+<p>The example uses <strong>2 heads</strong> for the word "learn":</p>
+<div class="highlight"><pre><span></span><code>Head 1 ("learn") → [0.19, 0.59, 0.22]
+Head 2 ("learn") → [0.45, 0.10, 0.45]
+
+Concat             → [0.19, 0.59, 0.22, 0.45, 0.10, 0.45]
+× Wᴼ (project back) → [0.30, 0.40, 0.30]
+</code></pre></div>
+<hr />
+<h2 id="5-residual-connection-layer-normalization">5. Residual Connection + Layer Normalization</h2>
+<h3 id="residual-skip-connection">Residual (skip) connection</h3>
+<p>The input of each sub-layer is <strong>added back</strong> to its output. This preserves the original information and helps gradients flow through deep networks (prevents vanishing gradients):</p>
+<div class="highlight"><pre><span></span><code>output = x + Sublayer(x)
+</code></pre></div>
+<h3 id="layer-normalization">Layer Normalization</h3>
+<p>The result is then normalized to zero mean and unit variance, followed by learnable scale (γ) and shift (β):</p>
+<div class="highlight"><pre><span></span><code>LayerNorm(x) = (x − μ) / √(σ² + ε) × γ + β
+</code></pre></div>
+<p>Worked example for "learn" (first 3 dimensions):</p>
+<div class="highlight"><pre><span></span><code>x (input)          = [1.31, 0.18, 0.52]
+Attention output   = [0.19, 0.59, 0.22]
+After residual     = [1.50, 0.77, 0.74]
+
+μ (mean)           = 1.00
+σ² (variance)      = 0.12
+√(σ² + ε)          ≈ 0.35
+
+LayerNorm output   = [1.43, -0.66, -0.74]
+</code></pre></div>
+<hr />
+<h2 id="6-feed-forward-network-ffn">6. Feed-Forward Network (FFN)</h2>
+<p>Each position is passed <strong>independently</strong> through a small two-layer network. The first layer expands the dimension (512 → 2048 in the real model), a ReLU sets negative values to zero, and the second layer projects back to the original size:</p>
+<div class="highlight"><pre><span></span><code>FFN(x) = max(0, x × W₁ + b₁) × W₂ + b₂
+</code></pre></div>
+<p>Worked example:</p>
+<div class="highlight"><pre><span></span><code>Input              = [1.43, -0.66, -0.74]
+After W₁ + b₁      = [2.1, -0.3, 1.5, -1.2]
+After ReLU         = [2.1,  0.0, 1.5,  0.0]
+After W₂ + b₂      = [0.8,  0.5, 0.3]
+</code></pre></div>
+<p>A second <strong>residual connection + LayerNorm</strong> follows the FFN. The result is the <strong>encoder output</strong> — a contextualized representation of every input word. The whole encoder block (sections 3–6) is repeated <strong>6 times</strong>.</p>
+<hr />
+<h2 id="7-decoder">7. Decoder</h2>
+<p>The decoder generates the translation <strong>one word at a time</strong>. Suppose it has already produced "أنا" and "أحب" and is now generating the third word (shown as <code>???</code>):</p>
+<div class="highlight"><pre><span></span><code>Decoder input so far: ["أنا", "أحب", ???]
+</code></pre></div>
+<p>Each decoder layer has <strong>three</strong> sub-layers.</p>
+<h3 id="71-masked-self-attention">7.1 Masked Self-Attention</h3>
+<p>The decoder must not look at <strong>future</strong> words (they have not been generated yet). Future positions are masked by setting their scores to −∞ <strong>before</strong> softmax, so they get a weight of exactly 0.</p>
+<div class="highlight"><pre><span></span><code>Scores before mask            After mask                    After softmax
+          أنا  أحب  ???              أنا   أحب   ???                 أنا   أحب   ???
+"أنا"   [0.8, 0.5, 0.3]      "أنا"  [0.8,  -∞,   -∞ ]      "أنا"  [1.00, 0.00, 0.00]
+"أحب"   [0.6, 0.9, 0.4]      "أحب"  [0.6,  0.9,  -∞ ]      "أحب"  [0.43, 0.57, 0.00]
+"???"   [0.3, 0.7, 0.8]      "???"  [0.3,  0.7,  0.8]      "???"  [0.17, 0.37, 0.46]
+</code></pre></div>
+<p>Each word attends only to itself and the words before it.</p>
+<h3 id="72-cross-attention-encoderdecoder-attention">7.2 Cross-Attention (Encoder–Decoder Attention)</h3>
+<p>Here the decoder looks at the <strong>input sentence</strong>:</p>
+<ul>
+<li><strong>Q</strong> comes from the decoder (the Arabic words so far)</li>
+<li><strong>K</strong> and <strong>V</strong> come from the <strong>encoder output</strong> (the English words)</li>
+</ul>
+<div class="highlight"><pre><span></span><code>Q for "???"              = [0.5, 0.8, 0.3]
+
+Scores against encoder keys:
+   "I"        → 0.53
+   "love"     → 0.90
+   "learning" → 0.83
+
+Softmax → [0.22, 0.40, 0.38]
+</code></pre></div>
+<p>The third Arabic word attends most strongly to "love" and "learning" — exactly the English words it needs to translate.</p>
+<h3 id="73-feed-forward-residual-layernorm">7.3 Feed-Forward + Residual + LayerNorm</h3>
+<p>As in the encoder. The decoder block is also repeated <strong>6 times</strong>.</p>
+<hr />
+<h2 id="8-linear-softmax">8. Linear + Softmax</h2>
+<p>The final decoder vector is projected by a <strong>linear layer</strong> onto the whole vocabulary (which can be ~50,000 words), then <strong>softmax</strong> turns the scores into probabilities:</p>
+<div class="highlight"><pre><span></span><code>Decoder output for "???" = [0.25, 0.60, 0.15]
+
+Linear → Softmax over the vocabulary:
+   "أنا"     → 0.02
+   "أحب"     → 0.05
+   "التعلم"  → 0.85   ← highest
+   "كتاب"    → 0.03
+   "بيت"     → 0.05
+</code></pre></div>
+<p>The word with the highest probability, <strong>"التعلم"</strong>, is selected.</p>
+<p><strong>Final output: أنا أحب التعلم</strong> ✅</p>
+<hr />
+<h2 id="9-full-pipeline-overview">9. Full Pipeline Overview</h2>
+<div class="highlight"><pre><span></span><code>                 ENCODER (×6 layers)                          DECODER (×6 layers)
+ ┌────────────────────────────────────────┐      ┌────────────────────────────────────────────┐
+ │  "I love learning"                     │      │  Output so far: ["أنا", "أحب", ...]        │
+ │        ↓                               │      │        ↓                                   │
+ │  Input Embedding                       │      │  Output Embedding                          │
+ │        ↓                               │      │        ↓                                   │
+ │  + Positional Encoding                 │      │  + Positional Encoding                     │
+ │        ↓                               │      │        ↓                                   │
+ │  Multi-Head Self-Attention             │      │  Masked Multi-Head Self-Attention          │
+ │        ↓                               │      │        ↓                                   │
+ │  Add &amp; LayerNorm                       │      │  Add &amp; LayerNorm                           │
+ │        ↓                               │      │        ↓                                   │
+ │  Feed-Forward Network                  │ ───► │  Cross-Attention (Q: decoder, K,V: encoder)│
+ │        ↓                               │      │        ↓                                   │
+ │  Add &amp; LayerNorm                       │      │  Add &amp; LayerNorm                           │
+ │        ↓                               │      │        ↓                                   │
+ │  Encoder output (contextual vectors)   │      │  Feed-Forward Network                      │
+ └────────────────────────────────────────┘      │        ↓                                   │
+                                                 │  Add &amp; LayerNorm                           │
+                                                 │        ↓                                   │
+                                                 │  Linear → Softmax                          │
+                                                 │        ↓                                   │
+                                                 │  Next word: "التعلم"                       │
+                                                 └────────────────────────────────────────────┘
+
+ Final output: أنا أحب التعلم
+</code></pre></div>
+<hr />
+<h2 id="10-key-facts-original-paper">10. Key Facts (original paper)</h2>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Paper</td>
+<td>"Attention Is All You Need" (2017), Vaswani et al., Google</td>
+</tr>
+<tr>
+<td>Encoder layers</td>
+<td>6</td>
+</tr>
+<tr>
+<td>Decoder layers</td>
+<td>6</td>
+</tr>
+<tr>
+<td>d_model (embedding size)</td>
+<td>512</td>
+</tr>
+<tr>
+<td>Attention heads (h)</td>
+<td>8</td>
+</tr>
+<tr>
+<td>d_k per head</td>
+<td>512 / 8 = 64</td>
+</tr>
+<tr>
+<td>Feed-forward inner dimension (d_ff)</td>
+<td>2048</td>
+</tr>
+<tr>
+<td>Optimizer</td>
+<td>Adam with warmup and decay</td>
+</tr>
+<tr>
+<td>Loss function</td>
+<td>Cross-entropy</td>
+</tr>
+<tr>
+<td>Decoder training technique</td>
+<td>Teacher forcing (feed the correct previous token)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="11-three-types-of-transformer-models">11. Three Types of Transformer Models</h2>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Examples</th>
+<th>How it works</th>
+<th>Typical uses</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Encoder-only</strong></td>
+<td>BERT, RoBERTa, DistilBERT</td>
+<td>Bidirectional — sees the whole input at once</td>
+<td>Classification, Named-Entity Recognition, understanding tasks</td>
+</tr>
+<tr>
+<td><strong>Decoder-only</strong></td>
+<td>GPT family (GPT-2, GPT-3, GPT-4, …)</td>
+<td>Autoregressive — predicts left to right</td>
+<td>Text generation, chat</td>
+</tr>
+<tr>
+<td><strong>Encoder–Decoder</strong></td>
+<td>Original Transformer, BART, T5</td>
+<td>Full sequence-to-sequence</td>
+<td>Translation, summarization</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><em>Prepared by Dr. Abdulkarim Albanna — AI Applications Course.</em>
+<em>Related pages on the original site: <a href="https://albanna-tutorials.com/transformer.html">Transformer Overview</a> · <a href="https://albanna-tutorials.com/transformer-qa.html">Transformer Q&amp;A</a> · <a href="https://albanna-tutorials.com/transformer-step-by-step-ar.html">الشرح بالعربي</a></em></p>
+<h2 id="part-transformer-questions-answers">&quot;Transformer: Questions &amp; Answers&quot;</h2><p class="credit">Source page: <a href="https://albanna-tutorials.com/transformer-qa.html">https://albanna-tutorials.com/transformer-qa.html</a></p>
+<p><em>21 questions covering every component of the Transformer architecture.</em>
+<em>Intermediate · 21 Questions · Covers All Components · Exam Ready</em></p>
+<p><em>Material by Dr. Abdulkarim Albanna (Dr. Abedal-Kareem Al-Banna), Assistant Professor, Data Science &amp; AI, University of Petra — ilmy / albanna-tutorials.com. Reproduced here for teaching use; formulas, code blocks, tables and examples are as on the original page, with the prose kept as close to the original as the extraction allowed.</em></p>
+<hr />
+<h2 id="q1-what-is-a-transformer">Q1. What is a Transformer?</h2>
+<p>A <strong>Transformer</strong> is a deep learning architecture introduced in the 2017 paper <strong>"Attention Is All You Need"</strong> by Vaswani et al. (Google).</p>
+<ul>
+<li>It processes an <strong>entire sequence in parallel</strong> using <strong>self-attention</strong>, with <strong>no recurrence and no convolution</strong>.</li>
+<li>It consists of an <strong>Encoder</strong> (understands the input) and a <strong>Decoder</strong> (generates the output).</li>
+<li>It is the foundation of modern NLP models: BERT, GPT, T5, BART, and today's large language models.</li>
+</ul>
+<hr />
+<h2 id="q2-how-does-the-transformer-solve-the-problems-of-rnns-lstms">Q2. How does the Transformer solve the problems of RNNs / LSTMs?</h2>
+<table>
+<thead>
+<tr>
+<th>Problem with RNN / LSTM</th>
+<th>Transformer solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Sequential processing</strong> — words must be processed one after another, which is slow</td>
+<td>Processes <strong>all words in parallel</strong></td>
+</tr>
+<tr>
+<td><strong>Vanishing gradients</strong> over long sequences</td>
+<td><strong>Residual connections + Layer Normalization</strong> keep gradients flowing</td>
+</tr>
+<tr>
+<td><strong>Long-range dependencies</strong> are hard to capture (information fades over many steps)</td>
+<td><strong>Self-attention</strong> relates every word to every other word directly, in one step</td>
+</tr>
+<tr>
+<td><strong>Limited scalability</strong></td>
+<td>Parallelism makes full use of <strong>GPUs</strong>, so models scale to billions of parameters</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="q3-what-are-the-main-components-of-the-transformer">Q3. What are the main components of the Transformer?</h2>
+<ol>
+<li><strong>Input Embedding</strong> — converts each token to a vector.</li>
+<li><strong>Positional Encoding</strong> — adds word-order information.</li>
+<li><strong>Multi-Head Self-Attention</strong> — each word attends to all other words.</li>
+<li><strong>Feed-Forward Network (FFN)</strong> — a two-layer network applied to each position.</li>
+<li><strong>Residual Connections + Layer Normalization</strong> — around every sub-layer.</li>
+<li><strong>Linear + Softmax</strong> output layer — in the decoder, predicts the next word.</li>
+</ol>
+<p>The encoder stacks (3)(4)(5); the decoder adds <strong>masked</strong> self-attention and <strong>cross-attention</strong> before its FFN, then ends with (6).</p>
+<hr />
+<h2 id="q4-what-is-self-attention-and-how-does-it-work-with-example">Q4. What is self-attention, and how does it work? (with example)</h2>
+<p><strong>Self-attention</strong> lets each word look at <strong>all other words</strong> in the sentence and decide how much each one matters for its own meaning.</p>
+<p>Example: <em>"The cat sat on the mat because it was soft."</em> — to understand <strong>"it"</strong>, the model attends to all words and gives the highest attention score to <strong>"mat"</strong> (not "cat"), because "soft" fits a mat.</p>
+<p>Steps:</p>
+<ol>
+<li>Create <strong>Query (Q)</strong>, <strong>Key (K)</strong> and <strong>Value (V)</strong> vectors for every word.</li>
+<li>Compute the scores: <code>Score = Q × Kᵀ</code></li>
+<li><strong>Scale by √dₖ</strong></li>
+<li>Apply <strong>softmax</strong> to turn scores into probabilities (weights that sum to 1).</li>
+<li>Multiply the weights by <strong>V</strong> to get the weighted output for each word.</li>
+</ol>
+<hr />
+<h2 id="q5-what-are-query-key-and-value-why-three-vectors">Q5. What are Query, Key and Value? Why three vectors?</h2>
+<table>
+<thead>
+<tr>
+<th>Vector</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Query (Q)</strong></td>
+<td>What the current word is <strong>looking for</strong></td>
+</tr>
+<tr>
+<td><strong>Key (K)</strong></td>
+<td>What each word <strong>offers</strong> to be matched against</td>
+</tr>
+<tr>
+<td><strong>Value (V)</strong></td>
+<td>The actual <strong>information</strong> a word passes on once it is attended to</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Library analogy:</strong> your <strong>Query</strong> is what you type into the search; the <strong>Keys</strong> are the index entries of the books; the <strong>Values</strong> are the contents of the books you then read.</p>
+<p>Why three separate vectors? Because keeping them separate lets the model learn <strong>different representations</strong> for the three roles: how a word <em>searches</em>, how it <em>gets found</em>, and what it <em>contributes</em>. Using one vector for all three would force a single representation to do all three jobs.</p>
+<hr />
+<h2 id="q6-what-is-the-self-attention-formula-and-what-does-each-part-do">Q6. What is the self-attention formula, and what does each part do?</h2>
+<div class="highlight"><pre><span></span><code>Attention(Q, K, V) = softmax( Q × Kᵀ / √dₖ ) × V
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Q × Kᵀ</code></td>
+<td>Dot product of each Query with every Key → a <strong>relevance score</strong> between every pair of words</td>
+</tr>
+<tr>
+<td><code>/ √dₖ</code></td>
+<td><strong>Scaling.</strong> Large dot products would push softmax into near-0 / near-1 outputs (saturation) and slow down learning; dividing by √dₖ keeps the scores in a healthy range</td>
+</tr>
+<tr>
+<td><code>softmax(…)</code></td>
+<td>Turns each row of scores into <strong>weights that sum to 1</strong></td>
+</tr>
+<tr>
+<td><code>× V</code></td>
+<td><strong>Weighted sum</strong> of the Value vectors — the context-aware output of each word</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="q7-what-is-multi-head-attention-and-why-use-multiple-heads">Q7. What is multi-head attention, and why use multiple heads?</h2>
+<p>Instead of one attention computation, the Transformer runs <strong>h heads in parallel</strong>, each with its own learned projection matrices. Their outputs are <strong>concatenated</strong> and projected once more:</p>
+<div class="highlight"><pre><span></span><code>MultiHead(Q, K, V) = Concat(head₁, …, headₕ) × Wᴼ
+
+headᵢ = Attention( Q × WᵢQ,  K × WᵢK,  V × WᵢV )
+</code></pre></div>
+<p>Why multiple heads?</p>
+<ul>
+<li>Each head can <strong>specialize</strong> in a different kind of relationship — e.g. one head learns <strong>grammar</strong> (subject–verb), one learns <strong>nearby words</strong>, one learns <strong>meaning</strong> (semantic similarity).</li>
+<li>Several "views" of the sentence are combined into a richer representation.</li>
+<li>Original Transformer: <strong>8 heads</strong>, each with dimension <strong>64</strong> (512 / 8).</li>
+</ul>
+<hr />
+<h2 id="q8-why-does-the-transformer-need-positional-encoding">Q8. Why does the Transformer need positional encoding?</h2>
+<p>Self-attention treats the input as a <strong>set</strong>: it processes all tokens at once and has <strong>no built-in notion of order</strong>. Without position information, these two sentences look identical to the model:</p>
+<div class="highlight"><pre><span></span><code>"The cat ate the fish"  =  "The fish ate the cat"
+</code></pre></div>
+<p>Positional encoding <strong>adds a position-specific vector</strong> to every token embedding so the model knows <em>where</em> each word is.</p>
+<hr />
+<h2 id="q9-what-is-the-sincos-positional-encoding-formula-and-why-sine-and-cosine">Q9. What is the sin/cos positional-encoding formula, and why sine and cosine?</h2>
+<div class="highlight"><pre><span></span><code>PE(pos, 2i)   = sin( pos / 10000^(2i/d) )
+PE(pos, 2i+1) = cos( pos / 10000^(2i/d) )
+</code></pre></div>
+<ul>
+<li><code>pos</code> — position of the token; <code>i</code> — dimension index; <code>d</code> — model dimension.</li>
+<li><strong>Even</strong> dimensions use <strong>sine</strong>, <strong>odd</strong> dimensions use <strong>cosine</strong>.</li>
+</ul>
+<p>Why sin and cos?</p>
+<ul>
+<li>Together they give every position a <strong>unique pattern</strong>.</li>
+<li><strong>Relative positions</strong> can be expressed as a <strong>linear function</strong> of the encodings, so the model can easily learn "k steps away".</li>
+<li>Values are <strong>bounded</strong> (−1 to 1) and the scheme <strong>works for any sequence length</strong>, even longer than those seen in training.</li>
+<li>The constant <strong>10000</strong> spreads the wavelengths: low dimensions change <strong>quickly</strong> with position, high dimensions change <strong>slowly</strong> — like the hands of a clock.</li>
+</ul>
+<hr />
+<h2 id="q10-what-is-masked-self-attention-and-why-is-it-needed">Q10. What is masked self-attention, and why is it needed?</h2>
+<p>In the <strong>decoder</strong>, each word may attend only to <strong>itself and earlier words</strong>. Future positions are <strong>masked</strong> by setting their scores to <strong>−∞ before softmax</strong>, so they receive a weight of exactly <strong>0</strong>.</p>
+<div class="highlight"><pre><span></span><code>When generating "love" in "I love learning":
+   Can see:    "I"         ✅
+   Can see:    "love"      ✅ (itself)
+   Cannot see: "learning"  ❌ (future — not generated yet)
+</code></pre></div>
+<p>Why? During training the whole target sentence is available at once. Without the mask the decoder could simply <strong>copy the next word</strong> instead of learning to predict it. Masking forces it to predict from earlier tokens only — the same situation it faces at inference time.</p>
+<hr />
+<h2 id="q11-how-does-cross-attention-differ-from-self-attention">Q11. How does cross-attention differ from self-attention?</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Self-attention</th>
+<th>Cross-attention</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Q comes from</strong></td>
+<td>the same sequence</td>
+<td>the <strong>decoder</strong></td>
+</tr>
+<tr>
+<td><strong>K, V come from</strong></td>
+<td>the same sequence</td>
+<td>the <strong>encoder output</strong></td>
+</tr>
+<tr>
+<td><strong>Where</strong></td>
+<td>Encoder <strong>and</strong> decoder</td>
+<td><strong>Decoder only</strong></td>
+</tr>
+<tr>
+<td><strong>Purpose</strong></td>
+<td>Relate words <em>within</em> a sentence</td>
+<td>Connect the output being generated to the <strong>input sentence</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Example: when the decoder produces the Arabic word for "learning", its Query attends to the encoder's representation of <strong>"learning"</strong> (and "love") in "I love learning".</p>
+<hr />
+<h2 id="q12-what-are-residual-skip-connections-and-why-do-they-help">Q12. What are residual (skip) connections, and why do they help?</h2>
+<div class="highlight"><pre><span></span><code>output = x + Sublayer(x)
+</code></pre></div>
+<p>The input of each sub-layer is <strong>added back</strong> to its output.</p>
+<p>Benefits:</p>
+<ul>
+<li><strong>Gradient flow</strong> — the identity path lets gradients pass straight through, reducing vanishing gradients.</li>
+<li><strong>Preserves the original information</strong> — the sub-layer only has to learn a <em>correction</em>.</li>
+<li>Makes <strong>deep stacks</strong> (6, 12, 96 layers…) trainable.</li>
+</ul>
+<hr />
+<h2 id="q13-what-is-layer-normalization">Q13. What is layer normalization?</h2>
+<div class="highlight"><pre><span></span><code>LayerNorm(x) = γ × (x − μ) / √(σ² + ε) + β
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>μ</td>
+<td>mean of the vector's values</td>
+</tr>
+<tr>
+<td>σ²</td>
+<td>variance of the vector's values</td>
+</tr>
+<tr>
+<td>ε</td>
+<td>tiny constant to avoid division by zero</td>
+</tr>
+<tr>
+<td>γ</td>
+<td>learnable <strong>scale</strong></td>
+</tr>
+<tr>
+<td>β</td>
+<td>learnable <strong>shift</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Purpose: every position's vector is re-centred to <strong>zero mean and unit variance</strong>, which <strong>stabilizes training</strong>, allows <strong>higher learning rates</strong>, and reduces sensitivity to initialization. Unlike batch normalization, it normalizes across the <strong>features of one token</strong>, so it does not depend on the batch.</p>
+<hr />
+<h2 id="q14-what-is-the-feed-forward-network-and-why-is-it-needed">Q14. What is the feed-forward network, and why is it needed?</h2>
+<div class="highlight"><pre><span></span><code>FFN(x) = max(0, x·W₁ + b₁) · W₂ + b₂
+</code></pre></div>
+<ul>
+<li>Two linear layers with a <strong>ReLU</strong> in between.</li>
+<li>The hidden layer <strong>expands to 4×</strong> the model dimension: <strong>512 → 2048 → 512</strong>.</li>
+<li>Applied to <strong>each position independently</strong> (same weights for every position).</li>
+</ul>
+<p>Why needed? Attention is essentially a <strong>weighted average</strong> of value vectors — a (mostly) linear operation. The FFN adds <strong>non-linearity</strong> and extra capacity so the model can transform and combine the features each word has gathered.</p>
+<hr />
+<h2 id="q15-what-are-the-three-types-of-transformer-models">Q15. What are the three types of Transformer models?</h2>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Examples</th>
+<th>Attention direction</th>
+<th>Typical tasks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Encoder-only</strong></td>
+<td>BERT, RoBERTa</td>
+<td><strong>Bidirectional</strong> — sees the whole input</td>
+<td>Classification, NER, sentiment, understanding tasks</td>
+</tr>
+<tr>
+<td><strong>Decoder-only</strong></td>
+<td>GPT, GPT-4</td>
+<td><strong>Left-to-right</strong> (masked, autoregressive)</td>
+<td>Text generation, chat</td>
+</tr>
+<tr>
+<td><strong>Encoder–Decoder</strong></td>
+<td>BART, T5, original Transformer</td>
+<td>Encoder bidirectional + masked decoder</td>
+<td><strong>Sequence-to-sequence</strong>: translation, summarization</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="q16-what-are-the-key-hyperparameters-of-the-original-transformer">Q16. What are the key hyperparameters of the original Transformer?</h2>
+<table>
+<thead>
+<tr>
+<th>Hyperparameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Encoder layers (N)</td>
+<td>6</td>
+</tr>
+<tr>
+<td>Decoder layers (N)</td>
+<td>6</td>
+</tr>
+<tr>
+<td>d_model (embedding size)</td>
+<td>512</td>
+</tr>
+<tr>
+<td>Attention heads (h)</td>
+<td>8</td>
+</tr>
+<tr>
+<td>d_k (per head)</td>
+<td>512 / 8 = 64</td>
+</tr>
+<tr>
+<td>FFN inner dimension (d_ff)</td>
+<td>2048</td>
+</tr>
+<tr>
+<td>Optimizer</td>
+<td>Adam with warmup schedule</td>
+</tr>
+<tr>
+<td>Training technique</td>
+<td>Teacher forcing</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="q17-what-is-teacher-forcing">Q17. What is teacher forcing?</h2>
+<p>During training, at each step the decoder is fed the <strong>correct previous word from the target sentence</strong>, not its own (possibly wrong) prediction.</p>
+<div class="highlight"><pre><span></span><code>Step 1: Input = [START]              → predict "أنا"
+Step 2: Input = [START, أنا]         → predict "أحب"    (correct "أنا", not model's guess)
+Step 3: Input = [START, أنا, أحب]    → predict "التعلم"
+</code></pre></div>
+<p>Benefits:</p>
+<ul>
+<li><strong>Faster training</strong> — all positions can be computed in parallel because the whole target is known.</li>
+<li><strong>No error cascade</strong> — one wrong early prediction cannot derail every later step.</li>
+</ul>
+<hr />
+<h2 id="q18-how-does-the-full-translation-pipeline-work">Q18. How does the full translation pipeline work?</h2>
+<p>Example: <strong>"I love learning" → "أنا أحب التعلم"</strong></p>
+<p><strong>Encoder</strong></p>
+<ol>
+<li>Embed each English word as a vector.</li>
+<li>Add positional encoding.</li>
+<li>Pass through <strong>6 encoder layers</strong> (multi-head self-attention → Add &amp; Norm → FFN → Add &amp; Norm).</li>
+<li>Output: contextualized representations of "I", "love", "learning".</li>
+</ol>
+<p><strong>Decoder</strong> (one word at a time)</p>
+<ol>
+<li>Start with the <code>[START]</code> token.</li>
+<li>Embed the tokens generated so far and add positional encoding.</li>
+<li><strong>Masked self-attention</strong> — the decoder cannot see future words.</li>
+<li><strong>Cross-attention</strong> to the encoder output (Q from decoder, K/V from encoder).</li>
+<li>FFN → <strong>Linear → Softmax</strong> → predict the next word (e.g. "أنا").</li>
+<li>Append the predicted word and <strong>repeat</strong> (→ "أحب" → "التعلم") until the model predicts <code>[END]</code>.</li>
+</ol>
+<hr />
+<h2 id="q19-how-do-encoder-attention-and-decoder-attention-differ">Q19. How do encoder attention and decoder attention differ?</h2>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Encoder</th>
+<th>Decoder</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Self-attention</td>
+<td><strong>Unmasked</strong> — every word sees all words</td>
+<td><strong>Masked</strong> — cannot see future words</td>
+</tr>
+<tr>
+<td>Cross-attention</td>
+<td>None</td>
+<td><strong>Yes</strong> — Q from decoder, K and V from encoder</td>
+</tr>
+<tr>
+<td>Sub-layers per layer</td>
+<td><strong>2</strong> (self-attention, FFN)</td>
+<td><strong>3</strong> (masked self-attention, cross-attention, FFN)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="q20-why-is-the-transformer-better-than-a-cnn-for-nlp">Q20. Why is the Transformer better than a CNN for NLP?</h2>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>CNN</th>
+<th>Transformer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Context window</td>
+<td><strong>Limited</strong> by kernel size</td>
+<td><strong>Global</strong> — the whole sequence at once</td>
+</tr>
+<tr>
+<td>Long-range dependencies</td>
+<td>Need <strong>many stacked layers</strong></td>
+<td>Captured in <strong>a single attention layer</strong></td>
+</tr>
+<tr>
+<td>Parallelization</td>
+<td>Good</td>
+<td><strong>Excellent</strong></td>
+</tr>
+<tr>
+<td>Position awareness</td>
+<td>Built in (local)</td>
+<td>Requires <strong>positional encoding</strong></td>
+</tr>
+<tr>
+<td>Dominant in NLP</td>
+<td>No</td>
+<td><strong>Yes</strong>, since 2018</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="q21-bonus-if-transformers-process-in-parallel-why-is-text-generation-sequential">Q21 (Bonus). If Transformers process in parallel, why is text generation sequential?</h2>
+<ul>
+<li><strong>Training is parallel.</strong> The full target sentence is known, so with <strong>teacher forcing + masking</strong> every position is computed at the same time in one pass.</li>
+<li><strong>Inference is sequential.</strong> The next word is not known until it is predicted, so the decoder must generate <strong>one token at a time</strong>, feeding each output back in as input.</li>
+<li>This is why large language models still produce text <strong>word by word</strong> — even though, at each step, they process all previous tokens in parallel.</li>
+</ul>
+<hr />
+<p><em>Prepared by Dr. Abdulkarim Albanna — AI Applications Course.</em>
+<em>Related pages on the original site: <a href="https://albanna-tutorials.com/transformer.html">Transformer Overview</a> · <a href="https://albanna-tutorials.com/transformer-step-by-step.html">Step-by-Step Guide</a> · <a href="https://albanna-tutorials.com/transformer-step-by-step-ar.html">الشرح بالعربي</a></em></p>
+  <div class="pager"><span></span><a class="next" href="week02-text-classification.html"><small>Next</small>Week 2: Text Classification</a></div>
+  <footer style="margin-top:3rem;padding-top:1rem;border-top:1px solid var(--border);font-size:.84rem;color:var(--muted)">
+Course materials by <a href="https://albanna-tutorials.com/cs/">Dr. Abdulkarim Albanna</a> (University of Petra), adapted for the section taught by Dr. Zaid G. Momani. Interactive simulations and test code added for this site. Source on <a href="https://github.com/zmomani/ComputingSystemsDS-AI">GitHub</a>.
+</footer>
+</main><aside class="rail">
+  <div class="rail-tabs"><button class="active" data-panel="panel-sims">Simulations</button><button data-panel="panel-code">Test code</button></div>
+  <div class="rail-panel active" id="panel-sims"><p class="rail-intro">Interactive teaching aids for this week. Each opens full-size with step controls and teaching notes.</p><button class="sim-card" data-sim="attention"><span class="sim-kind">Transformers · animation</span><span class="sim-title">Self-attention: Q·Kᵀ → softmax → ·V</span><span class="sim-desc">Five stages of scaled dot-product attention on a 4-token sentence, with heatmaps.</span></button><button class="sim-card" data-sim="matrix-multiply"><span class="sim-kind">Linear algebra · animation</span><span class="sim-title">Matrix multiplication, step by step</span><span class="sim-desc">Row of A × column of B, one cell at a time, with the running sum.</span></button><button class="sim-card" data-sim="vectors"><span class="sim-kind">Linear algebra · interactive</span><span class="sim-title">Vectors, dot product &amp; cosine similarity</span><span class="sim-desc">Drag two vectors; see u+v, u·v, θ and cos θ — the geometry behind embeddings.</span></button><button class="sim-card" data-sim="tokenizer"><span class="sim-kind">Transformers · interactive</span><span class="sim-title">Subword tokenisation</span><span class="sim-desc">Type text, see WordPiece-style tokens, IDs and the embedding lookup.</span></button><button class="sim-card" data-sim="positional"><span class="sim-kind">Transformers · interactive</span><span class="sim-title">Positional encoding</span><span class="sim-desc">Sinusoid heatmap and per-dimension waves; why attention needs position.</span></button></div>
+  <div class="rail-panel" id="panel-code"><p class="rail-intro"><b>Run ▶</b> executes pure-Python/NumPy snippets in your browser (Pyodide). Snippets marked <i>local</i> need the course environment (PyTorch, Transformers, LangChain…) — copy them into VS Code.</p><div class="snippet"><div class="snippet-head"><span>Scaled dot-product attention from scratch (NumPy)</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 1. Scaled dot-product attention from scratch (NumPy)
+import numpy as np
+
+def softmax(x, axis=-1):
+    x = x - x.max(axis=axis, keepdims=True)
+    e = np.exp(x)
+    return e / e.sum(axis=axis, keepdims=True)
+
+def attention(Q, K, V):
+    d_k = Q.shape[-1]
+    scores = Q @ K.T / np.sqrt(d_k)
+    weights = softmax(scores)
+    return weights @ V, weights
+
+rng = np.random.default_rng(0)
+seq, d = 5, 8
+X = rng.normal(size=(seq, d))
+Wq, Wk, Wv = (rng.normal(size=(d, d)) * 0.3 for _ in range(3))
+out, w = attention(X @ Wq, X @ Wk, X @ Wv)
+print(&quot;attention weights (rows sum to 1):\n&quot;, w.round(3))
+print(&quot;row sums:&quot;, w.sum(axis=1).round(6))
+print(&quot;output shape:&quot;, out.shape)</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Check the PyTorch SelfAttention module from the lesson</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 2. Check the PyTorch SelfAttention module from the lesson
+import torch
+from torch import nn
+import math
+
+class SelfAttention(nn.Module):
+    def __init__(self, embed_size, heads):
+        super().__init__()
+        self.embed_size, self.heads = embed_size, heads
+        self.head_dim = embed_size // heads
+        assert self.head_dim * heads == embed_size
+        self.q_linear = nn.Linear(embed_size, embed_size)
+        self.k_linear = nn.Linear(embed_size, embed_size)
+        self.v_linear = nn.Linear(embed_size, embed_size)
+        self.fc_out = nn.Linear(embed_size, embed_size)
+
+    def forward(self, query, key, value, mask=None):
+        B = query.shape[0]
+        q = self.q_linear(query).view(B, -1, self.heads, self.head_dim).permute(0, 2, 1, 3)
+        k = self.k_linear(key).view(B, -1, self.heads, self.head_dim).permute(0, 2, 1, 3)
+        v = self.v_linear(value).view(B, -1, self.heads, self.head_dim).permute(0, 2, 1, 3)
+        scores = torch.matmul(q, k.permute(0, 1, 3, 2)) / math.sqrt(self.head_dim)
+        if mask is not None:
+            scores = scores.masked_fill(mask == 0, float(&quot;-1e20&quot;))
+        att = torch.softmax(scores, dim=-1)
+        out = torch.matmul(att, v).permute(0, 2, 1, 3).contiguous().view(B, -1, self.embed_size)
+        return self.fc_out(out)
+
+x = torch.randn(2, 7, 64)               # batch=2, seq=7, embed=64
+sa = SelfAttention(embed_size=64, heads=8)
+print(sa(x, x, x).shape)                # torch.Size([2, 7, 64])
+
+# causal mask: position i may only attend to j &lt;= i
+mask = torch.tril(torch.ones(7, 7))[None, None]   # (1,1,7,7)
+print(sa(x, x, x, mask=mask).shape)</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Sinusoidal positional encoding heatmap</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 3. Sinusoidal positional encoding heatmap
+import numpy as np
+import matplotlib.pyplot as plt
+
+def positional_encoding(seq_len, d_model):
+    pos = np.arange(seq_len)[:, None]
+    i = np.arange(d_model)[None, :]
+    angle = pos / np.power(10000, (2 * (i // 2)) / d_model)
+    pe = np.zeros((seq_len, d_model))
+    pe[:, 0::2] = np.sin(angle[:, 0::2])
+    pe[:, 1::2] = np.cos(angle[:, 1::2])
+    return pe
+
+pe = positional_encoding(50, 64)
+plt.imshow(pe, cmap=&quot;RdBu&quot;, aspect=&quot;auto&quot;)
+plt.xlabel(&quot;dimension&quot;); plt.ylabel(&quot;position&quot;); plt.colorbar()
+plt.title(&quot;Sinusoidal positional encoding&quot;)
+plt.show()</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Run BERT with Hugging Face and inspect output shapes</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 4. Run BERT with Hugging Face and inspect output shapes
+import torch
+from transformers import AutoModel, AutoTokenizer
+
+model_name = &quot;bert-base-uncased&quot;
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModel.from_pretrained(model_name)
+
+inputs = tokenizer(&quot;Understanding transformers is fascinating.&quot;, return_tensors=&quot;pt&quot;)
+with torch.no_grad():
+    outputs = model(**inputs)
+
+print(tokenizer.convert_ids_to_tokens(inputs[&quot;input_ids&quot;][0]))
+print(&quot;Hidden state shape:&quot;, outputs.last_hidden_state.shape)  # [1, seq_len, 768]
+print(&quot;Pooled output shape:&quot;, outputs.pooler_output.shape)     # [1, 768]</code></pre><div class="out"></div></div></div>
+</aside></div><div class="sim-overlay" id="sim-overlay" role="dialog" aria-modal="true">
+  <div class="sim-window"><div class="sim-head"><div><div class="sim-kind" id="sim-kind"></div><h3 id="sim-title"></h3></div><span class="spacer"></span><button class="btn-xs" id="sim-close">✕ Close (Esc)</button></div><div class="sim-body" id="sim-body"></div></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script>document.addEventListener('DOMContentLoaded',()=>{if(window.hljs)hljs.highlightAll();if(window.renderMathInElement)renderMathInElement(document.body,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});});</script>
+<script src="../assets/js/sims/core.js"></script>
+<script src="../assets/js/sims/matrix-multiply.js"></script><script src="../assets/js/sims/vectors.js"></script><script src="../assets/js/sims/attention.js"></script><script src="../assets/js/sims/tokenizer.js"></script><script src="../assets/js/sims/positional.js"></script><script src="../assets/js/sims/classifier.js"></script><script src="../assets/js/sims/bio-tagging.js"></script><script src="../assets/js/sims/rag.js"></script><script src="../assets/js/sims/langgraph.js"></script><script src="../assets/js/sims/sampling.js"></script><script src="../assets/js/sims/moe.js"></script><script src="../assets/js/sims/react-loop.js"></script><script src="../assets/js/sims/multi-agent.js"></script><script src="../assets/js/sims/mcp.js"></script><script src="../assets/js/sims/lam.js"></script><script src="../assets/js/sims/diffusion.js"></script>
+<script src="../assets/js/site.js"></script>
+</body></html>

@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 13: Diffusion Models · Computing Systems for DS & AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<link rel="stylesheet" href="../assets/css/site.css">
+</head>
+<body><header class="topbar">
+  <button class="btn-icon" id="menu-toggle" aria-label="Menu">☰</button>
+  <a class="brand" href="../index.html">606363 · Computing Systems for DS & AI<small>University of Petra</small></a>
+  <span class="spacer"></span>
+  <nav class="week-nav"><a class="btn-icon" href="week12-lams.html" title="Large Action Models (LAMs)">← Wk 12</a><a class="btn-icon" href="week14-project.html" title="Project Development &amp; Final Testing">Wk 14 →</a></nav>
+  <a class="btn-icon" href="../index.html#curriculum">Curriculum</a>
+  <a class="btn-icon" href="../index.html#simulations">Simulations</a>
+  <button class="btn-icon" id="theme-toggle" aria-label="Toggle dark mode">◐</button>
+</header><div class="layout"><aside class="sidebar">
+  <h4>Course</h4><ul class="outline"><li><a class="" href="../lessons/syllabus.html"><span class="wk">·</span><span>Course Syllabus</span></a></li><li><a class="" href="../lessons/project.html"><span class="wk">·</span><span>Final Project</span></a></li></ul>
+  <h4>16-week curriculum</h4><ul class="outline"><li><a class="" href="../lessons/week01-transformers.html"><span class="wk">01</span><span>Transformer Architecture</span></a></li><li><a class="" href="../lessons/week02-text-classification.html"><span class="wk">02</span><span>Text Classification</span></a></li><li><a class="soon" href="../lessons/week03-ner.html"><span class="wk">03</span><span>Named Entity Recognition (NER)</span></a></li><li><a class="" href="../lessons/week04-langchain.html"><span class="wk">04</span><span>LangChain Fundamentals</span></a></li><li><a class="" href="../lessons/week05-langgraph.html"><span class="wk">05</span><span>LangGraph</span></a></li><li><a class="" href="../lessons/week06-llms.html"><span class="wk">06</span><span>Large Language Models (LLMs)</span></a></li><li><a class="" href="../lessons/week07-moe.html"><span class="wk">07</span><span>Mixture of Experts (MoE)</span></a></li><li><a class="" href="../lessons/week08-midterm.html"><span class="wk">08</span><span>Midterm Exam</span></a></li><li><a class="" href="../lessons/week09-react-agents.html"><span class="wk">09</span><span>AI Agents &amp; ReAct</span></a></li><li><a class="" href="../lessons/week10-multi-agent.html"><span class="wk">10</span><span>Multi-Agent Systems</span></a></li><li><a class="" href="../lessons/week11-mcp.html"><span class="wk">11</span><span>Model Context Protocol (MCP)</span></a></li><li><a class="soon" href="../lessons/week12-lams.html"><span class="wk">12</span><span>Large Action Models (LAMs)</span></a></li><li><a class="active" href="../lessons/week13-diffusion.html"><span class="wk">13</span><span>Diffusion Models</span></a></li><li><a class="" href="../lessons/week14-project.html"><span class="wk">14</span><span>Project Development &amp; Final Testing</span></a></li><li><a class="" href="../lessons/week15-competition.html"><span class="wk">15</span><span>Competition Day &amp; Presentations</span></a></li><li><a class="" href="../lessons/week16-final.html"><span class="wk">16</span><span>Final Exam</span></a></li></ul>
+  <h4>On this page</h4><ul class="toc" id="toc"></ul>
+</aside><main class="main">
+  <div class="lesson-head"><div class="eyebrow">Week 13 · ILO K1, P1</div><h1>Diffusion Models</h1>
+  <p class="credit"><b>Topics:</b> Diffusion models, denoising architectures, Stable Diffusion, DALL-E<br><b>Project milestone:</b> Illustration Agent that generates figures for reports, plus a Streamlit UI with PDF download</p></div>
+  <div class="callout sim"><div class="sim-strip"><b style="margin-right:4px">Simulations for this week:</b><button class="chip" data-sim="diffusion">▶ Diffusion: noising &amp; denoising</button></div></div>
+  <blockquote>
+<p>Course page by Dr. Abedal-Kareem Al-Banna (Al-banna Tutorials). Code samples are PyTorch, as on the source page.</p>
+</blockquote>
+<h2 id="1-introduction-to-diffusion-models">1. Introduction to Diffusion Models</h2>
+<p>Diffusion models are generative models that gained wide attention from 2020 onward. They create new samples by <strong>gradually adding noise to training data, then learning to reverse that process</strong>.</p>
+<p><strong>Why they matter</strong>
+- State-of-the-art image quality.
+- No adversarial training (unlike GANs).
+- Comparatively stable training.
+- Highly controllable generation.
+- They power well-known tools such as DALL-E 2 and Stable Diffusion.</p>
+<p><strong>Timeline</strong>
+| Year | Milestone |
+|---|---|
+| 2015 | Sohl-Dickstein et al., <em>Deep Unsupervised Learning using Nonequilibrium Thermodynamics</em> — the first diffusion model, inspired by non-equilibrium thermodynamics |
+| 2020 | Ho et al., <em>Denoising Diffusion Probabilistic Models</em> (DDPM) — the foundation for modern implementations |
+| 2021 | <em>Improved Denoising Diffusion Probabilistic Models</em> — better sampling techniques |
+| 2022 | Stability AI releases Stable Diffusion, bringing diffusion models to the mainstream |</p>
+<blockquote>
+<p><strong>Key insight.</strong> Diffusion models gradually add noise to data, then learn to reverse that process to generate realistic, diverse samples.</p>
+</blockquote>
+<h2 id="2-fundamentals">2. Fundamentals</h2>
+<p>Diffusion models destroy structure in data with a <strong>forward process</strong>, then learn to restore it with a <strong>reverse process</strong>.</p>
+<ul>
+<li><strong>Forward diffusion</strong> — adds noise over many steps until the data becomes pure Gaussian noise.</li>
+<li><strong>Reverse diffusion</strong> — starts from noise and removes it step by step to produce a clean sample resembling the training data.</li>
+</ul>
+<p><strong>Key concepts</strong>
+- <strong>Markov chain</strong> — each step depends only on the previous one, which keeps the math tractable:</p>
+<p>q(x₁:T | x₀) := ∏ₜ₌₁ᵀ q(xₜ | xₜ₋₁)</p>
+<ul>
+<li><strong>Gaussian transitions</strong> — each forward step adds Gaussian noise according to a <strong>variance schedule βₜ</strong>:</li>
+</ul>
+<p>q(xₜ | xₜ₋₁) = 𝒩(xₜ; √(1 − βₜ)·xₜ₋₁, βₜ·I)</p>
+<ul>
+<li><strong>Neural network</strong> — any architecture whose input and output dimensions match can work; U-Nets are most common for images. The network is usually trained to predict (a) the added noise (most common), (b) the original data directly, or (c) the mean and variance of the posterior.</li>
+<li><strong>Timesteps</strong> — T is a key hyperparameter; more steps usually improve quality but slow generation.</li>
+</ul>
+<p><strong>Noise schedules</strong>
+| Schedule | Formula | Notes |
+|---|---|---|
+| Linear | βₜ = β₁ + (β_T − β₁) · (t−1)/(T−1) | Used in the original DDPM paper; can destroy most information around the halfway point |
+| Cosine | βₜ = 1 − cos²(((t/T + s)/(1 + s)) · π/2) / cos²((s/(1 + s)) · π/2) | Introduced by OpenAI; preserves more information early, allows as few as ~50 steps |
+| Quadratic | βₜ = β₁ + (β_T − β₁) · ((t−1)/(T−1))² | Adds noise faster later; can help preserve important structure early |</p>
+<h2 id="3-forward-diffusion-process">3. Forward Diffusion Process</h2>
+<p>The forward process gradually adds Gaussian noise until the data becomes pure noise.</p>
+<ol>
+<li><strong>Start with original data</strong> — sample x₀ from the real data distribution.</li>
+<li><strong>Define the noise schedule</strong> — choose β₁ … β_T (linear, cosine, or quadratic).</li>
+<li><strong>Apply noise iteratively</strong> — at each step mix the previous sample with fresh Gaussian noise, scaled by the schedule:</li>
+</ol>
+<p>xₜ = √(1 − βₜ)·xₜ₋₁ + √βₜ·εₜ,  εₜ ~ 𝒩(0, I)</p>
+<ol start="4">
+<li><strong>Sample efficiently</strong> — any xₜ can be computed directly from x₀ using the cumulative product ᾱₜ = ∏ₛ₌₁ᵗ (1 − βₛ):</li>
+</ol>
+<p>q(xₜ | x₀) = 𝒩(xₜ; √ᾱₜ·x₀, (1 − ᾱₜ)·I)
+   xₜ = √ᾱₜ·x₀ + √(1 − ᾱₜ)·ε</p>
+<p>This shortcut is essential for training.
+5. <strong>End result</strong> — after T steps, x_T is approximately standard Gaussian noise; all original structure is gone.</p>
+<blockquote>
+<p><strong>Important insight.</strong> The forward process is never used to generate images. It only defines the mathematical framework for learning the reverse process, which does the generating.</p>
+</blockquote>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">forward_diffusion_sample</span><span class="p">(</span><span class="n">x_0</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Takes an image and a timestep as input and</span>
+<span class="sd">    returns the noisy version of it at timestep t</span>
+<span class="sd">    """</span>
+    <span class="n">noise</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn_like</span><span class="p">(</span><span class="n">x_0</span><span class="p">)</span>
+    <span class="n">sqrt_alphas_cumprod_t</span> <span class="o">=</span> <span class="n">sqrt_alphas_cumprod</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
+    <span class="n">sqrt_one_minus_alphas_cumprod_t</span> <span class="o">=</span> <span class="n">sqrt_one_minus_alphas_cumprod</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
+
+    <span class="c1"># Forward diffusion formula: mean + variance</span>
+    <span class="k">return</span> <span class="n">sqrt_alphas_cumprod_t</span> <span class="o">*</span> <span class="n">x_0</span> <span class="o">+</span> <span class="n">sqrt_one_minus_alphas_cumprod_t</span> <span class="o">*</span> <span class="n">noise</span><span class="p">,</span> <span class="n">noise</span>
+</code></pre></div>
+<h2 id="4-reverse-diffusion-process">4. Reverse Diffusion Process</h2>
+<p>The reverse process is what gets learned during training and used during generation: it turns noise into structured data.</p>
+<p><strong>The challenge.</strong> Unlike the simple forward process, the reverse process is complex and must be learned from data. The model learns to predict and remove noise step by step.</p>
+<p><strong>Mathematical formulation</strong></p>
+<p>p_θ(x₀:T) := p(x_T) · ∏ₜ₌₁ᵀ p_θ(xₜ₋₁ | xₜ)
+  p_θ(xₜ₋₁ | xₜ) = 𝒩(xₜ₋₁; μ_θ(xₜ, t), Σ_θ(xₜ, t))</p>
+<ul>
+<li>Each transition's variance is often fixed to match the forward schedule, so the network mainly predicts the mean.</li>
+<li>Predicting the <strong>noise component</strong> ε_θ(xₜ, t) ≈ ε, rather than the mean directly, gives more stable training and better results.</li>
+<li>The denoising update subtracts the predicted-noise contribution and adds a small random term (except at the final step):</li>
+</ul>
+<p>xₜ₋₁ = (1/√αₜ) · (xₜ − ((1 − αₜ)/√(1 − ᾱₜ)) · ε_θ(xₜ, t)) + σₜ·z,  z ~ 𝒩(0, I), αₜ = 1 − βₜ</p>
+<p><strong>Sampling steps</strong>
+1. Start with random Gaussian noise x_T.
+2. For t = T down to 1: predict the noise with the network, then compute the less-noisy sample with the denoising formula.
+3. Return x₀ as the generated output.</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">image_size</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Samples n_samples new images from the model</span>
+<span class="sd">    """</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="c1"># Start from pure noise</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">image_size</span><span class="p">,</span> <span class="n">image_size</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">timesteps</span><span class="p">)):</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,),</span> <span class="n">i</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
+
+            <span class="c1"># Predict noise</span>
+            <span class="n">predicted_noise</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+
+            <span class="c1"># Get alpha values for this timestep</span>
+            <span class="n">alpha</span> <span class="o">=</span> <span class="n">alphas</span><span class="p">[</span><span class="n">t</span><span class="p">][:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+            <span class="n">alpha_hat</span> <span class="o">=</span> <span class="n">alphas_cumprod</span><span class="p">[</span><span class="n">t</span><span class="p">][:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+            <span class="n">beta</span> <span class="o">=</span> <span class="n">betas</span><span class="p">[</span><span class="n">t</span><span class="p">][:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+
+            <span class="c1"># Only add noise if we're not at the last step</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">noise</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">noise</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+            <span class="c1"># Compute the denoised x_0 at this step</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha_hat</span><span class="p">))</span> <span class="o">*</span> <span class="n">predicted_noise</span><span class="p">)</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span> <span class="o">*</span> <span class="n">noise</span>
+
+    <span class="c1"># Rescale to [0, 1] for images</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>Advanced sampling techniques</strong>
+- <strong>DDIM sampling</strong> — uses non-Markovian paths to skip steps while maintaining quality.
+- <strong>Classifier guidance</strong> — a separate classifier steers generation toward desired attributes.
+- <strong>Classifier-free guidance</strong> — balances conditional and unconditional predictions to improve quality and prompt adherence; the guidance scale controls how strongly the output follows the condition.</p>
+<h2 id="5-neural-network-architecture">5. Neural Network Architecture</h2>
+<p>The network predicts noise at each timestep. The most common choice for images is the <strong>U-Net</strong>:
+- <strong>Downsampling path</strong> — captures context through convolutional layers.
+- <strong>Upsampling path</strong> — rebuilds spatial detail.
+- <strong>Skip connections</strong> — pass information directly from encoder to decoder.
+- <strong>Attention layers</strong> — many implementations add self-attention at certain resolutions.</p>
+<p><strong>Key architectural elements</strong>
+- <strong>ResNet blocks</strong> — the U-Net backbone: group normalization, SiLU activation, 3×3 convolutions, and a skip connection adding input to output.</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ResidualBlock</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">,</span> <span class="n">time_emb_dim</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_mlp</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">time_emb_dim</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">in_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">norm1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">GroupNorm</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">out_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">norm2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">GroupNorm</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">act</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">SiLU</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">in_channels</span> <span class="o">!=</span> <span class="n">out_channels</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">shortcut</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">in_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">shortcut</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Identity</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">act</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">norm1</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+        <span class="n">time_emb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">act</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time_mlp</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">h</span> <span class="o">+</span> <span class="n">time_emb</span><span class="p">[:,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">act</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">norm2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv2</span><span class="p">(</span><span class="n">h</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">h</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">shortcut</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</code></pre></div>
+<ul>
+<li><strong>Self-attention blocks</strong> — capture long-range dependencies, as in transformers; often placed in the middle of the U-Net where feature maps are medium resolution.</li>
+<li><strong>Timestep embeddings</strong> — convert t into a high-dimensional sinusoidal embedding, pass it through an MLP, and inject it into each residual block.</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">timestep_embedding</span><span class="p">(</span><span class="n">timesteps</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">max_period</span><span class="o">=</span><span class="mi">10000</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Create sinusoidal timestep embeddings.</span>
+<span class="sd">    """</span>
+    <span class="n">half</span> <span class="o">=</span> <span class="n">dim</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="n">freqs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
+        <span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">max_period</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">half</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">/</span> <span class="n">half</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">timesteps</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">timesteps</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">()</span> <span class="o">*</span> <span class="n">freqs</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+    <span class="n">embedding</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">args</span><span class="p">)],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dim</span> <span class="o">%</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">embedding</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">embedding</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">embedding</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">1</span><span class="p">])],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">embedding</span>
+</code></pre></div>
+<p><strong>Conditional generation</strong> — the model can be conditioned on:
+- <strong>Class labels</strong> — converted to embeddings and combined with timestep embeddings.
+- <strong>Text prompts</strong> — encoded by a pre-trained text encoder such as CLIP, then injected into the model.
+- <strong>Other images</strong> — encoded and used as extra conditioning, enabling image-to-image translation.</p>
+<p><strong>Advanced architectures</strong>
+- <strong>Latent diffusion models</strong> — run diffusion in a smaller latent space rather than pixel space, greatly reducing compute. Stable Diffusion works on 4×64×64 latents rather than 3×512×512 images.
+- <strong>Cascaded diffusion</strong> — chains models at increasing resolutions for very high-resolution output; DALL-E 2 uses this to reach 1024×1024.
+- <strong>Score-based models</strong> — model the gradient of the log-density instead of predicting noise; under certain conditions mathematically equivalent to diffusion models.</p>
+<blockquote>
+<p><strong>Architectural flexibility.</strong> The only hard requirement is matching input and output dimensions, which makes the architecture easy to adapt.</p>
+</blockquote>
+<h2 id="6-training-diffusion-models">6. Training Diffusion Models</h2>
+<p>Training teaches the network to predict the noise added during the forward process.</p>
+<p><strong>Objective.</strong> The full objective is a variational bound on the negative log-likelihood, one KL term per timestep:</p>
+<p>L_vlb = L₀ + L₁ + … + L_{T−1} + L_T</p>
+<p>In practice the <strong>simplified objective</strong> is used — mean squared error between the true and predicted noise at a random timestep:</p>
+<p>L_simple = 𝔼_{t, x₀, ε} [ ‖ε − ε_θ(xₜ, t)‖² ]</p>
+<p><strong>Training algorithm</strong>
+1. Sample a batch of training data x₀.
+2. Sample a random timestep t for each example.
+3. Sample Gaussian noise ε.
+4. Create noisy samples xₜ using the direct sampling formula.
+5. Predict the noise with the network.
+6. Compute the loss between predicted and true noise.
+7. Update parameters with gradient descent.</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">train_step</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">x_0</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">):</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="n">x_0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Sample random timesteps</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">timesteps</span><span class="p">,</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,),</span> <span class="n">device</span><span class="o">=</span><span class="n">x_0</span><span class="o">.</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
+
+    <span class="c1"># Sample random noise</span>
+    <span class="n">noise</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn_like</span><span class="p">(</span><span class="n">x_0</span><span class="p">)</span>
+
+    <span class="c1"># Get noisy samples</span>
+    <span class="n">x_t</span> <span class="o">=</span> <span class="n">get_noisy_samples</span><span class="p">(</span><span class="n">x_0</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">noise</span><span class="p">)</span>
+
+    <span class="c1"># Predict noise</span>
+    <span class="n">predicted_noise</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x_t</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+
+    <span class="c1"># Calculate loss</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">predicted_noise</span><span class="p">,</span> <span class="n">noise</span><span class="p">)</span>
+
+    <span class="c1"># Update model</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+</code></pre></div>
+<p><strong>Hyperparameters</strong>
+| Hyperparameter | Typical value |
+|---|---|
+| Timesteps (T) | ~1000 for training; fewer for sampling |
+| Noise schedule | Linear, cosine, or quadratic |
+| Batch size | 32 – 256 |
+| Learning rate | ~1e-4 to 2e-5 |
+| EMA decay | ~0.9999 |</p>
+<p><strong>Optimization techniques</strong>
+- Careful weight initialization.
+- Gradient clipping to prevent exploding gradients.
+- Cosine learning-rate decay.
+- Mixed-precision training for speed on modern GPUs.
+- Exponential moving average (EMA) of model weights, which often improves results.</p>
+<blockquote>
+<p><strong>Training stability.</strong> Diffusion models are generally more stable than GANs: they avoid mode collapse and converge more consistently.</p>
+</blockquote>
+<p><strong>Conditional training</strong>
+- <strong>Class-conditional</strong> — feed the class label with the noisy image and timestep; convert labels to learned embeddings, combine with timestep embeddings, inject throughout the model.
+- <strong>Text-conditional</strong> — encode prompts with a pre-trained encoder (CLIP), process through extra layers, inject via <strong>cross-attention</strong> so the model learns to match descriptions.
+- <strong>Classifier-free guidance</strong> — train one model for both conditional and unconditional generation by randomly dropping the condition (c → ∅) during training. At sampling time extrapolate from the unconditional toward the conditional prediction with guidance weight w &gt; 1:</p>
+<p>ε_θ^CFG(xₜ, c, t) = ε_θ(xₜ, ∅, t) + w · (ε_θ(xₜ, c, t) − ε_θ(xₜ, ∅, t))</p>
+<h2 id="7-applications">7. Applications</h2>
+<p>Covered areas: text-to-image generation, image editing, video, audio, 3D content, and scientific uses such as drug discovery.</p>
+<p><strong>Text-to-image walkthrough</strong>
+1. The user enters a text prompt.
+2. A text encoder (typically CLIP) turns the prompt into embeddings.
+3. The diffusion model uses those embeddings to condition generation.
+4. Starting from random noise, the model denoises into an image matching the prompt.
+5. Classifier-free guidance improves quality and prompt adherence.</p>
+<p><strong>Model comparison</strong>
+| Model | Architecture | Key features | Strengths | Limitations |
+|---|---|---|---|---|
+| DALL-E 2 | CLIP + diffusion | Cascaded diffusion models; CLIP image embeddings | Strong photorealism and composition | Closed source, limited customization |
+| Stable Diffusion | Latent diffusion | Works in compressed latent space; open source | Efficient, customizable, large community of extensions | Can be less coherent than DALL-E 2 |
+| Midjourney | Proprietary diffusion | Focus on artistic quality; Discord interface | Strong aesthetics and artistic styles | Less control; Discord-only |
+| Google Imagen | Cascaded diffusion | T5 text encoder; super-resolution diffusion | Strong text alignment, high resolution | Limited public access |</p>
+<p><strong>Future directions</strong>
+- Multimodal models unifying text, image, audio, and video.
+- Faster sampling with fewer steps.
+- More precise control over generated content.
+- Greater compute efficiency and accessibility.
+- Specialized models for scientific, medical, and industrial domains.</p>
+<h2 id="8-advanced-topics">8. Advanced Topics</h2>
+<ul>
+<li><strong>Sampling</strong> — DDIM (fewer steps, deterministic), DPM-Solver (higher-order ODE solvers), ancestral sampling (controlled randomness).</li>
+<li><strong>Latent diffusion</strong> — a VAE compresses images, diffusion runs in latent space, a decoder reconstructs the image.</li>
+<li><strong>Control</strong> — ControlNet (spatial conditioning), textual inversion (learning new concepts), LoRA (small trainable adapters for lightweight fine-tuning).</li>
+<li><strong>Cascaded models</strong> — a low-resolution base model followed by upsampling models.</li>
+<li><strong>Video diffusion</strong> — 3D U-Nets, transformers, latent video diffusion; challenges are cost and temporal consistency.</li>
+<li><strong>Theory</strong> — links to score-based models and SDEs, and to variational inference / hierarchical VAEs.</li>
+<li><strong>Research frontiers</strong> — efficiency, quality–speed trade-offs, multimodal generation, ethics.</li>
+</ul>
+<h2 id="9-learning-resources">9. Learning Resources</h2>
+<p><strong>Research papers</strong>
+| Category | Title | Authors | Year |
+|---|---|---|---|
+| Foundational | Deep Unsupervised Learning using Nonequilibrium Thermodynamics | Sohl-Dickstein et al. | 2015 |
+| Core DDPM | Denoising Diffusion Probabilistic Models | Ho et al. | 2020 |
+| Improvements | Improved Denoising Diffusion Probabilistic Models | Nichol &amp; Dhariwal | 2021 |
+| Latent space | High-Resolution Image Synthesis with Latent Diffusion Models | Rombach et al. | 2022 |
+| Guidance | Classifier-Free Diffusion Guidance | Ho &amp; Salimans | 2022 |</p>
+<p><strong>Tutorials and courses</strong>
+- <em>Understanding Diffusion Models: A Unified Perspective</em> — Calvin Luo (mathematical background)
+- <em>Diffusion Models from Scratch</em> — Hugging Face (code walkthrough)
+- <em>Diffusion Models | Paper Explanation</em> — Yannic Kilcher (video)
+- <em>Diffusion Models: A Practical Guide</em> — Google AI (interactive)
+- <em>Generative AI with Diffusion Models</em> (full course)</p>
+<p><strong>Code and implementation</strong>
+- <code>denoising-diffusion-pytorch</code> — Phil Wang (PyTorch)
+- Stable Diffusion GitHub repository (production code)
+- <code>score_sde</code> — Yang Song (JAX)
+- Hugging Face <em>Diffusion Models Tutorial</em> (simplified demo)
+- Colab notebooks for experimentation</p>
+<p><strong>Learning path</strong>
+1. <strong>Foundations</strong> — probability, Markov chains, generative models, Gaussians, KL divergence.
+2. <strong>Core concepts</strong> — forward and reverse diffusion; how noise is added and removed.
+3. <strong>Architecture</strong> — U-Net design, timestep embedding, conditioning.
+4. <strong>Training and sampling</strong> — objectives and sampling procedures; a small PyTorch/TensorFlow implementation.
+5. <strong>Advanced topics</strong> — latent diffusion, classifier-free guidance, accelerated sampling.
+6. <strong>Applications and projects</strong> — text-to-image generation or inpainting.</p>
+<h2 id="10-conclusion">10. Conclusion</h2>
+<p>Diffusion models are stable to train, produce high-quality and controllable output, are theoretically grounded, and are architecturally flexible. Continued growth is expected across modalities and domains.</p>
+  <div class="pager"><a href="week12-lams.html"><small>Previous</small>Week 12: Large Action Models (LAMs)</a><a class="next" href="week14-project.html"><small>Next</small>Week 14: Project Development &amp; Final Testing</a></div>
+  <footer style="margin-top:3rem;padding-top:1rem;border-top:1px solid var(--border);font-size:.84rem;color:var(--muted)">
+Course materials by <a href="https://albanna-tutorials.com/cs/">Dr. Abdulkarim Albanna</a> (University of Petra), adapted for the section taught by Dr. Zaid G. Momani. Interactive simulations and test code added for this site. Source on <a href="https://github.com/zmomani/ComputingSystemsDS-AI">GitHub</a>.
+</footer>
+</main><aside class="rail">
+  <div class="rail-tabs"><button class="active" data-panel="panel-sims">Simulations</button><button data-panel="panel-code">Test code</button></div>
+  <div class="rail-panel active" id="panel-sims"><p class="rail-intro">Interactive teaching aids for this week. Each opens full-size with step controls and teaching notes.</p><button class="sim-card" data-sim="diffusion"><span class="sim-kind">Diffusion · simulation</span><span class="sim-title">Diffusion: noising &amp; denoising</span><span class="sim-desc">Scrub t under a β schedule, read ᾱ_t and SNR, then denoise step by step.</span></button></div>
+  <div class="rail-panel" id="panel-code"><p class="rail-intro"><b>Run ▶</b> executes pure-Python/NumPy snippets in your browser (Pyodide). Snippets marked <i>local</i> need the course environment (PyTorch, Transformers, LangChain…) — copy them into VS Code.</p><div class="snippet"><div class="snippet-head"><span>Noise schedules and the closed-form forward sample (numpy only)</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 1. Noise schedules and the closed-form forward sample (numpy only)
+import numpy as np
+
+T = 1000
+betas_linear = np.linspace(1e-4, 0.02, T)
+s = 0.008
+tt = np.arange(T + 1) / T
+f = np.cos((tt + s) / (1 + s) * np.pi / 2) ** 2
+alphas_bar_cos = f / f[0]
+betas_cosine = np.clip(1 - alphas_bar_cos[1:] / alphas_bar_cos[:-1], 0, 0.999)
+
+def alpha_bar(betas):
+    return np.cumprod(1 - betas)
+
+for name, b in [(&quot;linear&quot;, betas_linear), (&quot;cosine&quot;, betas_cosine)]:
+    ab = alpha_bar(b)
+    print(f&quot;{name:7s} alpha_bar at t=250/500/750: {ab[249]:.3f} {ab[499]:.3f} {ab[749]:.3f}&quot;)
+
+# forward sample of a scalar x0 = 1.0 at t = 500 under the linear schedule
+ab = alpha_bar(betas_linear)
+x0, t = 1.0, 500
+eps = np.random.randn()
+x_t = np.sqrt(ab[t]) * x0 + np.sqrt(1 - ab[t]) * eps
+print(&quot;x_t =&quot;, round(x_t, 3))</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Train a tiny DDPM on a 2-D toy dataset and sample from it (PyTorch)</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 2. Train a tiny DDPM on a 2-D toy dataset and sample from it (PyTorch)
+import math, torch, torch.nn as nn, torch.nn.functional as F
+
+torch.manual_seed(0)
+T = 200
+betas = torch.linspace(1e-4, 0.02, T)
+alphas = 1 - betas
+alphas_cumprod = torch.cumprod(alphas, 0)
+
+def make_data(n=2048):           # two Gaussian blobs
+    c = torch.randint(0, 2, (n, 1)).float() * 4 - 2
+    return torch.cat([c, torch.zeros(n, 1)], 1) + 0.3 * torch.randn(n, 2)
+
+def timestep_embedding(timesteps, dim, max_period=10000):
+    half = dim // 2
+    freqs = torch.exp(-math.log(max_period) * torch.arange(half).float() / half)
+    args = timesteps[:, None].float() * freqs[None]
+    return torch.cat([torch.cos(args), torch.sin(args)], -1)
+
+class EpsNet(nn.Module):
+    def __init__(self, d=64):
+        super().__init__()
+        self.net = nn.Sequential(nn.Linear(2 + d, 128), nn.SiLU(),
+                                 nn.Linear(128, 128), nn.SiLU(), nn.Linear(128, 2))
+        self.d = d
+    def forward(self, x, t):
+        return self.net(torch.cat([x, timestep_embedding(t, self.d)], -1))
+
+model = EpsNet(); opt = torch.optim.Adam(model.parameters(), 1e-3)
+x0_all = make_data()
+for step in range(1500):
+    x0 = x0_all[torch.randint(0, len(x0_all), (256,))]
+    t = torch.randint(0, T, (256,))
+    noise = torch.randn_like(x0)
+    ab = alphas_cumprod[t][:, None]
+    x_t = ab.sqrt() * x0 + (1 - ab).sqrt() * noise
+    loss = F.mse_loss(model(x_t, t), noise)
+    opt.zero_grad(); loss.backward(); opt.step()
+    if step % 500 == 0: print(f&quot;step {step} loss {loss.item():.4f}&quot;)
+
+@torch.no_grad()
+def sample(n=500):
+    x = torch.randn(n, 2)
+    for i in reversed(range(T)):
+        t = torch.full((n,), i)
+        eps = model(x, t)
+        a, ab, b = alphas[i], alphas_cumprod[i], betas[i]
+        z = torch.randn_like(x) if i &gt; 0 else 0
+        x = (x - (1 - a) / (1 - ab).sqrt() * eps) / a.sqrt() + b.sqrt() * z
+    return x
+
+xs = sample()
+print(&quot;sampled x-means by cluster:&quot;, xs[xs[:, 0] &lt; 0, 0].mean().item(), xs[xs[:, 0] &gt; 0, 0].mean().item())</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Sinusoidal timestep embeddings: nearby timesteps are close, distant ones are not</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 3. Sinusoidal timestep embeddings: nearby timesteps are close, distant ones are not
+import math, torch
+
+def timestep_embedding(timesteps, dim, max_period=10000):
+    half = dim // 2
+    freqs = torch.exp(-math.log(max_period) * torch.arange(half).float() / half)
+    args = timesteps[:, None].float() * freqs[None]
+    return torch.cat([torch.cos(args), torch.sin(args)], -1)
+
+e = timestep_embedding(torch.tensor([10, 11, 500]), 32)
+cos = torch.nn.functional.cosine_similarity
+print(&quot;sim(10,11) =&quot;, round(cos(e[0:1], e[1:2]).item(), 3))
+print(&quot;sim(10,500)=&quot;, round(cos(e[0:1], e[2:3]).item(), 3))</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Classifier-free guidance arithmetic on noise predictions</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 4. Classifier-free guidance arithmetic on noise predictions
+import torch
+
+eps_uncond = torch.tensor([0.10, -0.20])   # eps_theta(x_t, None, t)
+eps_cond   = torch.tensor([0.40,  0.10])   # eps_theta(x_t, c, t)
+for w in [0.0, 1.0, 3.0, 7.5]:
+    eps_cfg = eps_uncond + w * (eps_cond - eps_uncond)
+    print(f&quot;w={w:&lt;4} eps_cfg={eps_cfg.tolist()}&quot;)</code></pre><div class="out"></div></div></div>
+</aside></div><div class="sim-overlay" id="sim-overlay" role="dialog" aria-modal="true">
+  <div class="sim-window"><div class="sim-head"><div><div class="sim-kind" id="sim-kind"></div><h3 id="sim-title"></h3></div><span class="spacer"></span><button class="btn-xs" id="sim-close">✕ Close (Esc)</button></div><div class="sim-body" id="sim-body"></div></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script>document.addEventListener('DOMContentLoaded',()=>{if(window.hljs)hljs.highlightAll();if(window.renderMathInElement)renderMathInElement(document.body,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});});</script>
+<script src="../assets/js/sims/core.js"></script>
+<script src="../assets/js/sims/matrix-multiply.js"></script><script src="../assets/js/sims/vectors.js"></script><script src="../assets/js/sims/attention.js"></script><script src="../assets/js/sims/tokenizer.js"></script><script src="../assets/js/sims/positional.js"></script><script src="../assets/js/sims/classifier.js"></script><script src="../assets/js/sims/bio-tagging.js"></script><script src="../assets/js/sims/rag.js"></script><script src="../assets/js/sims/langgraph.js"></script><script src="../assets/js/sims/sampling.js"></script><script src="../assets/js/sims/moe.js"></script><script src="../assets/js/sims/react-loop.js"></script><script src="../assets/js/sims/multi-agent.js"></script><script src="../assets/js/sims/mcp.js"></script><script src="../assets/js/sims/lam.js"></script><script src="../assets/js/sims/diffusion.js"></script>
+<script src="../assets/js/site.js"></script>
+</body></html>

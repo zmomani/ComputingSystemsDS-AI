@@ -1,0 +1,703 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 10: Multi-Agent Systems · Computing Systems for DS & AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<link rel="stylesheet" href="../assets/css/site.css">
+</head>
+<body><header class="topbar">
+  <button class="btn-icon" id="menu-toggle" aria-label="Menu">☰</button>
+  <a class="brand" href="../index.html">606363 · Computing Systems for DS & AI<small>University of Petra</small></a>
+  <span class="spacer"></span>
+  <nav class="week-nav"><a class="btn-icon" href="week09-react-agents.html" title="AI Agents &amp; ReAct">← Wk 9</a><a class="btn-icon" href="week11-mcp.html" title="Model Context Protocol (MCP)">Wk 11 →</a></nav>
+  <a class="btn-icon" href="../index.html#curriculum">Curriculum</a>
+  <a class="btn-icon" href="../index.html#simulations">Simulations</a>
+  <button class="btn-icon" id="theme-toggle" aria-label="Toggle dark mode">◐</button>
+</header><div class="layout"><aside class="sidebar">
+  <h4>Course</h4><ul class="outline"><li><a class="" href="../lessons/syllabus.html"><span class="wk">·</span><span>Course Syllabus</span></a></li><li><a class="" href="../lessons/project.html"><span class="wk">·</span><span>Final Project</span></a></li></ul>
+  <h4>16-week curriculum</h4><ul class="outline"><li><a class="" href="../lessons/week01-transformers.html"><span class="wk">01</span><span>Transformer Architecture</span></a></li><li><a class="" href="../lessons/week02-text-classification.html"><span class="wk">02</span><span>Text Classification</span></a></li><li><a class="soon" href="../lessons/week03-ner.html"><span class="wk">03</span><span>Named Entity Recognition (NER)</span></a></li><li><a class="" href="../lessons/week04-langchain.html"><span class="wk">04</span><span>LangChain Fundamentals</span></a></li><li><a class="" href="../lessons/week05-langgraph.html"><span class="wk">05</span><span>LangGraph</span></a></li><li><a class="" href="../lessons/week06-llms.html"><span class="wk">06</span><span>Large Language Models (LLMs)</span></a></li><li><a class="" href="../lessons/week07-moe.html"><span class="wk">07</span><span>Mixture of Experts (MoE)</span></a></li><li><a class="" href="../lessons/week08-midterm.html"><span class="wk">08</span><span>Midterm Exam</span></a></li><li><a class="" href="../lessons/week09-react-agents.html"><span class="wk">09</span><span>AI Agents &amp; ReAct</span></a></li><li><a class="active" href="../lessons/week10-multi-agent.html"><span class="wk">10</span><span>Multi-Agent Systems</span></a></li><li><a class="" href="../lessons/week11-mcp.html"><span class="wk">11</span><span>Model Context Protocol (MCP)</span></a></li><li><a class="soon" href="../lessons/week12-lams.html"><span class="wk">12</span><span>Large Action Models (LAMs)</span></a></li><li><a class="" href="../lessons/week13-diffusion.html"><span class="wk">13</span><span>Diffusion Models</span></a></li><li><a class="" href="../lessons/week14-project.html"><span class="wk">14</span><span>Project Development &amp; Final Testing</span></a></li><li><a class="" href="../lessons/week15-competition.html"><span class="wk">15</span><span>Competition Day &amp; Presentations</span></a></li><li><a class="" href="../lessons/week16-final.html"><span class="wk">16</span><span>Final Exam</span></a></li></ul>
+  <h4>On this page</h4><ul class="toc" id="toc"></ul>
+</aside><main class="main">
+  <div class="lesson-head"><div class="eyebrow">Week 10 · ILO K2, I1, P2</div><h1>Multi-Agent Systems</h1>
+  <p class="credit"><b>Topics:</b> Agentic design patterns, workflow patterns, CrewAI/AutoGen, A2A protocol<br><b>Project milestone:</b> Full pipeline: Research → Classification → NER → Analyzer → Writer → Critic, with a human checkpoint before writing</p></div>
+  <div class="callout sim"><div class="sim-strip"><b style="margin-right:4px">Simulations for this week:</b><button class="chip" data-sim="multi-agent">▶ Multi-agent research pipeline</button><button class="chip" data-sim="langgraph">▶ LangGraph StateGraph</button><button class="chip" data-sim="react-loop">▶ ReAct agent loop</button></div></div>
+  <h2 id="part-a-visual-guide-to-llm-agents-multi-agent-systems">&quot;A Visual Guide to LLM Agents — Multi-Agent Systems&quot;</h2><p class="credit">Source page: <a href="https://albanna-tutorials.com/llm_agents.html">https://albanna-tutorials.com/llm_agents.html</a></p>
+<blockquote>
+<p>Explore the fascinating world of Large Language Model Agents. Level: Intermediate · ~30 min.</p>
+<p>Course page by Dr. Abedal-Kareem Al-Banna (Al-banna Tutorials), based on the tutorial "A Visual Guide to LLM Agents" by Maarten Grootendorst (https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-llm-agents). Images and original content are © Maarten Grootendorst; the diagrams referenced below (44 figures) live on the source page and are not reproduced here.</p>
+</blockquote>
+<h2 id="1-introduction-to-llms">1. Introduction to LLMs</h2>
+<ul>
+<li>Traditionally, a Large Language Model does nothing more than <strong>predict the next token</strong>. By sampling many tokens in a row, the model can mimic a conversation and give longer answers.</li>
+<li>Two main limitations motivate agents:</li>
+<li><strong>No memory between conversations.</strong> An LLM does not remember what was said earlier; a follow-up question cannot be connected to the previous exchange (figure: "LLM Memory Limitation").</li>
+<li><strong>Weak basic arithmetic.</strong> LLMs often fail at basic multiplication and division (figure: "LLM Math Limitation").</li>
+<li>This does not make LLMs bad. They do not need to do everything, because <strong>external tools, memory, and retrieval systems</strong> can compensate for these gaps.</li>
+</ul>
+<h2 id="2-augmented-llms-agents">2. Augmented LLMs &amp; Agents</h2>
+<ul>
+<li>Anthropic calls an LLM extended with external systems (tools, memory, retrieval) an <strong>Augmented LLM</strong>. For example, the model can call a calculator rather than do multiplication itself (figure: "Tool Use Example").</li>
+<li>The page uses the Russell &amp; Norvig definition (<em>AI: A Modern Approach</em>, 2016): an agent is <em>anything that can be viewed as perceiving its environment through sensors and acting upon that environment through actuators</em>.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Environment</td>
+<td>The world the agent interacts with</td>
+</tr>
+<tr>
+<td>Sensors</td>
+<td>Used to observe the environment</td>
+</tr>
+<tr>
+<td>Actuators</td>
+<td>Tools used to interact with the environment</td>
+</tr>
+<tr>
+<td>Effectors</td>
+<td>The "brain" or rules that decide how to go from observations to actions</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Because LLMs are textual models, an LLM agent <strong>observes the environment through textual input</strong> and <strong>acts through tools</strong> (e.g. searching the web). The Augmented LLM is a generalization of this framework: the LLM handles understanding and planning, tools handle actions, and memory tracks what has been done (figures: "Agent Framework", "Augmented LLM Framework", "Agent Components").</li>
+<li><strong>Autonomy levels.</strong> Agents vary in their degree of autonomy. The more the LLM decides how the system behaves, the more "agentic" the system is (figure: "Agent Autonomy Levels"). Tool use can follow a fixed order set by the framework, or the LLM can choose which tool to use and when.</li>
+</ul>
+<h2 id="3-memory-systems">3. Memory Systems</h2>
+<ul>
+<li><strong>Core problem:</strong> LLMs are forgetful; more precisely, they perform no memorization between interactions.</li>
+</ul>
+<h3 id="short-term-memory-working-memory">Short-term memory (working memory)</h3>
+<ul>
+<li>A buffer for the (near-)immediate context, including the agent's recent actions.</li>
+<li>The most straightforward implementation is the <strong>context window</strong> — the number of tokens the LLM can process. The LLM is effectively <em>told</em> what the conversation was rather than memorizing it (figures: "Context Window", "Context Window Memory").</li>
+<li><strong>Summarization:</strong> for smaller context windows or large histories, another LLM summarizes the conversation so far (figure: "Memory Summarization").</li>
+</ul>
+<h3 id="long-term-memory">Long-term memory</h3>
+<ul>
+<li>Covers dozens or hundreds of steps the agent may need to retain.</li>
+<li>Common technique: store all previous interactions, actions, and conversations in an <strong>external vector database</strong>; retrieve relevant pieces when needed. This is <strong>Retrieval-Augmented Generation (RAG)</strong> (figures: "Vector Database Creation", "Vector Database Retrieval").</li>
+</ul>
+<h3 id="memory-types-coala">Memory types (CoALA)</h3>
+<p>The paper <em>Cognitive Architectures for Language Agents</em> couples psychological memory types to LLM agents. Two are defined on the page:</p>
+<table>
+<thead>
+<tr>
+<th>Memory type</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Semantic</td>
+<td>Facts about the world</td>
+</tr>
+<tr>
+<td>Working</td>
+<td>Current and recent circumstances</td>
+</tr>
+</tbody>
+</table>
+<p>Different information can live in different stores — e.g. semantic memory kept separate from working memory — which helps when designing agent frameworks (figure: "Memory Types").</p>
+<h2 id="4-tools-interaction">4. Tools &amp; Interaction</h2>
+<ul>
+<li>Tools let an LLM interact with an external environment (a database) or run external applications (custom code). Two categories (figure: "Tool Types"):</li>
+<li><strong>Fetching data</strong> — retrieve up-to-date information.</li>
+<li><strong>Taking action</strong> — e.g. scheduling a meeting or ordering food.</li>
+<li>To use a tool, the LLM generates text matching the tool's API, usually <strong>JSON</strong>, so a code interpreter can execute it (figure: "JSON Tool Call"). Illustrative shape of such a call:</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"multiply"</span><span class="p">,</span><span class="w"> </span><span class="nt">"arguments"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"a"</span><span class="p">:</span><span class="w"> </span><span class="mi">123</span><span class="p">,</span><span class="w"> </span><span class="nt">"b"</span><span class="p">:</span><span class="w"> </span><span class="mi">456</span><span class="p">}}</span>
+</code></pre></div>
+<ul>
+<li><strong>Function calling:</strong> developers define custom functions (e.g. a basic multiplication function) that the LLM can call with parameters. Most current LLMs can perform tool use; some need careful prompting.</li>
+<li><strong>Fixed tool order:</strong> the agentic framework predefines the order of tool use. <strong>Autonomous tool selection:</strong> the LLM decides which tool to use and when. Agents are essentially sequences of LLM calls with autonomous selection of actions and tools.</li>
+<li>Research moved from <em>prompting</em> for tool use to <em>training</em> for it:</li>
+<li><strong>Toolformer</strong> — one of the first approaches to train a model to decide which APIs to call and how (three-step figure series).</li>
+<li><strong>ToolLLM</strong> — LLMs using thousands of tools.</li>
+<li><strong>Gorilla</strong> — LLMs easily retrieving the most relevant tools.</li>
+<li><strong>Model Context Protocol (MCP):</strong> Anthropic developed MCP to make tools easier to implement across agentic frameworks; it standardizes API access for services such as weather apps and GitHub (figure: "MCP Components"). See Week 11.</li>
+</ul>
+<h2 id="5-planning-reasoning">5. Planning &amp; Reasoning</h2>
+<ul>
+<li><strong>Planning</strong> breaks a task into actionable steps and lets the model reflect iteratively on past behavior, updating the plan when necessary.</li>
+<li>Planning requires complex <strong>reasoning</strong>; the LLM should show this reasoning before taking the next step. Reasoning is enabled by fine-tuning or by prompt engineering:</li>
+<li><strong>Chain-of-Thought prompting</strong> — provide examples of step-by-step reasoning so the model explains its thinking before answering.</li>
+<li><strong>Zero-shot Chain-of-Thought</strong> — add the phrase "Let's think step-by-step" without examples.</li>
+</ul>
+<h3 id="react-reason-and-act">ReAct (Reason and Act)</h3>
+<p>Achieved through prompt engineering rather than training. The prompt describes three steps:</p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Thought</td>
+<td>A reasoning step about the current situation</td>
+</tr>
+<tr>
+<td>Action</td>
+<td>A set of actions to execute (e.g., tools)</td>
+</tr>
+<tr>
+<td>Observation</td>
+<td>A reasoning step about the result of the action</td>
+</tr>
+</tbody>
+</table>
+<p>The cycle Thought → Action → Observation repeats until an action specifies that the result should be returned. By iterating, the LLM can plan actions, observe their output, and adjust.</p>
+<h3 id="reflexion">Reflexion</h3>
+<ul>
+<li>Adds what ReAct lacks: <strong>reflection on failure</strong>. Uses verbal reinforcement so agents learn from prior failures.</li>
+<li>Memory modules track actions (short-term) and self-reflections (long-term); together they help the agent identify improved actions.</li>
+</ul>
+<h3 id="self-refine">SELF-REFINE</h3>
+<ul>
+<li>A loop in which <strong>refining the output</strong> and <strong>generating feedback</strong> are repeated.</li>
+</ul>
+<h2 id="6-multi-agent-systems">6. Multi-Agent Systems</h2>
+<h3 id="why-one-agent-is-not-enough">Why one agent is not enough</h3>
+<ul>
+<li>Too many tools complicate tool selection.</li>
+<li>Context becomes too complex.</li>
+<li>The task may require specialization.</li>
+</ul>
+<h3 id="structure">Structure</h3>
+<ul>
+<li>Multi-agent systems are frameworks in which multiple agents — each with tools, memory, and planning — interact with each other and with their environments.</li>
+<li>Typically <strong>specialized agents</strong>, each with its own toolset, overseen by a <strong>supervisor</strong> that manages communication and assigns tasks (figures: "Multi-Agent System", "Multi-Agent Architecture").</li>
+<li>Two core design components:</li>
+<li><strong>Agent initialization</strong> — how individual specialized agents are created.</li>
+<li><strong>Agent orchestration</strong> — how all agents are coordinated.</li>
+</ul>
+<h3 id="generative-agents">Generative Agents</h3>
+<p><em>Generative Agents: Interactive Simulacra of Human Behavior</em> (Park et al.) created software agents that simulate believable human behavior. The <strong>Memory</strong> module is the most vital component; it stores planning and reflection behaviors and all events so far.</p>
+<p>Components common to multi-agent frameworks: <strong>Profile</strong>, <strong>Perception</strong> of the environment, <strong>Memory</strong>, <strong>Planning</strong>, <strong>Available actions</strong>.</p>
+<h3 id="frameworks">Frameworks</h3>
+<table>
+<thead>
+<tr>
+<th>Framework</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AutoGen</td>
+<td>Collaborative; inter-agent communication differs from the others</td>
+</tr>
+<tr>
+<td>MetaGPT</td>
+<td>Collaborative; inter-agent communication differs from the others</td>
+</tr>
+<tr>
+<td>CAMEL</td>
+<td>Role-playing: the user defines an <strong>AI User</strong> (represents the human and guides the process) and an <strong>AI Assistant</strong>; the two collaborate by interacting with each other to resolve the query</td>
+</tr>
+</tbody>
+</table>
+<p>The growth of these frameworks has been explosive (figure: "Framework Growth").</p>
+<h2 id="7-conclusion">7. Conclusion</h2>
+<p>LLM Agents combine the language understanding of LLMs with the ability to interact with an environment through tools, keep information in memory, and plan complex actions. Areas of ongoing progress:</p>
+<ul>
+<li>More advanced planning and reasoning</li>
+<li>Better memory systems for context retention</li>
+<li>Improved tool integration and execution</li>
+<li>Stronger coordination among multiple agents</li>
+<li>Self-reflection and self-improvement mechanisms</li>
+</ul>
+<blockquote>
+<p>"This concludes our journey of LLM Agents! Hopefully, this guide gives a better understanding of how LLM Agents are built." — Maarten Grootendorst</p>
+</blockquote>
+<h2 id="part-agent-to-agent-protocols-a2a-and-mcp">&quot;Agent-to-Agent Protocols: A2A and MCP&quot;</h2><p class="credit">Source page: <a href="https://albanna-tutorials.com/a2a.html">https://albanna-tutorials.com/a2a.html</a></p>
+<blockquote>
+<p>Standardizing communication between AI agents and data sources. Level: Intermediate · AI Agents · ~25 min.</p>
+<p>Course page by Dr. Abedal-Kareem Al-Banna (Al-banna Tutorials). Google's Agent2Agent (A2A) protocol and Anthropic's Model Context Protocol (MCP) are presented as two complementary protocols that are changing how AI systems interact.</p>
+</blockquote>
+<h2 id="a2a-agent2agent-protocol">A2A (Agent2Agent Protocol)</h2>
+<p>A2A is an open protocol announced by Google in April 2025. It is designed to let AI agents communicate and interoperate regardless of the framework or vendor they are built on. More than 50 technology and service partners support it, including Atlassian, Box, Cohere, Intuit, LangChain, MongoDB, PayPal, Salesforce, SAP, and ServiceNow.</p>
+<h3 id="design-principles">Design principles</h3>
+<ul>
+<li><strong>Embrace agentic capabilities</strong> — supports natural, collaborative workflows between agents.</li>
+<li><strong>Build on existing standards</strong> — HTTP, SSE (Server-Sent Events), and JSON-RPC.</li>
+<li><strong>Secure by default</strong> — enterprise-grade authentication and authorization.</li>
+<li><strong>Support long-running tasks</strong> — real-time feedback and state updates.</li>
+<li><strong>Modality agnostic</strong> — multiple content formats, including audio and video.</li>
+</ul>
+<h3 id="key-components">Key components</h3>
+<ul>
+<li><strong>Agent Card</strong> — a public metadata file (JSON) describing an agent's capabilities, skills, endpoint URL, and authentication requirements. Clients use it for discovery.</li>
+<li><strong>Task-oriented communication</strong> — work is organized as tasks with a defined lifecycle. A task may complete immediately or remain active for an extended period.</li>
+<li><strong>Messages, Parts, Artifacts</strong> — agents exchange messages whose content is carried as <em>parts</em> (text, files, or structured data); a finished task may return <em>artifacts</em>.</li>
+<li><strong>UX / capability negotiation</strong> — agents negotiate the right content format, explicitly including user-interface capabilities.</li>
+</ul>
+<h3 id="agent-card-fields-from-the-sample">Agent Card fields (from the sample)</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code>, <code>description</code>, <code>version</code></td>
+<td>Display name, what the agent does, version string</td>
+</tr>
+<tr>
+<td><code>url</code></td>
+<td>The agent's A2A endpoint</td>
+</tr>
+<tr>
+<td><code>authentication.type</code></td>
+<td>Auth method (sample: <code>oauth2</code>)</td>
+</tr>
+<tr>
+<td><code>authentication.authorizationUrl</code>, <code>tokenUrl</code>, <code>scopes</code></td>
+<td>OAuth2 endpoints and permitted scopes</td>
+</tr>
+<tr>
+<td><code>capabilities.streaming</code></td>
+<td>Whether SSE streaming is supported</td>
+</tr>
+<tr>
+<td><code>capabilities.multimodal</code></td>
+<td>Whether multiple content types are supported</td>
+</tr>
+<tr>
+<td><code>skills[]</code></td>
+<td>Each with <code>name</code>, <code>description</code>, and typed <code>parameters</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="a2a-workflow-step-by-step">A2A workflow (step by step)</h3>
+<ol>
+<li><strong>Agent Discovery</strong> — the client agent reads the remote agent's Agent Card to learn its capabilities and endpoints.</li>
+<li><strong>Task Initialization</strong> — the client sends a task request with an initial message and task parameters.</li>
+<li><strong>Task Processing</strong> — the remote agent completes the task immediately or enters a <em>working</em> state for longer operations.</li>
+<li><strong>Status Updates</strong> — for long-running tasks, the remote agent streams status updates over SSE.</li>
+<li><strong>Message Exchange</strong> — agents exchange text, files, or structured data as parts to collaborate.</li>
+<li><strong>Task Completion</strong> — the task reaches a terminal state (<em>completed</em>, <em>failed</em>, or <em>canceled</em>) and may return artifacts.</li>
+</ol>
+<h3 id="sample-a2a-agent-card-json">Sample A2A Agent Card (JSON)</h3>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Recruitment Assistant"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"An agent that helps find and evaluate job candidates"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.0.0"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://recruitment-agent.example.com/a2a"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"authentication"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"oauth2"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"authorizationUrl"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://auth.example.com/authorize"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"tokenUrl"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://auth.example.com/token"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"scopes"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"read"</span><span class="p">,</span><span class="w"> </span><span class="s2">"write"</span><span class="p">]</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"capabilities"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"streaming"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"multimodal"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"skills"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"findCandidates"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Find candidates matching job requirements"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"parameters"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"jobTitle"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"The job title to search for"</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nt">"skills"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"array"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Required skills for the position"</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nt">"location"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Preferred location for the candidate"</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="frameworks-and-implementations">Frameworks and implementations</h3>
+<ul>
+<li><strong>Frameworks:</strong> Agent Development Kit (ADK), CrewAI, LangGraph, Genkit.</li>
+<li><strong>Samples:</strong> client/server examples in Python and JavaScript, multi-agent web applications, and command-line interfaces.</li>
+</ul>
+<h3 id="a2a-scenarios">A2A scenarios</h3>
+<p><strong>Candidate sourcing</strong> — a recruiting manager needs candidates for a software engineering position.
+1. The manager's agent connects to specialized recruiting agents.
+2. Each agent handles one part: sourcing, screening, or scheduling.
+3. The agents collaborate over A2A to find suitable candidates.
+4. The manager receives a unified view of the results.
+5. After selection, the manager's agent uses A2A to coordinate interview scheduling.</p>
+<p><strong>Multi-agent research</strong> — a data scientist needs comprehensive research on a complex topic.
+1. The primary agent divides the research tasks among specialized agents.
+2. A market-research agent gathers industry trends.
+3. A data-analysis agent processes relevant statistics.
+4. A visualization agent creates charts from the processed data.
+5. The primary agent synthesizes everything into a cohesive report.</p>
+<h2 id="mcp-model-context-protocol">MCP (Model Context Protocol)</h2>
+<p>MCP is an open standard from Anthropic (announced November 2024) that standardizes how AI applications connect to external tools, data sources, and systems, so assistants can reach data where it lives and reduce information silos. (Full treatment in Week 11.)</p>
+<h3 id="architecture">Architecture</h3>
+<ul>
+<li><strong>Host</strong> — an application such as Claude Desktop or an IDE that wants data through MCP; the entry point for user interaction.</li>
+<li><strong>Client</strong> — maintains a 1:1 connection with each server and manages protocol details.</li>
+<li><strong>Server</strong> — a lightweight program exposing specific capabilities and connecting to the underlying data sources and tools.</li>
+</ul>
+<h3 id="key-characteristics">Key characteristics</h3>
+<ul>
+<li><strong>Secure</strong> — operates within your security boundaries.</li>
+<li><strong>Open</strong> — community-driven, open-source standard.</li>
+<li><strong>Interoperable</strong> — works across LLM providers.</li>
+<li><strong>Extensible</strong> — adaptable to various data sources.</li>
+</ul>
+<h3 id="mcp-workflow">MCP workflow</h3>
+<ol>
+<li><strong>Connection Initialization</strong> — the MCP client in the host connects to a server and exchanges capabilities and protocol versions.</li>
+<li><strong>User Query</strong> — the user interacts with the host; the model identifies a need for external data.</li>
+<li><strong>Resource Request</strong> — the client requests the needed data or tool from the appropriate server.</li>
+<li><strong>Server Processing</strong> — the server accesses the resource (file, database, API) and formats the data.</li>
+<li><strong>Response Delivery</strong> — the server returns the formatted data to the client via the standard protocol.</li>
+<li><strong>AI Response Generation</strong> — the model uses the retrieved data to produce a more informed response.</li>
+</ol>
+<h3 id="sample-mcp-server-implementation-python">Sample MCP server implementation (Python)</h3>
+<p>As on the source page. Note: this is illustrative pseudo-SDK code; the official <code>mcp</code> Python SDK uses <code>FastMCP</code> and <code>@mcp.tool()</code> (see the Week 11 test code).</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">mcp.server</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCPServer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mcp.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">Capability</span><span class="p">,</span> <span class="n">Action</span>
+
+<span class="c1"># Create a simple MCP server</span>
+<span class="n">server</span> <span class="o">=</span> <span class="n">MCPServer</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"FileReader"</span><span class="p">,</span>
+                   <span class="n">description</span><span class="o">=</span><span class="s2">"Reads files from the local filesystem"</span><span class="p">)</span>
+
+<span class="c1"># Define a capability</span>
+<span class="n">file_capability</span> <span class="o">=</span> <span class="n">Capability</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"read_file"</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">"Reads content from a file"</span><span class="p">,</span>
+    <span class="n">parameters</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"path"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"string"</span><span class="p">,</span>
+            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Path to the file"</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="n">returns</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"content"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"string"</span><span class="p">,</span>
+            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Content of the file"</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+
+<span class="c1"># Implement the capability</span>
+<span class="nd">@server</span><span class="o">.</span><span class="n">implement</span><span class="p">(</span><span class="n">file_capability</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_file</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"content"</span><span class="p">:</span> <span class="n">content</span><span class="p">}</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
+
+<span class="c1"># Start the server</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">server</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</code></pre></div>
+<h3 id="mcp-scenarios">MCP scenarios</h3>
+<p><strong>Document analysis</strong> — a lawyer reviewing legal documents.
+1. Claude recognizes it needs access to local files.
+2. The MCP host connects to a FileReader MCP server.
+3. The server securely accesses the documents.
+4. Claude receives the contents in a standardized format.
+5. Claude analyzes the legal language and provides insights.</p>
+<p><strong>Integrated development</strong> — an AI assistant in an IDE.
+1. The assistant needs to understand the codebase context.
+2. MCP connects it to Git and GitHub MCP servers.
+3. The Git server provides local repository information.
+4. The GitHub server provides issue and pull-request context.
+5. The assistant generates contextually appropriate code.</p>
+<p><strong>Pre-built MCP servers:</strong> GitHub, Slack, Google Drive, PostgreSQL, Git, Puppeteer.</p>
+<h2 id="how-a2a-and-mcp-complement-each-other">How A2A and MCP complement each other</h2>
+<ul>
+<li><strong>MCP</strong> connects AI models to the tools, data, and systems they need — "the protocol to connect agents with their structured tools."</li>
+<li><strong>A2A</strong> lets end-users or other agents work with specialized agents (one that finds job candidates, one that summarizes meeting notes) and lets those agents collaborate.</li>
+</ul>
+<h3 id="feature-comparison">Feature comparison</h3>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>A2A (Google)</th>
+<th>MCP (Anthropic)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Primary purpose</td>
+<td>Communication between different AI agents</td>
+<td>Connecting AI models to data sources and tools</td>
+</tr>
+<tr>
+<td>Focus</td>
+<td>Agent-to-agent collaboration</td>
+<td>Agent-to-data / agent-to-tool connection</td>
+</tr>
+<tr>
+<td>Communication pattern</td>
+<td>Task-based messages between agents</td>
+<td>Request–response for tools and data</td>
+</tr>
+<tr>
+<td>Key components</td>
+<td>Agent Cards, Tasks, Messages, Parts, Artifacts</td>
+<td>Hosts, Clients, Servers, Tools, Resources</td>
+</tr>
+<tr>
+<td>Discovery mechanism</td>
+<td>Agent Cards and capability advertising</td>
+<td>Host discovers available servers</td>
+</tr>
+<tr>
+<td>Transport</td>
+<td>HTTP, SSE, JSON-RPC</td>
+<td>stdio, HTTP/SSE, WebSockets*</td>
+</tr>
+<tr>
+<td>Ideal use case</td>
+<td>Multi-agent workflows requiring collaboration</td>
+<td>A single agent that needs external systems</td>
+</tr>
+<tr>
+<td>Announced</td>
+<td>April 2025</td>
+<td>November 2024</td>
+</tr>
+</tbody>
+</table>
+<p>* As on the source page. The official MCP specification defines stdio and streamable HTTP transports; WebSockets is not a standard transport.</p>
+<h2 id="use-cases">Use cases</h2>
+<table>
+<thead>
+<tr>
+<th>Domain</th>
+<th>MCP</th>
+<th>A2A</th>
+<th>Both</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Software development</td>
+<td>Code analysis with repository context</td>
+<td>Collaborative code review; multi-agent debugging</td>
+<td></td>
+</tr>
+<tr>
+<td>Data analysis</td>
+<td>Querying data from various sources</td>
+<td>Collaborative exploration; multi-agent reporting</td>
+<td></td>
+</tr>
+<tr>
+<td>Enterprise workflows</td>
+<td>Access to enterprise data sources</td>
+<td>Cross-department agent collaboration</td>
+<td>Secure information sharing</td>
+</tr>
+<tr>
+<td>Healthcare</td>
+<td>Secure access to medical records; patient-history summarization</td>
+<td>Specialized diagnostic collaboration</td>
+<td></td>
+</tr>
+<tr>
+<td>Education</td>
+<td>Access to educational resources</td>
+<td>Collaborative tutoring agents</td>
+<td>Personalized learning experiences</td>
+</tr>
+</tbody>
+</table>
+<h3 id="real-world-examples">Real-world examples</h3>
+<ul>
+<li><strong>Multi-agent customer support</strong> — specialized agents handle inquiry routing, knowledge-base search, ticket creation, and follow-up coordination (A2A for agent communication, MCP for data access).</li>
+<li><strong>Supply-chain optimization</strong> — agents coordinate inventory management, logistics planning, demand forecasting, and supplier relations (primarily A2A).</li>
+<li><strong>Research assistant</strong> — assistants access academic papers, experimental data, and simulation results to analyze and synthesize findings (heavily MCP).</li>
+</ul>
+<h2 id="resources">Resources</h2>
+<ul>
+<li>A2A official website — https://google.github.io/A2A/</li>
+<li>A2A GitHub repository — https://github.com/google/A2A</li>
+<li>MCP official website — https://modelcontextprotocol.io/</li>
+<li>MCP GitHub repository — https://github.com/modelcontextprotocol</li>
+<li>A2A discussions — https://github.com/google/A2A/discussions</li>
+<li>MCP discussions — https://github.com/modelcontextprotocol/modelcontextprotocol/discussions</li>
+<li>Google A2A announcement — https://developers.googleblog.com/en/a2a-a-new-era-of-agent-interoperability/</li>
+<li>Anthropic MCP announcement — https://www.anthropic.com/news/model-context-protocol</li>
+</ul>
+  <div class="pager"><a href="week09-react-agents.html"><small>Previous</small>Week 9: AI Agents &amp; ReAct</a><a class="next" href="week11-mcp.html"><small>Next</small>Week 11: Model Context Protocol (MCP)</a></div>
+  <footer style="margin-top:3rem;padding-top:1rem;border-top:1px solid var(--border);font-size:.84rem;color:var(--muted)">
+Course materials by <a href="https://albanna-tutorials.com/cs/">Dr. Abdulkarim Albanna</a> (University of Petra), adapted for the section taught by Dr. Zaid G. Momani. Interactive simulations and test code added for this site. Source on <a href="https://github.com/zmomani/ComputingSystemsDS-AI">GitHub</a>.
+</footer>
+</main><aside class="rail">
+  <div class="rail-tabs"><button class="active" data-panel="panel-sims">Simulations</button><button data-panel="panel-code">Test code</button></div>
+  <div class="rail-panel active" id="panel-sims"><p class="rail-intro">Interactive teaching aids for this week. Each opens full-size with step controls and teaching notes.</p><button class="sim-card" data-sim="multi-agent"><span class="sim-kind">Multi-agent · animation</span><span class="sim-title">Multi-agent research pipeline</span><span class="sim-desc">The course project: six agents, a human checkpoint and a Writer–Critic loop.</span></button><button class="sim-card" data-sim="langgraph"><span class="sim-kind">LangGraph · animation</span><span class="sim-title">LangGraph StateGraph</span><span class="sim-desc">State flowing through nodes, conditional edges, a loop, an interrupt and checkpoints.</span></button><button class="sim-card" data-sim="react-loop"><span class="sim-kind">Agents · animation</span><span class="sim-title">ReAct agent loop</span><span class="sim-desc">Thought → Action → Observation on a growing scratchpad, including a tool error.</span></button></div>
+  <div class="rail-panel" id="panel-code"><p class="rail-intro"><b>Run ▶</b> executes pure-Python/NumPy snippets in your browser (Pyodide). Snippets marked <i>local</i> need the course environment (PyTorch, Transformers, LangChain…) — copy them into VS Code.</p><div class="snippet"><div class="snippet-head"><span>Minimal ReAct loop with a toy tool set (no API key needed: a scripted &quot;LLM&quot;)</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 1. Minimal ReAct loop with a toy tool set (no API key needed: a scripted &quot;LLM&quot;)
+import re, json
+
+TOOLS = {
+    &quot;multiply&quot;: lambda a, b: a * b,
+    &quot;search&quot;: lambda q: f&quot;Stub result for &#x27;{q}&#x27;&quot;,
+}
+
+def fake_llm(trace):
+    # A scripted policy standing in for the model; replace with a real LLM call.
+    if &quot;Observation&quot; not in trace:
+        return &#x27;Thought: I need 17*23.\nAction: {&quot;name&quot;:&quot;multiply&quot;,&quot;arguments&quot;:{&quot;a&quot;:17,&quot;b&quot;:23}}&#x27;
+    return &quot;Thought: I have the answer.\nFinal Answer: 391&quot;
+
+trace = &quot;Question: What is 17 times 23?&quot;
+for step in range(5):
+    out = fake_llm(trace)
+    trace += &quot;\n&quot; + out
+    if &quot;Final Answer:&quot; in out:
+        break
+    call = json.loads(re.search(r&quot;Action: (\{.*\})&quot;, out).group(1))
+    obs = TOOLS[call[&quot;name&quot;]](**call[&quot;arguments&quot;])
+    trace += f&quot;\nObservation: {obs}&quot;
+print(trace)</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Short-term memory: a fixed-size context window with summarization fallback</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 2. Short-term memory: a fixed-size context window with summarization fallback
+from collections import deque
+
+WINDOW = 6  # tokens for illustration
+history = deque(maxlen=WINDOW)
+summary = &quot;&quot;
+
+def add_turn(text):
+    global summary
+    for tok in text.split():
+        if len(history) == WINDOW:
+            summary = (summary + &quot; &quot; + history[0])[-40:]  # crude &quot;summarizer&quot;
+        history.append(tok)
+
+for turn in [&quot;my name is Zaid&quot;, &quot;I teach big data&quot;, &quot;what is my name&quot;]:
+    add_turn(turn)
+print(&quot;window :&quot;, list(history))
+print(&quot;summary:&quot;, summary.strip())</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Long-term memory via RAG with a tiny vector store (numpy only)</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 3. Long-term memory via RAG with a tiny vector store (numpy only)
+import numpy as np
+
+docs = [&quot;The meeting is on Tuesday at 10am.&quot;,
+        &quot;The project deadline is 30 November.&quot;,
+        &quot;Zaid prefers Python for data science labs.&quot;]
+
+def embed(text):  # bag-of-characters embedding, enough to demonstrate retrieval
+    v = np.zeros(128)
+    for ch in text.lower():
+        v[ord(ch) % 128] += 1
+    return v / (np.linalg.norm(v) + 1e-9)
+
+store = np.stack([embed(d) for d in docs])
+query = &quot;when is the deadline?&quot;
+scores = store @ embed(query)
+print(&quot;retrieved:&quot;, docs[int(scores.argmax())])</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Supervisor routing in a multi-agent system</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 4. Supervisor routing in a multi-agent system
+AGENTS = {
+    &quot;math&quot;:   lambda task: f&quot;[math agent] {eval(task)}&quot;,
+    &quot;writer&quot;: lambda task: f&quot;[writer agent] Draft: {task.title()}&quot;,
+}
+
+def supervisor(task):
+    agent = &quot;math&quot; if any(c in task for c in &quot;+-*/&quot;) else &quot;writer&quot;
+    return AGENTS[agent](task)
+
+for t in [&quot;12*12&quot;, &quot;introduce multi-agent systems&quot;]:
+    print(supervisor(t))</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Parse an Agent Card and check whether it advertises a needed skill</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 1. Parse an Agent Card and check whether it advertises a needed skill
+import json
+
+card = json.loads(&quot;&quot;&quot;{
+  &quot;name&quot;: &quot;Recruitment Assistant&quot;, &quot;version&quot;: &quot;1.0.0&quot;,
+  &quot;url&quot;: &quot;https://recruitment-agent.example.com/a2a&quot;,
+  &quot;capabilities&quot;: {&quot;streaming&quot;: true, &quot;multimodal&quot;: true},
+  &quot;skills&quot;: [{&quot;name&quot;: &quot;findCandidates&quot;,
+              &quot;parameters&quot;: {&quot;jobTitle&quot;: {&quot;type&quot;: &quot;string&quot;},
+                             &quot;skills&quot;: {&quot;type&quot;: &quot;array&quot;},
+                             &quot;location&quot;: {&quot;type&quot;: &quot;string&quot;}}}]
+}&quot;&quot;&quot;)
+
+def has_skill(card, name):
+    return any(s[&quot;name&quot;] == name for s in card[&quot;skills&quot;])
+
+print(card[&quot;name&quot;], &quot;supports findCandidates:&quot;, has_skill(card, &quot;findCandidates&quot;))
+print(&quot;streams:&quot;, card[&quot;capabilities&quot;][&quot;streaming&quot;])</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Task lifecycle state machine</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 2. Task lifecycle state machine
+TRANSITIONS = {
+    &quot;submitted&quot;: {&quot;working&quot;, &quot;canceled&quot;},
+    &quot;working&quot;: {&quot;input-required&quot;, &quot;completed&quot;, &quot;failed&quot;, &quot;canceled&quot;},
+    &quot;input-required&quot;: {&quot;working&quot;, &quot;canceled&quot;},
+}
+TERMINAL = {&quot;completed&quot;, &quot;failed&quot;, &quot;canceled&quot;}
+
+class Task:
+    def __init__(self):
+        self.state = &quot;submitted&quot;
+        self.history = [self.state]
+    def move(self, new):
+        if self.state in TERMINAL or new not in TRANSITIONS[self.state]:
+            raise ValueError(f&quot;illegal {self.state} -&gt; {new}&quot;)
+        self.state = new
+        self.history.append(new)
+
+t = Task()
+for s in [&quot;working&quot;, &quot;input-required&quot;, &quot;working&quot;, &quot;completed&quot;]:
+    t.move(s)
+print(&quot; -&gt; &quot;.join(t.history))</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Build a JSON-RPC 2.0 &#x27;tasks/send&#x27; request with a multi-part message</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 3. Build a JSON-RPC 2.0 &#x27;tasks/send&#x27; request with a multi-part message
+import json, uuid
+
+def tasks_send(text, data):
+    return {
+        &quot;jsonrpc&quot;: &quot;2.0&quot;,
+        &quot;id&quot;: str(uuid.uuid4()),
+        &quot;method&quot;: &quot;tasks/send&quot;,
+        &quot;params&quot;: {
+            &quot;id&quot;: str(uuid.uuid4()),
+            &quot;message&quot;: {
+                &quot;role&quot;: &quot;user&quot;,
+                &quot;parts&quot;: [
+                    {&quot;type&quot;: &quot;text&quot;, &quot;text&quot;: text},
+                    {&quot;type&quot;: &quot;data&quot;, &quot;data&quot;: data},
+                ],
+            },
+        },
+    }
+
+print(json.dumps(tasks_send(&quot;Find Python developers in Amman&quot;,
+                            {&quot;jobTitle&quot;: &quot;Data Engineer&quot;, &quot;skills&quot;: [&quot;Python&quot;, &quot;Spark&quot;]}),
+                 indent=2))</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Simulate SSE status updates from a long-running remote agent</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 4. Simulate SSE status updates from a long-running remote agent
+import time
+
+def remote_agent_stream():
+    for i, state in enumerate([&quot;working&quot;, &quot;working&quot;, &quot;working&quot;, &quot;completed&quot;]):
+        time.sleep(0.2)
+        yield f&quot;event: TaskStatusUpdateEvent\ndata: {{\&quot;state\&quot;: \&quot;{state}\&quot;, \&quot;progress\&quot;: {25*(i+1)}}}\n\n&quot;
+
+for chunk in remote_agent_stream():
+    print(chunk, end=&quot;&quot;)</code></pre><div class="out"></div></div></div>
+</aside></div><div class="sim-overlay" id="sim-overlay" role="dialog" aria-modal="true">
+  <div class="sim-window"><div class="sim-head"><div><div class="sim-kind" id="sim-kind"></div><h3 id="sim-title"></h3></div><span class="spacer"></span><button class="btn-xs" id="sim-close">✕ Close (Esc)</button></div><div class="sim-body" id="sim-body"></div></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script>document.addEventListener('DOMContentLoaded',()=>{if(window.hljs)hljs.highlightAll();if(window.renderMathInElement)renderMathInElement(document.body,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});});</script>
+<script src="../assets/js/sims/core.js"></script>
+<script src="../assets/js/sims/matrix-multiply.js"></script><script src="../assets/js/sims/vectors.js"></script><script src="../assets/js/sims/attention.js"></script><script src="../assets/js/sims/tokenizer.js"></script><script src="../assets/js/sims/positional.js"></script><script src="../assets/js/sims/classifier.js"></script><script src="../assets/js/sims/bio-tagging.js"></script><script src="../assets/js/sims/rag.js"></script><script src="../assets/js/sims/langgraph.js"></script><script src="../assets/js/sims/sampling.js"></script><script src="../assets/js/sims/moe.js"></script><script src="../assets/js/sims/react-loop.js"></script><script src="../assets/js/sims/multi-agent.js"></script><script src="../assets/js/sims/mcp.js"></script><script src="../assets/js/sims/lam.js"></script><script src="../assets/js/sims/diffusion.js"></script>
+<script src="../assets/js/site.js"></script>
+</body></html>

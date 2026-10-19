@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 7: Mixture of Experts (MoE) · Computing Systems for DS & AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<link rel="stylesheet" href="../assets/css/site.css">
+</head>
+<body><header class="topbar">
+  <button class="btn-icon" id="menu-toggle" aria-label="Menu">☰</button>
+  <a class="brand" href="../index.html">606363 · Computing Systems for DS & AI<small>University of Petra</small></a>
+  <span class="spacer"></span>
+  <nav class="week-nav"><a class="btn-icon" href="week06-llms.html" title="Large Language Models (LLMs)">← Wk 6</a><a class="btn-icon" href="week08-midterm.html" title="Midterm Exam">Wk 8 →</a></nav>
+  <a class="btn-icon" href="../index.html#curriculum">Curriculum</a>
+  <a class="btn-icon" href="../index.html#simulations">Simulations</a>
+  <button class="btn-icon" id="theme-toggle" aria-label="Toggle dark mode">◐</button>
+</header><div class="layout"><aside class="sidebar">
+  <h4>Course</h4><ul class="outline"><li><a class="" href="../lessons/syllabus.html"><span class="wk">·</span><span>Course Syllabus</span></a></li><li><a class="" href="../lessons/project.html"><span class="wk">·</span><span>Final Project</span></a></li></ul>
+  <h4>16-week curriculum</h4><ul class="outline"><li><a class="" href="../lessons/week01-transformers.html"><span class="wk">01</span><span>Transformer Architecture</span></a></li><li><a class="" href="../lessons/week02-text-classification.html"><span class="wk">02</span><span>Text Classification</span></a></li><li><a class="soon" href="../lessons/week03-ner.html"><span class="wk">03</span><span>Named Entity Recognition (NER)</span></a></li><li><a class="" href="../lessons/week04-langchain.html"><span class="wk">04</span><span>LangChain Fundamentals</span></a></li><li><a class="" href="../lessons/week05-langgraph.html"><span class="wk">05</span><span>LangGraph</span></a></li><li><a class="" href="../lessons/week06-llms.html"><span class="wk">06</span><span>Large Language Models (LLMs)</span></a></li><li><a class="active" href="../lessons/week07-moe.html"><span class="wk">07</span><span>Mixture of Experts (MoE)</span></a></li><li><a class="" href="../lessons/week08-midterm.html"><span class="wk">08</span><span>Midterm Exam</span></a></li><li><a class="" href="../lessons/week09-react-agents.html"><span class="wk">09</span><span>AI Agents &amp; ReAct</span></a></li><li><a class="" href="../lessons/week10-multi-agent.html"><span class="wk">10</span><span>Multi-Agent Systems</span></a></li><li><a class="" href="../lessons/week11-mcp.html"><span class="wk">11</span><span>Model Context Protocol (MCP)</span></a></li><li><a class="soon" href="../lessons/week12-lams.html"><span class="wk">12</span><span>Large Action Models (LAMs)</span></a></li><li><a class="" href="../lessons/week13-diffusion.html"><span class="wk">13</span><span>Diffusion Models</span></a></li><li><a class="" href="../lessons/week14-project.html"><span class="wk">14</span><span>Project Development &amp; Final Testing</span></a></li><li><a class="" href="../lessons/week15-competition.html"><span class="wk">15</span><span>Competition Day &amp; Presentations</span></a></li><li><a class="" href="../lessons/week16-final.html"><span class="wk">16</span><span>Final Exam</span></a></li></ul>
+  <h4>On this page</h4><ul class="toc" id="toc"></ul>
+</aside><main class="main">
+  <div class="lesson-head"><div class="eyebrow">Week 7 · ILO K1, T1</div><h1>Mixture of Experts (MoE)</h1>
+  <p class="credit"><b>Topics:</b> MoE architecture, routing, Mixtral, DeepSeek-MoE, dense vs. MoE trade-offs<br><b>Project milestone:</b> MoE comparison report, optional Mixtral integration, model selection logic. Checkpoint 1: demo the NLP pipeline</p></div>
+  <div class="callout sim"><div class="sim-strip"><b style="margin-right:4px">Simulations for this week:</b><button class="chip" data-sim="moe">▶ Mixture of Experts router</button><button class="chip" data-sim="sampling">▶ Temperature, top-k, top-p</button></div></div>
+  <blockquote>
+<p>Based on Dr. Abdulkarim Albanna's lesson "Mixture of Experts in LLMs" (albanna-tutorials.com; an Arabic version exists at moe_ar.html). All five code blocks are reproduced verbatim. Prose was extracted via a fetcher that paraphrases long passages, so wording is close to but not identical to the original; all figures and tables are as published.</p>
+</blockquote>
+<h2 id="what-is-mixture-of-experts-moe">What is Mixture of Experts (MoE)?</h2>
+<p>Mixture of Experts is a neural network architecture that replaces a single dense model with <strong>several specialized sub-models called experts</strong>. In LLMs, MoE swaps the dense feedforward (FFN) layers of the transformer for sets of expert networks, so the <em>total</em> parameter count can grow enormously while the compute spent <em>per token</em> stays manageable.</p>
+<p>A <strong>router</strong> (gating network) decides which experts process each token, so only a small subset of the parameters is active at any time. Typical configurations use 8–64 experts per layer with top-2 routing, leaving roughly 20% of parameters active per token.</p>
+<blockquote>
+<p>"MoE enables models to be pretrained with far less compute, which means you can dramatically scale up the model or dataset size with the same compute budget as a dense model." — Hugging Face blog</p>
+</blockquote>
+<p><em>Figure: Mixture of Experts diagram — multiple specialized expert networks with a routing mechanism that selects the best experts for each token.</em></p>
+<h2 id="how-moe-works-in-llms">How MoE Works in LLMs</h2>
+<ol>
+<li><strong>Input processing:</strong> the token embedding enters the MoE layer inside a transformer block.</li>
+<li><strong>Router evaluation:</strong> a learned linear layer followed by softmax scores every expert for the token.</li>
+<li><strong>Expert selection:</strong> the top-k experts (typically k = 2) are chosen for each token.</li>
+<li><strong>Parallel processing:</strong> the chosen experts process the token independently.</li>
+<li><strong>Output aggregation:</strong> their outputs are merged as a <strong>weighted sum</strong> using the router's probabilities.</li>
+<li><strong>Forward propagation:</strong> the combined output moves on to the next transformer layer.</li>
+</ol>
+<p><em>Figure: token routing through expert networks in an MoE layer — tokens flow through the router to the selected experts.</em></p>
+<h2 id="key-components">Key Components</h2>
+<h3 id="experts">Experts</h3>
+<ul>
+<li>Individual feedforward sub-networks that tend to specialize in patterns such as math, code, creative writing or multilingual tasks.</li>
+<li>Experts usually share the <strong>same architecture</strong> and differ only in their <strong>learned weights</strong>.</li>
+<li>Specialization is not programmed in; it <strong>emerges during training</strong>.</li>
+</ul>
+<h3 id="router-gate-network">Router / Gate Network</h3>
+<ul>
+<li>Computes a probability distribution over experts for each token and selects the top-k.</li>
+<li>Implemented as a <strong>linear layer followed by softmax</strong>.</li>
+<li>Routing strategies:</li>
+<li><strong>Top-1</strong> — Switch Transformer.</li>
+<li><strong>Top-2</strong> — Mixtral.</li>
+<li><strong>Expert choice</strong> — experts pick tokens rather than tokens picking experts.</li>
+</ul>
+<h3 id="load-balancing">Load Balancing</h3>
+<p>Prevents <strong>expert collapse</strong>, where the router sends most tokens to one or two experts. Techniques:
+- An <strong>auxiliary loss</strong> that penalizes uneven routing.
+- <strong>Expert capacity</strong> limits on how many tokens an expert can process per batch.
+- A <strong>router z-loss</strong> that prevents extreme routing logits (attributed on the page to Mistral).</p>
+<p><em>Figure: MoE layer detailed (Switch layer) — the router selects experts per token and combines their outputs with learned weights.</em></p>
+<h2 id="advantages-of-moe">Advantages of MoE</h2>
+<ol>
+<li><strong>Improved scalability:</strong> models can reach hundreds of billions of parameters while activating only a fraction per token.</li>
+<li><strong>Computational efficiency:</strong> DeepSeek-V3 (671B total) runs at roughly the cost of a 37B dense model per token — about <strong>18x</strong> parameter efficiency.</li>
+<li><strong>Specialized knowledge:</strong> experts develop niches (math, code, specific languages), giving both depth and breadth.</li>
+<li><strong>Training efficiency:</strong> Mixtral 8x7B matches Llama 2 70B quality with about 5x less pretraining compute per token; DeepSeek-V3 was trained in 2.788M H800 GPU-hours.</li>
+<li><strong>Flexible resource allocation:</strong> compute is directed where each token needs it, unlike dense models that apply uniform computation.</li>
+</ol>
+<blockquote>
+<p>"Mixtral outperforms Llama 2 70B on most benchmarks while using 5x fewer active parameters per token." — Mistral AI (2023)</p>
+</blockquote>
+<h3 id="dense-vs-moe-comparison">Dense vs. MoE comparison</h3>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Dense model</th>
+<th>MoE model</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Active parameters per token</td>
+<td>All parameters</td>
+<td>Roughly 10–25% of total</td>
+</tr>
+<tr>
+<td>Inference memory</td>
+<td>Scales with model size</td>
+<td>High — all experts must be loaded</td>
+</tr>
+<tr>
+<td>Inference compute (FLOPs) per token</td>
+<td>Grows with model size</td>
+<td>Low relative to total parameter count</td>
+</tr>
+<tr>
+<td>Training compute for equal quality</td>
+<td>Higher</td>
+<td>Lower</td>
+</tr>
+<tr>
+<td>Specialization</td>
+<td>Spread evenly across the network</td>
+<td>Concentrated in specific experts</td>
+</tr>
+<tr>
+<td>Fine-tuning stability</td>
+<td>More stable</td>
+<td>Needs more careful tuning</td>
+</tr>
+</tbody>
+</table>
+<h2 id="real-world-implementations">Real-World Implementations</h2>
+<h3 id="mixtral-8x7b-8x22b-mistral-ai">Mixtral 8x7B / 8x22B (Mistral AI)</h3>
+<ul>
+<li>8x7B: <strong>46.7B total, 12.9B active</strong> parameters; outperforms Llama 2 70B.</li>
+<li>8x22B (April 2024): <strong>141B total, ~39B active</strong>; 64K context; rivals GPT-4-class models on coding and reasoning. (The page elsewhere states 65B active for 8x22B — the 39B figure matches Mistral's documentation.)</li>
+<li>Open weights under <strong>Apache 2.0</strong>, token-level routing, <strong>32K context</strong> for 8x7B.</li>
+<li>Technically: every FFN layer of a Mistral-7B-style transformer is replaced by 8 experts; the router picks the <strong>top 2</strong> and combines their outputs with normalized softmax weights.</li>
+</ul>
+<h3 id="deepseek-v3-2024">DeepSeek-V3 (2024)</h3>
+<ul>
+<li><strong>671B total, 37B active</strong> parameters per token; <strong>256 experts per layer with top-8 routing</strong> (fine-grained experts).</li>
+<li><strong>Multi-Head Latent Attention (MLA)</strong> for KV-cache efficiency.</li>
+<li>Trained on 14.8T tokens for about $5.5M; matches GPT-4o on coding (HumanEval 90.2%).</li>
+<li>Technically: <strong>auxiliary-loss-free load balancing</strong> using learned bias terms added to routing logits; FP8 mixed-precision training; a multi-token prediction auxiliary objective.</li>
+</ul>
+<h3 id="switch-transformer-google-2021">Switch Transformer (Google, 2021)</h3>
+<ul>
+<li>Routes each token to <strong>exactly one expert (top-1)</strong>, keeping the design simple and reducing communication overhead.</li>
+<li>Scales to <strong>1.6 trillion parameters</strong>; reports a 7x speedup over T5-XXL at the same compute budget.</li>
+<li>Key ideas: expert <strong>capacity factor</strong>, <strong>selective precision</strong>, and an <strong>auxiliary load-balancing loss</strong>.</li>
+</ul>
+<h3 id="moe-model-timeline-20202025">MoE model timeline (2020–2025)</h3>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Organization</th>
+<th>Year</th>
+<th>Total params</th>
+<th>Active params</th>
+<th>Experts / routing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GShard</td>
+<td>Google</td>
+<td>2020</td>
+<td>—</td>
+<td>—</td>
+<td>Top-2, alternating MoE layers</td>
+</tr>
+<tr>
+<td>Switch Transformer</td>
+<td>Google</td>
+<td>2021</td>
+<td>1.6T</td>
+<td>—</td>
+<td>Top-1</td>
+</tr>
+<tr>
+<td>GLaM</td>
+<td>Google</td>
+<td>2021</td>
+<td>1.2T</td>
+<td>—</td>
+<td>64 experts per layer</td>
+</tr>
+<tr>
+<td>NLLB-MoE</td>
+<td>Meta AI</td>
+<td>2022</td>
+<td>—</td>
+<td>1.5B</td>
+<td>Translation model</td>
+</tr>
+<tr>
+<td>Mixtral 8x7B</td>
+<td>Mistral AI</td>
+<td>2023</td>
+<td>46.7B</td>
+<td>12.9B</td>
+<td>8 experts, top-2</td>
+</tr>
+<tr>
+<td>Grok-1</td>
+<td>xAI</td>
+<td>2024</td>
+<td>314B</td>
+<td>—</td>
+<td>8 experts, top-2</td>
+</tr>
+<tr>
+<td>Mixtral 8x22B</td>
+<td>Mistral AI</td>
+<td>2024</td>
+<td>141B</td>
+<td>39B</td>
+<td>8 experts, top-2</td>
+</tr>
+<tr>
+<td>Qwen1.5-MoE</td>
+<td>Alibaba</td>
+<td>2024</td>
+<td>14.3B</td>
+<td>2.7B</td>
+<td>—</td>
+</tr>
+<tr>
+<td>DeepSeek-V2</td>
+<td>DeepSeek</td>
+<td>2024</td>
+<td>236B</td>
+<td>21B</td>
+<td>Fine-grained MoE</td>
+</tr>
+<tr>
+<td>DeepSeek-V3</td>
+<td>DeepSeek</td>
+<td>2024</td>
+<td>671B</td>
+<td>37B</td>
+<td>256 experts, top-8</td>
+</tr>
+</tbody>
+</table>
+<h2 id="code-examples-building-an-moe-layer-in-pytorch">Code Examples: Building an MoE Layer in PyTorch</h2>
+<h3 id="step-1-the-expert-network-a-feedforward-sub-model">Step 1: The Expert Network — a feedforward sub-model</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn.functional</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">F</span>
+
+<span class="c1"># A single Expert = a 2-layer feedforward network (same as a transformer FFN)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Expert</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_model</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">d_ff</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">d_ff</span><span class="p">)</span>   <span class="c1"># expand</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">d_ff</span><span class="p">,</span> <span class="n">d_model</span><span class="p">)</span>   <span class="c1"># project back</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+        <span class="c1"># x: [num_tokens, d_model]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fc1</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+
+<span class="c1"># Try it out</span>
+<span class="n">expert</span> <span class="o">=</span> <span class="n">Expert</span><span class="p">(</span><span class="n">d_model</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">d_ff</span><span class="o">=</span><span class="mi">2048</span><span class="p">)</span>
+<span class="n">tokens</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">512</span><span class="p">)</span>   <span class="c1"># batch of 4 tokens</span>
+<span class="n">output</span> <span class="o">=</span> <span class="n">expert</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Input:  </span><span class="si">{</span><span class="n">tokens</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>   <span class="c1"># [4, 512]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Output: </span><span class="si">{</span><span class="n">output</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>   <span class="c1"># [4, 512] — same shape!</span>
+</code></pre></div>
+<h3 id="step-2-the-router-deciding-which-experts-process-each-token">Step 2: The Router — deciding which experts process each token</h3>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">TopKRouter</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Routes each token to the top-k most relevant experts."""</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_model</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_experts</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">top_k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">top_k</span> <span class="o">=</span> <span class="n">top_k</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_experts</span> <span class="o">=</span> <span class="n">num_experts</span>
+        <span class="c1"># Learned: maps token embedding → score per expert</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gate</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">num_experts</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="c1"># x: [num_tokens, d_model]</span>
+        <span class="c1"># Step A: raw routing scores for every expert</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>                          <span class="c1"># [num_tokens, num_experts]</span>
+        <span class="c1"># Step B: softmax → probability distribution</span>
+        <span class="n">probs</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>              <span class="c1"># [num_tokens, num_experts]</span>
+        <span class="c1"># Step C: pick the top-k experts per token</span>
+        <span class="n">top_k_probs</span><span class="p">,</span> <span class="n">top_k_idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">top_k</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># top_k_probs: [num_tokens, k] — how much weight per expert</span>
+        <span class="c1"># top_k_idx:   [num_tokens, k] — which expert indices</span>
+        <span class="c1"># Step D: renormalize so the k weights sum to 1</span>
+        <span class="n">top_k_probs</span> <span class="o">=</span> <span class="n">top_k_probs</span> <span class="o">/</span> <span class="n">top_k_probs</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">top_k_probs</span><span class="p">,</span> <span class="n">top_k_idx</span><span class="p">,</span> <span class="n">probs</span>   <span class="c1"># probs used for load-balancing loss</span>
+
+<span class="c1"># Example: 4 tokens, 8 experts, select top-2</span>
+<span class="n">router</span> <span class="o">=</span> <span class="n">TopKRouter</span><span class="p">(</span><span class="n">d_model</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">num_experts</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">tokens</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">512</span><span class="p">)</span>
+<span class="n">weights</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">all_probs</span> <span class="o">=</span> <span class="n">router</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Expert indices per token:"</span><span class="p">,</span> <span class="n">indices</span><span class="p">)</span>
+<span class="c1"># e.g. tensor([[3, 6], [1, 7], [0, 2], [5, 3]])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Expert weights per token: "</span><span class="p">,</span> <span class="n">weights</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">decimals</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+<span class="c1"># e.g. tensor([[0.62, 0.38], [0.71, 0.29], ...])</span>
+</code></pre></div>
+<h3 id="step-3-the-moe-layer-combining-router-experts">Step 3: The MoE Layer — combining router + experts</h3>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">MoELayer</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Sparse Mixture of Experts Layer.</span>
+<span class="sd">    Replaces a single FFN in a Transformer with N expert FFNs.</span>
+<span class="sd">    Only k out of N experts activate per token (k &lt;&lt; N).</span>
+<span class="sd">    """</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_model</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">d_ff</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">num_experts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span> <span class="n">top_k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">top_k</span> <span class="o">=</span> <span class="n">top_k</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_experts</span> <span class="o">=</span> <span class="n">num_experts</span>
+        <span class="c1"># N independent expert networks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">experts</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">([</span>
+            <span class="n">Expert</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">d_ff</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_experts</span><span class="p">)</span>
+        <span class="p">])</span>
+        <span class="c1"># Router selects which experts process each token</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">router</span> <span class="o">=</span> <span class="n">TopKRouter</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">num_experts</span><span class="p">,</span> <span class="n">top_k</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="c1"># x: [batch, seq_len, d_model]</span>
+        <span class="n">B</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">D</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span>
+        <span class="c1"># Flatten batch and sequence dims — treat all tokens equally</span>
+        <span class="n">x_flat</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">D</span><span class="p">)</span>                   <span class="c1"># [B*S, d_model]</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="n">x_flat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>                         <span class="c1"># total tokens</span>
+
+        <span class="c1"># Get routing decisions</span>
+        <span class="n">weights</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">all_probs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">router</span><span class="p">(</span><span class="n">x_flat</span><span class="p">)</span>
+        <span class="c1"># weights: [N, top_k] — how much each expert contributes</span>
+        <span class="c1"># indices: [N, top_k] — which expert to use</span>
+
+        <span class="n">output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x_flat</span><span class="p">)</span>           <span class="c1"># [N, d_model]</span>
+
+        <span class="c1"># For each expert slot (0 to top_k-1)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">top_k</span><span class="p">):</span>
+            <span class="n">expert_ids</span>  <span class="o">=</span> <span class="n">indices</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span>             <span class="c1"># [N] which expert for slot k</span>
+            <span class="n">slot_weight</span> <span class="o">=</span> <span class="n">weights</span><span class="p">[:,</span> <span class="n">k</span><span class="p">:</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>         <span class="c1"># [N, 1] contribution weight</span>
+
+            <span class="c1"># Group tokens by their assigned expert and run each expert once</span>
+            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_experts</span><span class="p">):</span>
+                <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">expert_ids</span> <span class="o">==</span> <span class="n">e</span><span class="p">)</span>            <span class="c1"># which tokens go to expert e</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">mask</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+                    <span class="k">continue</span>                        <span class="c1"># skip unused experts (saves compute!)</span>
+                <span class="n">expert_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">experts</span><span class="p">[</span><span class="n">e</span><span class="p">](</span><span class="n">x_flat</span><span class="p">[</span><span class="n">mask</span><span class="p">])</span>   <span class="c1"># [n_e, D]</span>
+                <span class="n">output</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">+=</span> <span class="n">slot_weight</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">*</span> <span class="n">expert_out</span>  <span class="c1"># weighted add</span>
+
+        <span class="k">return</span> <span class="n">output</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">D</span><span class="p">),</span> <span class="n">all_probs</span>   <span class="c1"># restore original shape</span>
+
+<span class="c1"># Test the full MoE layer</span>
+<span class="n">moe</span> <span class="o">=</span> <span class="n">MoELayer</span><span class="p">(</span><span class="n">d_model</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">d_ff</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span> <span class="n">num_experts</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">512</span><span class="p">)</span>                         <span class="c1"># batch=2, seq_len=10</span>
+<span class="n">out</span><span class="p">,</span> <span class="n">probs</span> <span class="o">=</span> <span class="n">moe</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Input:  </span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>                         <span class="c1"># torch.Size([2, 10, 512])</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Output: </span><span class="si">{</span><span class="n">out</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>                       <span class="c1"># torch.Size([2, 10, 512]) ✓</span>
+
+<span class="c1"># Count parameters: 8 experts × (512×2048 + 2048×512) = ~33.6M expert params</span>
+<span class="c1"># But only 2/8 experts activate per token = 25% active</span>
+<span class="n">total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">moe</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
+<span class="n">active</span> <span class="o">=</span> <span class="n">total</span> <span class="o">*</span> <span class="p">(</span><span class="n">moe</span><span class="o">.</span><span class="n">top_k</span> <span class="o">/</span> <span class="n">moe</span><span class="o">.</span><span class="n">num_experts</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total params: </span><span class="si">{</span><span class="n">total</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> | Active per token: </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">active</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+<blockquote>
+<p>Note for students: the comment "~33.6M expert params" is off by 2x. Each expert has 512×2048 + 2048 + 2048×512 + 512 ≈ 2.1M parameters, so 8 experts hold ≈ 16.8M. Run the code and check <code>total</code> yourself.</p>
+</blockquote>
+<h3 id="step-4-load-balancing-loss-preventing-expert-collapse">Step 4: Load Balancing Loss — preventing expert collapse</h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">auxiliary_load_balancing_loss</span><span class="p">(</span>
+    <span class="n">router_probs</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>   <span class="c1"># [N, num_experts] — softmax output</span>
+    <span class="n">expert_indices</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="c1"># [N, top_k] — selected expert IDs</span>
+    <span class="n">num_experts</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Switch Transformer / Mixtral style auxiliary load-balancing loss.</span>
+<span class="sd">    Encourages all experts to receive roughly equal token counts.</span>
+
+<span class="sd">    Loss = num_experts * sum_i(f_i * P_i)</span>
+<span class="sd">      f_i = fraction of tokens routed to expert i</span>
+<span class="sd">      P_i = mean router probability for expert i</span>
+<span class="sd">    Both terms should be ~1/num_experts for uniform distribution.</span>
+<span class="sd">    """</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">router_probs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># f_i: fraction of tokens dispatched to each expert</span>
+    <span class="n">one_hot</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">one_hot</span><span class="p">(</span><span class="n">expert_indices</span><span class="p">,</span> <span class="n">num_experts</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>   <span class="c1"># [N, k, E]</span>
+    <span class="n">tokens_per_expert</span> <span class="o">=</span> <span class="n">one_hot</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">N</span> <span class="o">*</span> <span class="n">expert_indices</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="c1"># Shape: [num_experts] — ideally all equal to 1/num_experts</span>
+
+    <span class="c1"># P_i: mean router probability assigned to each expert</span>
+    <span class="n">mean_probs</span> <span class="o">=</span> <span class="n">router_probs</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>   <span class="c1"># Shape: [num_experts] — ideally all equal to 1/num_experts</span>
+
+    <span class="c1"># Dot product × num_experts: 1.0 when perfectly balanced</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">num_experts</span> <span class="o">*</span> <span class="p">(</span><span class="n">tokens_per_expert</span> <span class="o">*</span> <span class="n">mean_probs</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">loss</span>
+
+<span class="c1"># ------ How to use it in your training loop ------</span>
+<span class="n">moe</span> <span class="o">=</span> <span class="n">MoELayer</span><span class="p">(</span><span class="n">d_model</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">d_ff</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span> <span class="n">num_experts</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">512</span><span class="p">)</span>
+
+<span class="n">out</span><span class="p">,</span> <span class="n">all_probs</span> <span class="o">=</span> <span class="n">moe</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">_</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">moe</span><span class="o">.</span><span class="n">router</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">512</span><span class="p">))</span>
+
+<span class="c1"># Main task loss (e.g. cross-entropy for language modelling)</span>
+<span class="n">task_loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">2.5</span><span class="p">)</span>   <span class="c1"># placeholder</span>
+
+<span class="c1"># Add a small load-balancing penalty (coefficient α = 0.01)</span>
+<span class="n">balance_loss</span> <span class="o">=</span> <span class="n">auxiliary_load_balancing_loss</span><span class="p">(</span><span class="n">all_probs</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">num_experts</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">total_loss</span> <span class="o">=</span> <span class="n">task_loss</span> <span class="o">+</span> <span class="mf">0.01</span> <span class="o">*</span> <span class="n">balance_loss</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Task loss:    </span><span class="si">{</span><span class="n">task_loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Balance loss: </span><span class="si">{</span><span class="n">balance_loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>   <span class="c1"># ideally close to 1.0</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total loss:   </span><span class="si">{</span><span class="n">total_loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="step-5-using-mixtral-deepseek-via-huggingface-transformers">Step 5: Using Mixtral / DeepSeek via HuggingFace Transformers</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Install: pip install transformers accelerate bitsandbytes</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoModelForCausalLM</span><span class="p">,</span> <span class="n">AutoTokenizer</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+
+<span class="c1"># ── Option A: Mixtral 8x7B (open weights, Apache-2.0) ──────────────────────</span>
+<span class="n">model_name</span> <span class="o">=</span> <span class="s2">"mistralai/Mixtral-8x7B-Instruct-v0.1"</span>
+<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
+
+<span class="c1"># Load with 4-bit quantization: reduces VRAM from ~90 GB → ~24 GB</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+    <span class="n">model_name</span><span class="p">,</span>
+    <span class="n">device_map</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">,</span>        <span class="c1"># spread across available GPUs/CPU</span>
+    <span class="n">torch_dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float16</span><span class="p">,</span>
+    <span class="n">load_in_4bit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>        <span class="c1"># requires bitsandbytes</span>
+<span class="p">)</span>
+
+<span class="c1"># Prepare a chat-formatted prompt</span>
+<span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"user"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="s2">"Explain Mixture of Experts in three sentences."</span><span class="p">}</span>
+<span class="p">]</span>
+<span class="n">input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">apply_chat_template</span><span class="p">(</span>
+    <span class="n">messages</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">"pt"</span><span class="p">,</span> <span class="n">add_generation_prompt</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+<span class="c1"># Generate a response</span>
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+    <span class="n">output_ids</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+        <span class="n">input_ids</span><span class="p">,</span>
+        <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+        <span class="n">do_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
+    <span class="n">output_ids</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">input_ids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:],</span>
+    <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+
+<span class="c1"># ── Option B: Inspect which experts were activated ─────────────────────────</span>
+<span class="c1"># Access the router logits for interpretability</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">output_router_logits</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">router_logits</span> <span class="o">=</span> <span class="n">outputs</span><span class="o">.</span><span class="n">router_logits</span>   <span class="c1"># tuple of tensors per MoE layer</span>
+<span class="k">for</span> <span class="n">layer_idx</span><span class="p">,</span> <span class="n">logits</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">router_logits</span><span class="p">):</span>
+    <span class="n">top2</span> <span class="o">=</span> <span class="n">logits</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">indices</span>   <span class="c1"># [seq, 2]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Layer </span><span class="si">{</span><span class="n">layer_idx</span><span class="si">}</span><span class="s2">: top-2 experts used → </span><span class="si">{</span><span class="n">top2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="formulas-summary">Formulas (summary)</h2>
+<ul>
+<li>Router logits: <code>logits = W_gate · x</code>, with <code>W_gate ∈ R^{num_experts × d_model}</code> (no bias).</li>
+<li>Router probabilities: <code>p = softmax(logits)</code> over experts.</li>
+<li>Top-k renormalization: <code>w_j = p_j / Σ_{i∈TopK} p_i</code> so the k weights sum to 1.</li>
+<li>Expert output: <code>E(x) = W_2 · ReLU(W_1 · x)</code>.</li>
+<li>Layer output: <code>y = Σ_{j∈TopK} w_j · E_j(x)</code>.</li>
+<li>Load-balancing loss: <code>L_aux = N · Σ_i f_i · P_i</code>, where <code>f_i</code> = fraction of token assignments sent to expert i and <code>P_i</code> = mean router probability for expert i; equals 1.0 under perfectly uniform routing.</li>
+<li>Total training loss: <code>L = L_task + 0.01 · L_aux</code>.</li>
+<li>Active parameters ≈ <code>total_params × (top_k / num_experts)</code>.</li>
+</ul>
+<h2 id="technical-challenges">Technical Challenges</h2>
+<ul>
+<li><strong>High memory requirements:</strong> all experts must sit in VRAM even though only a few are active per token. <em>Mitigation:</em> quantization (e.g., 4-bit loading).</li>
+<li><strong>Training instability:</strong> discrete top-k routing is non-differentiable and can destabilize gradients. <em>Mitigations:</em> auxiliary losses, router z-loss, careful initialization, keeping the router in FP32.</li>
+<li><strong>Fine-tuning difficulty:</strong> MoE models overfit faster during supervised fine-tuning. <em>Mitigation:</em> applying LoRA only to router or non-expert weights.</li>
+<li><strong>Load imbalance / expert collapse:</strong> the router can collapse onto a few experts, wasting capacity. <em>Mitigations:</em> auxiliary balancing losses and capacity factors.</li>
+<li><strong>Communication overhead:</strong> distributed training needs all-to-all token transfers between devices, which can reduce throughput by roughly <strong>30–50%</strong>. <em>Mitigations:</em> expert parallelism and optimized serving stacks (vLLM, TensorRT-LLM).</li>
+<li><strong>Expert capacity planning / token drops:</strong> tokens beyond an expert's capacity are dropped, hurting quality. <em>Mitigation:</em> careful tuning of the capacity factor.</li>
+</ul>
+<h2 id="future-directions">Future Directions</h2>
+<ul>
+<li><strong>Hardware co-design:</strong> accelerators built for sparse expert dispatch with less communication overhead; faster interconnects; paging experts between CPU and GPU memory.</li>
+<li><strong>Advanced routing:</strong> routing informed by semantic context, task type or language; expert-choice routing, soft routing, auxiliary-loss-free balancing.</li>
+<li><strong>Multimodal MoE:</strong> dedicated experts for vision, audio and text plus cross-modal experts; combination with retrieval for grounded generation.</li>
+<li><strong>Expert merging and pruning:</strong> combining experts after training to produce compact dense models.</li>
+<li><strong>Long-context MoE:</strong> pairing MoE with sliding-window or latent attention to reach 128K+ context at manageable memory cost.</li>
+<li><strong>Reasoning models:</strong> combining MoE with reinforcement learning, as in DeepSeek-R1.</li>
+<li><strong>On-device MoE:</strong> small sparse models bringing large-capacity behaviour to mobile hardware.</li>
+</ul>
+<h2 id="key-terms">Key Terms</h2>
+<ul>
+<li><strong>Mixture of Experts (MoE):</strong> replaces a single dense network with several sub-models (experts), only a subset of which runs per input.</li>
+<li><strong>Experts:</strong> feedforward sub-networks with shared architecture and different learned weights.</li>
+<li><strong>Router / gate network:</strong> learned layer that scores experts per token and selects which to use.</li>
+<li><strong>Top-k routing:</strong> selecting the k highest-scoring experts (top-1: Switch; top-2: Mixtral; top-8: DeepSeek-V3).</li>
+<li><strong>Expert choice:</strong> experts pick tokens instead of tokens picking experts.</li>
+<li><strong>Load balancing / expert collapse / auxiliary loss / expert capacity / router z-loss / token drop:</strong> see Key Components and Challenges above.</li>
+<li><strong>Active parameters:</strong> parameters actually used for a given token, vs. total parameters.</li>
+<li><strong>All-to-all communication:</strong> cross-device exchange needed to send tokens to experts on other devices.</li>
+<li><strong>Expert parallelism:</strong> distributing different experts across different GPUs.</li>
+<li><strong>Multi-Head Latent Attention (MLA):</strong> DeepSeek's attention variant that compresses the KV cache.</li>
+<li><strong>Quantization (4-bit / 8-bit):</strong> lower numeric precision to reduce memory use.</li>
+</ul>
+<h2 id="resources">Resources</h2>
+<ul>
+<li>Hugging Face MoE blog: https://huggingface.co/blog/moe</li>
+<li>Switch Transformers paper: https://arxiv.org/abs/2101.03961</li>
+<li>DeepSeek-V3 Technical Report: https://arxiv.org/abs/2412.19437</li>
+<li>Mixtral of Experts (paper and weights): https://mistral.ai/news/mixtral-of-experts/</li>
+<li>Grok-1 open weights: https://github.com/xai-org/grok-1</li>
+<li>DeepSeek-V3 model: https://huggingface.co/deepseek-ai/DeepSeek-V3</li>
+</ul>
+<p>Images on the original page are credited to Hugging Face, Mistral AI and public research.</p>
+  <div class="pager"><a href="week06-llms.html"><small>Previous</small>Week 6: Large Language Models (LLMs)</a><a class="next" href="week08-midterm.html"><small>Next</small>Week 8: Midterm Exam</a></div>
+  <footer style="margin-top:3rem;padding-top:1rem;border-top:1px solid var(--border);font-size:.84rem;color:var(--muted)">
+Course materials by <a href="https://albanna-tutorials.com/cs/">Dr. Abdulkarim Albanna</a> (University of Petra), adapted for the section taught by Dr. Zaid G. Momani. Interactive simulations and test code added for this site. Source on <a href="https://github.com/zmomani/ComputingSystemsDS-AI">GitHub</a>.
+</footer>
+</main><aside class="rail">
+  <div class="rail-tabs"><button class="active" data-panel="panel-sims">Simulations</button><button data-panel="panel-code">Test code</button></div>
+  <div class="rail-panel active" id="panel-sims"><p class="rail-intro">Interactive teaching aids for this week. Each opens full-size with step controls and teaching notes.</p><button class="sim-card" data-sim="moe"><span class="sim-kind">MoE · simulation</span><span class="sim-title">Mixture of Experts router</span><span class="sim-desc">Gate softmax picks top-k experts per token; watch load and active-parameter share.</span></button><button class="sim-card" data-sim="sampling"><span class="sim-kind">LLMs · simulation</span><span class="sim-title">Temperature, top-k, top-p</span><span class="sim-desc">Probability bars that sharpen or flatten; truncate and sample the next token.</span></button></div>
+  <div class="rail-panel" id="panel-code"><p class="rail-intro"><b>Run ▶</b> executes pure-Python/NumPy snippets in your browser (Pyodide). Snippets marked <i>local</i> need the course environment (PyTorch, Transformers, LangChain…) — copy them into VS Code.</p><div class="snippet"><div class="snippet-head"><span>The core routing step on its own: softmax → top-k → renormalize</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 1. The core routing step on its own: softmax → top-k → renormalize
+import torch, torch.nn.functional as F
+torch.manual_seed(0)
+num_experts, top_k = 8, 2
+gate = torch.nn.Linear(512, num_experts, bias=False)
+x = torch.randn(4, 512)                       # 4 tokens
+probs = F.softmax(gate(x), dim=-1)
+w, idx = torch.topk(probs, top_k, dim=-1)
+w = w / w.sum(dim=-1, keepdim=True)
+print(&quot;experts chosen per token:\n&quot;, idx)
+print(&quot;renormalized weights (rows sum to 1):\n&quot;, w.round(decimals=2), w.sum(-1))</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Show that an MoE layer preserves shape and uses only k/N of its expert parameter</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 2. Show that an MoE layer preserves shape and uses only k/N of its expert parameters
+import torch, torch.nn as nn, torch.nn.functional as F
+
+class Expert(nn.Module):
+    def __init__(s, d, f): super().__init__(); s.fc1, s.fc2 = nn.Linear(d, f), nn.Linear(f, d)
+    def forward(s, x): return s.fc2(F.relu(s.fc1(x)))
+
+class MoE(nn.Module):
+    def __init__(s, d=64, f=256, E=8, k=2):
+        super().__init__(); s.k, s.E = k, E
+        s.experts = nn.ModuleList(Expert(d, f) for _ in range(E)); s.gate = nn.Linear(d, E, bias=False)
+    def forward(s, x):
+        B, S, D = x.shape; xf = x.reshape(-1, D)
+        p = F.softmax(s.gate(xf), -1); w, idx = torch.topk(p, s.k, -1); w = w / w.sum(-1, keepdim=True)
+        out = torch.zeros_like(xf)
+        for slot in range(s.k):
+            for e in range(s.E):
+                m = idx[:, slot] == e
+                if m.any(): out[m] += w[m, slot:slot+1] * s.experts[e](xf[m])
+        return out.reshape(B, S, D), p, idx
+
+moe = MoE(); y, p, idx = moe(torch.randn(2, 10, 64))
+total = sum(q.numel() for q in moe.experts.parameters())
+print(&quot;output shape:&quot;, tuple(y.shape), &quot;| expert params:&quot;, total, &quot;| active per token:&quot;, total * moe.k // moe.E)</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Load-balancing loss: balanced vs. collapsed routing</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 3. Load-balancing loss: balanced vs. collapsed routing
+import torch, torch.nn.functional as F
+def aux_loss(probs, idx, E):
+    f = F.one_hot(idx, E).float().sum(dim=[0, 1]) / (probs.shape[0] * idx.shape[1])
+    P = probs.mean(0)
+    return E * (f * P).sum()
+E, N = 8, 1000
+uniform_p = torch.full((N, E), 1 / E); uniform_idx = torch.stack([torch.arange(N) % E, (torch.arange(N) + 1) % E], 1)
+collapsed_p = F.one_hot(torch.zeros(N, dtype=torch.long), E).float() * 0.9 + 0.1 / E
+collapsed_idx = torch.zeros(N, 2, dtype=torch.long)
+print(&quot;balanced  :&quot;, aux_loss(uniform_p, uniform_idx, E).item())    # ≈ 1.0
+print(&quot;collapsed :&quot;, aux_loss(collapsed_p, collapsed_idx, E).item()) # &gt;&gt; 1.0</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Watch the auxiliary loss fix collapse during a toy training loop</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 4. Watch the auxiliary loss fix collapse during a toy training loop
+import torch, torch.nn.functional as F
+torch.manual_seed(1)
+E, k, d = 8, 2, 32
+gate = torch.nn.Linear(d, E, bias=False)
+with torch.no_grad(): gate.weight[0] += 3.0          # bias the router toward expert 0 (collapse)
+opt = torch.optim.Adam(gate.parameters(), lr=0.05)
+for step in range(201):
+    x = torch.randn(256, d)
+    p = F.softmax(gate(x), -1); _, idx = torch.topk(p, k, -1)
+    f = F.one_hot(idx, E).float().sum([0, 1]) / (256 * k)
+    loss = E * (f * p.mean(0)).sum()
+    opt.zero_grad(); loss.backward(); opt.step()
+    if step % 50 == 0:
+        print(f&quot;step {step:3d}  L_aux={loss.item():.3f}  tokens/expert={(f*100).round().int().tolist()}%&quot;)</code></pre><div class="out"></div></div></div>
+</aside></div><div class="sim-overlay" id="sim-overlay" role="dialog" aria-modal="true">
+  <div class="sim-window"><div class="sim-head"><div><div class="sim-kind" id="sim-kind"></div><h3 id="sim-title"></h3></div><span class="spacer"></span><button class="btn-xs" id="sim-close">✕ Close (Esc)</button></div><div class="sim-body" id="sim-body"></div></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script>document.addEventListener('DOMContentLoaded',()=>{if(window.hljs)hljs.highlightAll();if(window.renderMathInElement)renderMathInElement(document.body,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});});</script>
+<script src="../assets/js/sims/core.js"></script>
+<script src="../assets/js/sims/matrix-multiply.js"></script><script src="../assets/js/sims/vectors.js"></script><script src="../assets/js/sims/attention.js"></script><script src="../assets/js/sims/tokenizer.js"></script><script src="../assets/js/sims/positional.js"></script><script src="../assets/js/sims/classifier.js"></script><script src="../assets/js/sims/bio-tagging.js"></script><script src="../assets/js/sims/rag.js"></script><script src="../assets/js/sims/langgraph.js"></script><script src="../assets/js/sims/sampling.js"></script><script src="../assets/js/sims/moe.js"></script><script src="../assets/js/sims/react-loop.js"></script><script src="../assets/js/sims/multi-agent.js"></script><script src="../assets/js/sims/mcp.js"></script><script src="../assets/js/sims/lam.js"></script><script src="../assets/js/sims/diffusion.js"></script>
+<script src="../assets/js/site.js"></script>
+</body></html>
