@@ -5,7 +5,7 @@ source: https://albanna-tutorials.com/langgraph.html
 ---
 # LangGraph
 
-> Material by Dr. Abedal-Kareem Al-Banna (ilmy / albanna-tutorials.com). Original page: "LangGraph Step-by-Step Tutorial | Week 5" — an 11-step tutorial. All 42 code listings are reproduced verbatim from the page. Explanatory prose follows the author's structure and wording closely; callouts are kept with their original labels.
+> Material by Dr. Abedal-Kareem Al-Banna (ilmy / albanna-tutorials.com). Original page: "LangGraph Step-by-Step Tutorial | Week 5" — an 11-step tutorial.
 
 ## Step 1: Introduction to LangGraph
 
@@ -50,7 +50,7 @@ pip install langgraph langchain-openai langchain-core
 pip install langchain-community tavily-python
 
 # Verify installation
-python -c "import langgraph; print(f'LangGraph version: {langgraph.__version__}')"
+python -c "from importlib.metadata import version; print(f'LangGraph version: {version(\"langgraph\")}')"
 ```
 
 ### Setting Up API Keys
@@ -242,7 +242,7 @@ def add_ten(state: CounterState) -> dict:
 
 ### Node Signature
 
-The function receives the **full** state and returns **only** the keys it modifies. Returning only changed keys is how LangGraph detects what changed.
+The function receives the **full** state and returns **only** the keys it modifies. Keys that are not returned are left unchanged.
 
 ```python
 def my_node(state: MyState) -> dict:
@@ -289,7 +289,9 @@ Runs the tools the LLM requested and wraps each result in a `ToolMessage`. (In p
 
 ```python
 from langchain_core.messages import ToolMessage
-import json
+
+# tool_registry maps each tool's name to the tool object,
+# e.g. tool_registry = {t.name: t for t in tools}
 
 def tool_executor_node(state: MessagesState) -> dict:
     """Execute tools that the LLM requested."""
@@ -319,6 +321,7 @@ Performs plain computation (here, text analysis) with or without an LLM call.
 ```python
 from typing import TypedDict, Annotated
 import operator
+from langchain_openai import ChatOpenAI
 
 class AnalysisState(TypedDict):
     raw_text: str
@@ -366,7 +369,7 @@ graph.add_node("summarize", summarize_text)
 # Node names are used when defining edges (next step!)
 ```
 
-> **Common mistake:** node names must be unique. A duplicate name overwrites the earlier node.
+> **Common mistake:** node names must be unique. Adding a second node with the same name raises a `ValueError` ("Node `analyze` already present").
 
 > **Key takeaway:** a node can do almost anything — call an LLM, run a tool, hit an API. It only has to accept state and return a partial state.
 
@@ -402,8 +405,9 @@ The most powerful edge type. A **routing function** inspects state and returns a
 
 ```python
 from typing import Literal
+from langgraph.graph.message import MessagesState
 
-def route_after_agent(state: MyState) -> Literal["tools", "end"]:
+def route_after_agent(state: MessagesState) -> Literal["tools", "end"]:
     """Decide what happens after the agent node runs.
 
     This function inspects the state and returns a STRING
@@ -1572,7 +1576,7 @@ urlpatterns = [
 ]
 ```
 
-### Step 6: Django URLs (chat/urls.py)
+### Step 6 (continued): App URLs (chat/urls.py)
 
 ```python
 from django.urls import path
@@ -1927,7 +1931,8 @@ g.add_conditional_edges("work", should_continue)
 graph = g.compile()
 
 print(graph.invoke({"n": 0, "log": []}))
-print(graph.get_graph().draw_ascii())   # pip install grandalf
+print(graph.get_graph().draw_mermaid())   # Mermaid source; paste into https://mermaid.live to view
+# (draw_ascii() needs `pip install grandalf` and cannot lay out the work -> work self-loop)
 ```
 
 ```python

@@ -1936,7 +1936,8 @@ g.add_conditional_edges(&quot;work&quot;, should_continue)
 graph = g.compile()
 
 print(graph.invoke({&quot;n&quot;: 0, &quot;log&quot;: []}))
-print(graph.get_graph().draw_ascii())   # pip install grandalf</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>ReAct agent with tools (needs OPENAI_API_KEY)</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 3. ReAct agent with tools (needs OPENAI_API_KEY)
+print(graph.get_graph().draw_mermaid())   # Mermaid source; paste into https://mermaid.live to view
+# (draw_ascii() needs `pip install grandalf` and cannot lay out the work -&gt; work self-loop)</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>ReAct agent with tools (needs OPENAI_API_KEY)</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 3. ReAct agent with tools (needs OPENAI_API_KEY)
 from langgraph.graph import StateGraph, START
 from langgraph.graph.message import MessagesState
 from langgraph.prebuilt import ToolNode, tools_condition
