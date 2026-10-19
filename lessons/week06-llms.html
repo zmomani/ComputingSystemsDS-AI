@@ -4,29 +4,26 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Week 6: Large Language Models (LLMs) · Computing Systems for DS & AI</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<meta name="description" content="Interactive course site for 606363 Computing Systems for Data Science and AI, University of Petra. Python runs in your browser; every week has simulations and animations.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231f3a5f'/><text x='16' y='22' font-size='14' font-family='monospace' fill='white' text-anchor='middle'>AI</text></svg>">
+<link rel="stylesheet" href="../assets/vendor/codemirror/codemirror.css">
+<link rel="stylesheet" href="../assets/vendor/codemirror/material-darker.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
 <link rel="stylesheet" href="../assets/css/site.css">
 </head>
 <body><header class="topbar">
-  <button class="btn-icon" id="menu-toggle" aria-label="Menu">☰</button>
-  <a class="brand" href="../index.html">606363 · Computing Systems for DS & AI<small>University of Petra</small></a>
-  <span class="spacer"></span>
-  <nav class="week-nav"><a class="btn-icon" href="week05-langgraph.html" title="LangGraph">← Wk 5</a><a class="btn-icon" href="week07-moe.html" title="Mixture of Experts (MoE)">Wk 7 →</a></nav>
-  <a class="btn-icon" href="../index.html#curriculum">Curriculum</a>
-  <a class="btn-icon" href="../index.html#simulations">Simulations</a>
-  <button class="btn-icon" id="theme-toggle" aria-label="Toggle dark mode">◐</button>
-</header><div class="layout"><aside class="sidebar">
-  <h4>Course</h4><ul class="outline"><li><a class="" href="../lessons/syllabus.html"><span class="wk">·</span><span>Course Syllabus</span></a></li><li><a class="" href="../lessons/project.html"><span class="wk">·</span><span>Final Project</span></a></li></ul>
-  <h4>16-week curriculum</h4><ul class="outline"><li><a class="" href="../lessons/week01-transformers.html"><span class="wk">01</span><span>Transformer Architecture</span></a></li><li><a class="" href="../lessons/week02-text-classification.html"><span class="wk">02</span><span>Text Classification</span></a></li><li><a class="soon" href="../lessons/week03-ner.html"><span class="wk">03</span><span>Named Entity Recognition (NER)</span></a></li><li><a class="" href="../lessons/week04-langchain.html"><span class="wk">04</span><span>LangChain Fundamentals</span></a></li><li><a class="" href="../lessons/week05-langgraph.html"><span class="wk">05</span><span>LangGraph</span></a></li><li><a class="active" href="../lessons/week06-llms.html"><span class="wk">06</span><span>Large Language Models (LLMs)</span></a></li><li><a class="" href="../lessons/week07-moe.html"><span class="wk">07</span><span>Mixture of Experts (MoE)</span></a></li><li><a class="" href="../lessons/week08-midterm.html"><span class="wk">08</span><span>Midterm Exam</span></a></li><li><a class="" href="../lessons/week09-react-agents.html"><span class="wk">09</span><span>AI Agents &amp; ReAct</span></a></li><li><a class="" href="../lessons/week10-multi-agent.html"><span class="wk">10</span><span>Multi-Agent Systems</span></a></li><li><a class="" href="../lessons/week11-mcp.html"><span class="wk">11</span><span>Model Context Protocol (MCP)</span></a></li><li><a class="soon" href="../lessons/week12-lams.html"><span class="wk">12</span><span>Large Action Models (LAMs)</span></a></li><li><a class="" href="../lessons/week13-diffusion.html"><span class="wk">13</span><span>Diffusion Models</span></a></li><li><a class="" href="../lessons/week14-project.html"><span class="wk">14</span><span>Project Development &amp; Final Testing</span></a></li><li><a class="" href="../lessons/week15-competition.html"><span class="wk">15</span><span>Competition Day &amp; Presentations</span></a></li><li><a class="" href="../lessons/week16-final.html"><span class="wk">16</span><span>Final Exam</span></a></li></ul>
-  <h4>On this page</h4><ul class="toc" id="toc"></ul>
-</aside><main class="main">
-  <div class="lesson-head"><div class="eyebrow">Week 6 · ILO K1, K2</div><h1>Large Language Models (LLMs)</h1>
-  <p class="credit"><b>Topics:</b> LLM evolution, model families, open vs. closed models, prompting, Ollama<br><b>Project milestone:</b> Configure LLM parameters, benchmark 2+ models, track token usage and cost</p></div>
-  <div class="callout sim"><div class="sim-strip"><b style="margin-right:4px">Simulations for this week:</b><button class="chip" data-sim="sampling">▶ Temperature, top-k, top-p</button><button class="chip" data-sim="tokenizer">▶ Subword tokenisation</button><button class="chip" data-sim="attention">▶ Self-attention: Q·Kᵀ → softmax → ·V</button></div></div>
-  <h2 id="introduction">Introduction</h2>
+  <a class="brand" href="../index.html">
+    <span class="brand-mark">AI</span>
+    <span class="brand-text"><strong>Computing Systems for DS &amp; AI</strong><span class="muted"> · 606363 · University of Petra</span></span>
+  </a>
+  <nav class="topnav"><a class="btn ghost" href="week05-langgraph.html" title="LangGraph">‹ Prev</a><select id="lesson-select" aria-label="Choose lesson"><option value="">Lessons…</option><option value="syllabus.html">Course Syllabus</option><option value="project.html">Final Project</option><option value="week01-transformers.html">Week 1 · Transformer Architecture</option><option value="week02-text-classification.html">Week 2 · Text Classification</option><option value="week03-ner.html">Week 3 · Named Entity Recognition (NER)</option><option value="week04-langchain.html">Week 4 · LangChain Fundamentals</option><option value="week05-langgraph.html">Week 5 · LangGraph</option><option value="week06-llms.html" selected>Week 6 · Large Language Models (LLMs)</option><option value="week07-moe.html">Week 7 · Mixture of Experts (MoE)</option><option value="week08-midterm.html">Week 8 · Midterm Exam</option><option value="week09-react-agents.html">Week 9 · AI Agents &amp; ReAct</option><option value="week10-multi-agent.html">Week 10 · Multi-Agent Systems</option><option value="week11-mcp.html">Week 11 · Model Context Protocol (MCP)</option><option value="week12-lams.html">Week 12 · Large Action Models (LAMs)</option><option value="week13-diffusion.html">Week 13 · Diffusion Models</option><option value="week14-project.html">Week 14 · Project Development &amp; Final Testing</option><option value="week15-competition.html">Week 15 · Competition Day &amp; Presentations</option><option value="week16-final.html">Week 16 · Final Exam</option></select><a class="btn ghost" href="week07-moe.html" title="Mixture of Experts (MoE)">Next ›</a></nav>
+  <button id="btn-panel" class="btn accent" title="Show or hide the editor / animation panel">⇆ Panel</button><div class="status" id="py-status"><span class="dot"></span><span id="py-status-text">Python loads on first run</span></div>
+</header><main class="lesson panel-closed" id="lesson"><article class="lesson-content" id="lesson-content"><div class="lesson-head"><div class="eyebrow">Week 6 · ILO K1, K2</div><h1>Large Language Models (LLMs)</h1>
+<p class="lesson-intro"><b>Topics:</b> LLM evolution, model families, open vs. closed models, prompting, Ollama<br><b>Project milestone:</b> Configure LLM parameters, benchmark 2+ models, track token usage and cost</p></div>
+<div class="sim-strip"><div class="sim-strip-head">Animations for this week — open them in the panel</div><div class="sim-strip-items"><button class="sim-chip" data-display="sampling"><span class="sim-chip-kind">LLMs</span>▶ Display: Temperature, top-k, top-p</button><button class="sim-chip" data-display="tokenizer"><span class="sim-chip-kind">Transformers</span>▶ Display: Subword tokenisation</button><button class="sim-chip" data-display="attention"><span class="sim-chip-kind">Transformers</span>▶ Display: Self-attention: Q·Kᵀ → softmax → ·V</button></div></div>
+<details class="contents"><summary>Contents (12 sections)</summary><ol><li><a href="#introduction">Introduction</a></li><li><a href="#why-llama4-matters">Why LLAMA4 Matters</a></li><li><a href="#what-is-llama4">What Is LLAMA4?</a></li><li><a href="#the-models-scout-maverick-and-behemoth">The Models: Scout, Maverick and Behemoth</a></li><li><a href="#key-features">Key Features</a></li><li><a href="#technical-specifications">Technical Specifications</a></li><li><a href="#benchmarks">Benchmarks</a></li><li><a href="#how-to-use-llama4">How to Use LLAMA4</a></li><li><a href="#use-cases">Use Cases</a></li><li><a href="#faq">FAQ</a></li><li><a href="#figures-on-the-original-page">Figures on the original page</a></li><li><a href="#resources">Resources</a></li></ol></details>
+<h2 id="introduction">Introduction</h2>
 <p>LLAMA4 is Meta's most advanced family of large language models to date: <strong>natively multimodal, open-weight</strong> models that process text and images in a single backbone and use a <strong>mixture-of-experts (MoE)</strong> design for efficiency. The lesson is written as an approximately 30-minute read.</p>
 <h2 id="why-llama4-matters">Why LLAMA4 Matters</h2>
 <ul>
@@ -411,105 +408,193 @@
 <li><strong>Integrate and deploy</strong> — connect through the provided APIs/SDKs and roll out to users or internal systems.</li>
 </ol>
 <h3 id="using-with-hugging-face">Using with Hugging Face</h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoTokenizer</span><span class="p">,</span> <span class="n">AutoModelForCausalLM</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="torch, transformers" title="Needs torch, transformers — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>from transformers import AutoTokenizer, AutoModelForCausalLM
+import torch
 
-<span class="c1"># Load tokenizer</span>
-<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">"meta-llama/Llama-4-Scout-17B-16E-Instruct"</span><span class="p">)</span>
+# Load tokenizer
+tokenizer = AutoTokenizer.from_pretrained(&quot;meta-llama/Llama-4-Scout-17B-16E-Instruct&quot;)
 
-<span class="c1"># Load model</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
-    <span class="s2">"meta-llama/Llama-4-Scout-17B-16E-Instruct"</span><span class="p">,</span>
-    <span class="n">torch_dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bfloat16</span><span class="p">,</span>
-    <span class="n">device_map</span><span class="o">=</span><span class="s2">"auto"</span>
-<span class="p">)</span>
+# Load model
+model = AutoModelForCausalLM.from_pretrained(
+    &quot;meta-llama/Llama-4-Scout-17B-16E-Instruct&quot;,
+    torch_dtype=torch.bfloat16,
+    device_map=&quot;auto&quot;
+)
 
-<span class="c1"># Create prompt (the tokenizer's chat template applies Llama 4's own special tokens)</span>
-<span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">{</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"system"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="s2">"You are an expert assistant that helps users with information about technology."</span><span class="p">},</span>
-    <span class="p">{</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"user"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="s2">"What are the key features of LLAMA4?"</span><span class="p">},</span>
-<span class="p">]</span>
+# Create prompt (the tokenizer&#x27;s chat template applies Llama 4&#x27;s own special tokens)
+messages = [
+    {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;You are an expert assistant that helps users with information about technology.&quot;},
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What are the key features of LLAMA4?&quot;},
+]
 
-<span class="c1"># Tokenize prompt</span>
-<span class="n">input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">apply_chat_template</span><span class="p">(</span>
-    <span class="n">messages</span><span class="p">,</span> <span class="n">add_generation_prompt</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">"pt"</span>
-<span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+# Tokenize prompt
+input_ids = tokenizer.apply_chat_template(
+    messages, add_generation_prompt=True, return_tensors=&quot;pt&quot;
+).to(model.device)
 
-<span class="c1"># Generate response</span>
-<span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
-    <span class="n">input_ids</span><span class="p">,</span>
-    <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
-    <span class="n">do_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">temperature</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
-    <span class="n">top_p</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
-<span class="p">)</span>
+# Generate response
+outputs = model.generate(
+    input_ids,
+    max_new_tokens=512,
+    do_sample=True,
+    temperature=0.7,
+    top_p=0.9,
+)
 
-<span class="c1"># Decode and print response (only the newly generated tokens)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">input_ids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:],</span> <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
-</code></pre></div>
+# Decode and print response (only the newly generated tokens)
+print(tokenizer.decode(outputs[0][input_ids.shape[1]:], skip_special_tokens=True))</textarea><pre><code class="language-python">from transformers import AutoTokenizer, AutoModelForCausalLM
+import torch
+
+# Load tokenizer
+tokenizer = AutoTokenizer.from_pretrained(&quot;meta-llama/Llama-4-Scout-17B-16E-Instruct&quot;)
+
+# Load model
+model = AutoModelForCausalLM.from_pretrained(
+    &quot;meta-llama/Llama-4-Scout-17B-16E-Instruct&quot;,
+    torch_dtype=torch.bfloat16,
+    device_map=&quot;auto&quot;
+)
+
+# Create prompt (the tokenizer&#x27;s chat template applies Llama 4&#x27;s own special tokens)
+messages = [
+    {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;You are an expert assistant that helps users with information about technology.&quot;},
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What are the key features of LLAMA4?&quot;},
+]
+
+# Tokenize prompt
+input_ids = tokenizer.apply_chat_template(
+    messages, add_generation_prompt=True, return_tensors=&quot;pt&quot;
+).to(model.device)
+
+# Generate response
+outputs = model.generate(
+    input_ids,
+    max_new_tokens=512,
+    do_sample=True,
+    temperature=0.7,
+    top_p=0.9,
+)
+
+# Decode and print response (only the newly generated tokens)
+print(tokenizer.decode(outputs[0][input_ids.shape[1]:], skip_special_tokens=True))</code></pre></div>
 <h3 id="using-with-vllm">Using with vLLM</h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">vllm</span><span class="w"> </span><span class="kn">import</span> <span class="n">LLM</span><span class="p">,</span> <span class="n">SamplingParams</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="vllm" title="Needs vllm — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>from vllm import LLM, SamplingParams
 
-<span class="c1"># Initialize the model</span>
-<span class="n">llm</span> <span class="o">=</span> <span class="n">LLM</span><span class="p">(</span>
-    <span class="n">model</span><span class="o">=</span><span class="s2">"meta-llama/Llama-4-Maverick-17B-128E-Instruct"</span><span class="p">,</span>
-    <span class="n">dtype</span><span class="o">=</span><span class="s2">"bfloat16"</span><span class="p">,</span>
-    <span class="n">gpu_memory_utilization</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
-<span class="p">)</span>
+# Initialize the model
+llm = LLM(
+    model=&quot;meta-llama/Llama-4-Maverick-17B-128E-Instruct&quot;,
+    dtype=&quot;bfloat16&quot;,
+    gpu_memory_utilization=0.9,
+)
 
-<span class="c1"># Create sampling parameters</span>
-<span class="n">sampling_params</span> <span class="o">=</span> <span class="n">SamplingParams</span><span class="p">(</span>
-    <span class="n">temperature</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
-    <span class="n">top_p</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
-    <span class="n">max_tokens</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
-<span class="p">)</span>
+# Create sampling parameters
+sampling_params = SamplingParams(
+    temperature=0.7,
+    top_p=0.9,
+    max_tokens=512,
+)
 
-<span class="c1"># Create prompt (vLLM applies the model's chat template)</span>
-<span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">{</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"system"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="s2">"You are an expert assistant that helps users with information about technology."</span><span class="p">},</span>
-    <span class="p">{</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"user"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="s2">"What are the key features of LLAMA4?"</span><span class="p">},</span>
-<span class="p">]</span>
+# Create prompt (vLLM applies the model&#x27;s chat template)
+messages = [
+    {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;You are an expert assistant that helps users with information about technology.&quot;},
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What are the key features of LLAMA4?&quot;},
+]
 
-<span class="c1"># Generate response</span>
-<span class="n">outputs</span> <span class="o">=</span> <span class="n">llm</span><span class="o">.</span><span class="n">chat</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="n">sampling_params</span><span class="p">)</span>
+# Generate response
+outputs = llm.chat(messages, sampling_params)
 
-<span class="c1"># Print response</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
-</code></pre></div>
+# Print response
+print(outputs[0].outputs[0].text)</textarea><pre><code class="language-python">from vllm import LLM, SamplingParams
+
+# Initialize the model
+llm = LLM(
+    model=&quot;meta-llama/Llama-4-Maverick-17B-128E-Instruct&quot;,
+    dtype=&quot;bfloat16&quot;,
+    gpu_memory_utilization=0.9,
+)
+
+# Create sampling parameters
+sampling_params = SamplingParams(
+    temperature=0.7,
+    top_p=0.9,
+    max_tokens=512,
+)
+
+# Create prompt (vLLM applies the model&#x27;s chat template)
+messages = [
+    {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;You are an expert assistant that helps users with information about technology.&quot;},
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What are the key features of LLAMA4?&quot;},
+]
+
+# Generate response
+outputs = llm.chat(messages, sampling_params)
+
+# Print response
+print(outputs[0].outputs[0].text)</code></pre></div>
 <h3 id="using-llama4-with-images">Using LLAMA4 with Images</h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoProcessor</span><span class="p">,</span> <span class="n">Llama4ForConditionalGeneration</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="torch, transformers" title="Needs torch, transformers — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>from transformers import AutoProcessor, Llama4ForConditionalGeneration
+import torch
 
-<span class="c1"># Load model and processor (requires transformers &gt;= 4.51)</span>
-<span class="n">model_id</span> <span class="o">=</span> <span class="s2">"meta-llama/Llama-4-Scout-17B-16E-Instruct"</span>
-<span class="n">processor</span> <span class="o">=</span> <span class="n">AutoProcessor</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_id</span><span class="p">)</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">Llama4ForConditionalGeneration</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
-    <span class="n">model_id</span><span class="p">,</span>
-    <span class="n">torch_dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bfloat16</span><span class="p">,</span>
-    <span class="n">device_map</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">,</span>
-<span class="p">)</span>
+# Load model and processor (requires transformers &gt;= 4.51)
+model_id = &quot;meta-llama/Llama-4-Scout-17B-16E-Instruct&quot;
+processor = AutoProcessor.from_pretrained(model_id)
+model = Llama4ForConditionalGeneration.from_pretrained(
+    model_id,
+    torch_dtype=torch.bfloat16,
+    device_map=&quot;auto&quot;,
+)
 
-<span class="c1"># Load image and create prompt (the processor downloads the image from the URL)</span>
-<span class="n">url</span> <span class="o">=</span> <span class="s2">"https://example.com/image.jpg"</span>
-<span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">{</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"user"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="p">[</span>
-        <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"image"</span><span class="p">,</span> <span class="s2">"url"</span><span class="p">:</span> <span class="n">url</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"text"</span><span class="p">,</span> <span class="s2">"text"</span><span class="p">:</span> <span class="s2">"What can you see in this image?"</span><span class="p">},</span>
-    <span class="p">]}</span>
-<span class="p">]</span>
+# Load image and create prompt (the processor downloads the image from the URL)
+url = &quot;https://example.com/image.jpg&quot;
+messages = [
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: [
+        {&quot;type&quot;: &quot;image&quot;, &quot;url&quot;: url},
+        {&quot;type&quot;: &quot;text&quot;, &quot;text&quot;: &quot;What can you see in this image?&quot;},
+    ]}
+]
 
-<span class="c1"># Process inputs</span>
-<span class="n">inputs</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">apply_chat_template</span><span class="p">(</span>
-    <span class="n">messages</span><span class="p">,</span> <span class="n">add_generation_prompt</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tokenize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">return_dict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">"pt"</span><span class="p">,</span>
-<span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+# Process inputs
+inputs = processor.apply_chat_template(
+    messages, add_generation_prompt=True, tokenize=True,
+    return_dict=True, return_tensors=&quot;pt&quot;,
+).to(model.device)
 
-<span class="c1"># Generate response</span>
-<span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="o">**</span><span class="n">inputs</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+# Generate response
+outputs = model.generate(**inputs, max_new_tokens=100)
 
-<span class="c1"># Decode and print response (only the newly generated tokens)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">processor</span><span class="o">.</span><span class="n">batch_decode</span><span class="p">(</span><span class="n">outputs</span><span class="p">[:,</span> <span class="n">inputs</span><span class="p">[</span><span class="s2">"input_ids"</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:],</span> <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
-</code></pre></div>
+# Decode and print response (only the newly generated tokens)
+print(processor.batch_decode(outputs[:, inputs[&quot;input_ids&quot;].shape[-1]:], skip_special_tokens=True)[0])</textarea><pre><code class="language-python">from transformers import AutoProcessor, Llama4ForConditionalGeneration
+import torch
+
+# Load model and processor (requires transformers &gt;= 4.51)
+model_id = &quot;meta-llama/Llama-4-Scout-17B-16E-Instruct&quot;
+processor = AutoProcessor.from_pretrained(model_id)
+model = Llama4ForConditionalGeneration.from_pretrained(
+    model_id,
+    torch_dtype=torch.bfloat16,
+    device_map=&quot;auto&quot;,
+)
+
+# Load image and create prompt (the processor downloads the image from the URL)
+url = &quot;https://example.com/image.jpg&quot;
+messages = [
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: [
+        {&quot;type&quot;: &quot;image&quot;, &quot;url&quot;: url},
+        {&quot;type&quot;: &quot;text&quot;, &quot;text&quot;: &quot;What can you see in this image?&quot;},
+    ]}
+]
+
+# Process inputs
+inputs = processor.apply_chat_template(
+    messages, add_generation_prompt=True, tokenize=True,
+    return_dict=True, return_tensors=&quot;pt&quot;,
+).to(model.device)
+
+# Generate response
+outputs = model.generate(**inputs, max_new_tokens=100)
+
+# Decode and print response (only the newly generated tokens)
+print(processor.batch_decode(outputs[:, inputs[&quot;input_ids&quot;].shape[-1]:], skip_special_tokens=True)[0])</code></pre></div>
 <h2 id="use-cases">Use Cases</h2>
 <ul>
 <li><strong>Software development:</strong> code generation, debugging, documentation, modernizing legacy code, understanding large codebases.</li>
@@ -551,14 +636,58 @@
 <li>Meta AI: https://meta.ai/</li>
 <li>Community: https://discord.gg/meta-llama</li>
 </ul>
-  <div class="pager"><a href="week05-langgraph.html"><small>Previous</small>Week 5: LangGraph</a><a class="next" href="week07-moe.html"><small>Next</small>Week 7: Mixture of Experts (MoE)</a></div>
-  <footer style="margin-top:3rem;padding-top:1rem;border-top:1px solid var(--border);font-size:.84rem;color:var(--muted)">
-This site is based on the course site <a href="https://albanna-tutorials.com/cs/">albanna-tutorials.com/cs</a> by Dr. Abdulkarim Albanna, used with the author's permission.
-</footer>
-</main><aside class="rail">
-  <div class="rail-tabs"><button class="active" data-panel="panel-sims">Simulations</button><button data-panel="panel-code">Test code</button></div>
-  <div class="rail-panel active" id="panel-sims"><p class="rail-intro">Interactive teaching aids for this week. Each opens full-size with step controls and teaching notes.</p><button class="sim-card" data-sim="sampling"><span class="sim-kind">LLMs · simulation</span><span class="sim-title">Temperature, top-k, top-p</span><span class="sim-desc">Probability bars that sharpen or flatten; truncate and sample the next token.</span></button><button class="sim-card" data-sim="tokenizer"><span class="sim-kind">Transformers · interactive</span><span class="sim-title">Subword tokenisation</span><span class="sim-desc">Type text, see WordPiece-style tokens, IDs and the embedding lookup.</span></button><button class="sim-card" data-sim="attention"><span class="sim-kind">Transformers · animation</span><span class="sim-title">Self-attention: Q·Kᵀ → softmax → ·V</span><span class="sim-desc">Five stages of scaled dot-product attention on a 4-token sentence, with heatmaps.</span></button></div>
-  <div class="rail-panel" id="panel-code"><p class="rail-intro"><b>Run ▶</b> executes pure-Python/NumPy snippets in your browser (Pyodide). Snippets marked <i>local</i> need the course environment (PyTorch, Transformers, LangChain…) — copy them into VS Code.</p><div class="snippet"><div class="snippet-head"><span>Active-parameter math for MoE models (no GPU needed)</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 1. Active-parameter math for MoE models (no GPU needed)
+<h2 id="try-it-yourself">Try it yourself</h2>
+<p class="lesson-intro"><b>▶ Try it</b> runs an example in the editor panel, inside your browser — change the code and press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to run it again. Examples marked <b>✎ Open in editor</b> need libraries or API keys that cannot run in a browser (PyTorch, Transformers, LangChain, OpenAI…): read them in the editor, then copy them to VS Code and run them in the course environment.</p><h3 id="run-in-your-browser">Run in your browser</h3><p class="lesson-intro">Self-contained versions of this week's mechanisms, written with NumPy, scikit-learn or plain Python so they run here.</p><div class="runnable"><div class="code-title">Temperature, top-k and top-p sampling (NumPy)</div><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden>import numpy as np
+
+words = [&quot;sunny&quot;, &quot;cold&quot;, &quot;nice&quot;, &quot;rainy&quot;, &quot;perfect&quot;, &quot;Tuesday&quot;, &quot;banana&quot;]
+logits = np.array([3.2, 2.6, 2.4, 2.1, 1.5, -0.8, -2.5])
+rng = np.random.default_rng(0)
+
+def next_token_probs(logits, temperature=1.0, top_k=None, top_p=None):
+    z = logits / temperature
+    p = np.exp(z - z.max()); p /= p.sum()
+    keep = np.ones_like(p, dtype=bool)
+    order = np.argsort(p)[::-1]
+    if top_k is not None:
+        keep[order[top_k:]] = False
+    if top_p is not None:
+        cum = np.cumsum(p[order])
+        cutoff = np.searchsorted(cum, top_p) + 1          # smallest set with mass &gt;= top_p
+        keep[order[cutoff:]] = False
+    p = np.where(keep, p, 0); return p / p.sum()
+
+for T in (0.2, 1.0, 2.0):
+    p = next_token_probs(logits, T)
+    print(f&quot;T={T}: &quot; + &quot;, &quot;.join(f&quot;{w}={pi:.2f}&quot; for w, pi in zip(words, p)))
+
+p = next_token_probs(logits, 1.0, top_p=0.9)
+print(&quot;\ntop-p=0.9 keeps:&quot;, [w for w, pi in zip(words, p) if pi &gt; 0])
+print(&quot;10 samples:&quot;, [str(w) for w in rng.choice(words, size=10, p=p)])</textarea><pre><code class="language-python">import numpy as np
+
+words = [&quot;sunny&quot;, &quot;cold&quot;, &quot;nice&quot;, &quot;rainy&quot;, &quot;perfect&quot;, &quot;Tuesday&quot;, &quot;banana&quot;]
+logits = np.array([3.2, 2.6, 2.4, 2.1, 1.5, -0.8, -2.5])
+rng = np.random.default_rng(0)
+
+def next_token_probs(logits, temperature=1.0, top_k=None, top_p=None):
+    z = logits / temperature
+    p = np.exp(z - z.max()); p /= p.sum()
+    keep = np.ones_like(p, dtype=bool)
+    order = np.argsort(p)[::-1]
+    if top_k is not None:
+        keep[order[top_k:]] = False
+    if top_p is not None:
+        cum = np.cumsum(p[order])
+        cutoff = np.searchsorted(cum, top_p) + 1          # smallest set with mass &gt;= top_p
+        keep[order[cutoff:]] = False
+    p = np.where(keep, p, 0); return p / p.sum()
+
+for T in (0.2, 1.0, 2.0):
+    p = next_token_probs(logits, T)
+    print(f&quot;T={T}: &quot; + &quot;, &quot;.join(f&quot;{w}={pi:.2f}&quot; for w, pi in zip(words, p)))
+
+p = next_token_probs(logits, 1.0, top_p=0.9)
+print(&quot;\ntop-p=0.9 keeps:&quot;, [w for w, pi in zip(words, p) if pi &gt; 0])
+print(&quot;10 samples:&quot;, [str(w) for w in rng.choice(words, size=10, p=p)])</code></pre></div><h3 id="test-code">Test code for the course environment</h3><div class="runnable"><div class="code-title">Active-parameter math for MoE models (no GPU needed)</div><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden># 1. Active-parameter math for MoE models (no GPU needed)
 models = {
     &quot;Scout&quot;:    dict(total=109e9, experts=16,  active=17e9),
     &quot;Maverick&quot;: dict(total=400e9, experts=128, active=17e9),
@@ -567,7 +696,16 @@ models = {
 for name, m in models.items():
     frac = m[&quot;active&quot;] / m[&quot;total&quot;]
     print(f&quot;{name:9s} active/total = {frac:6.1%}  &quot;
-          f&quot;(~{m[&#x27;total&#x27;]*2/1e9:.0f} GB in BF16, ~{m[&#x27;total&#x27;]*0.5/1e9:.0f} GB in int4)&quot;)</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Softmax sampling with temperature and top-p (nucleus), as used in the generate()</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 2. Softmax sampling with temperature and top-p (nucleus), as used in the generate() calls
+          f&quot;(~{m[&#x27;total&#x27;]*2/1e9:.0f} GB in BF16, ~{m[&#x27;total&#x27;]*0.5/1e9:.0f} GB in int4)&quot;)</textarea><pre><code class="language-python"># 1. Active-parameter math for MoE models (no GPU needed)
+models = {
+    &quot;Scout&quot;:    dict(total=109e9, experts=16,  active=17e9),
+    &quot;Maverick&quot;: dict(total=400e9, experts=128, active=17e9),
+    &quot;Behemoth&quot;: dict(total=2e12,  experts=16,  active=288e9),
+}
+for name, m in models.items():
+    frac = m[&quot;active&quot;] / m[&quot;total&quot;]
+    print(f&quot;{name:9s} active/total = {frac:6.1%}  &quot;
+          f&quot;(~{m[&#x27;total&#x27;]*2/1e9:.0f} GB in BF16, ~{m[&#x27;total&#x27;]*0.5/1e9:.0f} GB in int4)&quot;)</code></pre></div><div class="runnable"><div class="code-title">Softmax sampling with temperature and top-p (nucleus), as used in the generate() calls</div><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden># 2. Softmax sampling with temperature and top-p (nucleus), as used in the generate() calls
 import numpy as np
 
 def sample_next(logits, temperature=0.7, top_p=0.9, rng=np.random.default_rng(0)):
@@ -580,13 +718,32 @@ def sample_next(logits, temperature=0.7, top_p=0.9, rng=np.random.default_rng(0)
     return rng.choice(keep, p=q), dict(zip(keep.tolist(), q.round(3).tolist()))
 
 tok, kept = sample_next([2.0, 1.5, 1.0, 0.2, -1.0])
-print(&quot;sampled token id:&quot;, tok, &quot;| nucleus:&quot;, kept)</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Context-window scale: how many tokens is a document? (needs: pip install tiktoke</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 3. Context-window scale: how many tokens is a document? (needs: pip install tiktoken)
+print(&quot;sampled token id:&quot;, tok, &quot;| nucleus:&quot;, kept)</textarea><pre><code class="language-python"># 2. Softmax sampling with temperature and top-p (nucleus), as used in the generate() calls
+import numpy as np
+
+def sample_next(logits, temperature=0.7, top_p=0.9, rng=np.random.default_rng(0)):
+    z = np.asarray(logits) / temperature
+    p = np.exp(z - z.max()); p /= p.sum()
+    order = np.argsort(-p)
+    cum = np.cumsum(p[order])
+    keep = order[: np.searchsorted(cum, top_p) + 1]
+    q = p[keep] / p[keep].sum()
+    return rng.choice(keep, p=q), dict(zip(keep.tolist(), q.round(3).tolist()))
+
+tok, kept = sample_next([2.0, 1.5, 1.0, 0.2, -1.0])
+print(&quot;sampled token id:&quot;, tok, &quot;| nucleus:&quot;, kept)</code></pre></div><div class="runnable local"><div class="code-title">Context-window scale: how many tokens is a document? (needs: pip install tiktoken)</div><button class="try local" data-run="0" data-needs="tiktoken" title="Needs tiktoken — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden># 3. Context-window scale: how many tokens is a document? (needs: pip install tiktoken)
 import tiktoken
 enc = tiktoken.get_encoding(&quot;cl100k_base&quot;)
 text = open(__file__).read()  # any file you like
 n = len(enc.encode(text))
 for model, ctx in [(&quot;Llama 3&quot;, 128_000), (&quot;Maverick&quot;, 1_000_000), (&quot;Scout&quot;, 10_000_000)]:
-    print(f&quot;{model:9s} window holds ~{ctx // n:,} copies of this file ({n} tokens)&quot;)</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Smoke test the Hugging Face loading pattern on a tiny model (CPU-friendly stand-</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 4. Smoke test the Hugging Face loading pattern on a tiny model (CPU-friendly stand-in for Llama 4)
+    print(f&quot;{model:9s} window holds ~{ctx // n:,} copies of this file ({n} tokens)&quot;)</textarea><pre><code class="language-python"># 3. Context-window scale: how many tokens is a document? (needs: pip install tiktoken)
+import tiktoken
+enc = tiktoken.get_encoding(&quot;cl100k_base&quot;)
+text = open(__file__).read()  # any file you like
+n = len(enc.encode(text))
+for model, ctx in [(&quot;Llama 3&quot;, 128_000), (&quot;Maverick&quot;, 1_000_000), (&quot;Scout&quot;, 10_000_000)]:
+    print(f&quot;{model:9s} window holds ~{ctx // n:,} copies of this file ({n} tokens)&quot;)</code></pre></div><div class="runnable local"><div class="code-title">Smoke test the Hugging Face loading pattern on a tiny model (CPU-friendly stand-in for Lla</div><button class="try local" data-run="0" data-needs="torch, transformers" title="Needs torch, transformers — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden># 4. Smoke test the Hugging Face loading pattern on a tiny model (CPU-friendly stand-in for Llama 4)
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 name = &quot;sshleifer/tiny-gpt2&quot;   # swap for &quot;meta-llama/Llama-4-Scout-17B-16E-Instruct&quot; on an H100
@@ -594,14 +751,60 @@ tok = AutoTokenizer.from_pretrained(name)
 model = AutoModelForCausalLM.from_pretrained(name, torch_dtype=torch.float32)
 inputs = tok(&quot;What are the key features of LLAMA4?&quot;, return_tensors=&quot;pt&quot;)
 out = model.generate(inputs.input_ids, max_new_tokens=20, do_sample=True, temperature=0.7, top_p=0.9)
-print(tok.decode(out[0], skip_special_tokens=True))</code></pre><div class="out"></div></div></div>
-</aside></div><div class="sim-overlay" id="sim-overlay" role="dialog" aria-modal="true">
-  <div class="sim-window"><div class="sim-head"><div><div class="sim-kind" id="sim-kind"></div><h3 id="sim-title"></h3></div><span class="spacer"></span><button class="btn-xs" id="sim-close">✕ Close (Esc)</button></div><div class="sim-body" id="sim-body"></div></div>
+print(tok.decode(out[0], skip_special_tokens=True))</textarea><pre><code class="language-python"># 4. Smoke test the Hugging Face loading pattern on a tiny model (CPU-friendly stand-in for Llama 4)
+from transformers import AutoTokenizer, AutoModelForCausalLM
+import torch
+name = &quot;sshleifer/tiny-gpt2&quot;   # swap for &quot;meta-llama/Llama-4-Scout-17B-16E-Instruct&quot; on an H100
+tok = AutoTokenizer.from_pretrained(name)
+model = AutoModelForCausalLM.from_pretrained(name, torch_dtype=torch.float32)
+inputs = tok(&quot;What are the key features of LLAMA4?&quot;, return_tensors=&quot;pt&quot;)
+out = model.generate(inputs.input_ids, max_new_tokens=20, do_sample=True, temperature=0.7, top_p=0.9)
+print(tok.decode(out[0], skip_special_tokens=True))</code></pre></div>
+<div class="lesson-nav"><a href="week05-langgraph.html">‹ Week 5: LangGraph</a><a href="week07-moe.html">Week 7: Mixture of Experts (MoE) ›</a></div>
+<footer class="site-footer">
+This site is based on the course site <a href="https://albanna-tutorials.com/cs/">albanna-tutorials.com/cs</a> by Dr. Abdulkarim Albanna, used with the author's permission.
+</footer></article><div id="splitter" class="splitter" role="separator" aria-orientation="vertical" title="Drag to resize"></div><aside class="workbench" id="workbench">
+  <div class="wb-tabs">
+    <button class="wb-tab active" data-mode="code">⌨ Code</button>
+    <button class="wb-tab" data-mode="anim">◉ Animation</button>
+    <span class="spacer"></span>
+    <button class="btn ghost wb-close" id="btn-close" title="Hide panel">✕</button>
+  </div>
+  <section class="wb-mode wb-code active" data-mode="code">
+    <div class="wb-toolbar">
+      <span class="wb-title" id="wb-title">Editor</span>
+      <span class="spacer"></span>
+      <button id="btn-run" class="btn primary" title="Run (Ctrl+Enter)">▶ Run</button>
+      <button id="btn-reset" class="btn ghost" title="Restore the original code">Reset</button>
+      <button id="btn-copy" class="btn ghost" title="Copy code">Copy</button>
+      <button id="btn-clear" class="btn ghost" title="Clear output">Clear</button>
+    </div>
+    <div class="editor-wrap"><textarea id="editor"># Press "▶ Try it" on any example in the lesson,
+# or write Python here and press Ctrl+Enter.
+import numpy as np
+print(np.round(np.linspace(0, 1, 5), 2))</textarea></div>
+    <div class="output-head"><span>Output</span><span id="run-time" class="muted small"></span></div>
+    <div id="output" class="output" aria-live="polite"></div>
+  </section>
+  <section class="wb-mode wb-anim" data-mode="anim">
+    <div class="wb-toolbar light">
+      <select id="anim-select" aria-label="Choose animation"><optgroup label="This week"><option value="sampling">Temperature, top-k, top-p</option><option value="tokenizer">Subword tokenisation</option><option value="attention">Self-attention: Q·Kᵀ → softmax → ·V</option></optgroup><optgroup label="Other weeks"><option value="matrix-multiply">Matrix multiplication, step by step</option><option value="vectors">Vectors, dot product &amp; cosine similarity</option><option value="positional">Positional encoding</option><option value="classifier">Decision boundary, threshold &amp; F1</option><option value="bio-tagging">NER: BIO tags &amp; entity-level F1</option><option value="rag">RAG pipeline</option><option value="langgraph">LangGraph StateGraph</option><option value="moe">Mixture of Experts router</option><option value="react-loop">ReAct agent loop</option><option value="multi-agent">Multi-agent research pipeline</option><option value="mcp">MCP message flow</option><option value="lam">Browser agent: perceive → plan → act</option><option value="diffusion">Diffusion: noising &amp; denoising</option></optgroup></select>
+      <span class="spacer"></span>
+      <button id="btn-full" class="btn ghost" title="Open full screen">⤢ Full screen</button>
+    </div>
+    <div class="anim-host" id="anim-host"><p class="muted anim-empty">Press <b>▶ Display</b> on an animation in the lesson, or choose one above.</p></div>
+  </section>
+</aside></main><div class="sim-overlay" id="sim-overlay" role="dialog" aria-modal="true">
+  <div class="sim-window"><div class="sim-head"><div><div class="sim-kind" id="sim-kind"></div><h3 id="sim-title"></h3></div><span class="spacer"></span><button class="btn ghost" id="sim-close">✕ Close (Esc)</button></div><div class="sim-body" id="sim-body"></div></div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
-<script>document.addEventListener('DOMContentLoaded',()=>{if(window.hljs)hljs.highlightAll();if(window.renderMathInElement)renderMathInElement(document.body,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});});</script>
+<script src="../assets/vendor/codemirror/codemirror.js"></script>
+<script src="../assets/vendor/codemirror/python.js"></script>
+<script src="../assets/vendor/codemirror/matchbrackets.js"></script>
+<script src="../assets/vendor/codemirror/closebrackets.js"></script>
+<script>window.CS_PYODIDE_URL = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";</script>
 <script src="../assets/js/sims/core.js"></script>
 <script src="../assets/js/sims/matrix-multiply.js"></script><script src="../assets/js/sims/vectors.js"></script><script src="../assets/js/sims/attention.js"></script><script src="../assets/js/sims/tokenizer.js"></script><script src="../assets/js/sims/positional.js"></script><script src="../assets/js/sims/classifier.js"></script><script src="../assets/js/sims/bio-tagging.js"></script><script src="../assets/js/sims/rag.js"></script><script src="../assets/js/sims/langgraph.js"></script><script src="../assets/js/sims/sampling.js"></script><script src="../assets/js/sims/moe.js"></script><script src="../assets/js/sims/react-loop.js"></script><script src="../assets/js/sims/multi-agent.js"></script><script src="../assets/js/sims/mcp.js"></script><script src="../assets/js/sims/lam.js"></script><script src="../assets/js/sims/diffusion.js"></script>
 <script src="../assets/js/site.js"></script>

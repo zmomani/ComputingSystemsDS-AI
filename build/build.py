@@ -112,13 +112,117 @@ SIMS = {
 }
 SIM_FILES = ['matrix-multiply', 'vectors', 'attention', 'tokenizer', 'positional', 'classifier', 'bio-tagging', 'rag', 'langgraph', 'sampling', 'moe', 'react-loop', 'multi-agent', 'mcp', 'lam', 'diffusion']
 
+
+# ---------------------------------------------------------------- runnability
+# Modules that run in the browser: the Python standard library plus Pyodide packages loaded on demand.
+BROWSER_MODULES = set(getattr(sys, 'stdlib_module_names', ())) | {
+    'numpy', 'pandas', 'scipy', 'sklearn', 'matplotlib', 'networkx', 'sympy', 'regex', 'PIL', 'statsmodels'}
+NO_BROWSER = {'requests', 'urllib3', 'httpx', 'socket', 'subprocess', 'multiprocessing', 'asyncio_subprocess', 'webbrowser'}
+
+def imported_modules(code):
+    mods = set()
+    for m in re.finditer(r'^\s*(?:from\s+([\w.]+)\s+import|import\s+([\w., ]+))', code, re.M):
+        if m.group(1): mods.add(m.group(1).split('.')[0])
+        else:
+            for part in m.group(2).split(','):
+                part = part.strip().split(' ')[0]
+                if part: mods.add(part.split('.')[0])
+    return mods
+
+LOCAL_NAMES = re.compile(r'\b(torch|nn|F|transformers|langchain\w*|langgraph|ChatOpenAI|OpenAI|AutoModel\w*|AutoTokenizer|pipeline|Trainer|tf|keras|ollama|chromadb)\.')
+
+def runs_in_browser(code):
+    if LOCAL_NAMES.search(code): return False      # uses a local-only library without importing it here
+    mods = imported_modules(code)
+    if any(m not in BROWSER_MODULES or m in NO_BROWSER for m in mods): return False
+    if re.search(r'os\.environ|getenv\(|API_KEY|input\(|open\([\'"][^\'"]+\.(pdf|db|sqlite|png|jpg)', code): return False
+    return True
+
+def missing_modules(code):
+    mods = {m for m in imported_modules(code) if m not in BROWSER_MODULES or m in NO_BROWSER}
+    for m in LOCAL_NAMES.finditer(code):
+        n = m.group(1)
+        mods.add({'nn': 'torch', 'F': 'torch', 'tf': 'tensorflow', 'ChatOpenAI': 'langchain_openai', 'OpenAI': 'openai',
+                  'pipeline': 'transformers', 'Trainer': 'transformers', 'AutoTokenizer': 'transformers'}.get(n, 'transformers' if n.startswith('AutoModel') else n))
+    return sorted(mods)
+
 # ---------------------------------------------------------------- markdown
 MD = markdown.Markdown(extensions=[
-  'pymdownx.superfences', 'pymdownx.arithmatex', 'tables', 'toc', 'attr_list', 'md_in_html', 'sane_lists', 'pymdownx.tilde'
+  'pymdownx.arithmatex', 'tables', 'toc', 'attr_list', 'md_in_html', 'sane_lists', 'pymdownx.tilde'
 ], extension_configs={
   'pymdownx.arithmatex': {'generic': True, 'inline_syntax': ['round'], 'block_syntax': ['dollar', 'square']},
   'toc': {'permalink': False, 'toc_depth': '2-3'},
 })
+
+FENCE = re.compile(r'^([ \t]*)(```+|~~~+)[ \t]*([\w+#-]*)[^\n]*\n(.*?)^\1\2[ \t]*$', re.S | re.M)
+LANG_ALIAS = {'py': 'python', 'sh': 'bash', 'shell': 'bash', 'console': 'bash', 'js': 'javascript', 'yml': 'yaml', 'text': 'plaintext', 'txt': 'plaintext', '': 'plaintext'}
+
+PAGE_BLOCKS = []   # python blocks of the page being built: (code, title)
+
+def code_block_html(code, lang, title=None):
+    lang = LANG_ALIAS.get(lang.lower(), lang.lower())
+    esc = html.escape(code)
+    pre = f'<pre><code class="language-{lang}">{esc}</code></pre>'
+    head = f'<div class="code-title">{html.escape(title)}</div>' if title else ''
+    if lang != 'python' or re.search(r'^\s*[!%]', code, re.M):
+        return f'<div class="codeblock">{head}<button class="copy">Copy</button>{pre}</div>'
+    PAGE_BLOCKS.append((code, title))
+    return f'PYBLOCK{len(PAGE_BLOCKS) - 1}XEND'
+
+CACHE_FILE = ROOT / 'build' / 'runnable-cache.json'
+try: CACHE = json.loads(CACHE_FILE.read_text())
+except Exception: CACHE = {}
+
+def classify_page():
+    import hashlib, subprocess
+    payload = [{'code': c, 'static_ok': runs_in_browser(c)} for c, _ in PAGE_BLOCKS]
+    key = hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()
+    if key in CACHE: return CACHE[key]
+    try:
+        r = subprocess.run([sys.executable, '-I', str(ROOT / 'build' / 'classify.py')], input=json.dumps(payload),
+                           capture_output=True, text=True, timeout=900, cwd=str(ROOT / 'build'))
+        res = json.loads(r.stdout)
+    except Exception as e:
+        print('  (classification unavailable, using import check only:', str(e)[:80], ')', file=sys.stderr)
+        return [{'run': p['static_ok'], 'setup': '', 'reason': ''} for p in payload]
+    CACHE[key] = res
+    return res
+
+def finalize(page_html):
+    res = classify_page()
+    def block(i):
+        code, title = PAGE_BLOCKS[i]; r = res[i]
+        return python_block_html(code, title, r['run'], r.get('setup', ''), r.get('reason', ''))
+    out = re.sub(r'<p>\s*PYBLOCK(\d+)XEND\s*</p>', lambda m: block(int(m.group(1))), page_html)
+    out = re.sub(r'PYBLOCK(\d+)XEND', lambda m: block(int(m.group(1))), out)
+    PAGE_BLOCKS.clear()
+    return out
+
+def python_block_html(code, title, run, setup, reason):
+    esc = html.escape(code)
+    pre = f'<pre><code class="language-python">{esc}</code></pre>'
+    head = f'<div class="code-title">{html.escape(title)}</div>' if title else ''
+    setup_ta = f'<textarea class="setup" hidden>{html.escape(setup)}</textarea>' if setup else ''
+    if run:
+        btn = f'<button class="try" data-run="1">▶ Try it</button>'
+        return f'<div class="runnable">{head}{btn}<button class="copy">Copy</button><textarea class="src" hidden>{esc}</textarea>{setup_ta}{pre}</div>'
+    miss = ', '.join(missing_modules(code)) or ('code from the earlier examples in this lesson' if 'NameError' in reason else 'an API key or local files')
+    btn = f'<button class="try local" data-run="0" data-needs="{html.escape(miss)}" title="Needs {html.escape(miss)} — opens in the editor; run it in your local environment">✎ Open in editor</button>'
+    return f'<div class="runnable local">{head}{btn}<button class="copy">Copy</button><textarea class="src" hidden>{esc}</textarea>{pre}</div>'
+
+def md_to_html(text):
+    blocks = []
+    def stash(m):
+        indent, _, lang, code = m.group(1), m.group(2), m.group(3), m.group(4)
+        if indent: code = '\n'.join(l[len(indent):] if l.startswith(indent) else l for l in code.split('\n'))
+        blocks.append(code_block_html(code.rstrip('\n'), lang))
+        return f'{indent}\n{indent}CODEBLOCK{len(blocks) - 1}XEND\n'
+    text = FENCE.sub(stash, text)
+    MD.reset()
+    out = MD.convert(text)
+    out = re.sub(r'<p>\s*CODEBLOCK(\d+)XEND\s*</p>', lambda m: blocks[int(m.group(1))], out)
+    out = re.sub(r'CODEBLOCK(\d+)XEND', lambda m: blocks[int(m.group(1))], out)
+    return out
 
 def parse(path: Path):
     text = path.read_text(encoding='utf-8')
@@ -129,7 +233,6 @@ def parse(path: Path):
             if ':' in line:
                 k, v = line.split(':', 1); meta[k.strip()] = v.strip()
         text = text[m.end():]
-    # split off "Key concepts worth simulating" and "Test code"
     def cut(section):
         nonlocal text
         mm = re.search(r'\n## ' + section + r'[^\n]*\n', text)
@@ -140,9 +243,8 @@ def parse(path: Path):
         chunk = text[mm.end():end]
         text = text[:start] + text[end:]
         return chunk
-    concepts = cut('Key concepts worth simulating')
+    cut('Key concepts worth simulating')
     testcode = cut('Test code')
-    # drop the top-level H1 (we render our own header) and any author/source preamble before the first H2
     text = re.sub(r'^\s*# [^\n]*\n', '', text, count=1)
     first = re.search(r'\n## ', text)
     if first:
@@ -150,10 +252,9 @@ def parse(path: Path):
         pre = '\n'.join(l for l in pre.split('\n') if not re.search(r'albanna|al-banna|ilmy|extraction note|material by|course site', l, re.I))
         pre = re.sub(r'^>\s*$', '', pre, flags=re.M)
         text = pre + rest
-    return meta, text, concepts, testcode
+    return meta, text, testcode
 
 def snippets_from(testcode: str):
-    """Return [(title, code, runnable)] from fenced python blocks; a preceding line/heading is the title."""
     out = []
     for m in re.finditer(r'(?:###?\s*([^\n]*)\n|\*\*([^*\n]+)\*\*[^\n]*\n|^([^\n`#][^\n]{0,90})\n)?\s*```(?:python|py)\n(.*?)```', testcode, re.S | re.M):
         title = (m.group(1) or m.group(2) or m.group(3) or '').strip().rstrip(':')
@@ -161,115 +262,8 @@ def snippets_from(testcode: str):
         first = code.lstrip().split('\n', 1)[0]
         if (not title or title.lower().startswith('snippet')) and first.startswith('#'):
             title = re.sub(r'^#+\s*(\d+[.)]\s*)?', '', first).strip()
-        title = title or f'Snippet {len(out) + 1}'
-        runnable = not re.search(r'^\s*(import|from)\s+(torch|transformers|langchain|langgraph|langchain_\w+|datasets|sentence_transformers|chromadb|openai|anthropic|mcp|requests|sklearn|diffusers|ollama|dotenv|playwright|streamlit|evaluate|seqeval|tavily|httpx|a2a)', code, re.M) and not re.search(r'os\.environ|API_KEY|input\(', code)
-        out.append((title[:80], code, runnable))
+        out.append((title[:90] or f'Example {len(out) + 1}', code))
     return out[:6]
-
-# ---------------------------------------------------------------- templates
-def head(title, depth=0):
-    base = '../' if depth else ''
-    return f'''<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{html.escape(title)} · {SITE_TITLE}</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
-<link rel="stylesheet" href="{base}assets/css/site.css">
-</head>
-<body>'''
-
-def topbar(depth, prev=None, nxt=None):
-    base = '../' if depth else ''
-    nav = ''
-    if prev: nav += f'<a class="btn-icon" href="{prev[0]}" title="{html.escape(prev[1])}">← Wk {prev[2]}</a>'
-    if nxt: nav += f'<a class="btn-icon" href="{nxt[0]}" title="{html.escape(nxt[1])}">Wk {nxt[2]} →</a>'
-    return f'''<header class="topbar">
-  <button class="btn-icon" id="menu-toggle" aria-label="Menu">☰</button>
-  <a class="brand" href="{base}index.html">{COURSE_CODE} · {SITE_TITLE}<small>University of Petra</small></a>
-  <span class="spacer"></span>
-  <nav class="week-nav">{nav}</nav>
-  <a class="btn-icon" href="{base}index.html#curriculum">Curriculum</a>
-  <a class="btn-icon" href="{base}index.html#simulations">Simulations</a>
-  <button class="btn-icon" id="theme-toggle" aria-label="Toggle dark mode">◐</button>
-</header>'''
-
-def sidebar(active_slug, depth):
-    base = '../' if depth else ''
-    items = ''
-    for w in WEEKS:
-        cls = 'active' if w['slug'] == active_slug else ''
-        if w.get('soon'): cls += ' soon'
-        items += f'<li><a class="{cls.strip()}" href="{base}lessons/{w["slug"]}.html"><span class="wk">{w["n"]:02d}</span><span>{html.escape(w["title"])}</span></a></li>'
-    extra = ''.join(f'<li><a class="{"active" if p["slug"] == active_slug else ""}" href="{base}lessons/{p["slug"]}.html"><span class="wk">·</span><span>{html.escape(p["title"].split(":")[0])}</span></a></li>' for p in EXTRA_PAGES)
-    return f'''<aside class="sidebar">
-  <h4>Course</h4><ul class="outline">{extra}</ul>
-  <h4>16-week curriculum</h4><ul class="outline">{items}</ul>
-  <h4>On this page</h4><ul class="toc" id="toc"></ul>
-</aside>'''
-
-def sim_card(sid):
-    t, kind, desc = SIMS[sid]
-    return f'''<button class="sim-card" data-sim="{sid}"><span class="sim-kind">{html.escape(kind)} · {sim_icon(sid)}</span><span class="sim-title">{html.escape(t)}</span><span class="sim-desc">{html.escape(desc)}</span></button>'''
-
-def sim_icon(sid):
-    return {'matrix-multiply': 'animation', 'vectors': 'interactive', 'attention': 'animation', 'tokenizer': 'interactive', 'positional': 'interactive', 'classifier': 'simulation', 'bio-tagging': 'animation', 'rag': 'animation', 'langgraph': 'animation', 'sampling': 'simulation', 'moe': 'simulation', 'react-loop': 'animation', 'multi-agent': 'animation', 'mcp': 'animation', 'lam': 'animation', 'diffusion': 'simulation'}[sid]
-
-def rail(sims, snippets):
-    cards = ''.join(sim_card(s) for s in sims) or '<p class="rail-intro">No simulation for this page.</p>'
-    sn = ''
-    for i, (title, code, runnable) in enumerate(snippets):
-        run = '<button class="btn-xs run-btn">Run ▶</button>' if runnable else '<span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span>'
-        sn += f'''<div class="snippet"><div class="snippet-head"><span>{html.escape(title)}</span><span class="spacer"></span>{run}<button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python">{html.escape(code)}</code></pre><div class="out"></div></div>'''
-    if not sn: sn = '<p class="rail-intro">No test code for this page.</p>'
-    return f'''<aside class="rail">
-  <div class="rail-tabs"><button class="active" data-panel="panel-sims">Simulations</button><button data-panel="panel-code">Test code</button></div>
-  <div class="rail-panel active" id="panel-sims"><p class="rail-intro">Interactive teaching aids for this week. Each opens full-size with step controls and teaching notes.</p>{cards}</div>
-  <div class="rail-panel" id="panel-code"><p class="rail-intro"><b>Run ▶</b> executes pure-Python/NumPy snippets in your browser (Pyodide). Snippets marked <i>local</i> need the course environment (PyTorch, Transformers, LangChain…) — copy them into VS Code.</p>{sn}</div>
-</aside>'''
-
-def overlay():
-    return '''<div class="sim-overlay" id="sim-overlay" role="dialog" aria-modal="true">
-  <div class="sim-window"><div class="sim-head"><div><div class="sim-kind" id="sim-kind"></div><h3 id="sim-title"></h3></div><span class="spacer"></span><button class="btn-xs" id="sim-close">✕ Close (Esc)</button></div><div class="sim-body" id="sim-body"></div></div>
-</div>'''
-
-def scripts(depth):
-    base = '../' if depth else ''
-    sims = ''.join(f'<script src="{base}assets/js/sims/{s}.js"></script>' for s in SIM_FILES)
-    return f'''{overlay()}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
-<script>document.addEventListener('DOMContentLoaded',()=>{{if(window.hljs)hljs.highlightAll();if(window.renderMathInElement)renderMathInElement(document.body,{{delimiters:[{{left:'\\\\[',right:'\\\\]',display:true}},{{left:'\\\\(',right:'\\\\)',display:false}}],throwOnError:false}});}});</script>
-<script src="{base}assets/js/sims/core.js"></script>
-{sims}
-<script src="{base}assets/js/site.js"></script>
-</body></html>'''
-
-def footer():
-    return f'''<footer style="margin-top:3rem;padding-top:1rem;border-top:1px solid var(--border);font-size:.84rem;color:var(--muted)">
-This site is based on the course site <a href="{ORIGINAL_SITE}">albanna-tutorials.com/cs</a> by {ORIGINAL_AUTHOR}, used with the author's permission.
-</footer>'''
-
-# ---------------------------------------------------------------- pages
-def render_body(files):
-    parts, snippets = [], []
-    for f in files:
-        p = CONTENT / f
-        if not p.exists():
-            print('missing', p, file=sys.stderr); continue
-        meta, text, concepts, testcode = parse(p)
-        MD.reset()
-        body = MD.convert(text)
-        if len(files) > 1:
-            parts.append(f'<h2 id="part-{slugify(meta.get("title", f))}">{html.escape(meta.get("title", f))}</h2>')
-        parts.append(localise_links(body))
-        snippets += snippets_from(testcode)
-    return '\n'.join(parts), snippets
 
 URL_MAP = {
   'transformer.html': 'week01-transformers.html', 'transformer-step-by-step.html': 'week01-transformers.html#part-transformer-complete-step-by-step-guide-with-one-example',
@@ -280,95 +274,260 @@ URL_MAP = {
   'cs/syllabus.html': 'syllabus.html', 'cs/project_research_assistant.html': 'project.html', 'cs/': '../index.html',
 }
 def localise_links(body):
-    def rep(m):
-        page = m.group(1)
-        return m.group(0).replace(m.group(0), m.group(0)) if page not in URL_MAP else URL_MAP[page]
     return re.sub(r'https?://(?:www\.)?(?:albanna-tutorials\.com|ilmy\.me)/([A-Za-z0-9_./-]+)', lambda m: URL_MAP.get(m.group(1), m.group(0)), body)
 
 def slugify(s): return re.sub(r'[^a-z0-9]+', '-', s.lower()).strip('-')
 
+def render_body(files):
+    parts, snippets = [], []
+    for f in files:
+        p = CONTENT / f
+        if not p.exists():
+            print('missing', p, file=sys.stderr); continue
+        meta, text, testcode = parse(p)
+        if len(files) > 1:
+            parts.append(f'<h2 class="part" id="part-{slugify(meta.get("title", f))}">{html.escape(meta.get("title", f))}</h2>')
+        parts.append(localise_links(md_to_html(text)))
+        snippets += snippets_from(testcode)
+    return '\n'.join(parts), snippets
+
+# ---------------------------------------------------------------- page chrome
+def head(title, depth=0):
+    base = '../' if depth else ''
+    return f'''<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{html.escape(title)} · {SITE_TITLE}</title>
+<meta name="description" content="Interactive course site for {COURSE_CODE} Computing Systems for Data Science and AI, University of Petra. Python runs in your browser; every week has simulations and animations.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231f3a5f'/><text x='16' y='22' font-size='14' font-family='monospace' fill='white' text-anchor='middle'>AI</text></svg>">
+<link rel="stylesheet" href="{base}assets/vendor/codemirror/codemirror.css">
+<link rel="stylesheet" href="{base}assets/vendor/codemirror/material-darker.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<link rel="stylesheet" href="{base}assets/css/site.css">
+</head>
+<body>'''
+
+def lesson_select(active_slug, depth):
+    base = '' if depth else 'lessons/'
+    opts = '<option value="">Lessons…</option>'
+    for p in EXTRA_PAGES:
+        opts += f'<option value="{base}{p["slug"]}.html"{" selected" if p["slug"] == active_slug else ""}>{html.escape(p["title"].split(":")[0])}</option>'
+    for w in WEEKS:
+        opts += f'<option value="{base}{w["slug"]}.html"{" selected" if w["slug"] == active_slug else ""}>Week {w["n"]} · {html.escape(w["title"])}</option>'
+    return f'<select id="lesson-select" aria-label="Choose lesson">{opts}</select>'
+
+def topbar(depth, active_slug='', prev=None, nxt=None, workbench=False):
+    base = '../' if depth else ''
+    p = f'<a class="btn ghost" href="{prev[0]}" title="{html.escape(prev[1])}">‹ Prev</a>' if prev else '<button class="btn ghost" disabled>‹ Prev</button>'
+    n = f'<a class="btn ghost" href="{nxt[0]}" title="{html.escape(nxt[1])}">Next ›</a>' if nxt else '<button class="btn ghost" disabled>Next ›</button>'
+    nav = f'{p}{lesson_select(active_slug, depth)}{n}' if depth else lesson_select('', 0)
+    wb = ('<button id="btn-panel" class="btn accent" title="Show or hide the editor / animation panel">⇆ Panel</button>'
+          '<div class="status" id="py-status"><span class="dot"></span><span id="py-status-text">Python loads on first run</span></div>') if workbench else ''
+    return f'''<header class="topbar">
+  <a class="brand" href="{base}index.html">
+    <span class="brand-mark">AI</span>
+    <span class="brand-text"><strong>Computing Systems for DS &amp; AI</strong><span class="muted"> · {COURSE_CODE} · University of Petra</span></span>
+  </a>
+  <nav class="topnav">{nav}</nav>
+  {wb}
+</header>'''
+
+def sim_buttons(sims, label):
+    if not sims: return ''
+    items = ''.join(f'<button class="sim-chip" data-display="{s}"><span class="sim-chip-kind">{html.escape(SIMS[s][1])}</span>▶ Display: {html.escape(SIMS[s][0])}</button>' for s in sims)
+    return f'<div class="sim-strip"><div class="sim-strip-head">{label}</div><div class="sim-strip-items">{items}</div></div>'
+
+def workbench(sims):
+    opts = ''.join(f'<option value="{s}">{html.escape(SIMS[s][0])}</option>' for s in sims)
+    others = ''.join(f'<option value="{s}">{html.escape(SIMS[s][0])}</option>' for s in SIM_FILES if s not in sims)
+    return f'''<aside class="workbench" id="workbench">
+  <div class="wb-tabs">
+    <button class="wb-tab active" data-mode="code">⌨ Code</button>
+    <button class="wb-tab" data-mode="anim">◉ Animation</button>
+    <span class="spacer"></span>
+    <button class="btn ghost wb-close" id="btn-close" title="Hide panel">✕</button>
+  </div>
+  <section class="wb-mode wb-code active" data-mode="code">
+    <div class="wb-toolbar">
+      <span class="wb-title" id="wb-title">Editor</span>
+      <span class="spacer"></span>
+      <button id="btn-run" class="btn primary" title="Run (Ctrl+Enter)">▶ Run</button>
+      <button id="btn-reset" class="btn ghost" title="Restore the original code">Reset</button>
+      <button id="btn-copy" class="btn ghost" title="Copy code">Copy</button>
+      <button id="btn-clear" class="btn ghost" title="Clear output">Clear</button>
+    </div>
+    <div class="editor-wrap"><textarea id="editor"># Press "▶ Try it" on any example in the lesson,
+# or write Python here and press Ctrl+Enter.
+import numpy as np
+print(np.round(np.linspace(0, 1, 5), 2))</textarea></div>
+    <div class="output-head"><span>Output</span><span id="run-time" class="muted small"></span></div>
+    <div id="output" class="output" aria-live="polite"></div>
+  </section>
+  <section class="wb-mode wb-anim" data-mode="anim">
+    <div class="wb-toolbar light">
+      <select id="anim-select" aria-label="Choose animation"><optgroup label="This week">{opts}</optgroup><optgroup label="Other weeks">{others}</optgroup></select>
+      <span class="spacer"></span>
+      <button id="btn-full" class="btn ghost" title="Open full screen">⤢ Full screen</button>
+    </div>
+    <div class="anim-host" id="anim-host"><p class="muted anim-empty">Press <b>▶ Display</b> on an animation in the lesson, or choose one above.</p></div>
+  </section>
+</aside>'''
+
+def overlay():
+    return '''<div class="sim-overlay" id="sim-overlay" role="dialog" aria-modal="true">
+  <div class="sim-window"><div class="sim-head"><div><div class="sim-kind" id="sim-kind"></div><h3 id="sim-title"></h3></div><span class="spacer"></span><button class="btn ghost" id="sim-close">✕ Close (Esc)</button></div><div class="sim-body" id="sim-body"></div></div>
+</div>'''
+
+def scripts(depth, workbench=False):
+    base = '../' if depth else ''
+    sims = ''.join(f'<script src="{base}assets/js/sims/{s}.js"></script>' for s in SIM_FILES)
+    cm = f'''<script src="{base}assets/vendor/codemirror/codemirror.js"></script>
+<script src="{base}assets/vendor/codemirror/python.js"></script>
+<script src="{base}assets/vendor/codemirror/matchbrackets.js"></script>
+<script src="{base}assets/vendor/codemirror/closebrackets.js"></script>
+<script>window.CS_PYODIDE_URL = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";</script>''' if workbench else ''
+    return f'''{overlay()}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+{cm}
+<script src="{base}assets/js/sims/core.js"></script>
+{sims}
+<script src="{base}assets/js/site.js"></script>
+</body></html>'''
+
+def footer():
+    return f'''<footer class="site-footer">
+This site is based on the course site <a href="{ORIGINAL_SITE}">albanna-tutorials.com/cs</a> by {ORIGINAL_AUTHOR}, used with the author's permission.
+</footer>'''
+
+def contents_box(body):
+    heads = re.findall(r'<h2[^>]*id="([^"]+)"[^>]*>(.*?)</h2>', body)
+    if len(heads) < 4: return ''
+    items = ''.join(f'<li><a href="#{i}">{re.sub(r"<[^>]+>", "", t)}</a></li>' for i, t in heads)
+    return f'<details class="contents"><summary>Contents ({len(heads)} sections)</summary><ol>{items}</ol></details>'
+
+def load_browser_examples():
+    src = (CONTENT / 'browser-examples.py').read_text(encoding='utf-8')
+    parts = re.split(r'^#@ week (\d+) \| (.*)$', src, flags=re.M)
+    ex = {}
+    for i in range(1, len(parts), 3):
+        ex.setdefault(int(parts[i]), []).append((parts[i + 1].strip(), parts[i + 2].strip('\n')))
+    return ex
+BROWSER_EXAMPLES = load_browser_examples()
+
+def try_section(snippets, week=None):
+    browser = BROWSER_EXAMPLES.get(week, [])
+    if not snippets and not browser: return ''
+    out = '''<h2 id="try-it-yourself">Try it yourself</h2>
+<p class="lesson-intro"><b>▶ Try it</b> runs an example in the editor panel, inside your browser — change the code and press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to run it again. Examples marked <b>✎ Open in editor</b> need libraries or API keys that cannot run in a browser (PyTorch, Transformers, LangChain, OpenAI…): read them in the editor, then copy them to VS Code and run them in the course environment.</p>'''
+    if browser:
+        out += '<h3 id="run-in-your-browser">Run in your browser</h3><p class="lesson-intro">Self-contained versions of this week\'s mechanisms, written with NumPy, scikit-learn or plain Python so they run here.</p>'
+        out += ''.join(code_block_html(code, 'python', title) for title, code in browser)
+    if snippets:
+        out += '<h3 id="test-code">Test code for the course environment</h3>'
+        out += ''.join(code_block_html(code, 'python', title) for title, code in snippets)
+    return out
+
+# ---------------------------------------------------------------- pages
+def lesson_shell(title, active_slug, prev, nxt, inner, sims):
+    inner = finalize(inner)
+    return (head(title, 1) + topbar(1, active_slug, prev, nxt, workbench=True) +
+            f'<main class="lesson panel-closed" id="lesson"><article class="lesson-content" id="lesson-content">{inner}</article>'
+            f'<div id="splitter" class="splitter" role="separator" aria-orientation="vertical" title="Drag to resize"></div>{workbench(sims)}</main>' +
+            scripts(1, workbench=True))
+
 def lesson_page(w, prev, nxt):
     body, snippets = render_body(w['files'])
-    sims_html = '<div class="callout sim"><div class="sim-strip"><b style="margin-right:4px">Simulations for this week:</b>' + ''.join(f'<button class="chip" data-sim="{s}">▶ {html.escape(SIMS[s][0])}</button>' for s in w['sims']) + '</div></div>' if w['sims'] else ''
     if not w['files']:
-        note = 'This lesson is marked <b>Coming Soon</b> on the original course site. Until it is published, use the topics, milestone and simulations below.' if w.get('soon') else ('Exam week. Use the simulations below to revise the mechanisms covered so far.' if w.get('exam') else 'Project week. The milestone and the pipeline simulation below are the reference for what is due.')
-        body = f'<div class="callout warn">{note}</div><h2 id="topics">Topics</h2><p>{html.escape(w["topics"])}</p><h2 id="milestone">Project milestone</h2><p>{html.escape(w["milestone"])}</p>'
-    content = f'''<main class="main">
-  <div class="lesson-head"><div class="eyebrow">Week {w["n"]} · ILO {html.escape(w["ilo"])}</div><h1>{html.escape(w["title"])}</h1>
-  <p class="credit"><b>Topics:</b> {html.escape(w["topics"])}<br><b>Project milestone:</b> {html.escape(w["milestone"])}</p></div>
-  {sims_html}
-  {body}
-  <div class="pager">{f'<a href="{prev[0]}"><small>Previous</small>Week {prev[2]}: {html.escape(prev[1])}</a>' if prev else '<span></span>'}{f'<a class="next" href="{nxt[0]}"><small>Next</small>Week {nxt[2]}: {html.escape(nxt[1])}</a>' if nxt else '<span></span>'}</div>
-  {footer()}
-</main>'''
-    return head(f'Week {w["n"]}: {w["title"]}', 1) + topbar(1, prev, nxt) + '<div class="layout">' + sidebar(w['slug'], 1) + content + rail(w['sims'], snippets) + '</div>' + scripts(1)
+        note = ('This lesson is marked <b>Coming Soon</b> on the original course site. Until it is published, use the topics, the milestone and the animations below.' if w.get('soon')
+                else 'Exam week. Use the animations below to revise the mechanisms covered so far.' if w.get('exam')
+                else 'Project week. The milestone and the pipeline animation are the reference for what is due.')
+        body = f'<blockquote><p>{note}</p></blockquote><h2 id="topics">Topics</h2><p>{html.escape(w["topics"])}</p><h2 id="milestone">Project milestone</h2><p>{html.escape(w["milestone"])}</p>'
+    nav = f'''<div class="lesson-nav">{f'<a href="{prev[0]}">‹ Week {prev[2]}: {html.escape(prev[1])}</a>' if prev else '<a href="../index.html">‹ All lessons</a>'}{f'<a href="{nxt[0]}">Week {nxt[2]}: {html.escape(nxt[1])} ›</a>' if nxt else '<a href="../index.html">All lessons ›</a>'}</div>'''
+    inner = f'''<div class="lesson-head"><div class="eyebrow">Week {w["n"]} · ILO {html.escape(w["ilo"])}</div><h1>{html.escape(w["title"])}</h1>
+<p class="lesson-intro"><b>Topics:</b> {html.escape(w["topics"])}<br><b>Project milestone:</b> {html.escape(w["milestone"])}</p></div>
+{sim_buttons(w["sims"], "Animations for this week — open them in the panel")}
+{contents_box(body)}
+{body}
+{try_section(snippets, w['n'])}
+{nav}
+{footer()}'''
+    return lesson_shell(f'Week {w["n"]}: {w["title"]}', w['slug'], prev, nxt, inner, w['sims'])
 
 def extra_page(p):
     body, snippets = render_body(p['files'])
-    sims_html = '<div class="callout sim"><div class="sim-strip"><b style="margin-right:4px">Related simulations:</b>' + ''.join(f'<button class="chip" data-sim="{s}">▶ {html.escape(SIMS[s][0])}</button>' for s in p['sims']) + '</div></div>' if p['sims'] else ''
-    content = f'<main class="main"><div class="lesson-head"><div class="eyebrow">{COURSE_CODE}</div><h1>{html.escape(p["title"])}</h1></div>{sims_html}{body}{footer()}</main>'
-    return head(p['title'], 1) + topbar(1) + '<div class="layout">' + sidebar(p['slug'], 1) + content + rail(p['sims'], snippets) + '</div>' + scripts(1)
+    inner = f'''<div class="lesson-head"><div class="eyebrow">{COURSE_CODE}</div><h1>{html.escape(p["title"])}</h1></div>
+{sim_buttons(p["sims"], "Related animations")}
+{contents_box(body)}{body}{try_section(snippets)}
+<div class="lesson-nav"><a href="../index.html">‹ All lessons</a><span></span></div>{footer()}'''
+    return lesson_shell(p['title'], p['slug'], None, None, inner, p['sims'] or ['multi-agent'])
 
 def index_page():
-    weeks = ''
+    cards = ''
     for w in WEEKS:
-        pill = '<span class="pill">coming soon</span>' if w.get('soon') else ('<span class="pill">exam</span>' if w.get('exam') else ('<span class="pill">project</span>' if w.get('meta') else '<span class="pill">lesson</span>'))
-        sims = ' '.join(f'<a class="pill sim" href="lessons/{w["slug"]}.html#sim={s}">{html.escape(SIMS[s][1])}</a>' for s in w['sims'][:3])
-        weeks += f'<li><span class="wk">Week {w["n"]}</span><div><a class="wt" href="lessons/{w["slug"]}.html">{html.escape(w["title"])}</a><div class="wd">{html.escape(w["topics"])}</div><div class="wm"><b>Milestone:</b> {html.escape(w["milestone"])}</div><div style="margin-top:4px">{sims}</div></div>{pill}</li>'
-    simcards = ''.join(f'<div class="card"><div class="sim-kind" style="font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--accent-2);font-weight:700">{html.escape(SIMS[s][1])}</div><h3 style="font-size:1.05rem">{html.escape(SIMS[s][0])}</h3><p style="font-size:.9rem;color:var(--muted);margin:0 0 .6rem">{html.escape(SIMS[s][2])}</p><button class="btn secondary" data-sim="{s}">Open</button></div>' for s in SIM_FILES)
+        kind = 'coming soon' if w.get('soon') else 'exam' if w.get('exam') else 'project' if w.get('meta') else 'lesson'
+        cards += f'''<li><a class="lesson-card{" dim" if w.get("soon") or w.get("exam") else ""}" href="lessons/{w["slug"]}.html">
+  <span class="lesson-num">{w["n"]:02d}</span>
+  <span><h3>{html.escape(w["title"])}</h3><p>{html.escape(w["topics"])}</p></span>
+  <span class="lesson-meta">Week {w["n"]}<br><span class="progress-pill{" sim" if w["sims"] else ""}">{len(w["sims"])} animation{"s" if len(w["sims"]) != 1 else ""}</span><br><span class="kind">{kind}</span></span></a></li>'''
+    simcards = ''.join(f'''<div class="card sim-card"><div class="sim-kind">{html.escape(SIMS[s][1])}</div><h3>{html.escape(SIMS[s][0])}</h3><p>{html.escape(SIMS[s][2])}</p><button class="btn primary" data-display="{s}">▶ Display</button></div>''' for s in SIM_FILES)
     quiz = [
-      ('What mechanism lets transformers process sequences effectively?', ['Recurrence', 'Self-attention', 'Convolution', 'Pooling'], 1, 'Self-attention lets every token look at every other token in parallel — try the attention simulation.'),
-      ('In ReAct, what does the cycle consist of?', ['Input, Process, Output', 'Thought, Action, Observation', 'Encode, Decode, Generate', 'Query, Key, Value'], 1, 'Reasoning traces interleaved with tool actions and their observations — see the ReAct loop simulation.'),
-      ('What is the main advantage of MoE models?', ['Smaller model size', 'Better training data', 'Sparse activation reduces compute while maintaining performance', 'Simpler architecture'], 2, 'Only the top-k experts run per token — see the MoE router simulation.'),
+      ('What mechanism lets transformers process sequences effectively?', ['Recurrence', 'Self-attention', 'Convolution', 'Pooling'], 1, 'Self-attention lets every token look at every other token in parallel — see the self-attention animation in Week 1.'),
+      ('In ReAct, what does the cycle consist of?', ['Input, Process, Output', 'Thought, Action, Observation', 'Encode, Decode, Generate', 'Query, Key, Value'], 1, 'Reasoning traces interleaved with tool actions and their observations — see the ReAct loop animation in Week 9.'),
+      ('What is the main advantage of MoE models?', ['Smaller model size', 'Better training data', 'Sparse activation reduces compute while maintaining performance', 'Simpler architecture'], 2, 'Only the top-k experts run for each token — see the MoE router animation in Week 7.'),
     ]
-    quiz_html = ''.join(f'<div class="q" data-answer="{a}"><p><b>{i + 1}. {html.escape(q)}</b></p>' + ''.join(f'<span class="opt" data-v="{j}">{chr(65 + j)}) {html.escape(o)}</span>' for j, o in enumerate(opts)) + f'<p class="fb" style="display:none;font-size:.9rem;color:var(--muted);margin-top:6px">{html.escape(fb)}</p></div>' for i, (q, opts, a, fb) in enumerate(quiz))
-    content = f'''<main class="main" style="max-width:1000px">
-  <section class="hero"><div class="eyebrow" style="font-size:.78rem;text-transform:uppercase;letter-spacing:.1em;color:var(--accent-2);font-weight:700">{COURSE_CODE} · Faculty of Information Technology · University of Petra</div>
+    quiz_html = ''.join(f'<div class="q" data-answer="{a}"><p><b>{i + 1}. {html.escape(q)}</b></p>' + ''.join(f'<span class="opt" data-v="{j}">{chr(65 + j)}) {html.escape(o)}</span>' for j, o in enumerate(opts)) + f'<p class="fb">{html.escape(fb)}</p></div>' for i, (q, opts, a, fb) in enumerate(quiz))
+    inner = f'''<div class="home-inner">
+  <div class="eyebrow">{COURSE_CODE} · Faculty of Information Technology · University of Petra</div>
   <h1>Computing Systems for Data Science and Artificial Intelligence</h1>
-  <p class="sub">A 16-week, project-driven course from transformers to agents: LLMs, Mixture of Experts, ReAct, multi-agent systems, MCP, Large Action Models and diffusion — built around a multi-agent research assistant that competes live in Week 15.</p>
-  <p class="credit">Section taught by <b>{INSTRUCTOR}</b>. Every week has its lesson, interactive simulations and animations, and runnable test code.</p>
-  <p><a class="btn" href="lessons/week01-transformers.html">Start with Week 1 →</a> <a class="btn secondary" href="lessons/syllabus.html">Syllabus</a> <a class="btn secondary" href="lessons/project.html">Final project</a></p></section>
+  <p class="lead">A 16-week, project-driven course from transformers to agents: LLMs, Mixture of Experts, ReAct, multi-agent systems, MCP, Large Action Models and diffusion — built around a multi-agent research assistant that competes live in Week 15.</p>
+  <p class="lead small-lead">Each lesson has the explanation on the left and a panel on the right. <b>▶ Try it</b> runs an example in a live Python editor inside your browser — nothing to install. <b>▶ Display</b> opens an animation of the concept you are reading about. Section taught by <b>{INSTRUCTOR}</b>.</p>
+  <p><a class="btn primary" href="lessons/week01-transformers.html">Start with Week 1 ›</a> <a class="btn ghost" href="lessons/syllabus.html">Syllabus</a> <a class="btn ghost" href="lessons/project.html">Final project</a></p>
+
+  <h2 id="curriculum">16-week curriculum</h2>
+  <ol class="lesson-list">{cards}</ol>
+
+  <h2 id="simulations">Animations &amp; simulations</h2>
+  <p class="muted">Step-by-step animations in the style of textbook figures and Khan-Academy explorables. Each one also appears in its week's lesson.</p>
+  <div class="grid">{simcards}</div>
 
   <h2 id="overview">Course overview</h2>
-  <div class="grid-2">
+  <div class="grid">
     <div class="card"><h3>What you'll learn</h3><p>Transformers, LLMs, Mixture of Experts, AI agents and ReAct, multi-agent systems, Model Context Protocol (MCP), Large Action Models (LAMs) and diffusion models.</p></div>
     <div class="card"><h3>What you'll build</h3><p>NER systems, RAG pipelines, LangGraph agents, multi-agent workflows, LAM applications and generative-AI projects, culminating in a multi-agent research assistant.</p></div>
     <div class="card"><h3>Technologies</h3><p>Python 3.12+, PyTorch, Hugging Face, LangChain &amp; LangGraph, OpenAI API, Ollama, Playwright, VS Code.</p></div>
-    <div class="card"><h3>Who should take it</h3><p>University of Petra students in Data Science and AI degrees interested in LLMs and agents. Basic Python is recommended; see the syllabus for prerequisites.</p></div>
+    <div class="card"><h3>Who should take it</h3><p>University of Petra students in Data Science and AI degrees interested in LLMs and agents. Basic Python is recommended.</p></div>
   </div>
 
-  <h2 id="curriculum">16-week curriculum</h2>
-  <p style="color:var(--muted)">Each week lists the topics, the ILO, the project milestone and the simulations available in that week's sidebar.</p>
-  <ul class="week-list">{weeks}</ul>
-
-  <h2 id="simulations">Simulations &amp; animations</h2>
-  <p style="color:var(--muted)">Sixteen interactive teaching aids, in the style of textbook figures and Khan-Academy-type explorables: step controls, live computation, legends and teaching notes. Each is also linked from its week.</p>
-  <div class="grid-2">{simcards}</div>
-
   <h2 id="quiz">Test your knowledge</h2>
-  <div class="quiz card">{quiz_html}</div>
+  <div class="card quiz">{quiz_html}</div>
 
   <h2 id="projects">Project portfolio</h2>
-  <div class="grid-2">
-    <div class="card"><h3>Arabic QA System <small style="color:var(--muted);font-weight:400">· Week 6</small></h3><p>Question answering over Arabic documents with RAG and LangChain.</p></div>
-    <div class="card"><h3>Research Assistant <small style="color:var(--muted);font-weight:400">· Week 10</small></h3><p>A multi-agent assistant that searches, summarises and synthesises information.</p></div>
-    <div class="card"><h3>Smart Tutor <small style="color:var(--muted);font-weight:400">· Week 9</small></h3><p>A tutoring agent that adapts to students and gives personalised feedback.</p></div>
-    <div class="card"><h3>Document Analyzer <small style="color:var(--muted);font-weight:400">· Week 4</small></h3><p>Document analysis combining RAG with a vector database.</p></div>
-    <div class="card"><h3>Code Review Agent <small style="color:var(--muted);font-weight:400">· Week 9</small></h3><p>A ReAct-based agent that reviews code, suggests improvements and explains issues.</p></div>
-    <div class="card"><h3>Browser Automation Agent <small style="color:var(--muted);font-weight:400">· Week 12</small></h3><p>A Large Action Model that automates web tasks through a browser.</p></div>
+  <div class="grid">
+    <div class="card"><h3>Arabic QA System <span class="muted small">· Week 6</span></h3><p>Question answering over Arabic documents with RAG and LangChain.</p></div>
+    <div class="card"><h3>Research Assistant <span class="muted small">· Week 10</span></h3><p>A multi-agent assistant that searches, summarises and synthesises information.</p></div>
+    <div class="card"><h3>Smart Tutor <span class="muted small">· Week 9</span></h3><p>A tutoring agent that adapts to students and gives personalised feedback.</p></div>
+    <div class="card"><h3>Document Analyzer <span class="muted small">· Week 4</span></h3><p>Document analysis combining RAG with a vector database.</p></div>
+    <div class="card"><h3>Code Review Agent <span class="muted small">· Week 9</span></h3><p>A ReAct-based agent that reviews code, suggests improvements and explains issues.</p></div>
+    <div class="card"><h3>Browser Automation Agent <span class="muted small">· Week 12</span></h3><p>A Large Action Model that automates web tasks through a browser.</p></div>
   </div>
 
   <h2 id="assessment">Assessment &amp; grading</h2>
-  <div class="grid-2">
+  <div class="grid">
     <div class="card"><h3>Weights</h3><ul><li>Assignments — 10%</li><li>Project (rubric-based) — 20%</li><li>Midterm (Week 8, covers Weeks 1–7) — 30%</li><li>Final (Week 16, all material; emphasis on agents, ReAct, multi-agent, MCP, LAMs, diffusion) — 40%</li></ul></div>
-    <div class="card"><h3>Weekly workload</h3><p>3 hours on campus (theory, demos, hands-on) plus 4–6 hours of self-study: 7–9 hours per week. Teams of 2–3; every week has a milestone, so falling behind early is the main failure mode.</p></div>
+    <div class="card"><h3>Weekly workload</h3><p>3 hours on campus (theory, demos, hands-on) plus 4–6 hours of self-study. Teams of 2–3; every week has a project milestone.</p></div>
   </div>
 
   <h2 id="resources">Resources</h2>
-  <div class="grid-2">
+  <div class="grid">
     <div class="card"><h3>Required software</h3><p>Python 3.12+, PyTorch, Hugging Face Transformers, LangChain &amp; LangGraph, Ollama, VS Code. Keep API keys in a <code>.env</code> file and never commit them.</p></div>
     <div class="card"><h3>Hardware</h3><p><b>Minimum:</b> 8 GB RAM, i5, 50 GB storage, webcam.<br><b>Recommended:</b> 16 GB RAM, i7/Ryzen 7, dedicated GPU, 100 GB SSD.</p></div>
-    <div class="card" style="grid-column:1/-1"><h3>References &amp; reading</h3><ol>
+  </div>
+  <div class="card" style="margin-top:.75rem"><h3>References &amp; reading</h3><ol>
       <li>Tunstall, von Werra &amp; Wolf, <i>Natural Language Processing with Transformers</i>, O'Reilly, 2022.</li>
       <li>Yao et al., <i>ReAct: Synergizing Reasoning and Acting in Language Models</i>, ICLR 2023.</li>
       <li>Chip Huyen, <i>AI Engineering</i>, O'Reilly, 2025.</li>
@@ -377,10 +536,9 @@ def index_page():
       <li>Maarten Grootendorst, <i>A Visual Guide to LLM Agents</i>, 2025.</li>
       <li>Vaswani et al., <i>Attention Is All You Need</i>, NeurIPS 2017.</li>
       <li>Calvin Luo, <i>Understanding Diffusion Models: A Unified Perspective</i>, 2022.</li></ol></div>
-  </div>
   {footer()}
-</main>'''
-    return head('Home') + topbar(0) + '<div class="layout" style="grid-template-columns:var(--sidebar-w) minmax(0,1fr)">' + sidebar('', 0) + content + '</div>' + scripts(0)
+</div>'''
+    return head('Home') + topbar(0) + f'<main class="home">{inner}</main>' + scripts(0)
 
 def main():
     nav = [(f'{w["slug"]}.html', w['title'], w['n']) for w in WEEKS]
@@ -392,6 +550,7 @@ def main():
         (OUT_LESSONS / f'{p["slug"]}.html').write_text(extra_page(p), encoding='utf-8')
     (ROOT / 'index.html').write_text(index_page(), encoding='utf-8')
     (ROOT / '.nojekyll').write_text('')
+    CACHE_FILE.write_text(json.dumps(CACHE, indent=0))
     print(f'built {len(WEEKS) + len(EXTRA_PAGES)} lesson pages + index')
 
 if __name__ == '__main__':

@@ -5,7 +5,7 @@ window.Sims = (function () {
   function css(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
   const theme = () => ({
     bg: css('--surface'), bg2: css('--surface-2'), border: css('--border'), text: css('--text'), muted: css('--muted'),
-    accent: css('--accent'), accent2: css('--accent-2'), green: css('--green'), purple: css('--purple'),
+    accent: css('--sim-accent') || css('--accent'), accent2: css('--accent-2'), green: css('--green'), purple: css('--purple'),
     yellow: css('--yellow'), red: css('--red'), mono: css('--font-mono') || 'monospace', body: css('--font-body') || 'sans-serif'
   });
 

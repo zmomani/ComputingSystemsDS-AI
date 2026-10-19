@@ -4,13 +4,15 @@ Course website for the University of Petra section taught by **Dr. Zaid G. Moman
 
 **Live site:** https://zmomani.github.io/ComputingSystemsDS-AI/
 
-Each lesson page has three parts:
+Each lesson page works like the Programming for Data Science tutorial: the lesson on the left and a panel on the right (opened with **⇆ Panel**, **▶ Try it** or **▶ Display**; drag the divider to resize).
 
-| Area | Contents |
+| Button | What happens |
 |---|---|
-| **Main column** | The week's lesson (topics, ILO, project milestone, lesson text, code, formulas). |
-| **Sidebar → Simulations** | Interactive simulations and animations of the week's key mechanisms, with step controls, live computation, legends and teaching notes. |
-| **Sidebar → Test code** | Short Python snippets per lesson. Pure-Python/NumPy snippets run in the browser (Pyodide); library-dependent ones are marked *local* with one-click copy. |
+| **▶ Try it** | Opens the panel's **Code** tab, loads the example into a live Python editor (CodeMirror) and runs it in the browser with Pyodide. Students edit and re-run with `Ctrl+Enter`. NumPy, pandas, scikit-learn and matplotlib load automatically; figures and DataFrames render in the output. |
+| **✎ Open in editor** | For code that needs libraries a browser cannot run (PyTorch, Transformers, LangChain, OpenAI…). The code opens in the editor with a note to run it in VS Code. |
+| **▶ Display** | Opens the panel's **Animation** tab on the chosen animation; **⤢ Full screen** enlarges it. |
+
+Every week also has a **Try it yourself** section with browser-runnable examples of that week's mechanisms (`content/browser-examples.py`).
 
 ## Simulations (16)
 
@@ -42,9 +44,12 @@ index.html              home page (overview, curriculum, simulations, quiz, asse
 lessons/*.html          one page per week + syllabus + final project (generated)
 content/*.md            lesson text extracted from the source site (edit these)
 assets/css/site.css     styles (light/dark)
-assets/js/site.js       sidebar, tabs, TOC, copy buttons, Pyodide runner, simulation overlay
+assets/js/site.js       panel, Try it / Display buttons, CodeMirror editor, Pyodide runner
 assets/js/sims/         simulation modules
 build/build.py          generator: content/*.md → lessons/*.html + index.html
+build/classify.py       decides which examples run in the browser (cached in build/runnable-cache.json)
+content/browser-examples.py  browser-runnable examples added to each week
+assets/vendor/          CodeMirror (MIT), from the pds-tutorial template
 build/check.py          headless-browser smoke test (loads every page and simulation)
 ```
 
@@ -52,7 +57,7 @@ build/check.py          headless-browser smoke test (loads every page and simula
 
 1. Edit `content/<week>.md` (front matter: `week`, `title`, `source`). The sections `## Key concepts worth simulating` and `## Test code` are stripped from the page; python blocks under *Test code* become the sidebar snippets.
 2. Add or change weeks/simulation assignments in `WEEKS` inside `build/build.py`.
-3. Rebuild: `pip install markdown pymdown-extensions && python3 build/build.py`
+3. Rebuild: `pip install markdown pymdown-extensions numpy pandas scikit-learn matplotlib && python3 build/build.py`
 4. Optional check: `pip install playwright && playwright install chromium && python3 build/check.py`
 
 Pages are static; GitHub Pages serves the repository root (see `.github/workflows/pages.yml`).

@@ -4,29 +4,26 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Week 2: Text Classification · Computing Systems for DS & AI</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<meta name="description" content="Interactive course site for 606363 Computing Systems for Data Science and AI, University of Petra. Python runs in your browser; every week has simulations and animations.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231f3a5f'/><text x='16' y='22' font-size='14' font-family='monospace' fill='white' text-anchor='middle'>AI</text></svg>">
+<link rel="stylesheet" href="../assets/vendor/codemirror/codemirror.css">
+<link rel="stylesheet" href="../assets/vendor/codemirror/material-darker.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
 <link rel="stylesheet" href="../assets/css/site.css">
 </head>
 <body><header class="topbar">
-  <button class="btn-icon" id="menu-toggle" aria-label="Menu">☰</button>
-  <a class="brand" href="../index.html">606363 · Computing Systems for DS & AI<small>University of Petra</small></a>
-  <span class="spacer"></span>
-  <nav class="week-nav"><a class="btn-icon" href="week01-transformers.html" title="Transformer Architecture">← Wk 1</a><a class="btn-icon" href="week03-ner.html" title="Named Entity Recognition (NER)">Wk 3 →</a></nav>
-  <a class="btn-icon" href="../index.html#curriculum">Curriculum</a>
-  <a class="btn-icon" href="../index.html#simulations">Simulations</a>
-  <button class="btn-icon" id="theme-toggle" aria-label="Toggle dark mode">◐</button>
-</header><div class="layout"><aside class="sidebar">
-  <h4>Course</h4><ul class="outline"><li><a class="" href="../lessons/syllabus.html"><span class="wk">·</span><span>Course Syllabus</span></a></li><li><a class="" href="../lessons/project.html"><span class="wk">·</span><span>Final Project</span></a></li></ul>
-  <h4>16-week curriculum</h4><ul class="outline"><li><a class="" href="../lessons/week01-transformers.html"><span class="wk">01</span><span>Transformer Architecture</span></a></li><li><a class="active" href="../lessons/week02-text-classification.html"><span class="wk">02</span><span>Text Classification</span></a></li><li><a class="soon" href="../lessons/week03-ner.html"><span class="wk">03</span><span>Named Entity Recognition (NER)</span></a></li><li><a class="" href="../lessons/week04-langchain.html"><span class="wk">04</span><span>LangChain Fundamentals</span></a></li><li><a class="" href="../lessons/week05-langgraph.html"><span class="wk">05</span><span>LangGraph</span></a></li><li><a class="" href="../lessons/week06-llms.html"><span class="wk">06</span><span>Large Language Models (LLMs)</span></a></li><li><a class="" href="../lessons/week07-moe.html"><span class="wk">07</span><span>Mixture of Experts (MoE)</span></a></li><li><a class="" href="../lessons/week08-midterm.html"><span class="wk">08</span><span>Midterm Exam</span></a></li><li><a class="" href="../lessons/week09-react-agents.html"><span class="wk">09</span><span>AI Agents &amp; ReAct</span></a></li><li><a class="" href="../lessons/week10-multi-agent.html"><span class="wk">10</span><span>Multi-Agent Systems</span></a></li><li><a class="" href="../lessons/week11-mcp.html"><span class="wk">11</span><span>Model Context Protocol (MCP)</span></a></li><li><a class="soon" href="../lessons/week12-lams.html"><span class="wk">12</span><span>Large Action Models (LAMs)</span></a></li><li><a class="" href="../lessons/week13-diffusion.html"><span class="wk">13</span><span>Diffusion Models</span></a></li><li><a class="" href="../lessons/week14-project.html"><span class="wk">14</span><span>Project Development &amp; Final Testing</span></a></li><li><a class="" href="../lessons/week15-competition.html"><span class="wk">15</span><span>Competition Day &amp; Presentations</span></a></li><li><a class="" href="../lessons/week16-final.html"><span class="wk">16</span><span>Final Exam</span></a></li></ul>
-  <h4>On this page</h4><ul class="toc" id="toc"></ul>
-</aside><main class="main">
-  <div class="lesson-head"><div class="eyebrow">Week 2 · ILO K1, P1</div><h1>Text Classification</h1>
-  <p class="credit"><b>Topics:</b> Text classification, sentiment analysis, feature extraction vs. fine-tuning, evaluation metrics<br><b>Project milestone:</b> Classification Agent that labels sources by type and relevance; evaluate on 20+ sources</p></div>
-  <div class="callout sim"><div class="sim-strip"><b style="margin-right:4px">Simulations for this week:</b><button class="chip" data-sim="classifier">▶ Decision boundary, threshold &amp; F1</button><button class="chip" data-sim="tokenizer">▶ Subword tokenisation</button><button class="chip" data-sim="vectors">▶ Vectors, dot product &amp; cosine similarity</button></div></div>
-  <h2 id="what-youll-learn">What You'll Learn</h2>
+  <a class="brand" href="../index.html">
+    <span class="brand-mark">AI</span>
+    <span class="brand-text"><strong>Computing Systems for DS &amp; AI</strong><span class="muted"> · 606363 · University of Petra</span></span>
+  </a>
+  <nav class="topnav"><a class="btn ghost" href="week01-transformers.html" title="Transformer Architecture">‹ Prev</a><select id="lesson-select" aria-label="Choose lesson"><option value="">Lessons…</option><option value="syllabus.html">Course Syllabus</option><option value="project.html">Final Project</option><option value="week01-transformers.html">Week 1 · Transformer Architecture</option><option value="week02-text-classification.html" selected>Week 2 · Text Classification</option><option value="week03-ner.html">Week 3 · Named Entity Recognition (NER)</option><option value="week04-langchain.html">Week 4 · LangChain Fundamentals</option><option value="week05-langgraph.html">Week 5 · LangGraph</option><option value="week06-llms.html">Week 6 · Large Language Models (LLMs)</option><option value="week07-moe.html">Week 7 · Mixture of Experts (MoE)</option><option value="week08-midterm.html">Week 8 · Midterm Exam</option><option value="week09-react-agents.html">Week 9 · AI Agents &amp; ReAct</option><option value="week10-multi-agent.html">Week 10 · Multi-Agent Systems</option><option value="week11-mcp.html">Week 11 · Model Context Protocol (MCP)</option><option value="week12-lams.html">Week 12 · Large Action Models (LAMs)</option><option value="week13-diffusion.html">Week 13 · Diffusion Models</option><option value="week14-project.html">Week 14 · Project Development &amp; Final Testing</option><option value="week15-competition.html">Week 15 · Competition Day &amp; Presentations</option><option value="week16-final.html">Week 16 · Final Exam</option></select><a class="btn ghost" href="week03-ner.html" title="Named Entity Recognition (NER)">Next ›</a></nav>
+  <button id="btn-panel" class="btn accent" title="Show or hide the editor / animation panel">⇆ Panel</button><div class="status" id="py-status"><span class="dot"></span><span id="py-status-text">Python loads on first run</span></div>
+</header><main class="lesson panel-closed" id="lesson"><article class="lesson-content" id="lesson-content"><div class="lesson-head"><div class="eyebrow">Week 2 · ILO K1, P1</div><h1>Text Classification</h1>
+<p class="lesson-intro"><b>Topics:</b> Text classification, sentiment analysis, feature extraction vs. fine-tuning, evaluation metrics<br><b>Project milestone:</b> Classification Agent that labels sources by type and relevance; evaluate on 20+ sources</p></div>
+<div class="sim-strip"><div class="sim-strip-head">Animations for this week — open them in the panel</div><div class="sim-strip-items"><button class="sim-chip" data-display="classifier"><span class="sim-chip-kind">Classification</span>▶ Display: Decision boundary, threshold &amp; F1</button><button class="sim-chip" data-display="tokenizer"><span class="sim-chip-kind">Transformers</span>▶ Display: Subword tokenisation</button><button class="sim-chip" data-display="vectors"><span class="sim-chip-kind">Linear algebra</span>▶ Display: Vectors, dot product &amp; cosine similarity</button></div></div>
+<details class="contents"><summary>Contents (10 sections)</summary><ol><li><a href="#what-youll-learn">What You'll Learn</a></li><li><a href="#1-what-are-transformers">1. What are Transformers?</a></li><li><a href="#2-loading-and-exploring-the-dataset">2. Loading and Exploring the Dataset</a></li><li><a href="#3-tokenization-and-data-preparation">3. Tokenization and Data Preparation</a></li><li><a href="#4-feature-extraction-from-pre-trained-models">4. Feature Extraction from Pre-trained Models</a></li><li><a href="#5-creating-a-baseline-model-with-logistic-regression">5. Creating a Baseline Model with Logistic Regression</a></li><li><a href="#6-fine-tuning-a-transformer-model">6. Fine-tuning a Transformer Model</a></li><li><a href="#7-evaluating-model-performance">7. Evaluating Model Performance</a></li><li><a href="#8-deploying-the-model-to-hugging-face-hub">8. Deploying the Model to Hugging Face Hub</a></li><li><a href="#9-next-steps-and-conclusion">9. Next Steps and Conclusion</a></li></ol></details>
+<h2 id="what-youll-learn">What You'll Learn</h2>
 <p>By the end of this tutorial you will be able to:</p>
 <ul>
 <li>Load and explore datasets from the Hugging Face Hub</li>
@@ -56,112 +53,155 @@
 </ul>
 <h3 id="setting-up-your-environment">Setting up your environment</h3>
 <p>Required tools: Python 3.10+, PyTorch, the Hugging Face libraries, and scikit-learn for evaluation.</p>
-<div class="highlight"><pre><span></span><code><span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">transformers</span><span class="p">[</span><span class="n">torch</span><span class="p">]</span>
-<span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">datasets</span>
-<span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">scikit</span><span class="o">-</span><span class="n">learn</span>
-<span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">huggingface_hub</span>
-<span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">pandas</span>
-<span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">matplotlib</span>
-<span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">torch</span>
-</code></pre></div>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-python">!pip install transformers[torch]
+!pip install datasets
+!pip install scikit-learn
+!pip install huggingface_hub
+!pip install pandas
+!pip install matplotlib
+!pip install torch</code></pre></div>
 <blockquote>
 <p><strong>Tip:</strong> If installation fails, consult the library's installation guide. Google Colab is a good option because most of these libraries are pre-installed.</p>
 </blockquote>
 <h3 id="mini-challenge-verify-your-setup">Mini-challenge: verify your setup</h3>
 <p>Import <code>torch</code>, <code>transformers</code> and <code>datasets</code> and print each version to confirm everything imports successfully.</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">transformers</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">datasets</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="datasets, torch, transformers" title="Needs datasets, torch, transformers — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>import torch
+import transformers
+import datasets
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"PyTorch version: </span><span class="si">{</span><span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Transformers version: </span><span class="si">{</span><span class="n">transformers</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Datasets version: </span><span class="si">{</span><span class="n">datasets</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</code></pre></div>
+print(f&quot;PyTorch version: {torch.__version__}&quot;)
+print(f&quot;Transformers version: {transformers.__version__}&quot;)
+print(f&quot;Datasets version: {datasets.__version__}&quot;)</textarea><pre><code class="language-python">import torch
+import transformers
+import datasets
+
+print(f&quot;PyTorch version: {torch.__version__}&quot;)
+print(f&quot;Transformers version: {transformers.__version__}&quot;)
+print(f&quot;Datasets version: {datasets.__version__}&quot;)</code></pre></div>
 <h2 id="2-loading-and-exploring-the-dataset">2. Loading and Exploring the Dataset</h2>
 <p>The Hugging Face <strong>Datasets</strong> library gives easy access to many public datasets. This tutorial uses the <strong>emotion</strong> dataset (<code>dair-ai/emotion</code>): English tweets labeled with one of six emotions.</p>
 <h3 id="loading-the-dataset">Loading the dataset</h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dataset</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="datasets" title="Needs datasets — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>from datasets import load_dataset
 
-<span class="n">emotions</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">"dair-ai/emotion"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">emotions</span><span class="p">)</span>
-</code></pre></div>
+emotions = load_dataset(&quot;dair-ai/emotion&quot;)
+print(emotions)</textarea><pre><code class="language-python">from datasets import load_dataset
+
+emotions = load_dataset(&quot;dair-ai/emotion&quot;)
+print(emotions)</code></pre></div>
 <p>The dataset has <strong>train</strong>, <strong>validation</strong> and <strong>test</strong> splits. Each example has a <code>text</code> field and an integer <code>label</code> from 0 to 5.</p>
 <h3 id="examining-dataset-structure">Examining dataset structure</h3>
-<div class="highlight"><pre><span></span><code><span class="n">emotions</span><span class="p">[</span><span class="s2">"train"</span><span class="p">]</span><span class="o">.</span><span class="n">features</span>
-<span class="n">emotions</span><span class="p">[</span><span class="s2">"train"</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span>
-<span class="n">emotions</span><span class="p">[</span><span class="s2">"train"</span><span class="p">][</span><span class="s2">"text"</span><span class="p">][:</span><span class="mi">2</span><span class="p">]</span>
-<span class="n">emotions</span><span class="p">[</span><span class="s2">"train"</span><span class="p">][</span><span class="s2">"label"</span><span class="p">][:</span><span class="mi">2</span><span class="p">]</span>
-</code></pre></div>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>emotions[&quot;train&quot;].features
+emotions[&quot;train&quot;].column_names
+emotions[&quot;train&quot;][&quot;text&quot;][:2]
+emotions[&quot;train&quot;][&quot;label&quot;][:2]</textarea><pre><code class="language-python">emotions[&quot;train&quot;].features
+emotions[&quot;train&quot;].column_names
+emotions[&quot;train&quot;][&quot;text&quot;][:2]
+emotions[&quot;train&quot;][&quot;label&quot;][:2]</code></pre></div>
 <p>Label names, in order: <strong>sadness (0), joy (1), love (2), anger (3), fear (4), surprise (5)</strong>.</p>
 <h3 id="converting-to-pandas">Converting to pandas</h3>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>import pandas as pd
 
-<span class="n">emotions</span><span class="o">.</span><span class="n">set_format</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">"pandas"</span><span class="p">)</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">emotions</span><span class="p">[</span><span class="s2">"train"</span><span class="p">][:]</span>
+emotions.set_format(type=&quot;pandas&quot;)
+df = emotions[&quot;train&quot;][:]
 
-<span class="k">def</span><span class="w"> </span><span class="nf">convert_label_int_2_string</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">emotions</span><span class="p">[</span><span class="s2">"train"</span><span class="p">]</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s2">"label"</span><span class="p">]</span><span class="o">.</span><span class="n">int2str</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+def convert_label_int_2_string(row):
+    return emotions[&quot;train&quot;].features[&quot;label&quot;].int2str(row)
 
-<span class="n">df</span><span class="p">[</span><span class="s2">"label_name"</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">"label"</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">convert_label_int_2_string</span><span class="p">)</span>
-<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
-</code></pre></div>
+df[&quot;label_name&quot;] = df[&quot;label&quot;].apply(convert_label_int_2_string)
+df.head()</textarea><pre><code class="language-python">import pandas as pd
+
+emotions.set_format(type=&quot;pandas&quot;)
+df = emotions[&quot;train&quot;][:]
+
+def convert_label_int_2_string(row):
+    return emotions[&quot;train&quot;].features[&quot;label&quot;].int2str(row)
+
+df[&quot;label_name&quot;] = df[&quot;label&quot;].apply(convert_label_int_2_string)
+df.head()</code></pre></div>
 <h3 id="visualizing-the-data">Visualizing the data</h3>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>import matplotlib.pyplot as plt
 
-<span class="n">df</span><span class="p">[</span><span class="s2">"label_name"</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">ascending</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">barh</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Distribution of Emotions in Dataset"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Count"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Emotion"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</code></pre></div>
+df[&quot;label_name&quot;].value_counts(ascending=True).plot.barh()
+plt.title(&quot;Distribution of Emotions in Dataset&quot;)
+plt.xlabel(&quot;Count&quot;)
+plt.ylabel(&quot;Emotion&quot;)
+plt.show()</textarea><pre><code class="language-python">import matplotlib.pyplot as plt
+
+df[&quot;label_name&quot;].value_counts(ascending=True).plot.barh()
+plt.title(&quot;Distribution of Emotions in Dataset&quot;)
+plt.xlabel(&quot;Count&quot;)
+plt.ylabel(&quot;Emotion&quot;)
+plt.show()</code></pre></div>
 <p>This chart reveals the class distribution and any <strong>class imbalance</strong> (joy and sadness dominate; surprise and love are rare).</p>
 <h3 id="mini-challenge-class-percentages">Mini-challenge: class percentages</h3>
 <p>Compute the percentage of each emotion in the training set and identify the most and least common emotions. This tells you whether the model will need class-imbalance handling.</p>
-<div class="highlight"><pre><span></span><code><span class="n">percentages</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">"label_name"</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">percentages</span><span class="p">)</span>
-</code></pre></div>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>percentages = df[&quot;label_name&quot;].value_counts(normalize=True) * 100
+print(percentages)</textarea><pre><code class="language-python">percentages = df[&quot;label_name&quot;].value_counts(normalize=True) * 100
+print(percentages)</code></pre></div>
 <h2 id="3-tokenization-and-data-preparation">3. Tokenization and Data Preparation</h2>
 <p><strong>Tokenization</strong> splits text into tokens and maps each token to a numeric ID so the model can process it.</p>
 <h3 id="what-is-tokenization-character-level-example">What is tokenization? (character-level example)</h3>
-<div class="highlight"><pre><span></span><code><span class="n">text</span> <span class="o">=</span> <span class="s2">"My name is kareem"</span>
-<span class="n">tokenized_text</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">tokenized_text</span><span class="p">)</span>
+<div class="runnable"><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden>text = &quot;My name is kareem&quot;
+tokenized_text = list(text)
+print(tokenized_text)
 
-<span class="n">token2index</span> <span class="o">=</span> <span class="p">{</span><span class="n">ch</span><span class="p">:</span> <span class="n">idx</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">ch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">tokenized_text</span><span class="p">)))}</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">token2index</span><span class="p">)</span>
-<span class="c1"># {' ': 0, 'M': 1, 'a': 2, 'e': 3, 'i': 4, 'k': 5, 'm': 6, 'n': 7, 'r': 8, 's': 9, 'y': 10}</span>
-</code></pre></div>
+token2index = {ch: idx for idx, ch in enumerate(sorted(set(tokenized_text)))}
+print(token2index)
+# {&#x27; &#x27;: 0, &#x27;M&#x27;: 1, &#x27;a&#x27;: 2, &#x27;e&#x27;: 3, &#x27;i&#x27;: 4, &#x27;k&#x27;: 5, &#x27;m&#x27;: 6, &#x27;n&#x27;: 7, &#x27;r&#x27;: 8, &#x27;s&#x27;: 9, &#x27;y&#x27;: 10}</textarea><pre><code class="language-python">text = &quot;My name is kareem&quot;
+tokenized_text = list(text)
+print(tokenized_text)
+
+token2index = {ch: idx for idx, ch in enumerate(sorted(set(tokenized_text)))}
+print(token2index)
+# {&#x27; &#x27;: 0, &#x27;M&#x27;: 1, &#x27;a&#x27;: 2, &#x27;e&#x27;: 3, &#x27;i&#x27;: 4, &#x27;k&#x27;: 5, &#x27;m&#x27;: 6, &#x27;n&#x27;: 7, &#x27;r&#x27;: 8, &#x27;s&#x27;: 9, &#x27;y&#x27;: 10}</code></pre></div>
 <p>Production systems use <strong>subword</strong> tokenization methods such as WordPiece (BERT), BPE (GPT) or SentencePiece.</p>
 <h3 id="using-hugging-face-tokenizers">Using Hugging Face tokenizers</h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoTokenizer</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="transformers" title="Needs transformers — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>from transformers import AutoTokenizer
 
-<span class="n">model_ckp</span> <span class="o">=</span> <span class="s2">"distilbert-base-uncased"</span>
-<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_ckp</span><span class="p">)</span>
+model_ckp = &quot;distilbert-base-uncased&quot;
+tokenizer = AutoTokenizer.from_pretrained(model_ckp)
 
-<span class="n">text</span> <span class="o">=</span> <span class="s2">"My name is kareem"</span>
-<span class="n">encoded_text</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">encoded_text</span><span class="p">)</span>
+text = &quot;My name is kareem&quot;
+encoded_text = tokenizer(text)
+print(encoded_text)
 
-<span class="n">tokens</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">convert_ids_to_tokens</span><span class="p">(</span><span class="n">encoded_text</span><span class="o">.</span><span class="n">input_ids</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+tokens = tokenizer.convert_ids_to_tokens(encoded_text.input_ids)
+print(tokens)
 
-<span class="nb">print</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">convert_tokens_to_string</span><span class="p">(</span><span class="n">tokens</span><span class="p">))</span>
-</code></pre></div>
+print(tokenizer.convert_tokens_to_string(tokens))</textarea><pre><code class="language-python">from transformers import AutoTokenizer
+
+model_ckp = &quot;distilbert-base-uncased&quot;
+tokenizer = AutoTokenizer.from_pretrained(model_ckp)
+
+text = &quot;My name is kareem&quot;
+encoded_text = tokenizer(text)
+print(encoded_text)
+
+tokens = tokenizer.convert_ids_to_tokens(encoded_text.input_ids)
+print(tokens)
+
+print(tokenizer.convert_tokens_to_string(tokens))</code></pre></div>
 <h3 id="tokenizer-properties">Tokenizer properties</h3>
-<div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">vocab_size</span><span class="p">)</span>          <span class="c1"># vocabulary size</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">model_input_names</span><span class="p">)</span>   <span class="c1"># inputs the model expects</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">model_max_length</span><span class="p">)</span>    <span class="c1"># maximum sequence length</span>
-</code></pre></div>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>print(tokenizer.vocab_size)          # vocabulary size
+print(tokenizer.model_input_names)   # inputs the model expects
+print(tokenizer.model_max_length)    # maximum sequence length</textarea><pre><code class="language-python">print(tokenizer.vocab_size)          # vocabulary size
+print(tokenizer.model_input_names)   # inputs the model expects
+print(tokenizer.model_max_length)    # maximum sequence length</code></pre></div>
 <p>The tokenizer output contains <code>input_ids</code> (token IDs), <code>attention_mask</code> (which tokens to attend to), and special tokens such as <code>[CLS]</code> and <code>[SEP]</code>.</p>
 <h3 id="tokenizing-the-entire-dataset">Tokenizing the entire dataset</h3>
-<div class="highlight"><pre><span></span><code><span class="n">emotions</span><span class="o">.</span><span class="n">reset_format</span><span class="p">()</span>   <span class="c1"># undo the pandas format set earlier</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>emotions.reset_format()   # undo the pandas format set earlier
 
-<span class="k">def</span><span class="w"> </span><span class="nf">tokenize</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s2">"text"</span><span class="p">],</span> <span class="n">padding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">truncation</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+def tokenize(batch):
+    return tokenizer(batch[&quot;text&quot;], padding=True, truncation=True)
 
-<span class="n">emotion_encoded</span> <span class="o">=</span> <span class="n">emotions</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">tokenize</span><span class="p">,</span> <span class="n">batched</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">emotion_encoded</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
-</code></pre></div>
+emotion_encoded = emotions.map(tokenize, batched=True, batch_size=None)
+print(emotion_encoded.column_names)</textarea><pre><code class="language-python">emotions.reset_format()   # undo the pandas format set earlier
+
+def tokenize(batch):
+    return tokenizer(batch[&quot;text&quot;], padding=True, truncation=True)
+
+emotion_encoded = emotions.map(tokenize, batched=True, batch_size=None)
+print(emotion_encoded.column_names)</code></pre></div>
 <ul>
 <li><code>padding=True</code> pads to the longest sequence in the batch (<code>padding="max_length"</code> pads to the model's max length instead). Padding adds special tokens so sequences in a batch have equal length.</li>
 <li><code>truncation=True</code> shortens sequences that exceed the model's maximum length. This prevents errors but may cut information.</li>
@@ -170,171 +210,271 @@
 </ul>
 <h3 id="mini-challenge-tokenize-a-custom-sentence">Mini-challenge: tokenize a custom sentence</h3>
 <p>Tokenize <em>"I am feeling both happy and sad at the same time."</em>, print the IDs and tokens, and identify which words split into subword pieces. This is a useful debugging skill.</p>
-<div class="highlight"><pre><span></span><code><span class="n">sentence</span> <span class="o">=</span> <span class="s2">"I am feeling both happy and sad at the same time."</span>
-<span class="n">encoded</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">sentence</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">encoded</span><span class="o">.</span><span class="n">input_ids</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">convert_ids_to_tokens</span><span class="p">(</span><span class="n">encoded</span><span class="o">.</span><span class="n">input_ids</span><span class="p">))</span>
-</code></pre></div>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>sentence = &quot;I am feeling both happy and sad at the same time.&quot;
+encoded = tokenizer(sentence)
+print(encoded.input_ids)
+print(tokenizer.convert_ids_to_tokens(encoded.input_ids))</textarea><pre><code class="language-python">sentence = &quot;I am feeling both happy and sad at the same time.&quot;
+encoded = tokenizer(sentence)
+print(encoded.input_ids)
+print(tokenizer.convert_ids_to_tokens(encoded.input_ids))</code></pre></div>
 <h2 id="4-feature-extraction-from-pre-trained-models">4. Feature Extraction from Pre-trained Models</h2>
 <p>Instead of fine-tuning, you can use a pre-trained model as a <strong>frozen feature extractor</strong> and train a simpler classifier on its outputs. This is faster and less resource-intensive.</p>
 <h3 id="loading-the-pre-trained-model">Loading the pre-trained model</h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoModel</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="torch, transformers" title="Needs torch, transformers — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>from transformers import AutoModel
+import torch
 
-<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">"cuda"</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">"cpu"</span><span class="p">)</span>
-<span class="n">model_chk</span> <span class="o">=</span> <span class="s2">"distilbert-base-uncased"</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">AutoModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_chk</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>   <span class="c1"># base model, no classification head</span>
-</code></pre></div>
+device = torch.device(&quot;cuda&quot; if torch.cuda.is_available() else &quot;cpu&quot;)
+model_chk = &quot;distilbert-base-uncased&quot;
+model = AutoModel.from_pretrained(model_chk).to(device)   # base model, no classification head</textarea><pre><code class="language-python">from transformers import AutoModel
+import torch
+
+device = torch.device(&quot;cuda&quot; if torch.cuda.is_available() else &quot;cpu&quot;)
+model_chk = &quot;distilbert-base-uncased&quot;
+model = AutoModel.from_pretrained(model_chk).to(device)   # base model, no classification head</code></pre></div>
 <p><strong>Hidden states.</strong> The model produces a contextual vector (hidden state) for every token. The final layer carries the most task-relevant information. The first token, <code>[CLS]</code>, is often used as a summary of the whole sentence, so we take its final-layer representation.</p>
 <h3 id="feature-extraction-function">Feature extraction function</h3>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">extract_hidden_states</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
-    <span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">batch</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">model_input_names</span><span class="p">}</span>
-    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
-        <span class="n">last_hidden_state</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">inputs</span><span class="p">)</span><span class="o">.</span><span class="n">last_hidden_state</span>
-    <span class="k">return</span> <span class="p">{</span><span class="s2">"hidden_state"</span><span class="p">:</span> <span class="n">last_hidden_state</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()}</span>
-</code></pre></div>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>def extract_hidden_states(batch):
+    inputs = {k: v.to(device) for k, v in batch.items() if k in tokenizer.model_input_names}
+    with torch.no_grad():
+        last_hidden_state = model(**inputs).last_hidden_state
+    return {&quot;hidden_state&quot;: last_hidden_state[:, 0].cpu().numpy()}</textarea><pre><code class="language-python">def extract_hidden_states(batch):
+    inputs = {k: v.to(device) for k, v in batch.items() if k in tokenizer.model_input_names}
+    with torch.no_grad():
+        last_hidden_state = model(**inputs).last_hidden_state
+    return {&quot;hidden_state&quot;: last_hidden_state[:, 0].cpu().numpy()}</code></pre></div>
 <h3 id="processing-the-dataset">Processing the dataset</h3>
-<div class="highlight"><pre><span></span><code><span class="n">emotion_encoded</span><span class="o">.</span><span class="n">set_format</span><span class="p">(</span><span class="s2">"torch"</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"input_ids"</span><span class="p">,</span> <span class="s2">"attention_mask"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">])</span>
-<span class="n">emotions_hidden</span> <span class="o">=</span> <span class="n">emotion_encoded</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">extract_hidden_states</span><span class="p">,</span> <span class="n">batched</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>emotion_encoded.set_format(&quot;torch&quot;, columns=[&quot;input_ids&quot;, &quot;attention_mask&quot;, &quot;label&quot;])
+emotions_hidden = emotion_encoded.map(extract_hidden_states, batched=True)
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+import numpy as np
 
-<span class="n">X_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">emotions_hidden</span><span class="p">[</span><span class="s2">"train"</span><span class="p">][</span><span class="s2">"hidden_state"</span><span class="p">])</span>
-<span class="n">X_valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">emotions_hidden</span><span class="p">[</span><span class="s2">"validation"</span><span class="p">][</span><span class="s2">"hidden_state"</span><span class="p">])</span>
-<span class="n">y_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">emotions_hidden</span><span class="p">[</span><span class="s2">"train"</span><span class="p">][</span><span class="s2">"label"</span><span class="p">])</span>
-<span class="n">y_valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">emotions_hidden</span><span class="p">[</span><span class="s2">"validation"</span><span class="p">][</span><span class="s2">"label"</span><span class="p">])</span>
+X_train = np.array(emotions_hidden[&quot;train&quot;][&quot;hidden_state&quot;])
+X_valid = np.array(emotions_hidden[&quot;validation&quot;][&quot;hidden_state&quot;])
+y_train = np.array(emotions_hidden[&quot;train&quot;][&quot;label&quot;])
+y_valid = np.array(emotions_hidden[&quot;validation&quot;][&quot;label&quot;])
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Training features shape: </span><span class="si">{</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Validation features shape: </span><span class="si">{</span><span class="n">X_valid</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</code></pre></div>
+print(f&quot;Training features shape: {X_train.shape}&quot;)
+print(f&quot;Validation features shape: {X_valid.shape}&quot;)</textarea><pre><code class="language-python">emotion_encoded.set_format(&quot;torch&quot;, columns=[&quot;input_ids&quot;, &quot;attention_mask&quot;, &quot;label&quot;])
+emotions_hidden = emotion_encoded.map(extract_hidden_states, batched=True)
+
+import numpy as np
+
+X_train = np.array(emotions_hidden[&quot;train&quot;][&quot;hidden_state&quot;])
+X_valid = np.array(emotions_hidden[&quot;validation&quot;][&quot;hidden_state&quot;])
+y_train = np.array(emotions_hidden[&quot;train&quot;][&quot;label&quot;])
+y_valid = np.array(emotions_hidden[&quot;validation&quot;][&quot;label&quot;])
+
+print(f&quot;Training features shape: {X_train.shape}&quot;)
+print(f&quot;Validation features shape: {X_valid.shape}&quot;)</code></pre></div>
 <p><strong>Benefits:</strong> faster than fine-tuning, less compute, still uses pre-trained knowledge, works well on small datasets.
 <strong>Limitations:</strong> features are not tuned to the task, may miss task-specific nuances, and the performance ceiling is usually lower than fine-tuning.</p>
 <h3 id="mini-challenge-inspect-the-features">Mini-challenge: inspect the features</h3>
-<div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Feature vector size: </span><span class="si">{</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>print(f&quot;Feature vector size: {X_train.shape[1]}&quot;)
 
-<span class="n">labels</span> <span class="o">=</span> <span class="n">emotions</span><span class="p">[</span><span class="s2">"train"</span><span class="p">]</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s2">"label"</span><span class="p">]</span><span class="o">.</span><span class="n">names</span>
-<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">emotion</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
-    <span class="n">mean_vec</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">[</span><span class="n">y_train</span> <span class="o">==</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">emotion</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">mean_vec</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span><span class="si">}</span><span class="s2"> ..."</span><span class="p">)</span>
+labels = emotions[&quot;train&quot;].features[&quot;label&quot;].names
+for i, emotion in enumerate(labels):
+    mean_vec = X_train[y_train == i].mean(axis=0)
+    print(f&quot;{emotion}: {mean_vec[:5]} ...&quot;)
 
-<span class="c1"># Optional visualization</span>
-<span class="c1"># !pip install umap-learn</span>
-<span class="c1"># import umap</span>
-<span class="c1"># reducer = umap.UMAP()</span>
-<span class="c1"># X_2d = reducer.fit_transform(X_train)</span>
-<span class="c1"># plt.scatter(X_2d[:, 0], X_2d[:, 1], c=y_train, cmap="viridis", s=2)</span>
-<span class="c1"># plt.colorbar()</span>
-<span class="c1"># plt.show()</span>
-</code></pre></div>
+# Optional visualization
+# !pip install umap-learn
+# import umap
+# reducer = umap.UMAP()
+# X_2d = reducer.fit_transform(X_train)
+# plt.scatter(X_2d[:, 0], X_2d[:, 1], c=y_train, cmap=&quot;viridis&quot;, s=2)
+# plt.colorbar()
+# plt.show()</textarea><pre><code class="language-python">print(f&quot;Feature vector size: {X_train.shape[1]}&quot;)
+
+labels = emotions[&quot;train&quot;].features[&quot;label&quot;].names
+for i, emotion in enumerate(labels):
+    mean_vec = X_train[y_train == i].mean(axis=0)
+    print(f&quot;{emotion}: {mean_vec[:5]} ...&quot;)
+
+# Optional visualization
+# !pip install umap-learn
+# import umap
+# reducer = umap.UMAP()
+# X_2d = reducer.fit_transform(X_train)
+# plt.scatter(X_2d[:, 0], X_2d[:, 1], c=y_train, cmap=&quot;viridis&quot;, s=2)
+# plt.colorbar()
+# plt.show()</code></pre></div>
 <p>The visualization shows whether the <code>[CLS]</code> features already separate the emotions.</p>
 <h2 id="5-creating-a-baseline-model-with-logistic-regression">5. Creating a Baseline Model with Logistic Regression</h2>
 <p>Always set a performance benchmark before fine-tuning.</p>
 <h3 id="dummy-classifier">Dummy classifier</h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.dummy</span><span class="w"> </span><span class="kn">import</span> <span class="n">DummyClassifier</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>from sklearn.dummy import DummyClassifier
 
-<span class="n">dummy_clf</span> <span class="o">=</span> <span class="n">DummyClassifier</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s2">"most_frequent"</span><span class="p">)</span>
-<span class="n">dummy_clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
-<span class="n">dummy_score</span> <span class="o">=</span> <span class="n">dummy_clf</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Dummy classifier accuracy: </span><span class="si">{</span><span class="n">dummy_score</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</code></pre></div>
+dummy_clf = DummyClassifier(strategy=&quot;most_frequent&quot;)
+dummy_clf.fit(X_train, y_train)
+dummy_score = dummy_clf.score(X_valid, y_valid)
+print(f&quot;Dummy classifier accuracy: {dummy_score:.4f}&quot;)</textarea><pre><code class="language-python">from sklearn.dummy import DummyClassifier
+
+dummy_clf = DummyClassifier(strategy=&quot;most_frequent&quot;)
+dummy_clf.fit(X_train, y_train)
+dummy_score = dummy_clf.score(X_valid, y_valid)
+print(f&quot;Dummy classifier accuracy: {dummy_score:.4f}&quot;)</code></pre></div>
 <h3 id="logistic-regression">Logistic regression</h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogisticRegression</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>from sklearn.linear_model import LogisticRegression
 
-<span class="n">lr_clf</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">max_iter</span><span class="o">=</span><span class="mi">3000</span><span class="p">)</span>
-<span class="n">lr_clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
-<span class="n">lr_score</span> <span class="o">=</span> <span class="n">lr_clf</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Logistic regression accuracy: </span><span class="si">{</span><span class="n">lr_score</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Improvement over dummy: </span><span class="si">{</span><span class="n">lr_score</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">dummy_score</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</code></pre></div>
+lr_clf = LogisticRegression(max_iter=3000)
+lr_clf.fit(X_train, y_train)
+lr_score = lr_clf.score(X_valid, y_valid)
+print(f&quot;Logistic regression accuracy: {lr_score:.4f}&quot;)
+print(f&quot;Improvement over dummy: {lr_score - dummy_score:.4f}&quot;)</textarea><pre><code class="language-python">from sklearn.linear_model import LogisticRegression
+
+lr_clf = LogisticRegression(max_iter=3000)
+lr_clf.fit(X_train, y_train)
+lr_score = lr_clf.score(X_valid, y_valid)
+print(f&quot;Logistic regression accuracy: {lr_score:.4f}&quot;)
+print(f&quot;Improvement over dummy: {lr_score - dummy_score:.4f}&quot;)</code></pre></div>
 <h3 id="confusion-matrix">Confusion matrix</h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfusionMatrixDisplay</span><span class="p">,</span> <span class="n">confusion_matrix</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
 
-<span class="k">def</span><span class="w"> </span><span class="nf">plot_confusion_matrix</span><span class="p">(</span><span class="n">y_preds</span><span class="p">,</span> <span class="n">y_true</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
-    <span class="n">cm</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_preds</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="s2">"true"</span><span class="p">)</span>
-    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
-    <span class="n">disp</span> <span class="o">=</span> <span class="n">ConfusionMatrixDisplay</span><span class="p">(</span><span class="n">confusion_matrix</span><span class="o">=</span><span class="n">cm</span><span class="p">,</span> <span class="n">display_labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
-    <span class="n">disp</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="s2">"Blues"</span><span class="p">,</span> <span class="n">values_format</span><span class="o">=</span><span class="s2">".2f"</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">colorbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Normalized confusion matrix"</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+def plot_confusion_matrix(y_preds, y_true, labels):
+    cm = confusion_matrix(y_true, y_preds, normalize=&quot;true&quot;)
+    fig, ax = plt.subplots(figsize=(10, 10))
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels)
+    disp.plot(cmap=&quot;Blues&quot;, values_format=&quot;.2f&quot;, ax=ax, colorbar=False)
+    plt.title(&quot;Normalized confusion matrix&quot;)
+    plt.show()
 
-<span class="n">y_preds</span> <span class="o">=</span> <span class="n">lr_clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_valid</span><span class="p">)</span>
-<span class="n">labels</span> <span class="o">=</span> <span class="n">emotions</span><span class="p">[</span><span class="s2">"train"</span><span class="p">]</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s2">"label"</span><span class="p">]</span><span class="o">.</span><span class="n">names</span>
-<span class="n">plot_confusion_matrix</span><span class="p">(</span><span class="n">y_preds</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
-</code></pre></div>
+y_preds = lr_clf.predict(X_valid)
+labels = emotions[&quot;train&quot;].features[&quot;label&quot;].names
+plot_confusion_matrix(y_preds, y_valid, labels)</textarea><pre><code class="language-python">from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
+
+def plot_confusion_matrix(y_preds, y_true, labels):
+    cm = confusion_matrix(y_true, y_preds, normalize=&quot;true&quot;)
+    fig, ax = plt.subplots(figsize=(10, 10))
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels)
+    disp.plot(cmap=&quot;Blues&quot;, values_format=&quot;.2f&quot;, ax=ax, colorbar=False)
+    plt.title(&quot;Normalized confusion matrix&quot;)
+    plt.show()
+
+y_preds = lr_clf.predict(X_valid)
+labels = emotions[&quot;train&quot;].features[&quot;label&quot;].names
+plot_confusion_matrix(y_preds, y_valid, labels)</code></pre></div>
 <p>The matrix shows which emotions are confused with one another.</p>
 <h3 id="additional-metrics">Additional metrics</h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">classification_report</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>from sklearn.metrics import classification_report
 
-<span class="nb">print</span><span class="p">(</span><span class="n">classification_report</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">y_preds</span><span class="p">,</span> <span class="n">target_names</span><span class="o">=</span><span class="n">labels</span><span class="p">))</span>
-</code></pre></div>
+print(classification_report(y_valid, y_preds, target_names=labels))</textarea><pre><code class="language-python">from sklearn.metrics import classification_report
+
+print(classification_report(y_valid, y_preds, target_names=labels))</code></pre></div>
 <p><strong>Why build a baseline?</strong> It sets minimum expectations, is quick to build, reveals which classes are easy or hard, and gives a reference point. A suspiciously strong baseline may indicate dataset issues; similar scores across models point to feature limits; class imbalance usually shows up here.</p>
 <h3 id="mini-challenge-random-forest">Mini-challenge: random forest</h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.ensemble</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomForestClassifier</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>from sklearn.ensemble import RandomForestClassifier
 
-<span class="n">rf_clf</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
-<span class="n">rf_clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
-<span class="n">rf_score</span> <span class="o">=</span> <span class="n">rf_clf</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Random forest accuracy: </span><span class="si">{</span><span class="n">rf_score</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">  (logistic regression: </span><span class="si">{</span><span class="n">lr_score</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+rf_clf = RandomForestClassifier(n_estimators=100, random_state=42)
+rf_clf.fit(X_train, y_train)
+rf_score = rf_clf.score(X_valid, y_valid)
+print(f&quot;Random forest accuracy: {rf_score:.4f}  (logistic regression: {lr_score:.4f})&quot;)
 
-<span class="n">rf_preds</span> <span class="o">=</span> <span class="n">rf_clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_valid</span><span class="p">)</span>
-<span class="n">rf_report</span> <span class="o">=</span> <span class="n">classification_report</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">rf_preds</span><span class="p">,</span> <span class="n">target_names</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">rf_report</span><span class="p">)</span>
-</code></pre></div>
+rf_preds = rf_clf.predict(X_valid)
+rf_report = classification_report(y_valid, rf_preds, target_names=labels)
+print(rf_report)</textarea><pre><code class="language-python">from sklearn.ensemble import RandomForestClassifier
+
+rf_clf = RandomForestClassifier(n_estimators=100, random_state=42)
+rf_clf.fit(X_train, y_train)
+rf_score = rf_clf.score(X_valid, y_valid)
+print(f&quot;Random forest accuracy: {rf_score:.4f}  (logistic regression: {lr_score:.4f})&quot;)
+
+rf_preds = rf_clf.predict(X_valid)
+rf_report = classification_report(y_valid, rf_preds, target_names=labels)
+print(rf_report)</code></pre></div>
 <p>Which emotions does the random forest predict better?</p>
 <h2 id="6-fine-tuning-a-transformer-model">6. Fine-tuning a Transformer Model</h2>
 <p>Fine-tuning updates <strong>all</strong> of the model's weights on the task, usually giving better results than frozen features.</p>
 <h3 id="loading-a-classification-model">Loading a classification model</h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoModelForSequenceClassification</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="transformers" title="Needs transformers — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>from transformers import AutoModelForSequenceClassification
 
-<span class="n">num_labels</span> <span class="o">=</span> <span class="mi">6</span>
-<span class="n">id2label</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">name</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">labels</span><span class="p">)}</span>
-<span class="n">label2id</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">labels</span><span class="p">)}</span>
-<span class="n">model</span> <span class="o">=</span> <span class="p">(</span><span class="n">AutoModelForSequenceClassification</span>
-         <span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_chk</span><span class="p">,</span> <span class="n">num_labels</span><span class="o">=</span><span class="n">num_labels</span><span class="p">,</span>
-                          <span class="n">id2label</span><span class="o">=</span><span class="n">id2label</span><span class="p">,</span> <span class="n">label2id</span><span class="o">=</span><span class="n">label2id</span><span class="p">)</span>
-         <span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">))</span>
-</code></pre></div>
+num_labels = 6
+id2label = {i: name for i, name in enumerate(labels)}
+label2id = {name: i for i, name in enumerate(labels)}
+model = (AutoModelForSequenceClassification
+         .from_pretrained(model_chk, num_labels=num_labels,
+                          id2label=id2label, label2id=label2id)
+         .to(device))</textarea><pre><code class="language-python">from transformers import AutoModelForSequenceClassification
+
+num_labels = 6
+id2label = {i: name for i, name in enumerate(labels)}
+label2id = {name: i for i, name in enumerate(labels)}
+model = (AutoModelForSequenceClassification
+         .from_pretrained(model_chk, num_labels=num_labels,
+                          id2label=id2label, label2id=label2id)
+         .to(device))</code></pre></div>
 <p>Same DistilBERT base as before, now with a randomly initialized classification head on top. Passing <code>id2label</code>/<code>label2id</code> stores the emotion names in the model config, so the deployed model reports <code>joy</code> rather than <code>LABEL_1</code>.</p>
 <h3 id="evaluation-metrics">Evaluation metrics</h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">accuracy_score</span><span class="p">,</span> <span class="n">f1_score</span>
+<div class="runnable"><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden>from sklearn.metrics import accuracy_score, f1_score
 
-<span class="k">def</span><span class="w"> </span><span class="nf">compute_metrics</span><span class="p">(</span><span class="n">pred</span><span class="p">):</span>
-    <span class="n">labels</span> <span class="o">=</span> <span class="n">pred</span><span class="o">.</span><span class="n">label_ids</span>
-    <span class="n">preds</span> <span class="o">=</span> <span class="n">pred</span><span class="o">.</span><span class="n">predictions</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">f1</span> <span class="o">=</span> <span class="n">f1_score</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">preds</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s2">"weighted"</span><span class="p">)</span>
-    <span class="n">acc</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">preds</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">{</span><span class="s2">"accuracy"</span><span class="p">:</span> <span class="n">acc</span><span class="p">,</span> <span class="s2">"f1"</span><span class="p">:</span> <span class="n">f1</span><span class="p">}</span>
-</code></pre></div>
+def compute_metrics(pred):
+    labels = pred.label_ids
+    preds = pred.predictions.argmax(-1)
+    f1 = f1_score(labels, preds, average=&quot;weighted&quot;)
+    acc = accuracy_score(labels, preds)
+    return {&quot;accuracy&quot;: acc, &quot;f1&quot;: f1}</textarea><pre><code class="language-python">from sklearn.metrics import accuracy_score, f1_score
+
+def compute_metrics(pred):
+    labels = pred.label_ids
+    preds = pred.predictions.argmax(-1)
+    f1 = f1_score(labels, preds, average=&quot;weighted&quot;)
+    acc = accuracy_score(labels, preds)
+    return {&quot;accuracy&quot;: acc, &quot;f1&quot;: f1}</code></pre></div>
 <h3 id="setting-up-the-trainer">Setting up the Trainer</h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trainer</span><span class="p">,</span> <span class="n">TrainingArguments</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="transformers" title="Needs transformers — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>from transformers import Trainer, TrainingArguments
 
-<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">64</span>
-<span class="n">logging_steps</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">emotion_encoded</span><span class="p">[</span><span class="s2">"train"</span><span class="p">])</span> <span class="o">//</span> <span class="n">batch_size</span>
-<span class="n">model_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">model_chk</span><span class="si">}</span><span class="s2">-finetuned-emotion"</span>
+batch_size = 64
+logging_steps = len(emotion_encoded[&quot;train&quot;]) // batch_size
+model_name = f&quot;{model_chk}-finetuned-emotion&quot;
 
-<span class="n">training_args</span> <span class="o">=</span> <span class="n">TrainingArguments</span><span class="p">(</span>
-    <span class="n">output_dir</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span>
-    <span class="n">num_train_epochs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-    <span class="n">learning_rate</span><span class="o">=</span><span class="mf">2e-5</span><span class="p">,</span>
-    <span class="n">per_device_train_batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
-    <span class="n">per_device_eval_batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
-    <span class="n">weight_decay</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
-    <span class="n">eval_strategy</span><span class="o">=</span><span class="s2">"epoch"</span><span class="p">,</span>
-    <span class="n">disable_tqdm</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">logging_steps</span><span class="o">=</span><span class="n">logging_steps</span><span class="p">,</span>
-    <span class="n">push_to_hub</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">log_level</span><span class="o">=</span><span class="s2">"error"</span><span class="p">,</span>
-<span class="p">)</span>
+training_args = TrainingArguments(
+    output_dir=model_name,
+    num_train_epochs=2,
+    learning_rate=2e-5,
+    per_device_train_batch_size=batch_size,
+    per_device_eval_batch_size=batch_size,
+    weight_decay=0.01,
+    eval_strategy=&quot;epoch&quot;,
+    disable_tqdm=False,
+    logging_steps=logging_steps,
+    push_to_hub=True,
+    log_level=&quot;error&quot;,
+)
 
-<span class="n">trainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span>
-    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
-    <span class="n">args</span><span class="o">=</span><span class="n">training_args</span><span class="p">,</span>
-    <span class="n">compute_metrics</span><span class="o">=</span><span class="n">compute_metrics</span><span class="p">,</span>
-    <span class="n">train_dataset</span><span class="o">=</span><span class="n">emotion_encoded</span><span class="p">[</span><span class="s2">"train"</span><span class="p">],</span>
-    <span class="n">eval_dataset</span><span class="o">=</span><span class="n">emotion_encoded</span><span class="p">[</span><span class="s2">"validation"</span><span class="p">],</span>
-    <span class="n">processing_class</span><span class="o">=</span><span class="n">tokenizer</span><span class="p">,</span>
-<span class="p">)</span>
-</code></pre></div>
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    compute_metrics=compute_metrics,
+    train_dataset=emotion_encoded[&quot;train&quot;],
+    eval_dataset=emotion_encoded[&quot;validation&quot;],
+    processing_class=tokenizer,
+)</textarea><pre><code class="language-python">from transformers import Trainer, TrainingArguments
+
+batch_size = 64
+logging_steps = len(emotion_encoded[&quot;train&quot;]) // batch_size
+model_name = f&quot;{model_chk}-finetuned-emotion&quot;
+
+training_args = TrainingArguments(
+    output_dir=model_name,
+    num_train_epochs=2,
+    learning_rate=2e-5,
+    per_device_train_batch_size=batch_size,
+    per_device_eval_batch_size=batch_size,
+    weight_decay=0.01,
+    eval_strategy=&quot;epoch&quot;,
+    disable_tqdm=False,
+    logging_steps=logging_steps,
+    push_to_hub=True,
+    log_level=&quot;error&quot;,
+)
+
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    compute_metrics=compute_metrics,
+    train_dataset=emotion_encoded[&quot;train&quot;],
+    eval_dataset=emotion_encoded[&quot;validation&quot;],
+    processing_class=tokenizer,
+)</code></pre></div>
 <table>
 <thead>
 <tr>
@@ -377,159 +517,242 @@
 <p><strong>Version note:</strong> Transformers releases before 4.46 used the older names <code>evaluation_strategy</code> and <code>Trainer(tokenizer=...)</code>; the current names are <code>eval_strategy</code> and <code>processing_class=...</code>. <code>push_to_hub=True</code> requires that you are logged in (see Section 8).</p>
 </blockquote>
 <h3 id="training-the-model">Training the model</h3>
-<div class="highlight"><pre><span></span><code><span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
-</code></pre></div>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>trainer.train()</textarea><pre><code class="language-python">trainer.train()</code></pre></div>
 <p>Training runs for the configured epochs, reports metrics after each epoch, saves checkpoints and shows a progress bar.</p>
 <h3 id="mini-challenge-tuning-experiments">Mini-challenge: tuning experiments</h3>
-<div class="highlight"><pre><span></span><code><span class="c1"># 1. Try a different learning rate</span>
-<span class="n">training_args</span><span class="o">.</span><span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">5e-5</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="transformers" title="Needs transformers — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden># 1. Try a different learning rate
+training_args.learning_rate = 5e-5
 
-<span class="c1"># 2. Try a different scheduler</span>
-<span class="n">training_args</span><span class="o">.</span><span class="n">lr_scheduler_type</span> <span class="o">=</span> <span class="s2">"cosine"</span>
+# 2. Try a different scheduler
+training_args.lr_scheduler_type = &quot;cosine&quot;
 
-<span class="c1"># 3. More epochs with early stopping</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarlyStoppingCallback</span>
-<span class="n">training_args</span><span class="o">.</span><span class="n">num_train_epochs</span> <span class="o">=</span> <span class="mi">5</span>
-<span class="n">training_args</span><span class="o">.</span><span class="n">save_strategy</span> <span class="o">=</span> <span class="s2">"epoch"</span>        <span class="c1"># must match eval_strategy when loading the best model</span>
-<span class="n">training_args</span><span class="o">.</span><span class="n">load_best_model_at_end</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="n">training_args</span><span class="o">.</span><span class="n">metric_for_best_model</span> <span class="o">=</span> <span class="s2">"f1"</span>   <span class="c1"># required by EarlyStoppingCallback</span>
-<span class="n">trainer</span><span class="o">.</span><span class="n">add_callback</span><span class="p">(</span><span class="n">EarlyStoppingCallback</span><span class="p">(</span><span class="n">early_stopping_patience</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+# 3. More epochs with early stopping
+from transformers import EarlyStoppingCallback
+training_args.num_train_epochs = 5
+training_args.save_strategy = &quot;epoch&quot;        # must match eval_strategy when loading the best model
+training_args.load_best_model_at_end = True
+training_args.metric_for_best_model = &quot;f1&quot;   # required by EarlyStoppingCallback
+trainer.add_callback(EarlyStoppingCallback(early_stopping_patience=2))
 
-<span class="c1"># Re-run trainer.train() after each change to see its effect</span>
-</code></pre></div>
+# Re-run trainer.train() after each change to see its effect</textarea><pre><code class="language-python"># 1. Try a different learning rate
+training_args.learning_rate = 5e-5
+
+# 2. Try a different scheduler
+training_args.lr_scheduler_type = &quot;cosine&quot;
+
+# 3. More epochs with early stopping
+from transformers import EarlyStoppingCallback
+training_args.num_train_epochs = 5
+training_args.save_strategy = &quot;epoch&quot;        # must match eval_strategy when loading the best model
+training_args.load_best_model_at_end = True
+training_args.metric_for_best_model = &quot;f1&quot;   # required by EarlyStoppingCallback
+trainer.add_callback(EarlyStoppingCallback(early_stopping_patience=2))
+
+# Re-run trainer.train() after each change to see its effect</code></pre></div>
 <h2 id="7-evaluating-model-performance">7. Evaluating Model Performance</h2>
 <h3 id="evaluating-on-the-validation-set">Evaluating on the validation set</h3>
-<div class="highlight"><pre><span></span><code><span class="n">validation_results</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">evaluate</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Validation accuracy: </span><span class="si">{</span><span class="n">validation_results</span><span class="p">[</span><span class="s1">'eval_accuracy'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Validation F1: </span><span class="si">{</span><span class="n">validation_results</span><span class="p">[</span><span class="s1">'eval_f1'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Improvement over logistic regression: </span><span class="si">{</span><span class="n">validation_results</span><span class="p">[</span><span class="s1">'eval_accuracy'</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">lr_score</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</code></pre></div>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>validation_results = trainer.evaluate()
+print(f&quot;Validation accuracy: {validation_results[&#x27;eval_accuracy&#x27;]:.4f}&quot;)
+print(f&quot;Validation F1: {validation_results[&#x27;eval_f1&#x27;]:.4f}&quot;)
+print(f&quot;Improvement over logistic regression: {validation_results[&#x27;eval_accuracy&#x27;] - lr_score:.4f}&quot;)</textarea><pre><code class="language-python">validation_results = trainer.evaluate()
+print(f&quot;Validation accuracy: {validation_results[&#x27;eval_accuracy&#x27;]:.4f}&quot;)
+print(f&quot;Validation F1: {validation_results[&#x27;eval_f1&#x27;]:.4f}&quot;)
+print(f&quot;Improvement over logistic regression: {validation_results[&#x27;eval_accuracy&#x27;] - lr_score:.4f}&quot;)</code></pre></div>
 <h3 id="confusion-matrix_1">Confusion matrix</h3>
-<div class="highlight"><pre><span></span><code><span class="n">preds_output</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">emotion_encoded</span><span class="p">[</span><span class="s2">"validation"</span><span class="p">])</span>
-<span class="n">y_preds</span> <span class="o">=</span> <span class="n">preds_output</span><span class="o">.</span><span class="n">predictions</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">y_valid</span> <span class="o">=</span> <span class="n">preds_output</span><span class="o">.</span><span class="n">label_ids</span>
-<span class="n">plot_confusion_matrix</span><span class="p">(</span><span class="n">y_preds</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
-</code></pre></div>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>preds_output = trainer.predict(emotion_encoded[&quot;validation&quot;])
+y_preds = preds_output.predictions.argmax(-1)
+y_valid = preds_output.label_ids
+plot_confusion_matrix(y_preds, y_valid, labels)</textarea><pre><code class="language-python">preds_output = trainer.predict(emotion_encoded[&quot;validation&quot;])
+y_preds = preds_output.predictions.argmax(-1)
+y_valid = preds_output.label_ids
+plot_confusion_matrix(y_preds, y_valid, labels)</code></pre></div>
 <h3 id="detailed-classification-report">Detailed classification report</h3>
-<div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="n">classification_report</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">y_preds</span><span class="p">,</span> <span class="n">target_names</span><span class="o">=</span><span class="n">labels</span><span class="p">))</span>
-</code></pre></div>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>print(classification_report(y_valid, y_preds, target_names=labels))</textarea><pre><code class="language-python">print(classification_report(y_valid, y_preds, target_names=labels))</code></pre></div>
 <p>Look for classes with low precision or recall.</p>
 <h3 id="error-analysis">Error analysis</h3>
-<div class="highlight"><pre><span></span><code><span class="n">validation_texts</span> <span class="o">=</span> <span class="n">emotions</span><span class="p">[</span><span class="s2">"validation"</span><span class="p">][</span><span class="s2">"text"</span><span class="p">]</span>
-<span class="n">validation_labels</span> <span class="o">=</span> <span class="n">emotions</span><span class="p">[</span><span class="s2">"validation"</span><span class="p">][</span><span class="s2">"label"</span><span class="p">]</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>validation_texts = emotions[&quot;validation&quot;][&quot;text&quot;]
+validation_labels = emotions[&quot;validation&quot;][&quot;label&quot;]
 
-<span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">true</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">y_preds</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">)):</span>
-    <span class="k">if</span> <span class="n">pred</span> <span class="o">!=</span> <span class="n">true</span><span class="p">:</span>
-        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
-            <span class="s2">"text"</span><span class="p">:</span> <span class="n">validation_texts</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
-            <span class="s2">"true"</span><span class="p">:</span> <span class="n">labels</span><span class="p">[</span><span class="n">true</span><span class="p">],</span>
-            <span class="s2">"predicted"</span><span class="p">:</span> <span class="n">labels</span><span class="p">[</span><span class="n">pred</span><span class="p">],</span>
-        <span class="p">})</span>
+errors = []
+for i, (pred, true) in enumerate(zip(y_preds, y_valid)):
+    if pred != true:
+        errors.append({
+            &quot;text&quot;: validation_texts[i],
+            &quot;true&quot;: labels[true],
+            &quot;predicted&quot;: labels[pred],
+        })
 
-<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">err</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">errors</span><span class="p">[:</span><span class="mi">5</span><span class="p">]):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">. Text: </span><span class="si">{</span><span class="n">err</span><span class="p">[</span><span class="s1">'text'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   True: </span><span class="si">{</span><span class="n">err</span><span class="p">[</span><span class="s1">'true'</span><span class="p">]</span><span class="si">}</span><span class="s2">, Predicted: </span><span class="si">{</span><span class="n">err</span><span class="p">[</span><span class="s1">'predicted'</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
-</code></pre></div>
+for i, err in enumerate(errors[:5]):
+    print(f&quot;{i+1}. Text: {err[&#x27;text&#x27;]}&quot;)
+    print(f&quot;   True: {err[&#x27;true&#x27;]}, Predicted: {err[&#x27;predicted&#x27;]}\n&quot;)</textarea><pre><code class="language-python">validation_texts = emotions[&quot;validation&quot;][&quot;text&quot;]
+validation_labels = emotions[&quot;validation&quot;][&quot;label&quot;]
+
+errors = []
+for i, (pred, true) in enumerate(zip(y_preds, y_valid)):
+    if pred != true:
+        errors.append({
+            &quot;text&quot;: validation_texts[i],
+            &quot;true&quot;: labels[true],
+            &quot;predicted&quot;: labels[pred],
+        })
+
+for i, err in enumerate(errors[:5]):
+    print(f&quot;{i+1}. Text: {err[&#x27;text&#x27;]}&quot;)
+    print(f&quot;   True: {err[&#x27;true&#x27;]}, Predicted: {err[&#x27;predicted&#x27;]}\n&quot;)</code></pre></div>
 <p><strong>Metric definitions:</strong> accuracy = fraction correct; precision = of predicted positives, how many are right; recall = of the actual positives, how many were found; F1 = harmonic mean of precision and recall.</p>
 <p><strong>Common error patterns:</strong> confusion between similar emotions (love vs joy), ambiguous text expressing several emotions, sarcasm and figurative language, cultural or contextual references.</p>
 <h3 id="mini-challenge-predict-on-custom-text">Mini-challenge: predict on custom text</h3>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">predict_emotion</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
-    <span class="n">inputs</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">"pt"</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
-        <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">inputs</span><span class="p">)</span>
-    <span class="n">probs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">outputs</span><span class="o">.</span><span class="n">logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">predicted_class</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-    <span class="n">confidence</span> <span class="o">=</span> <span class="n">probs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">predicted_class</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-    <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">"emotion"</span><span class="p">:</span> <span class="n">labels</span><span class="p">[</span><span class="n">predicted_class</span><span class="p">],</span>
-        <span class="s2">"confidence"</span><span class="p">:</span> <span class="n">confidence</span><span class="p">,</span>
-        <span class="s2">"all_probs"</span><span class="p">:</span> <span class="p">{</span><span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span> <span class="n">probs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">))},</span>
-    <span class="p">}</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>def predict_emotion(text):
+    inputs = tokenizer(text, return_tensors=&quot;pt&quot;).to(device)
+    with torch.no_grad():
+        outputs = model(**inputs)
+    probs = torch.nn.functional.softmax(outputs.logits, dim=-1)
+    predicted_class = torch.argmax(probs, dim=-1).item()
+    confidence = probs[0][predicted_class].item()
+    return {
+        &quot;emotion&quot;: labels[predicted_class],
+        &quot;confidence&quot;: confidence,
+        &quot;all_probs&quot;: {labels[i]: probs[0][i].item() for i in range(len(labels))},
+    }
 
-<span class="n">test_texts</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">"I can't believe I aced my exam!"</span><span class="p">,</span>
-    <span class="s2">"I miss my family so much right now."</span><span class="p">,</span>
-    <span class="s2">"That driver just cut me off! So rude!"</span><span class="p">,</span>
-<span class="p">]</span>
-<span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">test_texts</span><span class="p">:</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">predict_emotion</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Text: </span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Predicted: </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'emotion'</span><span class="p">]</span><span class="si">}</span><span class="s2"> (confidence: </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'confidence'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"All probabilities: </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'all_probs'</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
-</code></pre></div>
+test_texts = [
+    &quot;I can&#x27;t believe I aced my exam!&quot;,
+    &quot;I miss my family so much right now.&quot;,
+    &quot;That driver just cut me off! So rude!&quot;,
+]
+for text in test_texts:
+    result = predict_emotion(text)
+    print(f&quot;Text: {text}&quot;)
+    print(f&quot;Predicted: {result[&#x27;emotion&#x27;]} (confidence: {result[&#x27;confidence&#x27;]:.4f})&quot;)
+    print(f&quot;All probabilities: {result[&#x27;all_probs&#x27;]}\n&quot;)</textarea><pre><code class="language-python">def predict_emotion(text):
+    inputs = tokenizer(text, return_tensors=&quot;pt&quot;).to(device)
+    with torch.no_grad():
+        outputs = model(**inputs)
+    probs = torch.nn.functional.softmax(outputs.logits, dim=-1)
+    predicted_class = torch.argmax(probs, dim=-1).item()
+    confidence = probs[0][predicted_class].item()
+    return {
+        &quot;emotion&quot;: labels[predicted_class],
+        &quot;confidence&quot;: confidence,
+        &quot;all_probs&quot;: {labels[i]: probs[0][i].item() for i in range(len(labels))},
+    }
+
+test_texts = [
+    &quot;I can&#x27;t believe I aced my exam!&quot;,
+    &quot;I miss my family so much right now.&quot;,
+    &quot;That driver just cut me off! So rude!&quot;,
+]
+for text in test_texts:
+    result = predict_emotion(text)
+    print(f&quot;Text: {text}&quot;)
+    print(f&quot;Predicted: {result[&#x27;emotion&#x27;]} (confidence: {result[&#x27;confidence&#x27;]:.4f})&quot;)
+    print(f&quot;All probabilities: {result[&#x27;all_probs&#x27;]}\n&quot;)</code></pre></div>
 <h2 id="8-deploying-the-model-to-hugging-face-hub">8. Deploying the Model to Hugging Face Hub</h2>
 <h3 id="setting-up-your-hugging-face-account">Setting up your Hugging Face account</h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">huggingface_hub</span><span class="w"> </span><span class="kn">import</span> <span class="n">notebook_login</span>
-<span class="n">notebook_login</span><span class="p">()</span>
-</code></pre></div>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="huggingface_hub" title="Needs huggingface_hub — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>from huggingface_hub import notebook_login
+notebook_login()</textarea><pre><code class="language-python">from huggingface_hub import notebook_login
+notebook_login()</code></pre></div>
 <p>Create an access token at https://huggingface.co/settings/tokens. In a script (not a notebook) use <code>hf auth login</code> in the terminal instead (<code>huggingface-cli login</code> in older versions of <code>huggingface_hub</code>).</p>
 <h3 id="pushing-the-model-to-the-hub">Pushing the model to the Hub</h3>
-<div class="highlight"><pre><span></span><code><span class="n">trainer</span><span class="o">.</span><span class="n">push_to_hub</span><span class="p">(</span><span class="n">commit_message</span><span class="o">=</span><span class="s2">"Training completed!"</span><span class="p">)</span>
-</code></pre></div>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>trainer.push_to_hub(commit_message=&quot;Training completed!&quot;)</textarea><pre><code class="language-python">trainer.push_to_hub(commit_message=&quot;Training completed!&quot;)</code></pre></div>
 <p>This uploads the model weights, tokenizer configuration, model configuration and a README model card. The model appears at <code>https://huggingface.co/YOUR_USERNAME/distilbert-base-uncased-finetuned-emotion</code>.</p>
 <h3 id="creating-a-model-card">Creating a model card</h3>
-<div class="highlight"><pre><span></span><code><span class="n">model_card</span> <span class="o">=</span> <span class="s2">"""</span>
-<span class="s2"># Emotion Classification Model</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>model_card = &quot;&quot;&quot;
+# Emotion Classification Model
 
-<span class="s2">This model classifies text into six emotions: sadness, joy, love, anger, fear, and surprise.</span>
+This model classifies text into six emotions: sadness, joy, love, anger, fear, and surprise.
 
-<span class="s2">## Model Description</span>
-<span class="s2">- Architecture: DistilBERT (distilbert-base-uncased)</span>
-<span class="s2">- Fine-tuned on the DAIR.AI Emotion dataset</span>
-<span class="s2">- Training accuracy: </span><span class="si">{train_acc:.4f}</span>
-<span class="s2">- Validation accuracy: </span><span class="si">{val_acc:.4f}</span>
-<span class="s2">- F1 score: </span><span class="si">{f1:.4f}</span>
+## Model Description
+- Architecture: DistilBERT (distilbert-base-uncased)
+- Fine-tuned on the DAIR.AI Emotion dataset
+- Training accuracy: {train_acc:.4f}
+- Validation accuracy: {val_acc:.4f}
+- F1 score: {f1:.4f}
 
-<span class="s2">## Intended Usage</span>
-<span class="s2">Sentiment analysis and emotion detection in English text.</span>
+## Intended Usage
+Sentiment analysis and emotion detection in English text.
 
-<span class="s2">## Limitations</span>
-<span class="s2">- English only</span>
-<span class="s2">- May struggle with sarcasm and ambiguous emotions</span>
-<span class="s2">- May underperform on very short texts</span>
+## Limitations
+- English only
+- May struggle with sarcasm and ambiguous emotions
+- May underperform on very short texts
 
-<span class="s2">## Training Procedure</span>
-<span class="s2">- 2 epochs</span>
-<span class="s2">- Learning rate: 2e-5</span>
-<span class="s2">- Batch size: 64</span>
-<span class="s2">"""</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-    <span class="n">train_acc</span><span class="o">=</span><span class="mf">0.92</span><span class="p">,</span>   <span class="c1"># replace with your actual training accuracy</span>
-    <span class="n">val_acc</span><span class="o">=</span><span class="n">validation_results</span><span class="p">[</span><span class="s2">"eval_accuracy"</span><span class="p">],</span>
-    <span class="n">f1</span><span class="o">=</span><span class="n">validation_results</span><span class="p">[</span><span class="s2">"eval_f1"</span><span class="p">],</span>
-<span class="p">)</span>
+## Training Procedure
+- 2 epochs
+- Learning rate: 2e-5
+- Batch size: 64
+&quot;&quot;&quot;.format(
+    train_acc=0.92,   # replace with your actual training accuracy
+    val_acc=validation_results[&quot;eval_accuracy&quot;],
+    f1=validation_results[&quot;eval_f1&quot;],
+)
 
-<span class="c1"># from huggingface_hub import ModelCard</span>
-<span class="c1"># ModelCard(model_card).push_to_hub("YOUR_USERNAME/distilbert-base-uncased-finetuned-emotion",</span>
-<span class="c1">#                                   commit_message="Update model card")</span>
-</code></pre></div>
+# from huggingface_hub import ModelCard
+# ModelCard(model_card).push_to_hub(&quot;YOUR_USERNAME/distilbert-base-uncased-finetuned-emotion&quot;,
+#                                   commit_message=&quot;Update model card&quot;)</textarea><pre><code class="language-python">model_card = &quot;&quot;&quot;
+# Emotion Classification Model
+
+This model classifies text into six emotions: sadness, joy, love, anger, fear, and surprise.
+
+## Model Description
+- Architecture: DistilBERT (distilbert-base-uncased)
+- Fine-tuned on the DAIR.AI Emotion dataset
+- Training accuracy: {train_acc:.4f}
+- Validation accuracy: {val_acc:.4f}
+- F1 score: {f1:.4f}
+
+## Intended Usage
+Sentiment analysis and emotion detection in English text.
+
+## Limitations
+- English only
+- May struggle with sarcasm and ambiguous emotions
+- May underperform on very short texts
+
+## Training Procedure
+- 2 epochs
+- Learning rate: 2e-5
+- Batch size: 64
+&quot;&quot;&quot;.format(
+    train_acc=0.92,   # replace with your actual training accuracy
+    val_acc=validation_results[&quot;eval_accuracy&quot;],
+    f1=validation_results[&quot;eval_f1&quot;],
+)
+
+# from huggingface_hub import ModelCard
+# ModelCard(model_card).push_to_hub(&quot;YOUR_USERNAME/distilbert-base-uncased-finetuned-emotion&quot;,
+#                                   commit_message=&quot;Update model card&quot;)</code></pre></div>
 <h3 id="using-your-model">Using your model</h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">pipeline</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="transformers" title="Needs transformers — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>from transformers import pipeline
 
-<span class="n">model_name</span> <span class="o">=</span> <span class="s2">"YOUR_USERNAME/distilbert-base-uncased-finetuned-emotion"</span>   <span class="c1"># replace YOUR_USERNAME</span>
-<span class="n">classifier</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="s2">"text-classification"</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model_name</span><span class="p">)</span>
+model_name = &quot;YOUR_USERNAME/distilbert-base-uncased-finetuned-emotion&quot;   # replace YOUR_USERNAME
+classifier = pipeline(&quot;text-classification&quot;, model=model_name)
 
-<span class="n">result</span> <span class="o">=</span> <span class="n">classifier</span><span class="p">(</span><span class="s2">"I'm so excited to see this working!"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>   <span class="c1"># e.g. [{'label': 'joy', 'score': 0.9874}]</span>
-</code></pre></div>
+result = classifier(&quot;I&#x27;m so excited to see this working!&quot;)
+print(result)   # e.g. [{&#x27;label&#x27;: &#x27;joy&#x27;, &#x27;score&#x27;: 0.9874}]</textarea><pre><code class="language-python">from transformers import pipeline
+
+model_name = &quot;YOUR_USERNAME/distilbert-base-uncased-finetuned-emotion&quot;   # replace YOUR_USERNAME
+classifier = pipeline(&quot;text-classification&quot;, model=model_name)
+
+result = classifier(&quot;I&#x27;m so excited to see this working!&quot;)
+print(result)   # e.g. [{&#x27;label&#x27;: &#x27;joy&#x27;, &#x27;score&#x27;: 0.9874}]</code></pre></div>
 <p><strong>Hub benefits:</strong> easy sharing, version control, automatic model cards, browser inference widgets, community discussions, download statistics, Spaces for demos, and framework integrations.</p>
 <h3 id="mini-challenge-optional-gradio-demo">Mini-challenge (optional): Gradio demo</h3>
-<div class="highlight"><pre><span></span><code><span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">gradio</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">gradio</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gr</span>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-python">!pip install gradio
+import gradio as gr
 
-<span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
-    <span class="n">results</span> <span class="o">=</span> <span class="n">classifier</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>   <span class="c1"># scores for all six emotions</span>
-    <span class="k">return</span> <span class="p">{</span><span class="n">r</span><span class="p">[</span><span class="s2">"label"</span><span class="p">]:</span> <span class="n">r</span><span class="p">[</span><span class="s2">"score"</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">}</span>
+def predict(text):
+    results = classifier(text, top_k=None)   # scores for all six emotions
+    return {r[&quot;label&quot;]: r[&quot;score&quot;] for r in results}
 
-<span class="n">demo</span> <span class="o">=</span> <span class="n">gr</span><span class="o">.</span><span class="n">Interface</span><span class="p">(</span>
-    <span class="n">fn</span><span class="o">=</span><span class="n">predict</span><span class="p">,</span>
-    <span class="n">inputs</span><span class="o">=</span><span class="n">gr</span><span class="o">.</span><span class="n">Textbox</span><span class="p">(</span><span class="n">placeholder</span><span class="o">=</span><span class="s2">"Enter text here..."</span><span class="p">),</span>
-    <span class="n">outputs</span><span class="o">=</span><span class="n">gr</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">num_top_classes</span><span class="o">=</span><span class="mi">6</span><span class="p">),</span>
-    <span class="n">title</span><span class="o">=</span><span class="s2">"Emotion Classifier"</span><span class="p">,</span>
-    <span class="n">description</span><span class="o">=</span><span class="s2">"Classifies text into six emotions: sadness, joy, love, anger, fear, surprise."</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">demo</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
-</code></pre></div>
+demo = gr.Interface(
+    fn=predict,
+    inputs=gr.Textbox(placeholder=&quot;Enter text here...&quot;),
+    outputs=gr.Label(num_top_classes=6),
+    title=&quot;Emotion Classifier&quot;,
+    description=&quot;Classifies text into six emotions: sadness, joy, love, anger, fear, surprise.&quot;,
+)
+demo.launch()</code></pre></div>
 <p>The demo can be hosted permanently on Hugging Face Spaces.</p>
 <h2 id="9-next-steps-and-conclusion">9. Next Steps and Conclusion</h2>
 <p><strong>What you learned:</strong> loading datasets, tokenizing, extracting features, building scikit-learn baselines, fine-tuning for classification, evaluating with metrics and plots, and deploying to the Hub.</p>
@@ -555,14 +778,80 @@
 <li>Stack Overflow (huggingface-transformers tag): https://stackoverflow.com/questions/tagged/huggingface-transformers</li>
 </ul>
 <p>Congratulations on building your first text classification model. Back to course: https://albanna-tutorials.com/cs/index.html · All courses: https://albanna-tutorials.com/courses.html</p>
-  <div class="pager"><a href="week01-transformers.html"><small>Previous</small>Week 1: Transformer Architecture</a><a class="next" href="week03-ner.html"><small>Next</small>Week 3: Named Entity Recognition (NER)</a></div>
-  <footer style="margin-top:3rem;padding-top:1rem;border-top:1px solid var(--border);font-size:.84rem;color:var(--muted)">
-This site is based on the course site <a href="https://albanna-tutorials.com/cs/">albanna-tutorials.com/cs</a> by Dr. Abdulkarim Albanna, used with the author's permission.
-</footer>
-</main><aside class="rail">
-  <div class="rail-tabs"><button class="active" data-panel="panel-sims">Simulations</button><button data-panel="panel-code">Test code</button></div>
-  <div class="rail-panel active" id="panel-sims"><p class="rail-intro">Interactive teaching aids for this week. Each opens full-size with step controls and teaching notes.</p><button class="sim-card" data-sim="classifier"><span class="sim-kind">Classification · simulation</span><span class="sim-title">Decision boundary, threshold &amp; F1</span><span class="sim-desc">Train a linear classifier live over 2-D embeddings; slide the threshold.</span></button><button class="sim-card" data-sim="tokenizer"><span class="sim-kind">Transformers · interactive</span><span class="sim-title">Subword tokenisation</span><span class="sim-desc">Type text, see WordPiece-style tokens, IDs and the embedding lookup.</span></button><button class="sim-card" data-sim="vectors"><span class="sim-kind">Linear algebra · interactive</span><span class="sim-title">Vectors, dot product &amp; cosine similarity</span><span class="sim-desc">Drag two vectors; see u+v, u·v, θ and cos θ — the geometry behind embeddings.</span></button></div>
-  <div class="rail-panel" id="panel-code"><p class="rail-intro"><b>Run ▶</b> executes pure-Python/NumPy snippets in your browser (Pyodide). Snippets marked <i>local</i> need the course environment (PyTorch, Transformers, LangChain…) — copy them into VS Code.</p><div class="snippet"><div class="snippet-head"><span>Dataset + tokenizer sanity check (no training)</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 1. Dataset + tokenizer sanity check (no training)
+<h2 id="try-it-yourself">Try it yourself</h2>
+<p class="lesson-intro"><b>▶ Try it</b> runs an example in the editor panel, inside your browser — change the code and press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to run it again. Examples marked <b>✎ Open in editor</b> need libraries or API keys that cannot run in a browser (PyTorch, Transformers, LangChain, OpenAI…): read them in the editor, then copy them to VS Code and run them in the course environment.</p><h3 id="run-in-your-browser">Run in your browser</h3><p class="lesson-intro">Self-contained versions of this week's mechanisms, written with NumPy, scikit-learn or plain Python so they run here.</p><div class="runnable"><div class="code-title">Sentiment classifier: TF-IDF features + logistic regression (scikit-learn)</div><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden>from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report
+
+train_texts = [
+    &quot;I love this course&quot;, &quot;What a wonderful lecture&quot;, &quot;The project was fun and useful&quot;,
+    &quot;Great explanation, very clear&quot;, &quot;I enjoyed the lab today&quot;, &quot;This tutorial is excellent&quot;,
+    &quot;I hate waiting for the model to train&quot;, &quot;The lecture was boring&quot;, &quot;This bug is terrible&quot;,
+    &quot;I am disappointed with the results&quot;, &quot;The exam was awful&quot;, &quot;Nothing works, very frustrating&quot;,
+]
+train_labels = [&quot;pos&quot;] * 6 + [&quot;neg&quot;] * 6
+test_texts = [&quot;The lab was clear and fun&quot;, &quot;The results are terrible&quot;, &quot;I love the project&quot;, &quot;Boring and frustrating exam&quot;]
+test_labels = [&quot;pos&quot;, &quot;neg&quot;, &quot;pos&quot;, &quot;neg&quot;]
+
+vec = TfidfVectorizer()
+X_train = vec.fit_transform(train_texts)
+clf = LogisticRegression().fit(X_train, train_labels)
+
+pred = clf.predict(vec.transform(test_texts))
+for t, p in zip(test_texts, pred):
+    print(f&quot;{p:&gt;3}  &lt;- {t}&quot;)
+print()
+print(classification_report(test_labels, pred, zero_division=0))</textarea><pre><code class="language-python">from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report
+
+train_texts = [
+    &quot;I love this course&quot;, &quot;What a wonderful lecture&quot;, &quot;The project was fun and useful&quot;,
+    &quot;Great explanation, very clear&quot;, &quot;I enjoyed the lab today&quot;, &quot;This tutorial is excellent&quot;,
+    &quot;I hate waiting for the model to train&quot;, &quot;The lecture was boring&quot;, &quot;This bug is terrible&quot;,
+    &quot;I am disappointed with the results&quot;, &quot;The exam was awful&quot;, &quot;Nothing works, very frustrating&quot;,
+]
+train_labels = [&quot;pos&quot;] * 6 + [&quot;neg&quot;] * 6
+test_texts = [&quot;The lab was clear and fun&quot;, &quot;The results are terrible&quot;, &quot;I love the project&quot;, &quot;Boring and frustrating exam&quot;]
+test_labels = [&quot;pos&quot;, &quot;neg&quot;, &quot;pos&quot;, &quot;neg&quot;]
+
+vec = TfidfVectorizer()
+X_train = vec.fit_transform(train_texts)
+clf = LogisticRegression().fit(X_train, train_labels)
+
+pred = clf.predict(vec.transform(test_texts))
+for t, p in zip(test_texts, pred):
+    print(f&quot;{p:&gt;3}  &lt;- {t}&quot;)
+print()
+print(classification_report(test_labels, pred, zero_division=0))</code></pre></div><div class="runnable"><div class="code-title">Precision, recall and F1 by hand vs scikit-learn</div><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden>from sklearn.metrics import precision_score, recall_score, f1_score
+
+y_true = [1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
+y_pred = [1, 1, 1, 0, 1, 0, 0, 0, 0, 0]
+
+tp = sum(t == 1 and p == 1 for t, p in zip(y_true, y_pred))
+fp = sum(t == 0 and p == 1 for t, p in zip(y_true, y_pred))
+fn = sum(t == 1 and p == 0 for t, p in zip(y_true, y_pred))
+precision = tp / (tp + fp)
+recall = tp / (tp + fn)
+f1 = 2 * precision * recall / (precision + recall)
+print(f&quot;TP={tp} FP={fp} FN={fn}&quot;)
+print(f&quot;by hand:      precision={precision:.3f} recall={recall:.3f} F1={f1:.3f}&quot;)
+print(f&quot;scikit-learn: precision={precision_score(y_true, y_pred):.3f} &quot;
+      f&quot;recall={recall_score(y_true, y_pred):.3f} F1={f1_score(y_true, y_pred):.3f}&quot;)</textarea><pre><code class="language-python">from sklearn.metrics import precision_score, recall_score, f1_score
+
+y_true = [1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
+y_pred = [1, 1, 1, 0, 1, 0, 0, 0, 0, 0]
+
+tp = sum(t == 1 and p == 1 for t, p in zip(y_true, y_pred))
+fp = sum(t == 0 and p == 1 for t, p in zip(y_true, y_pred))
+fn = sum(t == 1 and p == 0 for t, p in zip(y_true, y_pred))
+precision = tp / (tp + fp)
+recall = tp / (tp + fn)
+f1 = 2 * precision * recall / (precision + recall)
+print(f&quot;TP={tp} FP={fp} FN={fn}&quot;)
+print(f&quot;by hand:      precision={precision:.3f} recall={recall:.3f} F1={f1:.3f}&quot;)
+print(f&quot;scikit-learn: precision={precision_score(y_true, y_pred):.3f} &quot;
+      f&quot;recall={recall_score(y_true, y_pred):.3f} F1={f1_score(y_true, y_pred):.3f}&quot;)</code></pre></div><h3 id="test-code">Test code for the course environment</h3><div class="runnable local"><div class="code-title">Dataset + tokenizer sanity check (no training)</div><button class="try local" data-run="0" data-needs="datasets, transformers" title="Needs datasets, transformers — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden># 1. Dataset + tokenizer sanity check (no training)
 from datasets import load_dataset
 from transformers import AutoTokenizer
 
@@ -574,7 +863,19 @@ print(labels)
 tokenizer = AutoTokenizer.from_pretrained(&quot;distilbert-base-uncased&quot;)
 enc = tokenizer(&quot;I am feeling both happy and sad at the same time.&quot;)
 print(enc.input_ids)
-print(tokenizer.convert_ids_to_tokens(enc.input_ids))</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>[CLS] feature extraction + logistic-regression baseline on a small subset</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 2. [CLS] feature extraction + logistic-regression baseline on a small subset
+print(tokenizer.convert_ids_to_tokens(enc.input_ids))</textarea><pre><code class="language-python"># 1. Dataset + tokenizer sanity check (no training)
+from datasets import load_dataset
+from transformers import AutoTokenizer
+
+emotions = load_dataset(&quot;dair-ai/emotion&quot;)
+labels = emotions[&quot;train&quot;].features[&quot;label&quot;].names
+print(emotions)
+print(labels)
+
+tokenizer = AutoTokenizer.from_pretrained(&quot;distilbert-base-uncased&quot;)
+enc = tokenizer(&quot;I am feeling both happy and sad at the same time.&quot;)
+print(enc.input_ids)
+print(tokenizer.convert_ids_to_tokens(enc.input_ids))</code></pre></div><div class="runnable local"><div class="code-title">[CLS] feature extraction + logistic-regression baseline on a small subset</div><button class="try local" data-run="0" data-needs="torch, transformers" title="Needs torch, transformers — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden># 2. [CLS] feature extraction + logistic-regression baseline on a small subset
 import numpy as np, torch
 from transformers import AutoModel
 from sklearn.linear_model import LogisticRegression
@@ -599,7 +900,32 @@ print(&quot;feature shape:&quot;, X_train.shape)
 
 dummy = DummyClassifier(strategy=&quot;most_frequent&quot;).fit(X_train, y_train)
 lr = LogisticRegression(max_iter=3000).fit(X_train, y_train)
-print(f&quot;dummy: {dummy.score(X_valid, y_valid):.3f}   logistic regression: {lr.score(X_valid, y_valid):.3f}&quot;)</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Quick fine-tune on a subset (1 epoch) and evaluate</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 3. Quick fine-tune on a subset (1 epoch) and evaluate
+print(f&quot;dummy: {dummy.score(X_valid, y_valid):.3f}   logistic regression: {lr.score(X_valid, y_valid):.3f}&quot;)</textarea><pre><code class="language-python"># 2. [CLS] feature extraction + logistic-regression baseline on a small subset
+import numpy as np, torch
+from transformers import AutoModel
+from sklearn.linear_model import LogisticRegression
+from sklearn.dummy import DummyClassifier
+
+device = torch.device(&quot;cuda&quot; if torch.cuda.is_available() else &quot;cpu&quot;)
+model = AutoModel.from_pretrained(&quot;distilbert-base-uncased&quot;).to(device).eval()
+
+def cls_features(texts, bs=32):
+    feats = []
+    for i in range(0, len(texts), bs):
+        batch = tokenizer(texts[i:i+bs], padding=True, truncation=True, return_tensors=&quot;pt&quot;).to(device)
+        with torch.no_grad():
+            feats.append(model(**batch).last_hidden_state[:, 0].cpu().numpy())
+    return np.vstack(feats)
+
+train = emotions[&quot;train&quot;].shuffle(seed=0).select(range(1000))
+valid = emotions[&quot;validation&quot;].select(range(300))
+X_train, y_train = cls_features(train[&quot;text&quot;]), np.array(train[&quot;label&quot;])
+X_valid, y_valid = cls_features(valid[&quot;text&quot;]), np.array(valid[&quot;label&quot;])
+print(&quot;feature shape:&quot;, X_train.shape)
+
+dummy = DummyClassifier(strategy=&quot;most_frequent&quot;).fit(X_train, y_train)
+lr = LogisticRegression(max_iter=3000).fit(X_train, y_train)
+print(f&quot;dummy: {dummy.score(X_valid, y_valid):.3f}   logistic regression: {lr.score(X_valid, y_valid):.3f}&quot;)</code></pre></div><div class="runnable local"><div class="code-title">Quick fine-tune on a subset (1 epoch) and evaluate</div><button class="try local" data-run="0" data-needs="transformers" title="Needs transformers — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden># 3. Quick fine-tune on a subset (1 epoch) and evaluate
 from transformers import AutoModelForSequenceClassification, Trainer, TrainingArguments
 from sklearn.metrics import accuracy_score, f1_score
 
@@ -621,7 +947,29 @@ args = TrainingArguments(output_dir=&quot;distilbert-emotion-test&quot;, num_tra
 trainer = Trainer(model=clf, args=args, compute_metrics=compute_metrics,
                   train_dataset=small, eval_dataset=small_val, processing_class=tokenizer)
 trainer.train()
-print(trainer.evaluate())</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Predict emotion with confidence from the fine-tuned model</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 4. Predict emotion with confidence from the fine-tuned model
+print(trainer.evaluate())</textarea><pre><code class="language-python"># 3. Quick fine-tune on a subset (1 epoch) and evaluate
+from transformers import AutoModelForSequenceClassification, Trainer, TrainingArguments
+from sklearn.metrics import accuracy_score, f1_score
+
+def tokenize(batch):
+    return tokenizer(batch[&quot;text&quot;], padding=True, truncation=True)
+
+small = emotions[&quot;train&quot;].shuffle(seed=0).select(range(2000)).map(tokenize, batched=True)
+small_val = emotions[&quot;validation&quot;].select(range(500)).map(tokenize, batched=True)
+
+def compute_metrics(pred):
+    preds = pred.predictions.argmax(-1)
+    return {&quot;accuracy&quot;: accuracy_score(pred.label_ids, preds),
+            &quot;f1&quot;: f1_score(pred.label_ids, preds, average=&quot;weighted&quot;)}
+
+clf = AutoModelForSequenceClassification.from_pretrained(&quot;distilbert-base-uncased&quot;, num_labels=6).to(device)
+args = TrainingArguments(output_dir=&quot;distilbert-emotion-test&quot;, num_train_epochs=1, learning_rate=2e-5,
+                         per_device_train_batch_size=32, per_device_eval_batch_size=32,
+                         weight_decay=0.01, eval_strategy=&quot;epoch&quot;, report_to=&quot;none&quot;, log_level=&quot;error&quot;)
+trainer = Trainer(model=clf, args=args, compute_metrics=compute_metrics,
+                  train_dataset=small, eval_dataset=small_val, processing_class=tokenizer)
+trainer.train()
+print(trainer.evaluate())</code></pre></div><div class="runnable local"><div class="code-title">Predict emotion with confidence from the fine-tuned model</div><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden># 4. Predict emotion with confidence from the fine-tuned model
 def predict_emotion(text):
     inputs = tokenizer(text, return_tensors=&quot;pt&quot;).to(device)
     with torch.no_grad():
@@ -632,14 +980,63 @@ def predict_emotion(text):
 for t in [&quot;I can&#x27;t believe I aced my exam!&quot;,
           &quot;I miss my family so much right now.&quot;,
           &quot;That driver just cut me off! So rude!&quot;]:
-    print(t, &quot;-&gt;&quot;, predict_emotion(t))</code></pre><div class="out"></div></div></div>
-</aside></div><div class="sim-overlay" id="sim-overlay" role="dialog" aria-modal="true">
-  <div class="sim-window"><div class="sim-head"><div><div class="sim-kind" id="sim-kind"></div><h3 id="sim-title"></h3></div><span class="spacer"></span><button class="btn-xs" id="sim-close">✕ Close (Esc)</button></div><div class="sim-body" id="sim-body"></div></div>
+    print(t, &quot;-&gt;&quot;, predict_emotion(t))</textarea><pre><code class="language-python"># 4. Predict emotion with confidence from the fine-tuned model
+def predict_emotion(text):
+    inputs = tokenizer(text, return_tensors=&quot;pt&quot;).to(device)
+    with torch.no_grad():
+        probs = torch.softmax(clf(**inputs).logits, dim=-1)[0]
+    idx = int(probs.argmax())
+    return labels[idx], float(probs[idx]), {l: round(float(p), 3) for l, p in zip(labels, probs)}
+
+for t in [&quot;I can&#x27;t believe I aced my exam!&quot;,
+          &quot;I miss my family so much right now.&quot;,
+          &quot;That driver just cut me off! So rude!&quot;]:
+    print(t, &quot;-&gt;&quot;, predict_emotion(t))</code></pre></div>
+<div class="lesson-nav"><a href="week01-transformers.html">‹ Week 1: Transformer Architecture</a><a href="week03-ner.html">Week 3: Named Entity Recognition (NER) ›</a></div>
+<footer class="site-footer">
+This site is based on the course site <a href="https://albanna-tutorials.com/cs/">albanna-tutorials.com/cs</a> by Dr. Abdulkarim Albanna, used with the author's permission.
+</footer></article><div id="splitter" class="splitter" role="separator" aria-orientation="vertical" title="Drag to resize"></div><aside class="workbench" id="workbench">
+  <div class="wb-tabs">
+    <button class="wb-tab active" data-mode="code">⌨ Code</button>
+    <button class="wb-tab" data-mode="anim">◉ Animation</button>
+    <span class="spacer"></span>
+    <button class="btn ghost wb-close" id="btn-close" title="Hide panel">✕</button>
+  </div>
+  <section class="wb-mode wb-code active" data-mode="code">
+    <div class="wb-toolbar">
+      <span class="wb-title" id="wb-title">Editor</span>
+      <span class="spacer"></span>
+      <button id="btn-run" class="btn primary" title="Run (Ctrl+Enter)">▶ Run</button>
+      <button id="btn-reset" class="btn ghost" title="Restore the original code">Reset</button>
+      <button id="btn-copy" class="btn ghost" title="Copy code">Copy</button>
+      <button id="btn-clear" class="btn ghost" title="Clear output">Clear</button>
+    </div>
+    <div class="editor-wrap"><textarea id="editor"># Press "▶ Try it" on any example in the lesson,
+# or write Python here and press Ctrl+Enter.
+import numpy as np
+print(np.round(np.linspace(0, 1, 5), 2))</textarea></div>
+    <div class="output-head"><span>Output</span><span id="run-time" class="muted small"></span></div>
+    <div id="output" class="output" aria-live="polite"></div>
+  </section>
+  <section class="wb-mode wb-anim" data-mode="anim">
+    <div class="wb-toolbar light">
+      <select id="anim-select" aria-label="Choose animation"><optgroup label="This week"><option value="classifier">Decision boundary, threshold &amp; F1</option><option value="tokenizer">Subword tokenisation</option><option value="vectors">Vectors, dot product &amp; cosine similarity</option></optgroup><optgroup label="Other weeks"><option value="matrix-multiply">Matrix multiplication, step by step</option><option value="attention">Self-attention: Q·Kᵀ → softmax → ·V</option><option value="positional">Positional encoding</option><option value="bio-tagging">NER: BIO tags &amp; entity-level F1</option><option value="rag">RAG pipeline</option><option value="langgraph">LangGraph StateGraph</option><option value="sampling">Temperature, top-k, top-p</option><option value="moe">Mixture of Experts router</option><option value="react-loop">ReAct agent loop</option><option value="multi-agent">Multi-agent research pipeline</option><option value="mcp">MCP message flow</option><option value="lam">Browser agent: perceive → plan → act</option><option value="diffusion">Diffusion: noising &amp; denoising</option></optgroup></select>
+      <span class="spacer"></span>
+      <button id="btn-full" class="btn ghost" title="Open full screen">⤢ Full screen</button>
+    </div>
+    <div class="anim-host" id="anim-host"><p class="muted anim-empty">Press <b>▶ Display</b> on an animation in the lesson, or choose one above.</p></div>
+  </section>
+</aside></main><div class="sim-overlay" id="sim-overlay" role="dialog" aria-modal="true">
+  <div class="sim-window"><div class="sim-head"><div><div class="sim-kind" id="sim-kind"></div><h3 id="sim-title"></h3></div><span class="spacer"></span><button class="btn ghost" id="sim-close">✕ Close (Esc)</button></div><div class="sim-body" id="sim-body"></div></div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
-<script>document.addEventListener('DOMContentLoaded',()=>{if(window.hljs)hljs.highlightAll();if(window.renderMathInElement)renderMathInElement(document.body,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});});</script>
+<script src="../assets/vendor/codemirror/codemirror.js"></script>
+<script src="../assets/vendor/codemirror/python.js"></script>
+<script src="../assets/vendor/codemirror/matchbrackets.js"></script>
+<script src="../assets/vendor/codemirror/closebrackets.js"></script>
+<script>window.CS_PYODIDE_URL = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";</script>
 <script src="../assets/js/sims/core.js"></script>
 <script src="../assets/js/sims/matrix-multiply.js"></script><script src="../assets/js/sims/vectors.js"></script><script src="../assets/js/sims/attention.js"></script><script src="../assets/js/sims/tokenizer.js"></script><script src="../assets/js/sims/positional.js"></script><script src="../assets/js/sims/classifier.js"></script><script src="../assets/js/sims/bio-tagging.js"></script><script src="../assets/js/sims/rag.js"></script><script src="../assets/js/sims/langgraph.js"></script><script src="../assets/js/sims/sampling.js"></script><script src="../assets/js/sims/moe.js"></script><script src="../assets/js/sims/react-loop.js"></script><script src="../assets/js/sims/multi-agent.js"></script><script src="../assets/js/sims/mcp.js"></script><script src="../assets/js/sims/lam.js"></script><script src="../assets/js/sims/diffusion.js"></script>
 <script src="../assets/js/site.js"></script>

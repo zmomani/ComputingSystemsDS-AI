@@ -4,29 +4,26 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Week 13: Diffusion Models · Computing Systems for DS & AI</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<meta name="description" content="Interactive course site for 606363 Computing Systems for Data Science and AI, University of Petra. Python runs in your browser; every week has simulations and animations.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231f3a5f'/><text x='16' y='22' font-size='14' font-family='monospace' fill='white' text-anchor='middle'>AI</text></svg>">
+<link rel="stylesheet" href="../assets/vendor/codemirror/codemirror.css">
+<link rel="stylesheet" href="../assets/vendor/codemirror/material-darker.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
 <link rel="stylesheet" href="../assets/css/site.css">
 </head>
 <body><header class="topbar">
-  <button class="btn-icon" id="menu-toggle" aria-label="Menu">☰</button>
-  <a class="brand" href="../index.html">606363 · Computing Systems for DS & AI<small>University of Petra</small></a>
-  <span class="spacer"></span>
-  <nav class="week-nav"><a class="btn-icon" href="week12-lams.html" title="Large Action Models (LAMs)">← Wk 12</a><a class="btn-icon" href="week14-project.html" title="Project Development &amp; Final Testing">Wk 14 →</a></nav>
-  <a class="btn-icon" href="../index.html#curriculum">Curriculum</a>
-  <a class="btn-icon" href="../index.html#simulations">Simulations</a>
-  <button class="btn-icon" id="theme-toggle" aria-label="Toggle dark mode">◐</button>
-</header><div class="layout"><aside class="sidebar">
-  <h4>Course</h4><ul class="outline"><li><a class="" href="../lessons/syllabus.html"><span class="wk">·</span><span>Course Syllabus</span></a></li><li><a class="" href="../lessons/project.html"><span class="wk">·</span><span>Final Project</span></a></li></ul>
-  <h4>16-week curriculum</h4><ul class="outline"><li><a class="" href="../lessons/week01-transformers.html"><span class="wk">01</span><span>Transformer Architecture</span></a></li><li><a class="" href="../lessons/week02-text-classification.html"><span class="wk">02</span><span>Text Classification</span></a></li><li><a class="soon" href="../lessons/week03-ner.html"><span class="wk">03</span><span>Named Entity Recognition (NER)</span></a></li><li><a class="" href="../lessons/week04-langchain.html"><span class="wk">04</span><span>LangChain Fundamentals</span></a></li><li><a class="" href="../lessons/week05-langgraph.html"><span class="wk">05</span><span>LangGraph</span></a></li><li><a class="" href="../lessons/week06-llms.html"><span class="wk">06</span><span>Large Language Models (LLMs)</span></a></li><li><a class="" href="../lessons/week07-moe.html"><span class="wk">07</span><span>Mixture of Experts (MoE)</span></a></li><li><a class="" href="../lessons/week08-midterm.html"><span class="wk">08</span><span>Midterm Exam</span></a></li><li><a class="" href="../lessons/week09-react-agents.html"><span class="wk">09</span><span>AI Agents &amp; ReAct</span></a></li><li><a class="" href="../lessons/week10-multi-agent.html"><span class="wk">10</span><span>Multi-Agent Systems</span></a></li><li><a class="" href="../lessons/week11-mcp.html"><span class="wk">11</span><span>Model Context Protocol (MCP)</span></a></li><li><a class="soon" href="../lessons/week12-lams.html"><span class="wk">12</span><span>Large Action Models (LAMs)</span></a></li><li><a class="active" href="../lessons/week13-diffusion.html"><span class="wk">13</span><span>Diffusion Models</span></a></li><li><a class="" href="../lessons/week14-project.html"><span class="wk">14</span><span>Project Development &amp; Final Testing</span></a></li><li><a class="" href="../lessons/week15-competition.html"><span class="wk">15</span><span>Competition Day &amp; Presentations</span></a></li><li><a class="" href="../lessons/week16-final.html"><span class="wk">16</span><span>Final Exam</span></a></li></ul>
-  <h4>On this page</h4><ul class="toc" id="toc"></ul>
-</aside><main class="main">
-  <div class="lesson-head"><div class="eyebrow">Week 13 · ILO K1, P1</div><h1>Diffusion Models</h1>
-  <p class="credit"><b>Topics:</b> Diffusion models, denoising architectures, Stable Diffusion, DALL-E<br><b>Project milestone:</b> Illustration Agent that generates figures for reports, plus a Streamlit UI with PDF download</p></div>
-  <div class="callout sim"><div class="sim-strip"><b style="margin-right:4px">Simulations for this week:</b><button class="chip" data-sim="diffusion">▶ Diffusion: noising &amp; denoising</button></div></div>
-  <h2 id="1-introduction-to-diffusion-models">1. Introduction to Diffusion Models</h2>
+  <a class="brand" href="../index.html">
+    <span class="brand-mark">AI</span>
+    <span class="brand-text"><strong>Computing Systems for DS &amp; AI</strong><span class="muted"> · 606363 · University of Petra</span></span>
+  </a>
+  <nav class="topnav"><a class="btn ghost" href="week12-lams.html" title="Large Action Models (LAMs)">‹ Prev</a><select id="lesson-select" aria-label="Choose lesson"><option value="">Lessons…</option><option value="syllabus.html">Course Syllabus</option><option value="project.html">Final Project</option><option value="week01-transformers.html">Week 1 · Transformer Architecture</option><option value="week02-text-classification.html">Week 2 · Text Classification</option><option value="week03-ner.html">Week 3 · Named Entity Recognition (NER)</option><option value="week04-langchain.html">Week 4 · LangChain Fundamentals</option><option value="week05-langgraph.html">Week 5 · LangGraph</option><option value="week06-llms.html">Week 6 · Large Language Models (LLMs)</option><option value="week07-moe.html">Week 7 · Mixture of Experts (MoE)</option><option value="week08-midterm.html">Week 8 · Midterm Exam</option><option value="week09-react-agents.html">Week 9 · AI Agents &amp; ReAct</option><option value="week10-multi-agent.html">Week 10 · Multi-Agent Systems</option><option value="week11-mcp.html">Week 11 · Model Context Protocol (MCP)</option><option value="week12-lams.html">Week 12 · Large Action Models (LAMs)</option><option value="week13-diffusion.html" selected>Week 13 · Diffusion Models</option><option value="week14-project.html">Week 14 · Project Development &amp; Final Testing</option><option value="week15-competition.html">Week 15 · Competition Day &amp; Presentations</option><option value="week16-final.html">Week 16 · Final Exam</option></select><a class="btn ghost" href="week14-project.html" title="Project Development &amp; Final Testing">Next ›</a></nav>
+  <button id="btn-panel" class="btn accent" title="Show or hide the editor / animation panel">⇆ Panel</button><div class="status" id="py-status"><span class="dot"></span><span id="py-status-text">Python loads on first run</span></div>
+</header><main class="lesson panel-closed" id="lesson"><article class="lesson-content" id="lesson-content"><div class="lesson-head"><div class="eyebrow">Week 13 · ILO K1, P1</div><h1>Diffusion Models</h1>
+<p class="lesson-intro"><b>Topics:</b> Diffusion models, denoising architectures, Stable Diffusion, DALL-E<br><b>Project milestone:</b> Illustration Agent that generates figures for reports, plus a Streamlit UI with PDF download</p></div>
+<div class="sim-strip"><div class="sim-strip-head">Animations for this week — open them in the panel</div><div class="sim-strip-items"><button class="sim-chip" data-display="diffusion"><span class="sim-chip-kind">Diffusion</span>▶ Display: Diffusion: noising &amp; denoising</button></div></div>
+<details class="contents"><summary>Contents (10 sections)</summary><ol><li><a href="#1-introduction-to-diffusion-models">1. Introduction to Diffusion Models</a></li><li><a href="#2-fundamentals">2. Fundamentals</a></li><li><a href="#3-forward-diffusion-process">3. Forward Diffusion Process</a></li><li><a href="#4-reverse-diffusion-process">4. Reverse Diffusion Process</a></li><li><a href="#5-neural-network-architecture">5. Neural Network Architecture</a></li><li><a href="#6-training-diffusion-models">6. Training Diffusion Models</a></li><li><a href="#7-applications">7. Applications</a></li><li><a href="#8-advanced-topics">8. Advanced Topics</a></li><li><a href="#9-learning-resources">9. Learning Resources</a></li><li><a href="#10-conclusion">10. Conclusion</a></li></ol></details>
+<h2 id="1-introduction-to-diffusion-models">1. Introduction to Diffusion Models</h2>
 <p>Diffusion models are generative models that gained wide attention from 2020 onward. They create new samples by <strong>gradually adding noise to training data, then learning to reverse that process</strong>.</p>
 <p><strong>Why they matter</strong>
 - State-of-the-art image quality.
@@ -85,20 +82,31 @@
 <blockquote>
 <p><strong>Important insight.</strong> The forward process is never used to generate images. It only defines the mathematical framework for learning the reverse process, which does the generating.</p>
 </blockquote>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">forward_diffusion_sample</span><span class="p">(</span><span class="n">x_0</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Takes an image and a timestep as input and</span>
-<span class="sd">    returns the noisy version of it at timestep t</span>
-<span class="sd">    """</span>
-    <span class="n">noise</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn_like</span><span class="p">(</span><span class="n">x_0</span><span class="p">)</span>
-    <span class="c1"># t may be a batch of timesteps: reshape the coefficients to (batch, 1, 1, 1)</span>
-    <span class="c1"># so they broadcast over the channel and spatial dimensions of x_0</span>
-    <span class="n">sqrt_alphas_cumprod_t</span> <span class="o">=</span> <span class="n">sqrt_alphas_cumprod</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-    <span class="n">sqrt_one_minus_alphas_cumprod_t</span> <span class="o">=</span> <span class="n">sqrt_one_minus_alphas_cumprod</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>def forward_diffusion_sample(x_0, t, device):
+    &quot;&quot;&quot;
+    Takes an image and a timestep as input and
+    returns the noisy version of it at timestep t
+    &quot;&quot;&quot;
+    noise = torch.randn_like(x_0)
+    # t may be a batch of timesteps: reshape the coefficients to (batch, 1, 1, 1)
+    # so they broadcast over the channel and spatial dimensions of x_0
+    sqrt_alphas_cumprod_t = sqrt_alphas_cumprod[t].reshape(-1, 1, 1, 1).to(device)
+    sqrt_one_minus_alphas_cumprod_t = sqrt_one_minus_alphas_cumprod[t].reshape(-1, 1, 1, 1).to(device)
 
-    <span class="c1"># Forward diffusion formula: mean + std * noise</span>
-    <span class="k">return</span> <span class="n">sqrt_alphas_cumprod_t</span> <span class="o">*</span> <span class="n">x_0</span> <span class="o">+</span> <span class="n">sqrt_one_minus_alphas_cumprod_t</span> <span class="o">*</span> <span class="n">noise</span><span class="p">,</span> <span class="n">noise</span>
-</code></pre></div>
+    # Forward diffusion formula: mean + std * noise
+    return sqrt_alphas_cumprod_t * x_0 + sqrt_one_minus_alphas_cumprod_t * noise, noise</textarea><pre><code class="language-python">def forward_diffusion_sample(x_0, t, device):
+    &quot;&quot;&quot;
+    Takes an image and a timestep as input and
+    returns the noisy version of it at timestep t
+    &quot;&quot;&quot;
+    noise = torch.randn_like(x_0)
+    # t may be a batch of timesteps: reshape the coefficients to (batch, 1, 1, 1)
+    # so they broadcast over the channel and spatial dimensions of x_0
+    sqrt_alphas_cumprod_t = sqrt_alphas_cumprod[t].reshape(-1, 1, 1, 1).to(device)
+    sqrt_one_minus_alphas_cumprod_t = sqrt_one_minus_alphas_cumprod[t].reshape(-1, 1, 1, 1).to(device)
+
+    # Forward diffusion formula: mean + std * noise
+    return sqrt_alphas_cumprod_t * x_0 + sqrt_one_minus_alphas_cumprod_t * noise, noise</code></pre></div>
 <h2 id="4-reverse-diffusion-process">4. Reverse Diffusion Process</h2>
 <p>The reverse process is what gets learned during training and used during generation: it turns noise into structured data.</p>
 <p><strong>The challenge.</strong> Unlike the simple forward process, the reverse process is complex and must be learned from data. The model learns to predict and remove noise step by step.</p>
@@ -115,38 +123,67 @@
 1. Start with random Gaussian noise x_T.
 2. For t = T down to 1: predict the noise with the network, then compute the less-noisy sample with the denoising formula.
 3. Return x₀ as the generated output.</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">image_size</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Samples n_samples new images from the model</span>
-<span class="sd">    """</span>
-    <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
-    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
-        <span class="c1"># Start from pure noise</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">image_size</span><span class="p">,</span> <span class="n">image_size</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>def sample(model, n_samples, device, image_size):
+    &quot;&quot;&quot;
+    Samples n_samples new images from the model
+    &quot;&quot;&quot;
+    model.eval()
+    with torch.no_grad():
+        # Start from pure noise
+        x = torch.randn(n_samples, 3, image_size, image_size).to(device)
 
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">timesteps</span><span class="p">)):</span>
-            <span class="n">t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,),</span> <span class="n">i</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
+        for i in reversed(range(1, timesteps)):
+            t = torch.full((n_samples,), i, device=device, dtype=torch.long)
 
-            <span class="c1"># Predict noise</span>
-            <span class="n">predicted_noise</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+            # Predict noise
+            predicted_noise = model(x, t)
 
-            <span class="c1"># Get alpha values for this timestep</span>
-            <span class="n">alpha</span> <span class="o">=</span> <span class="n">alphas</span><span class="p">[</span><span class="n">t</span><span class="p">][:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
-            <span class="n">alpha_hat</span> <span class="o">=</span> <span class="n">alphas_cumprod</span><span class="p">[</span><span class="n">t</span><span class="p">][:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
-            <span class="n">beta</span> <span class="o">=</span> <span class="n">betas</span><span class="p">[</span><span class="n">t</span><span class="p">][:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+            # Get alpha values for this timestep
+            alpha = alphas[t][:, None, None, None]
+            alpha_hat = alphas_cumprod[t][:, None, None, None]
+            beta = betas[t][:, None, None, None]
 
-            <span class="c1"># Only add noise if we're not at the last step</span>
-            <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">noise</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">noise</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            # Only add noise if we&#x27;re not at the last step
+            if i &gt; 1:
+                noise = torch.randn_like(x)
+            else:
+                noise = torch.zeros_like(x)
 
-            <span class="c1"># Compute the less-noisy sample x_{t-1} (DDPM reverse step, sigma_t = sqrt(beta_t))</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha_hat</span><span class="p">))</span> <span class="o">*</span> <span class="n">predicted_noise</span><span class="p">)</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span> <span class="o">*</span> <span class="n">noise</span>
+            # Compute the less-noisy sample x_{t-1} (DDPM reverse step, sigma_t = sqrt(beta_t))
+            x = 1 / torch.sqrt(alpha) * (x - ((1 - alpha) / torch.sqrt(1 - alpha_hat)) * predicted_noise) + torch.sqrt(beta) * noise
 
-    <span class="c1"># Rescale to [0, 1] for images</span>
-    <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</code></pre></div>
+    # Rescale to [0, 1] for images
+    return x.clamp(-1, 1).add(1).div(2)</textarea><pre><code class="language-python">def sample(model, n_samples, device, image_size):
+    &quot;&quot;&quot;
+    Samples n_samples new images from the model
+    &quot;&quot;&quot;
+    model.eval()
+    with torch.no_grad():
+        # Start from pure noise
+        x = torch.randn(n_samples, 3, image_size, image_size).to(device)
+
+        for i in reversed(range(1, timesteps)):
+            t = torch.full((n_samples,), i, device=device, dtype=torch.long)
+
+            # Predict noise
+            predicted_noise = model(x, t)
+
+            # Get alpha values for this timestep
+            alpha = alphas[t][:, None, None, None]
+            alpha_hat = alphas_cumprod[t][:, None, None, None]
+            beta = betas[t][:, None, None, None]
+
+            # Only add noise if we&#x27;re not at the last step
+            if i &gt; 1:
+                noise = torch.randn_like(x)
+            else:
+                noise = torch.zeros_like(x)
+
+            # Compute the less-noisy sample x_{t-1} (DDPM reverse step, sigma_t = sqrt(beta_t))
+            x = 1 / torch.sqrt(alpha) * (x - ((1 - alpha) / torch.sqrt(1 - alpha_hat)) * predicted_noise) + torch.sqrt(beta) * noise
+
+    # Rescale to [0, 1] for images
+    return x.clamp(-1, 1).add(1).div(2)</code></pre></div>
 <p><strong>Advanced sampling techniques</strong>
 - <strong>DDIM sampling</strong> — uses non-Markovian paths to skip steps while maintaining quality.
 - <strong>Classifier guidance</strong> — a separate classifier steers generation toward desired attributes.
@@ -159,45 +196,74 @@
 - <strong>Attention layers</strong> — many implementations add self-attention at certain resolutions.</p>
 <p><strong>Key architectural elements</strong>
 - <strong>ResNet blocks</strong> — the U-Net backbone: group normalization, SiLU activation, 3×3 convolutions, and a skip connection adding input to output.</p>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ResidualBlock</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">,</span> <span class="n">time_emb_dim</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">time_mlp</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">time_emb_dim</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">in_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">norm1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">GroupNorm</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">out_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">norm2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">GroupNorm</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">act</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">SiLU</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">in_channels</span> <span class="o">!=</span> <span class="n">out_channels</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">shortcut</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">in_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">shortcut</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Identity</span><span class="p">()</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>class ResidualBlock(nn.Module):
+    def __init__(self, in_channels, out_channels, time_emb_dim):
+        super().__init__()
+        self.time_mlp = nn.Linear(time_emb_dim, out_channels)
+        self.conv1 = nn.Conv2d(in_channels, out_channels, 3, padding=1)
+        self.norm1 = nn.GroupNorm(8, out_channels)
+        self.conv2 = nn.Conv2d(out_channels, out_channels, 3, padding=1)
+        self.norm2 = nn.GroupNorm(8, out_channels)
+        self.act = nn.SiLU()
+        if in_channels != out_channels:
+            self.shortcut = nn.Conv2d(in_channels, out_channels, 1)
+        else:
+            self.shortcut = nn.Identity()
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">act</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">norm1</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
-        <span class="n">time_emb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">act</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time_mlp</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
-        <span class="n">h</span> <span class="o">=</span> <span class="n">h</span> <span class="o">+</span> <span class="n">time_emb</span><span class="p">[:,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
-        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">act</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">norm2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv2</span><span class="p">(</span><span class="n">h</span><span class="p">)))</span>
-        <span class="k">return</span> <span class="n">h</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">shortcut</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-</code></pre></div>
+    def forward(self, x, t):
+        h = self.act(self.norm1(self.conv1(x)))
+        time_emb = self.act(self.time_mlp(t))
+        h = h + time_emb[:, :, None, None]
+        h = self.act(self.norm2(self.conv2(h)))
+        return h + self.shortcut(x)</textarea><pre><code class="language-python">class ResidualBlock(nn.Module):
+    def __init__(self, in_channels, out_channels, time_emb_dim):
+        super().__init__()
+        self.time_mlp = nn.Linear(time_emb_dim, out_channels)
+        self.conv1 = nn.Conv2d(in_channels, out_channels, 3, padding=1)
+        self.norm1 = nn.GroupNorm(8, out_channels)
+        self.conv2 = nn.Conv2d(out_channels, out_channels, 3, padding=1)
+        self.norm2 = nn.GroupNorm(8, out_channels)
+        self.act = nn.SiLU()
+        if in_channels != out_channels:
+            self.shortcut = nn.Conv2d(in_channels, out_channels, 1)
+        else:
+            self.shortcut = nn.Identity()
+
+    def forward(self, x, t):
+        h = self.act(self.norm1(self.conv1(x)))
+        time_emb = self.act(self.time_mlp(t))
+        h = h + time_emb[:, :, None, None]
+        h = self.act(self.norm2(self.conv2(h)))
+        return h + self.shortcut(x)</code></pre></div>
 <ul>
 <li><strong>Self-attention blocks</strong> — capture long-range dependencies, as in transformers; often placed in the middle of the U-Net where feature maps are medium resolution.</li>
 <li><strong>Timestep embeddings</strong> — convert t into a high-dimensional sinusoidal embedding, pass it through an MLP, and inject it into each residual block.</li>
 </ul>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">timestep_embedding</span><span class="p">(</span><span class="n">timesteps</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">max_period</span><span class="o">=</span><span class="mi">10000</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Create sinusoidal timestep embeddings.</span>
-<span class="sd">    """</span>
-    <span class="n">half</span> <span class="o">=</span> <span class="n">dim</span> <span class="o">//</span> <span class="mi">2</span>
-    <span class="n">freqs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
-        <span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">max_period</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">half</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">/</span> <span class="n">half</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">timesteps</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-    <span class="n">args</span> <span class="o">=</span> <span class="n">timesteps</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">()</span> <span class="o">*</span> <span class="n">freqs</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span>
-    <span class="n">embedding</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">args</span><span class="p">)],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">dim</span> <span class="o">%</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="n">embedding</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">embedding</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">embedding</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">1</span><span class="p">])],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">embedding</span>
-</code></pre></div>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>def timestep_embedding(timesteps, dim, max_period=10000):
+    &quot;&quot;&quot;
+    Create sinusoidal timestep embeddings.
+    &quot;&quot;&quot;
+    half = dim // 2
+    freqs = torch.exp(
+        -math.log(max_period) * torch.arange(start=0, end=half, dtype=torch.float32) / half
+    ).to(device=timesteps.device)
+    args = timesteps[:, None].float() * freqs[None]
+    embedding = torch.cat([torch.cos(args), torch.sin(args)], dim=-1)
+    if dim % 2:
+        embedding = torch.cat([embedding, torch.zeros_like(embedding[:, :1])], dim=-1)
+    return embedding</textarea><pre><code class="language-python">def timestep_embedding(timesteps, dim, max_period=10000):
+    &quot;&quot;&quot;
+    Create sinusoidal timestep embeddings.
+    &quot;&quot;&quot;
+    half = dim // 2
+    freqs = torch.exp(
+        -math.log(max_period) * torch.arange(start=0, end=half, dtype=torch.float32) / half
+    ).to(device=timesteps.device)
+    args = timesteps[:, None].float() * freqs[None]
+    embedding = torch.cat([torch.cos(args), torch.sin(args)], dim=-1)
+    if dim % 2:
+        embedding = torch.cat([embedding, torch.zeros_like(embedding[:, :1])], dim=-1)
+    return embedding</code></pre></div>
 <p><strong>Conditional generation</strong> — the model can be conditioned on:
 - <strong>Class labels</strong> — converted to embeddings and combined with timestep embeddings.
 - <strong>Text prompts</strong> — encoded by a pre-trained text encoder such as CLIP, then injected into the model.
@@ -223,28 +289,47 @@
 5. Predict the noise with the network.
 6. Compute the loss between predicted and true noise.
 7. Update parameters with gradient descent.</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">train_step</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">x_0</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">):</span>
-    <span class="n">batch_size</span> <span class="o">=</span> <span class="n">x_0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>def train_step(model, x_0, optimizer):
+    batch_size = x_0.shape[0]
 
-    <span class="c1"># Sample random timesteps</span>
-    <span class="n">t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">timesteps</span><span class="p">,</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,),</span> <span class="n">device</span><span class="o">=</span><span class="n">x_0</span><span class="o">.</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
+    # Sample random timesteps
+    t = torch.randint(1, timesteps, (batch_size,), device=x_0.device).long()
 
-    <span class="c1"># Get noisy samples (and the noise that was added) via the closed-form forward process</span>
-    <span class="n">x_t</span><span class="p">,</span> <span class="n">noise</span> <span class="o">=</span> <span class="n">forward_diffusion_sample</span><span class="p">(</span><span class="n">x_0</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">x_0</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    # Get noisy samples (and the noise that was added) via the closed-form forward process
+    x_t, noise = forward_diffusion_sample(x_0, t, x_0.device)
 
-    <span class="c1"># Predict noise</span>
-    <span class="n">predicted_noise</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x_t</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+    # Predict noise
+    predicted_noise = model(x_t, t)
 
-    <span class="c1"># Calculate loss</span>
-    <span class="n">loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">predicted_noise</span><span class="p">,</span> <span class="n">noise</span><span class="p">)</span>
+    # Calculate loss
+    loss = F.mse_loss(predicted_noise, noise)
 
-    <span class="c1"># Update model</span>
-    <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-    <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+    # Update model
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
 
-    <span class="k">return</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-</code></pre></div>
+    return loss.item()</textarea><pre><code class="language-python">def train_step(model, x_0, optimizer):
+    batch_size = x_0.shape[0]
+
+    # Sample random timesteps
+    t = torch.randint(1, timesteps, (batch_size,), device=x_0.device).long()
+
+    # Get noisy samples (and the noise that was added) via the closed-form forward process
+    x_t, noise = forward_diffusion_sample(x_0, t, x_0.device)
+
+    # Predict noise
+    predicted_noise = model(x_t, t)
+
+    # Calculate loss
+    loss = F.mse_loss(predicted_noise, noise)
+
+    # Update model
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+
+    return loss.item()</code></pre></div>
 <p><strong>Hyperparameters</strong>
 | Hyperparameter | Typical value |
 |---|---|
@@ -328,14 +413,48 @@
 6. <strong>Applications and projects</strong> — text-to-image generation or inpainting.</p>
 <h2 id="10-conclusion">10. Conclusion</h2>
 <p>Diffusion models are stable to train, produce high-quality and controllable output, are theoretically grounded, and are architecturally flexible. Continued growth is expected across modalities and domains.</p>
-  <div class="pager"><a href="week12-lams.html"><small>Previous</small>Week 12: Large Action Models (LAMs)</a><a class="next" href="week14-project.html"><small>Next</small>Week 14: Project Development &amp; Final Testing</a></div>
-  <footer style="margin-top:3rem;padding-top:1rem;border-top:1px solid var(--border);font-size:.84rem;color:var(--muted)">
-This site is based on the course site <a href="https://albanna-tutorials.com/cs/">albanna-tutorials.com/cs</a> by Dr. Abdulkarim Albanna, used with the author's permission.
-</footer>
-</main><aside class="rail">
-  <div class="rail-tabs"><button class="active" data-panel="panel-sims">Simulations</button><button data-panel="panel-code">Test code</button></div>
-  <div class="rail-panel active" id="panel-sims"><p class="rail-intro">Interactive teaching aids for this week. Each opens full-size with step controls and teaching notes.</p><button class="sim-card" data-sim="diffusion"><span class="sim-kind">Diffusion · simulation</span><span class="sim-title">Diffusion: noising &amp; denoising</span><span class="sim-desc">Scrub t under a β schedule, read ᾱ_t and SNR, then denoise step by step.</span></button></div>
-  <div class="rail-panel" id="panel-code"><p class="rail-intro"><b>Run ▶</b> executes pure-Python/NumPy snippets in your browser (Pyodide). Snippets marked <i>local</i> need the course environment (PyTorch, Transformers, LangChain…) — copy them into VS Code.</p><div class="snippet"><div class="snippet-head"><span>Noise schedules and the closed-form forward sample (numpy only)</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 1. Noise schedules and the closed-form forward sample (numpy only)
+<h2 id="try-it-yourself">Try it yourself</h2>
+<p class="lesson-intro"><b>▶ Try it</b> runs an example in the editor panel, inside your browser — change the code and press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to run it again. Examples marked <b>✎ Open in editor</b> need libraries or API keys that cannot run in a browser (PyTorch, Transformers, LangChain, OpenAI…): read them in the editor, then copy them to VS Code and run them in the course environment.</p><h3 id="run-in-your-browser">Run in your browser</h3><p class="lesson-intro">Self-contained versions of this week's mechanisms, written with NumPy, scikit-learn or plain Python so they run here.</p><div class="runnable"><div class="code-title">Forward diffusion: noising an image in closed form (NumPy + matplotlib)</div><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden>import numpy as np
+import matplotlib.pyplot as plt
+
+T = 1000
+betas = np.linspace(1e-4, 0.02, T)                 # linear schedule (Ho et al., 2020)
+alpha_bar = np.cumprod(1 - betas)
+
+yy, xx = np.mgrid[-1:1:64j, -1:1:64j]
+x0 = np.where(xx**2 + yy**2 &lt; 0.5, 1.0, -1.0)      # a white disk on black, values in [-1, 1]
+rng = np.random.default_rng(0)
+eps = rng.standard_normal(x0.shape)
+
+steps = [0, 50, 150, 300, 600, 999]
+fig, axes = plt.subplots(1, len(steps), figsize=(12, 2.4))
+for ax, t in zip(axes, steps):
+    xt = np.sqrt(alpha_bar[t]) * x0 + np.sqrt(1 - alpha_bar[t]) * eps
+    ax.imshow(xt, cmap=&quot;gray&quot;, vmin=-2.5, vmax=2.5); ax.axis(&quot;off&quot;)
+    ax.set_title(f&quot;t={t}\nsignal {np.sqrt(alpha_bar[t]):.2f}&quot;)
+plt.tight_layout()
+plt.show()
+print(&quot;alpha_bar at t = 0, 250, 500, 999:&quot;, np.round(alpha_bar[[0, 250, 500, 999]], 4))</textarea><pre><code class="language-python">import numpy as np
+import matplotlib.pyplot as plt
+
+T = 1000
+betas = np.linspace(1e-4, 0.02, T)                 # linear schedule (Ho et al., 2020)
+alpha_bar = np.cumprod(1 - betas)
+
+yy, xx = np.mgrid[-1:1:64j, -1:1:64j]
+x0 = np.where(xx**2 + yy**2 &lt; 0.5, 1.0, -1.0)      # a white disk on black, values in [-1, 1]
+rng = np.random.default_rng(0)
+eps = rng.standard_normal(x0.shape)
+
+steps = [0, 50, 150, 300, 600, 999]
+fig, axes = plt.subplots(1, len(steps), figsize=(12, 2.4))
+for ax, t in zip(axes, steps):
+    xt = np.sqrt(alpha_bar[t]) * x0 + np.sqrt(1 - alpha_bar[t]) * eps
+    ax.imshow(xt, cmap=&quot;gray&quot;, vmin=-2.5, vmax=2.5); ax.axis(&quot;off&quot;)
+    ax.set_title(f&quot;t={t}\nsignal {np.sqrt(alpha_bar[t]):.2f}&quot;)
+plt.tight_layout()
+plt.show()
+print(&quot;alpha_bar at t = 0, 250, 500, 999:&quot;, np.round(alpha_bar[[0, 250, 500, 999]], 4))</code></pre></div><h3 id="test-code">Test code for the course environment</h3><div class="runnable"><div class="code-title">Noise schedules and the closed-form forward sample (numpy only)</div><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden># 1. Noise schedules and the closed-form forward sample (numpy only)
 import numpy as np
 
 T = 1000
@@ -358,7 +477,30 @@ ab = alpha_bar(betas_linear)
 x0, t = 1.0, 500
 eps = np.random.randn()
 x_t = np.sqrt(ab[t - 1]) * x0 + np.sqrt(1 - ab[t - 1]) * eps   # ab[0] is alpha_bar_1
-print(&quot;x_t =&quot;, round(x_t, 3))</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Train a tiny DDPM on a 2-D toy dataset and sample from it (PyTorch)</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 2. Train a tiny DDPM on a 2-D toy dataset and sample from it (PyTorch)
+print(&quot;x_t =&quot;, round(x_t, 3))</textarea><pre><code class="language-python"># 1. Noise schedules and the closed-form forward sample (numpy only)
+import numpy as np
+
+T = 1000
+betas_linear = np.linspace(1e-4, 0.02, T)
+s = 0.008
+tt = np.arange(T + 1) / T
+f = np.cos((tt + s) / (1 + s) * np.pi / 2) ** 2
+alphas_bar_cos = f / f[0]
+betas_cosine = np.clip(1 - alphas_bar_cos[1:] / alphas_bar_cos[:-1], 0, 0.999)
+
+def alpha_bar(betas):
+    return np.cumprod(1 - betas)
+
+for name, b in [(&quot;linear&quot;, betas_linear), (&quot;cosine&quot;, betas_cosine)]:
+    ab = alpha_bar(b)
+    print(f&quot;{name:7s} alpha_bar at t=250/500/750: {ab[249]:.3f} {ab[499]:.3f} {ab[749]:.3f}&quot;)
+
+# forward sample of a scalar x0 = 1.0 at t = 500 under the linear schedule
+ab = alpha_bar(betas_linear)
+x0, t = 1.0, 500
+eps = np.random.randn()
+x_t = np.sqrt(ab[t - 1]) * x0 + np.sqrt(1 - ab[t - 1]) * eps   # ab[0] is alpha_bar_1
+print(&quot;x_t =&quot;, round(x_t, 3))</code></pre></div><div class="runnable local"><div class="code-title">Train a tiny DDPM on a 2-D toy dataset and sample from it (PyTorch)</div><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden># 2. Train a tiny DDPM on a 2-D toy dataset and sample from it (PyTorch)
 import math, torch, torch.nn as nn, torch.nn.functional as F
 
 torch.manual_seed(0)
@@ -410,7 +552,59 @@ def sample(n=500):
     return x
 
 xs = sample()
-print(&quot;sampled x-means by cluster:&quot;, xs[xs[:, 0] &lt; 0, 0].mean().item(), xs[xs[:, 0] &gt; 0, 0].mean().item())</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Sinusoidal timestep embeddings: nearby timesteps are close, distant ones are not</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 3. Sinusoidal timestep embeddings: nearby timesteps are close, distant ones are not
+print(&quot;sampled x-means by cluster:&quot;, xs[xs[:, 0] &lt; 0, 0].mean().item(), xs[xs[:, 0] &gt; 0, 0].mean().item())</textarea><pre><code class="language-python"># 2. Train a tiny DDPM on a 2-D toy dataset and sample from it (PyTorch)
+import math, torch, torch.nn as nn, torch.nn.functional as F
+
+torch.manual_seed(0)
+T = 200
+betas = torch.linspace(1e-4, 0.02, T)
+alphas = 1 - betas
+alphas_cumprod = torch.cumprod(alphas, 0)
+
+def make_data(n=2048):           # two Gaussian blobs
+    c = torch.randint(0, 2, (n, 1)).float() * 4 - 2
+    return torch.cat([c, torch.zeros(n, 1)], 1) + 0.3 * torch.randn(n, 2)
+
+def timestep_embedding(timesteps, dim, max_period=10000):
+    half = dim // 2
+    freqs = torch.exp(-math.log(max_period) * torch.arange(half).float() / half)
+    args = timesteps[:, None].float() * freqs[None]
+    return torch.cat([torch.cos(args), torch.sin(args)], -1)
+
+class EpsNet(nn.Module):
+    def __init__(self, d=64):
+        super().__init__()
+        self.net = nn.Sequential(nn.Linear(2 + d, 128), nn.SiLU(),
+                                 nn.Linear(128, 128), nn.SiLU(), nn.Linear(128, 2))
+        self.d = d
+    def forward(self, x, t):
+        return self.net(torch.cat([x, timestep_embedding(t, self.d)], -1))
+
+model = EpsNet(); opt = torch.optim.Adam(model.parameters(), 1e-3)
+x0_all = make_data()
+for step in range(1500):
+    x0 = x0_all[torch.randint(0, len(x0_all), (256,))]
+    t = torch.randint(0, T, (256,))
+    noise = torch.randn_like(x0)
+    ab = alphas_cumprod[t][:, None]
+    x_t = ab.sqrt() * x0 + (1 - ab).sqrt() * noise
+    loss = F.mse_loss(model(x_t, t), noise)
+    opt.zero_grad(); loss.backward(); opt.step()
+    if step % 500 == 0: print(f&quot;step {step} loss {loss.item():.4f}&quot;)
+
+@torch.no_grad()
+def sample(n=500):
+    x = torch.randn(n, 2)
+    for i in reversed(range(T)):
+        t = torch.full((n,), i)
+        eps = model(x, t)
+        a, ab, b = alphas[i], alphas_cumprod[i], betas[i]
+        z = torch.randn_like(x) if i &gt; 0 else 0
+        x = (x - (1 - a) / (1 - ab).sqrt() * eps) / a.sqrt() + b.sqrt() * z
+    return x
+
+xs = sample()
+print(&quot;sampled x-means by cluster:&quot;, xs[xs[:, 0] &lt; 0, 0].mean().item(), xs[xs[:, 0] &gt; 0, 0].mean().item())</code></pre></div><div class="runnable local"><div class="code-title">Sinusoidal timestep embeddings: nearby timesteps are close, distant ones are not</div><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden># 3. Sinusoidal timestep embeddings: nearby timesteps are close, distant ones are not
 import math, torch
 
 def timestep_embedding(timesteps, dim, max_period=10000):
@@ -422,21 +616,78 @@ def timestep_embedding(timesteps, dim, max_period=10000):
 e = timestep_embedding(torch.tensor([10, 11, 500]), 32)
 cos = torch.nn.functional.cosine_similarity
 print(&quot;sim(10,11) =&quot;, round(cos(e[0:1], e[1:2]).item(), 3))
-print(&quot;sim(10,500)=&quot;, round(cos(e[0:1], e[2:3]).item(), 3))</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Classifier-free guidance arithmetic on noise predictions</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 4. Classifier-free guidance arithmetic on noise predictions
+print(&quot;sim(10,500)=&quot;, round(cos(e[0:1], e[2:3]).item(), 3))</textarea><pre><code class="language-python"># 3. Sinusoidal timestep embeddings: nearby timesteps are close, distant ones are not
+import math, torch
+
+def timestep_embedding(timesteps, dim, max_period=10000):
+    half = dim // 2
+    freqs = torch.exp(-math.log(max_period) * torch.arange(half).float() / half)
+    args = timesteps[:, None].float() * freqs[None]
+    return torch.cat([torch.cos(args), torch.sin(args)], -1)
+
+e = timestep_embedding(torch.tensor([10, 11, 500]), 32)
+cos = torch.nn.functional.cosine_similarity
+print(&quot;sim(10,11) =&quot;, round(cos(e[0:1], e[1:2]).item(), 3))
+print(&quot;sim(10,500)=&quot;, round(cos(e[0:1], e[2:3]).item(), 3))</code></pre></div><div class="runnable local"><div class="code-title">Classifier-free guidance arithmetic on noise predictions</div><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden># 4. Classifier-free guidance arithmetic on noise predictions
 import torch
 
 eps_uncond = torch.tensor([0.10, -0.20])   # eps_theta(x_t, None, t)
 eps_cond   = torch.tensor([0.40,  0.10])   # eps_theta(x_t, c, t)
 for w in [0.0, 1.0, 3.0, 7.5]:
     eps_cfg = eps_uncond + w * (eps_cond - eps_uncond)
-    print(f&quot;w={w:&lt;4} eps_cfg={eps_cfg.tolist()}&quot;)</code></pre><div class="out"></div></div></div>
-</aside></div><div class="sim-overlay" id="sim-overlay" role="dialog" aria-modal="true">
-  <div class="sim-window"><div class="sim-head"><div><div class="sim-kind" id="sim-kind"></div><h3 id="sim-title"></h3></div><span class="spacer"></span><button class="btn-xs" id="sim-close">✕ Close (Esc)</button></div><div class="sim-body" id="sim-body"></div></div>
+    print(f&quot;w={w:&lt;4} eps_cfg={eps_cfg.tolist()}&quot;)</textarea><pre><code class="language-python"># 4. Classifier-free guidance arithmetic on noise predictions
+import torch
+
+eps_uncond = torch.tensor([0.10, -0.20])   # eps_theta(x_t, None, t)
+eps_cond   = torch.tensor([0.40,  0.10])   # eps_theta(x_t, c, t)
+for w in [0.0, 1.0, 3.0, 7.5]:
+    eps_cfg = eps_uncond + w * (eps_cond - eps_uncond)
+    print(f&quot;w={w:&lt;4} eps_cfg={eps_cfg.tolist()}&quot;)</code></pre></div>
+<div class="lesson-nav"><a href="week12-lams.html">‹ Week 12: Large Action Models (LAMs)</a><a href="week14-project.html">Week 14: Project Development &amp; Final Testing ›</a></div>
+<footer class="site-footer">
+This site is based on the course site <a href="https://albanna-tutorials.com/cs/">albanna-tutorials.com/cs</a> by Dr. Abdulkarim Albanna, used with the author's permission.
+</footer></article><div id="splitter" class="splitter" role="separator" aria-orientation="vertical" title="Drag to resize"></div><aside class="workbench" id="workbench">
+  <div class="wb-tabs">
+    <button class="wb-tab active" data-mode="code">⌨ Code</button>
+    <button class="wb-tab" data-mode="anim">◉ Animation</button>
+    <span class="spacer"></span>
+    <button class="btn ghost wb-close" id="btn-close" title="Hide panel">✕</button>
+  </div>
+  <section class="wb-mode wb-code active" data-mode="code">
+    <div class="wb-toolbar">
+      <span class="wb-title" id="wb-title">Editor</span>
+      <span class="spacer"></span>
+      <button id="btn-run" class="btn primary" title="Run (Ctrl+Enter)">▶ Run</button>
+      <button id="btn-reset" class="btn ghost" title="Restore the original code">Reset</button>
+      <button id="btn-copy" class="btn ghost" title="Copy code">Copy</button>
+      <button id="btn-clear" class="btn ghost" title="Clear output">Clear</button>
+    </div>
+    <div class="editor-wrap"><textarea id="editor"># Press "▶ Try it" on any example in the lesson,
+# or write Python here and press Ctrl+Enter.
+import numpy as np
+print(np.round(np.linspace(0, 1, 5), 2))</textarea></div>
+    <div class="output-head"><span>Output</span><span id="run-time" class="muted small"></span></div>
+    <div id="output" class="output" aria-live="polite"></div>
+  </section>
+  <section class="wb-mode wb-anim" data-mode="anim">
+    <div class="wb-toolbar light">
+      <select id="anim-select" aria-label="Choose animation"><optgroup label="This week"><option value="diffusion">Diffusion: noising &amp; denoising</option></optgroup><optgroup label="Other weeks"><option value="matrix-multiply">Matrix multiplication, step by step</option><option value="vectors">Vectors, dot product &amp; cosine similarity</option><option value="attention">Self-attention: Q·Kᵀ → softmax → ·V</option><option value="tokenizer">Subword tokenisation</option><option value="positional">Positional encoding</option><option value="classifier">Decision boundary, threshold &amp; F1</option><option value="bio-tagging">NER: BIO tags &amp; entity-level F1</option><option value="rag">RAG pipeline</option><option value="langgraph">LangGraph StateGraph</option><option value="sampling">Temperature, top-k, top-p</option><option value="moe">Mixture of Experts router</option><option value="react-loop">ReAct agent loop</option><option value="multi-agent">Multi-agent research pipeline</option><option value="mcp">MCP message flow</option><option value="lam">Browser agent: perceive → plan → act</option></optgroup></select>
+      <span class="spacer"></span>
+      <button id="btn-full" class="btn ghost" title="Open full screen">⤢ Full screen</button>
+    </div>
+    <div class="anim-host" id="anim-host"><p class="muted anim-empty">Press <b>▶ Display</b> on an animation in the lesson, or choose one above.</p></div>
+  </section>
+</aside></main><div class="sim-overlay" id="sim-overlay" role="dialog" aria-modal="true">
+  <div class="sim-window"><div class="sim-head"><div><div class="sim-kind" id="sim-kind"></div><h3 id="sim-title"></h3></div><span class="spacer"></span><button class="btn ghost" id="sim-close">✕ Close (Esc)</button></div><div class="sim-body" id="sim-body"></div></div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
-<script>document.addEventListener('DOMContentLoaded',()=>{if(window.hljs)hljs.highlightAll();if(window.renderMathInElement)renderMathInElement(document.body,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});});</script>
+<script src="../assets/vendor/codemirror/codemirror.js"></script>
+<script src="../assets/vendor/codemirror/python.js"></script>
+<script src="../assets/vendor/codemirror/matchbrackets.js"></script>
+<script src="../assets/vendor/codemirror/closebrackets.js"></script>
+<script>window.CS_PYODIDE_URL = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";</script>
 <script src="../assets/js/sims/core.js"></script>
 <script src="../assets/js/sims/matrix-multiply.js"></script><script src="../assets/js/sims/vectors.js"></script><script src="../assets/js/sims/attention.js"></script><script src="../assets/js/sims/tokenizer.js"></script><script src="../assets/js/sims/positional.js"></script><script src="../assets/js/sims/classifier.js"></script><script src="../assets/js/sims/bio-tagging.js"></script><script src="../assets/js/sims/rag.js"></script><script src="../assets/js/sims/langgraph.js"></script><script src="../assets/js/sims/sampling.js"></script><script src="../assets/js/sims/moe.js"></script><script src="../assets/js/sims/react-loop.js"></script><script src="../assets/js/sims/multi-agent.js"></script><script src="../assets/js/sims/mcp.js"></script><script src="../assets/js/sims/lam.js"></script><script src="../assets/js/sims/diffusion.js"></script>
 <script src="../assets/js/site.js"></script>

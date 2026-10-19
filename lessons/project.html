@@ -4,25 +4,24 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Final Project: Multi-Agent Research Assistant · Computing Systems for DS & AI</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<meta name="description" content="Interactive course site for 606363 Computing Systems for Data Science and AI, University of Petra. Python runs in your browser; every week has simulations and animations.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231f3a5f'/><text x='16' y='22' font-size='14' font-family='monospace' fill='white' text-anchor='middle'>AI</text></svg>">
+<link rel="stylesheet" href="../assets/vendor/codemirror/codemirror.css">
+<link rel="stylesheet" href="../assets/vendor/codemirror/material-darker.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
 <link rel="stylesheet" href="../assets/css/site.css">
 </head>
 <body><header class="topbar">
-  <button class="btn-icon" id="menu-toggle" aria-label="Menu">☰</button>
-  <a class="brand" href="../index.html">606363 · Computing Systems for DS & AI<small>University of Petra</small></a>
-  <span class="spacer"></span>
-  <nav class="week-nav"></nav>
-  <a class="btn-icon" href="../index.html#curriculum">Curriculum</a>
-  <a class="btn-icon" href="../index.html#simulations">Simulations</a>
-  <button class="btn-icon" id="theme-toggle" aria-label="Toggle dark mode">◐</button>
-</header><div class="layout"><aside class="sidebar">
-  <h4>Course</h4><ul class="outline"><li><a class="" href="../lessons/syllabus.html"><span class="wk">·</span><span>Course Syllabus</span></a></li><li><a class="active" href="../lessons/project.html"><span class="wk">·</span><span>Final Project</span></a></li></ul>
-  <h4>16-week curriculum</h4><ul class="outline"><li><a class="" href="../lessons/week01-transformers.html"><span class="wk">01</span><span>Transformer Architecture</span></a></li><li><a class="" href="../lessons/week02-text-classification.html"><span class="wk">02</span><span>Text Classification</span></a></li><li><a class="soon" href="../lessons/week03-ner.html"><span class="wk">03</span><span>Named Entity Recognition (NER)</span></a></li><li><a class="" href="../lessons/week04-langchain.html"><span class="wk">04</span><span>LangChain Fundamentals</span></a></li><li><a class="" href="../lessons/week05-langgraph.html"><span class="wk">05</span><span>LangGraph</span></a></li><li><a class="" href="../lessons/week06-llms.html"><span class="wk">06</span><span>Large Language Models (LLMs)</span></a></li><li><a class="" href="../lessons/week07-moe.html"><span class="wk">07</span><span>Mixture of Experts (MoE)</span></a></li><li><a class="" href="../lessons/week08-midterm.html"><span class="wk">08</span><span>Midterm Exam</span></a></li><li><a class="" href="../lessons/week09-react-agents.html"><span class="wk">09</span><span>AI Agents &amp; ReAct</span></a></li><li><a class="" href="../lessons/week10-multi-agent.html"><span class="wk">10</span><span>Multi-Agent Systems</span></a></li><li><a class="" href="../lessons/week11-mcp.html"><span class="wk">11</span><span>Model Context Protocol (MCP)</span></a></li><li><a class="soon" href="../lessons/week12-lams.html"><span class="wk">12</span><span>Large Action Models (LAMs)</span></a></li><li><a class="" href="../lessons/week13-diffusion.html"><span class="wk">13</span><span>Diffusion Models</span></a></li><li><a class="" href="../lessons/week14-project.html"><span class="wk">14</span><span>Project Development &amp; Final Testing</span></a></li><li><a class="" href="../lessons/week15-competition.html"><span class="wk">15</span><span>Competition Day &amp; Presentations</span></a></li><li><a class="" href="../lessons/week16-final.html"><span class="wk">16</span><span>Final Exam</span></a></li></ul>
-  <h4>On this page</h4><ul class="toc" id="toc"></ul>
-</aside><main class="main"><div class="lesson-head"><div class="eyebrow">606363</div><h1>Final Project: Multi-Agent Research Assistant</h1></div><div class="callout sim"><div class="sim-strip"><b style="margin-right:4px">Related simulations:</b><button class="chip" data-sim="multi-agent">▶ Multi-agent research pipeline</button><button class="chip" data-sim="langgraph">▶ LangGraph StateGraph</button><button class="chip" data-sim="react-loop">▶ ReAct agent loop</button></div></div><blockquote>
+  <a class="brand" href="../index.html">
+    <span class="brand-mark">AI</span>
+    <span class="brand-text"><strong>Computing Systems for DS &amp; AI</strong><span class="muted"> · 606363 · University of Petra</span></span>
+  </a>
+  <nav class="topnav"><button class="btn ghost" disabled>‹ Prev</button><select id="lesson-select" aria-label="Choose lesson"><option value="">Lessons…</option><option value="syllabus.html">Course Syllabus</option><option value="project.html" selected>Final Project</option><option value="week01-transformers.html">Week 1 · Transformer Architecture</option><option value="week02-text-classification.html">Week 2 · Text Classification</option><option value="week03-ner.html">Week 3 · Named Entity Recognition (NER)</option><option value="week04-langchain.html">Week 4 · LangChain Fundamentals</option><option value="week05-langgraph.html">Week 5 · LangGraph</option><option value="week06-llms.html">Week 6 · Large Language Models (LLMs)</option><option value="week07-moe.html">Week 7 · Mixture of Experts (MoE)</option><option value="week08-midterm.html">Week 8 · Midterm Exam</option><option value="week09-react-agents.html">Week 9 · AI Agents &amp; ReAct</option><option value="week10-multi-agent.html">Week 10 · Multi-Agent Systems</option><option value="week11-mcp.html">Week 11 · Model Context Protocol (MCP)</option><option value="week12-lams.html">Week 12 · Large Action Models (LAMs)</option><option value="week13-diffusion.html">Week 13 · Diffusion Models</option><option value="week14-project.html">Week 14 · Project Development &amp; Final Testing</option><option value="week15-competition.html">Week 15 · Competition Day &amp; Presentations</option><option value="week16-final.html">Week 16 · Final Exam</option></select><button class="btn ghost" disabled>Next ›</button></nav>
+  <button id="btn-panel" class="btn accent" title="Show or hide the editor / animation panel">⇆ Panel</button><div class="status" id="py-status"><span class="dot"></span><span id="py-status-text">Python loads on first run</span></div>
+</header><main class="lesson panel-closed" id="lesson"><article class="lesson-content" id="lesson-content"><div class="lesson-head"><div class="eyebrow">606363</div><h1>Final Project: Multi-Agent Research Assistant</h1></div>
+<div class="sim-strip"><div class="sim-strip-head">Related animations</div><div class="sim-strip-items"><button class="sim-chip" data-display="multi-agent"><span class="sim-chip-kind">Multi-agent</span>▶ Display: Multi-agent research pipeline</button><button class="sim-chip" data-display="langgraph"><span class="sim-chip-kind">LangGraph</span>▶ Display: LangGraph StateGraph</button><button class="sim-chip" data-display="react-loop"><span class="sim-chip-kind">Agents</span>▶ Display: ReAct agent loop</button></div></div>
+<details class="contents"><summary>Contents (12 sections)</summary><ol><li><a href="#1-project-overview">1. Project Overview</a></li><li><a href="#2-mapping-to-course-topics">2. Mapping to Course Topics</a></li><li><a href="#3-system-architecture">3. System Architecture</a></li><li><a href="#4-technology-stack">4. Technology Stack</a></li><li><a href="#5-agent-specifications">5. Agent Specifications</a></li><li><a href="#6-shared-state-schema">6. Shared State Schema</a></li><li><a href="#7-competition-format-competition-based-learning">7. Competition Format (Competition-Based Learning)</a></li><li><a href="#8-phase-by-phase-timeline">8. Phase-by-Phase Timeline</a></li><li><a href="#9-submission-requirements">9. Submission Requirements</a></li><li><a href="#10-project-grading">10. Project Grading</a></li><li><a href="#11-expected-output-example">11. Expected Output Example</a></li><li><a href="#12-useful-links">12. Useful Links</a></li></ol></details><blockquote>
 <p><strong>Team size:</strong> 2–3 students · <strong>Difficulty:</strong> Advanced · <strong>Deadline:</strong> Week 14 · <strong>Competition Day:</strong> Week 15</p>
 </blockquote>
 <h2 id="1-project-overview">1. Project Overview</h2>
@@ -117,7 +116,7 @@
 </tbody>
 </table>
 <h2 id="3-system-architecture">3. System Architecture</h2>
-<div class="highlight"><pre><span></span><code>                    ┌──────────────────────────────┐
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">                    ┌──────────────────────────────┐
    User input ───►  │  ORCHESTRATOR (LangGraph      │
   (research topic)  │  StateGraph, conditional edges)│
                     └──────────────┬───────────────┘
@@ -147,8 +146,7 @@
                            └────────┬────────┘
                                     │ APPROVE (score ≥ 7)
                                     ▼
-                          Final Report (Markdown / PDF)
-</code></pre></div>
+                          Final Report (Markdown / PDF)</code></pre></div>
 <p>Flow: the user's topic enters the <strong>Orchestrator</strong> (a LangGraph <code>StateGraph</code>). It fans out to the <strong>Research</strong>, <strong>Classification</strong>, <strong>NER</strong>, <strong>Browser</strong> and <strong>Analyzer</strong> agents, whose outputs converge on the <strong>Writer</strong>. The draft passes to the <strong>Illustration Agent</strong>, then to the <strong>Critic</strong>, which either approves (producing the final report) or sends the draft back to the Writer for revision.</p>
 <h2 id="4-technology-stack">4. Technology Stack</h2>
 <table>
@@ -286,49 +284,89 @@
 <li><strong>Responsibilities:</strong> check accuracy against sources; find coverage gaps; verify entity and label use; score 1–10 on accuracy, completeness, clarity, citations and visual quality. <strong>Score ≥ 7 → APPROVE; otherwise → REVISE</strong> with specific feedback, returning the draft to the Writer. Maximum <strong>3 revision cycles</strong>.</li>
 </ul>
 <h2 id="6-shared-state-schema">6. Shared State Schema</h2>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">TypedDict</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="typing_extensions" title="Needs typing_extensions — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>from typing import List, Optional
+from typing_extensions import TypedDict
 
 
-<span class="k">class</span><span class="w"> </span><span class="nc">ResearchState</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
-    <span class="c1"># Input</span>
-    <span class="n">topic</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">sub_questions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+class ResearchState(TypedDict):
+    # Input
+    topic: str
+    sub_questions: List[str]
 
-    <span class="c1"># Research Agent</span>
-    <span class="n">raw_sources</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>            <span class="c1"># {url, title, content, score}</span>
+    # Research Agent
+    raw_sources: List[dict]            # {url, title, content, score}
 
-    <span class="c1"># Classification Agent</span>
-    <span class="n">classified_sources</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>     <span class="c1"># {url, title, category, relevance}</span>
+    # Classification Agent
+    classified_sources: List[dict]     # {url, title, category, relevance}
 
-    <span class="c1"># NER Agent</span>
-    <span class="n">entities</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>               <span class="c1"># {text, label, source_url, frequency}</span>
-    <span class="n">entity_relationships</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>   <span class="c1"># {entity1, entity2, relation, context}</span>
+    # NER Agent
+    entities: List[dict]               # {text, label, source_url, frequency}
+    entity_relationships: List[dict]   # {entity1, entity2, relation, context}
 
-    <span class="c1"># Browser Agent (LAM)</span>
-    <span class="n">browser_results</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>        <span class="c1"># {url, action, extracted_data}</span>
+    # Browser Agent (LAM)
+    browser_results: List[dict]        # {url, action, extracted_data}
 
-    <span class="c1"># Analyzer Agent</span>
-    <span class="n">organized_findings</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>     <span class="c1"># {theme, findings, sources, entities}</span>
-    <span class="n">outline</span><span class="p">:</span> <span class="nb">str</span>
+    # Analyzer Agent
+    organized_findings: List[dict]     # {theme, findings, sources, entities}
+    outline: str
 
-    <span class="c1"># Writer Agent</span>
-    <span class="n">draft</span><span class="p">:</span> <span class="nb">str</span>
+    # Writer Agent
+    draft: str
 
-    <span class="c1"># Illustration Agent</span>
-    <span class="n">illustrations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>          <span class="c1"># {section, prompt, image_path}</span>
+    # Illustration Agent
+    illustrations: List[dict]          # {section, prompt, image_path}
 
-    <span class="c1"># Critic Agent</span>
-    <span class="n">critic_feedback</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-    <span class="n">critic_score</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
-    <span class="n">revision_count</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">final_report</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    # Critic Agent
+    critic_feedback: Optional[str]
+    critic_score: Optional[int]
+    revision_count: int
+    final_report: Optional[str]
 
-    <span class="c1"># Course-topic artefacts</span>
-    <span class="n">transformer_config</span><span class="p">:</span> <span class="nb">dict</span>
-    <span class="n">moe_analysis</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-    <span class="n">status</span><span class="p">:</span> <span class="nb">str</span>
-</code></pre></div>
+    # Course-topic artefacts
+    transformer_config: dict
+    moe_analysis: Optional[str]
+    status: str</textarea><pre><code class="language-python">from typing import List, Optional
+from typing_extensions import TypedDict
+
+
+class ResearchState(TypedDict):
+    # Input
+    topic: str
+    sub_questions: List[str]
+
+    # Research Agent
+    raw_sources: List[dict]            # {url, title, content, score}
+
+    # Classification Agent
+    classified_sources: List[dict]     # {url, title, category, relevance}
+
+    # NER Agent
+    entities: List[dict]               # {text, label, source_url, frequency}
+    entity_relationships: List[dict]   # {entity1, entity2, relation, context}
+
+    # Browser Agent (LAM)
+    browser_results: List[dict]        # {url, action, extracted_data}
+
+    # Analyzer Agent
+    organized_findings: List[dict]     # {theme, findings, sources, entities}
+    outline: str
+
+    # Writer Agent
+    draft: str
+
+    # Illustration Agent
+    illustrations: List[dict]          # {section, prompt, image_path}
+
+    # Critic Agent
+    critic_feedback: Optional[str]
+    critic_score: Optional[int]
+    revision_count: int
+    final_report: Optional[str]
+
+    # Course-topic artefacts
+    transformer_config: dict
+    moe_analysis: Optional[str]
+    status: str</code></pre></div>
 <h2 id="7-competition-format-competition-based-learning">7. Competition Format (Competition-Based Learning)</h2>
 <p>Each team builds its own system; teams compete head-to-head on identical tasks.</p>
 <ul>
@@ -554,31 +592,30 @@
 </table>
 <p>(These are the weights <em>within</em> the project's competition and final-submission component, which is 20% of the course grade — 8% competition score, 4% architecture, 3% code quality, 3% presentation, 2% peer review. Weekly deliverables add a further 10%, so the project as a whole is 30% of the course grade — see the syllabus.)</p>
 <h2 id="11-expected-output-example">11. Expected Output Example</h2>
-<div class="highlight"><pre><span></span><code><span class="gh"># Research Report: &lt;topic&gt;</span>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-markdown"># Research Report: &lt;topic&gt;
 
-<span class="gu">## Executive Summary</span>
+## Executive Summary
 ...
 
-<span class="gu">## Named Entities Identified</span>
+## Named Entities Identified
 | Entity | Type | Frequency | Sources |
 |---|---|---|---|
 
-<span class="gu">## Source Classification Summary</span>
+## Source Classification Summary
 | Category | Count | Avg. relevance |
 |---|---|---|
 
-<span class="gu">## 1. Introduction</span>
-<span class="gu">## 2. Background</span>
-<span class="gu">## 3. Key Themes</span>
-<span class="gu">## 4. Comparative Analysis</span>
+## 1. Introduction
+## 2. Background
+## 3. Key Themes
+## 4. Comparative Analysis
 [Figure 1: MoE vs Dense Model Efficiency Comparison -- generated illustration]
-<span class="gu">## 5. Contradictions and Open Questions</span>
-<span class="gu">## 6. Discussion</span>
-<span class="gu">## 7. Conclusion</span>
+## 5. Contradictions and Open Questions
+## 6. Discussion
+## 7. Conclusion
 
-<span class="gu">## References</span>
-[1] ...
-</code></pre></div>
+## References
+[1] ...</code></pre></div>
 <h2 id="12-useful-links">12. Useful Links</h2>
 <ul>
 <li>spaCy: https://spacy.io</li>
@@ -590,12 +627,8 @@
 <li>Tavily: https://tavily.com</li>
 <li>Course home: ../index.html · Syllabus: syllabus.html</li>
 <li>Instructor: abanna@uop.edu.jo · GitHub https://github.com/abedbanna · Hugging Face https://huggingface.co/abedbanna</li>
-</ul><footer style="margin-top:3rem;padding-top:1rem;border-top:1px solid var(--border);font-size:.84rem;color:var(--muted)">
-This site is based on the course site <a href="https://albanna-tutorials.com/cs/">albanna-tutorials.com/cs</a> by Dr. Abdulkarim Albanna, used with the author's permission.
-</footer></main><aside class="rail">
-  <div class="rail-tabs"><button class="active" data-panel="panel-sims">Simulations</button><button data-panel="panel-code">Test code</button></div>
-  <div class="rail-panel active" id="panel-sims"><p class="rail-intro">Interactive teaching aids for this week. Each opens full-size with step controls and teaching notes.</p><button class="sim-card" data-sim="multi-agent"><span class="sim-kind">Multi-agent · animation</span><span class="sim-title">Multi-agent research pipeline</span><span class="sim-desc">The course project: six agents, a human checkpoint and a Writer–Critic loop.</span></button><button class="sim-card" data-sim="langgraph"><span class="sim-kind">LangGraph · animation</span><span class="sim-title">LangGraph StateGraph</span><span class="sim-desc">State flowing through nodes, conditional edges, a loop, an interrupt and checkpoints.</span></button><button class="sim-card" data-sim="react-loop"><span class="sim-kind">Agents · animation</span><span class="sim-title">ReAct agent loop</span><span class="sim-desc">Thought → Action → Observation on a growing scratchpad, including a tool error.</span></button></div>
-  <div class="rail-panel" id="panel-code"><p class="rail-intro"><b>Run ▶</b> executes pure-Python/NumPy snippets in your browser (Pyodide). Snippets marked <i>local</i> need the course environment (PyTorch, Transformers, LangChain…) — copy them into VS Code.</p><div class="snippet"><div class="snippet-head"><span>Minimal LangGraph skeleton with the Critic revision loop</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 1. Minimal LangGraph skeleton with the Critic revision loop
+</ul><h2 id="try-it-yourself">Try it yourself</h2>
+<p class="lesson-intro"><b>▶ Try it</b> runs an example in the editor panel, inside your browser — change the code and press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to run it again. Examples marked <b>✎ Open in editor</b> need libraries or API keys that cannot run in a browser (PyTorch, Transformers, LangChain, OpenAI…): read them in the editor, then copy them to VS Code and run them in the course environment.</p><h3 id="test-code">Test code for the course environment</h3><div class="runnable local"><div class="code-title">Minimal LangGraph skeleton with the Critic revision loop</div><button class="try local" data-run="0" data-needs="langgraph, typing_extensions" title="Needs langgraph, typing_extensions — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden># 1. Minimal LangGraph skeleton with the Critic revision loop
 #    pip install langgraph typing_extensions
 from typing import List, Optional
 from typing_extensions import TypedDict
@@ -633,7 +666,45 @@ g.add_conditional_edges(&quot;critic&quot;, route, {&quot;writer&quot;: &quot;wr
 g.add_edge(&quot;finalize&quot;, END)
 app = g.compile()
 
-print(app.invoke({&quot;topic&quot;: &quot;Mixture of Experts&quot;, &quot;revision_count&quot;: 0}))</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>NER Agent prototype with spaCy  (pip install spacy &amp;&amp; python -m spacy download e</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 2. NER Agent prototype with spaCy  (pip install spacy &amp;&amp; python -m spacy download en_core_web_sm)
+print(app.invoke({&quot;topic&quot;: &quot;Mixture of Experts&quot;, &quot;revision_count&quot;: 0}))</textarea><pre><code class="language-python"># 1. Minimal LangGraph skeleton with the Critic revision loop
+#    pip install langgraph typing_extensions
+from typing import List, Optional
+from typing_extensions import TypedDict
+from langgraph.graph import StateGraph, START, END
+
+class ResearchState(TypedDict, total=False):
+    topic: str
+    draft: str
+    critic_score: Optional[int]
+    critic_feedback: Optional[str]
+    revision_count: int
+    final_report: Optional[str]
+
+def writer(state):
+    n = state.get(&quot;revision_count&quot;, 0)
+    return {&quot;draft&quot;: f&quot;Draft v{n+1} on &#x27;{state[&#x27;topic&#x27;]}&#x27;&quot;}
+
+def critic(state):
+    score = 5 + state.get(&quot;revision_count&quot;, 0)          # toy critic: improves each round
+    return {&quot;critic_score&quot;: score, &quot;critic_feedback&quot;: &quot;add citations&quot; if score &lt; 7 else &quot;ok&quot;,
+            &quot;revision_count&quot;: state.get(&quot;revision_count&quot;, 0) + 1}
+
+def route(state):
+    if state[&quot;critic_score&quot;] &gt;= 7 or state[&quot;revision_count&quot;] &gt;= 3:
+        return &quot;finalize&quot;
+    return &quot;writer&quot;
+
+def finalize(state):
+    return {&quot;final_report&quot;: state[&quot;draft&quot;]}
+
+g = StateGraph(ResearchState)
+g.add_node(&quot;writer&quot;, writer); g.add_node(&quot;critic&quot;, critic); g.add_node(&quot;finalize&quot;, finalize)
+g.add_edge(START, &quot;writer&quot;); g.add_edge(&quot;writer&quot;, &quot;critic&quot;)
+g.add_conditional_edges(&quot;critic&quot;, route, {&quot;writer&quot;: &quot;writer&quot;, &quot;finalize&quot;: &quot;finalize&quot;})
+g.add_edge(&quot;finalize&quot;, END)
+app = g.compile()
+
+print(app.invoke({&quot;topic&quot;: &quot;Mixture of Experts&quot;, &quot;revision_count&quot;: 0}))</code></pre></div><div class="runnable local"><div class="code-title">NER Agent prototype with spaCy  (pip install spacy &amp;&amp; python -m spacy download en_core_web</div><button class="try local" data-run="0" data-needs="spacy" title="Needs spacy — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden># 2. NER Agent prototype with spaCy  (pip install spacy &amp;&amp; python -m spacy download en_core_web_sm)
 import spacy
 from collections import Counter
 
@@ -644,14 +715,32 @@ doc = nlp(text)
 
 entities = [{&quot;text&quot;: e.text, &quot;label&quot;: e.label_} for e in doc.ents]
 print(entities)
-print(Counter(e[&quot;label&quot;] for e in entities))</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Classification Agent prototype using a zero-shot transformer</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 3. Classification Agent prototype using a zero-shot transformer
+print(Counter(e[&quot;label&quot;] for e in entities))</textarea><pre><code class="language-python"># 2. NER Agent prototype with spaCy  (pip install spacy &amp;&amp; python -m spacy download en_core_web_sm)
+import spacy
+from collections import Counter
+
+nlp = spacy.load(&quot;en_core_web_sm&quot;)
+text = (&quot;In 2017 Vaswani and colleagues at Google introduced the Transformer. &quot;
+        &quot;OpenAI later released GPT-4, while Mistral AI built Mixtral, a mixture-of-experts model.&quot;)
+doc = nlp(text)
+
+entities = [{&quot;text&quot;: e.text, &quot;label&quot;: e.label_} for e in doc.ents]
+print(entities)
+print(Counter(e[&quot;label&quot;] for e in entities))</code></pre></div><div class="runnable local"><div class="code-title">Classification Agent prototype using a zero-shot transformer</div><button class="try local" data-run="0" data-needs="transformers" title="Needs transformers — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden># 3. Classification Agent prototype using a zero-shot transformer
 from transformers import pipeline
 
 clf = pipeline(&quot;zero-shot-classification&quot;, model=&quot;facebook/bart-large-mnli&quot;)
 categories = [&quot;technical&quot;, &quot;review&quot;, &quot;tutorial&quot;, &quot;opinion&quot;, &quot;dataset&quot;]
 source = &quot;This step-by-step guide shows how to fine-tune DistilBERT for emotion classification.&quot;
 out = clf(source, candidate_labels=categories)
-print(dict(zip(out[&quot;labels&quot;], [round(s, 3) for s in out[&quot;scores&quot;]])))</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Competition score: average of 3 topics over the 100-point rubric</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 4. Competition score: average of 3 topics over the 100-point rubric
+print(dict(zip(out[&quot;labels&quot;], [round(s, 3) for s in out[&quot;scores&quot;]])))</textarea><pre><code class="language-python"># 3. Classification Agent prototype using a zero-shot transformer
+from transformers import pipeline
+
+clf = pipeline(&quot;zero-shot-classification&quot;, model=&quot;facebook/bart-large-mnli&quot;)
+categories = [&quot;technical&quot;, &quot;review&quot;, &quot;tutorial&quot;, &quot;opinion&quot;, &quot;dataset&quot;]
+source = &quot;This step-by-step guide shows how to fine-tune DistilBERT for emotion classification.&quot;
+out = clf(source, candidate_labels=categories)
+print(dict(zip(out[&quot;labels&quot;], [round(s, 3) for s in out[&quot;scores&quot;]])))</code></pre></div><div class="runnable"><div class="code-title">Competition score: average of 3 topics over the 100-point rubric</div><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden># 4. Competition score: average of 3 topics over the 100-point rubric
 rubric = {&quot;report_quality&quot;: 20, &quot;source_coverage&quot;: 15, &quot;entity_extraction&quot;: 10,
           &quot;source_classification&quot;: 10, &quot;illustrations&quot;: 10, &quot;speed&quot;: 10,
           &quot;cost_efficiency&quot;: 5, &quot;error_handling&quot;: 5, &quot;innovation&quot;: 15}
@@ -660,14 +749,60 @@ def score_report(earned_fraction: dict) -&gt; float:
     return sum(rubric[k] * earned_fraction.get(k, 0.0) for k in rubric)
 
 topic_scores = [score_report({k: f for k in rubric}) for f in (0.75, 0.8, 0.9)]
-print(&quot;per topic:&quot;, topic_scores, &quot;average:&quot;, round(sum(topic_scores) / 3, 1))</code></pre><div class="out"></div></div></div>
-</aside></div><div class="sim-overlay" id="sim-overlay" role="dialog" aria-modal="true">
-  <div class="sim-window"><div class="sim-head"><div><div class="sim-kind" id="sim-kind"></div><h3 id="sim-title"></h3></div><span class="spacer"></span><button class="btn-xs" id="sim-close">✕ Close (Esc)</button></div><div class="sim-body" id="sim-body"></div></div>
+print(&quot;per topic:&quot;, topic_scores, &quot;average:&quot;, round(sum(topic_scores) / 3, 1))</textarea><pre><code class="language-python"># 4. Competition score: average of 3 topics over the 100-point rubric
+rubric = {&quot;report_quality&quot;: 20, &quot;source_coverage&quot;: 15, &quot;entity_extraction&quot;: 10,
+          &quot;source_classification&quot;: 10, &quot;illustrations&quot;: 10, &quot;speed&quot;: 10,
+          &quot;cost_efficiency&quot;: 5, &quot;error_handling&quot;: 5, &quot;innovation&quot;: 15}
+
+def score_report(earned_fraction: dict) -&gt; float:
+    return sum(rubric[k] * earned_fraction.get(k, 0.0) for k in rubric)
+
+topic_scores = [score_report({k: f for k in rubric}) for f in (0.75, 0.8, 0.9)]
+print(&quot;per topic:&quot;, topic_scores, &quot;average:&quot;, round(sum(topic_scores) / 3, 1))</code></pre></div>
+<div class="lesson-nav"><a href="../index.html">‹ All lessons</a><span></span></div><footer class="site-footer">
+This site is based on the course site <a href="https://albanna-tutorials.com/cs/">albanna-tutorials.com/cs</a> by Dr. Abdulkarim Albanna, used with the author's permission.
+</footer></article><div id="splitter" class="splitter" role="separator" aria-orientation="vertical" title="Drag to resize"></div><aside class="workbench" id="workbench">
+  <div class="wb-tabs">
+    <button class="wb-tab active" data-mode="code">⌨ Code</button>
+    <button class="wb-tab" data-mode="anim">◉ Animation</button>
+    <span class="spacer"></span>
+    <button class="btn ghost wb-close" id="btn-close" title="Hide panel">✕</button>
+  </div>
+  <section class="wb-mode wb-code active" data-mode="code">
+    <div class="wb-toolbar">
+      <span class="wb-title" id="wb-title">Editor</span>
+      <span class="spacer"></span>
+      <button id="btn-run" class="btn primary" title="Run (Ctrl+Enter)">▶ Run</button>
+      <button id="btn-reset" class="btn ghost" title="Restore the original code">Reset</button>
+      <button id="btn-copy" class="btn ghost" title="Copy code">Copy</button>
+      <button id="btn-clear" class="btn ghost" title="Clear output">Clear</button>
+    </div>
+    <div class="editor-wrap"><textarea id="editor"># Press "▶ Try it" on any example in the lesson,
+# or write Python here and press Ctrl+Enter.
+import numpy as np
+print(np.round(np.linspace(0, 1, 5), 2))</textarea></div>
+    <div class="output-head"><span>Output</span><span id="run-time" class="muted small"></span></div>
+    <div id="output" class="output" aria-live="polite"></div>
+  </section>
+  <section class="wb-mode wb-anim" data-mode="anim">
+    <div class="wb-toolbar light">
+      <select id="anim-select" aria-label="Choose animation"><optgroup label="This week"><option value="multi-agent">Multi-agent research pipeline</option><option value="langgraph">LangGraph StateGraph</option><option value="react-loop">ReAct agent loop</option></optgroup><optgroup label="Other weeks"><option value="matrix-multiply">Matrix multiplication, step by step</option><option value="vectors">Vectors, dot product &amp; cosine similarity</option><option value="attention">Self-attention: Q·Kᵀ → softmax → ·V</option><option value="tokenizer">Subword tokenisation</option><option value="positional">Positional encoding</option><option value="classifier">Decision boundary, threshold &amp; F1</option><option value="bio-tagging">NER: BIO tags &amp; entity-level F1</option><option value="rag">RAG pipeline</option><option value="sampling">Temperature, top-k, top-p</option><option value="moe">Mixture of Experts router</option><option value="mcp">MCP message flow</option><option value="lam">Browser agent: perceive → plan → act</option><option value="diffusion">Diffusion: noising &amp; denoising</option></optgroup></select>
+      <span class="spacer"></span>
+      <button id="btn-full" class="btn ghost" title="Open full screen">⤢ Full screen</button>
+    </div>
+    <div class="anim-host" id="anim-host"><p class="muted anim-empty">Press <b>▶ Display</b> on an animation in the lesson, or choose one above.</p></div>
+  </section>
+</aside></main><div class="sim-overlay" id="sim-overlay" role="dialog" aria-modal="true">
+  <div class="sim-window"><div class="sim-head"><div><div class="sim-kind" id="sim-kind"></div><h3 id="sim-title"></h3></div><span class="spacer"></span><button class="btn ghost" id="sim-close">✕ Close (Esc)</button></div><div class="sim-body" id="sim-body"></div></div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
-<script>document.addEventListener('DOMContentLoaded',()=>{if(window.hljs)hljs.highlightAll();if(window.renderMathInElement)renderMathInElement(document.body,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});});</script>
+<script src="../assets/vendor/codemirror/codemirror.js"></script>
+<script src="../assets/vendor/codemirror/python.js"></script>
+<script src="../assets/vendor/codemirror/matchbrackets.js"></script>
+<script src="../assets/vendor/codemirror/closebrackets.js"></script>
+<script>window.CS_PYODIDE_URL = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";</script>
 <script src="../assets/js/sims/core.js"></script>
 <script src="../assets/js/sims/matrix-multiply.js"></script><script src="../assets/js/sims/vectors.js"></script><script src="../assets/js/sims/attention.js"></script><script src="../assets/js/sims/tokenizer.js"></script><script src="../assets/js/sims/positional.js"></script><script src="../assets/js/sims/classifier.js"></script><script src="../assets/js/sims/bio-tagging.js"></script><script src="../assets/js/sims/rag.js"></script><script src="../assets/js/sims/langgraph.js"></script><script src="../assets/js/sims/sampling.js"></script><script src="../assets/js/sims/moe.js"></script><script src="../assets/js/sims/react-loop.js"></script><script src="../assets/js/sims/multi-agent.js"></script><script src="../assets/js/sims/mcp.js"></script><script src="../assets/js/sims/lam.js"></script><script src="../assets/js/sims/diffusion.js"></script>
 <script src="../assets/js/site.js"></script>

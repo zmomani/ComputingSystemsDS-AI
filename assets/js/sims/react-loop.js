@@ -21,14 +21,14 @@ Sims.register('react-loop', {
     let task = 'research';
     const cv = H.canvas(720, 420); L.stage.appendChild(cv); const ctx = cv.ctx;
     function steps() { const s = [{ phase: 'start' }]; tasks[task].turns.forEach((t, i) => { s.push({ phase: 'thought', i }); s.push({ phase: 'action', i }); if (t.obs !== null) s.push({ phase: 'observation', i }); else s.push({ phase: 'answer', i }); }); return s; }
-    function render(st) {
+    function render(st, idx) {
       const T = H.theme(); H.clear(cv); const tk = tasks[task];
       // loop diagram on the right
       const cx = 590, cy = 150, r = 85;
       const nodesA = [['Thought', -Math.PI / 2, T.accent], ['Action', Math.PI / 6, T.accent2], ['Observation', 5 * Math.PI / 6, T.green]];
       ctx.save(); ctx.strokeStyle = T.border; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(cx, cy, r, 0, 7); ctx.stroke(); ctx.restore();
       for (let a = 0; a < 3; a++) { const ang = -Math.PI / 2 + a * 2 * Math.PI / 3 + Math.PI / 3; H.arrow(ctx, cx + r * Math.cos(ang - .08), cy + r * Math.sin(ang - .08), cx + r * Math.cos(ang + .04), cy + r * Math.sin(ang + .04), { color: T.muted, lw: 1 }); }
-      nodesA.forEach(([nm, ang, col]) => { const x = cx + r * Math.cos(ang), y = cy + r * Math.sin(ang), on = st.phase === nm.toLowerCase(); ctx.save(); ctx.fillStyle = on ? col : T.bg; ctx.strokeStyle = col; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(x, y, on ? 34 : 30, 0, 7); ctx.fill(); ctx.stroke(); ctx.restore(); H.text(ctx, nm, x, y + 4, { align: 'center', size: 11, weight: 700, color: on ? '#fff' : col }); });
+      nodesA.forEach(([nm, ang, col]) => { const x = cx + r * Math.cos(ang), y = cy + r * Math.sin(ang), on = st.phase === nm.toLowerCase(); ctx.save(); ctx.fillStyle = on ? col : T.bg; ctx.strokeStyle = col; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(x, y, on ? 34 : 30, 0, 7); ctx.fill(); ctx.stroke(); ctx.restore(); H.text(ctx, nm, x, y + 4, { align: 'center', size: nm.length > 8 ? 9 : 11, weight: 700, color: on ? '#fff' : col }); });
       H.text(ctx, 'LLM', cx, cy - 4, { align: 'center', size: 13, weight: 700, color: T.muted }); H.text(ctx, 'decides', cx, cy + 12, { align: 'center', size: 10, color: T.muted });
       // tools box
       H.rect(ctx, 490, 265, 200, 70, { fill: H.hexA(T.accent2, .12), stroke: T.accent2, r: 8 }); H.text(ctx, 'Tools (environment)', 590, 285, { align: 'center', size: 11, weight: 700 });
@@ -37,7 +37,7 @@ Sims.register('react-loop', {
       H.rect(ctx, 14, 14, 450, 392, { fill: T.bg, stroke: T.border, r: 8 }); H.text(ctx, 'Scratchpad (grows inside the prompt every turn)', 24, 34, { size: 11, weight: 700, color: T.muted });
       let y = 56; const put = (label, txt, col, mono) => { y = wrapText(label + txt, 24, y, 428, 11, col, mono) + 6; };
       put('Question: ', tk.q, T.text);
-      const stepsArr = steps(); const idx = stepsArr.indexOf(st);
+      const stepsArr = steps();
       for (let j = 1; j <= idx; j++) { const s = stepsArr[j], t = tk.turns[s.i]; const cur = j === idx;
         if (s.phase === 'thought') put(`Thought ${s.i + 1}: `, t.thought, cur ? T.accent : T.text);
         if (s.phase === 'action') put(`Action ${s.i + 1}: `, t.action === 'finish' ? 'finish' : `${t.action}[${t.input}]`, cur ? T.accent2 : T.text, true);

@@ -4,218 +4,349 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Week 9: AI Agents &amp; ReAct · Computing Systems for DS & AI</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<meta name="description" content="Interactive course site for 606363 Computing Systems for Data Science and AI, University of Petra. Python runs in your browser; every week has simulations and animations.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231f3a5f'/><text x='16' y='22' font-size='14' font-family='monospace' fill='white' text-anchor='middle'>AI</text></svg>">
+<link rel="stylesheet" href="../assets/vendor/codemirror/codemirror.css">
+<link rel="stylesheet" href="../assets/vendor/codemirror/material-darker.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
 <link rel="stylesheet" href="../assets/css/site.css">
 </head>
 <body><header class="topbar">
-  <button class="btn-icon" id="menu-toggle" aria-label="Menu">☰</button>
-  <a class="brand" href="../index.html">606363 · Computing Systems for DS & AI<small>University of Petra</small></a>
-  <span class="spacer"></span>
-  <nav class="week-nav"><a class="btn-icon" href="week08-midterm.html" title="Midterm Exam">← Wk 8</a><a class="btn-icon" href="week10-multi-agent.html" title="Multi-Agent Systems">Wk 10 →</a></nav>
-  <a class="btn-icon" href="../index.html#curriculum">Curriculum</a>
-  <a class="btn-icon" href="../index.html#simulations">Simulations</a>
-  <button class="btn-icon" id="theme-toggle" aria-label="Toggle dark mode">◐</button>
-</header><div class="layout"><aside class="sidebar">
-  <h4>Course</h4><ul class="outline"><li><a class="" href="../lessons/syllabus.html"><span class="wk">·</span><span>Course Syllabus</span></a></li><li><a class="" href="../lessons/project.html"><span class="wk">·</span><span>Final Project</span></a></li></ul>
-  <h4>16-week curriculum</h4><ul class="outline"><li><a class="" href="../lessons/week01-transformers.html"><span class="wk">01</span><span>Transformer Architecture</span></a></li><li><a class="" href="../lessons/week02-text-classification.html"><span class="wk">02</span><span>Text Classification</span></a></li><li><a class="soon" href="../lessons/week03-ner.html"><span class="wk">03</span><span>Named Entity Recognition (NER)</span></a></li><li><a class="" href="../lessons/week04-langchain.html"><span class="wk">04</span><span>LangChain Fundamentals</span></a></li><li><a class="" href="../lessons/week05-langgraph.html"><span class="wk">05</span><span>LangGraph</span></a></li><li><a class="" href="../lessons/week06-llms.html"><span class="wk">06</span><span>Large Language Models (LLMs)</span></a></li><li><a class="" href="../lessons/week07-moe.html"><span class="wk">07</span><span>Mixture of Experts (MoE)</span></a></li><li><a class="" href="../lessons/week08-midterm.html"><span class="wk">08</span><span>Midterm Exam</span></a></li><li><a class="active" href="../lessons/week09-react-agents.html"><span class="wk">09</span><span>AI Agents &amp; ReAct</span></a></li><li><a class="" href="../lessons/week10-multi-agent.html"><span class="wk">10</span><span>Multi-Agent Systems</span></a></li><li><a class="" href="../lessons/week11-mcp.html"><span class="wk">11</span><span>Model Context Protocol (MCP)</span></a></li><li><a class="soon" href="../lessons/week12-lams.html"><span class="wk">12</span><span>Large Action Models (LAMs)</span></a></li><li><a class="" href="../lessons/week13-diffusion.html"><span class="wk">13</span><span>Diffusion Models</span></a></li><li><a class="" href="../lessons/week14-project.html"><span class="wk">14</span><span>Project Development &amp; Final Testing</span></a></li><li><a class="" href="../lessons/week15-competition.html"><span class="wk">15</span><span>Competition Day &amp; Presentations</span></a></li><li><a class="" href="../lessons/week16-final.html"><span class="wk">16</span><span>Final Exam</span></a></li></ul>
-  <h4>On this page</h4><ul class="toc" id="toc"></ul>
-</aside><main class="main">
-  <div class="lesson-head"><div class="eyebrow">Week 9 · ILO K2, P2</div><h1>AI Agents &amp; ReAct</h1>
-  <p class="credit"><b>Topics:</b> AI agents, ReAct loop, tool use, short- and long-term memory<br><b>Project milestone:</b> Research Agent using ReAct with search and scraping tools, relevance scoring and ChromaDB storage; 10+ sources per topic</p></div>
-  <div class="callout sim"><div class="sim-strip"><b style="margin-right:4px">Simulations for this week:</b><button class="chip" data-sim="react-loop">▶ ReAct agent loop</button><button class="chip" data-sim="rag">▶ RAG pipeline</button></div></div>
-  <h2 id="1-introduction-to-react-agents">1. Introduction to ReAct Agents</h2>
+  <a class="brand" href="../index.html">
+    <span class="brand-mark">AI</span>
+    <span class="brand-text"><strong>Computing Systems for DS &amp; AI</strong><span class="muted"> · 606363 · University of Petra</span></span>
+  </a>
+  <nav class="topnav"><a class="btn ghost" href="week08-midterm.html" title="Midterm Exam">‹ Prev</a><select id="lesson-select" aria-label="Choose lesson"><option value="">Lessons…</option><option value="syllabus.html">Course Syllabus</option><option value="project.html">Final Project</option><option value="week01-transformers.html">Week 1 · Transformer Architecture</option><option value="week02-text-classification.html">Week 2 · Text Classification</option><option value="week03-ner.html">Week 3 · Named Entity Recognition (NER)</option><option value="week04-langchain.html">Week 4 · LangChain Fundamentals</option><option value="week05-langgraph.html">Week 5 · LangGraph</option><option value="week06-llms.html">Week 6 · Large Language Models (LLMs)</option><option value="week07-moe.html">Week 7 · Mixture of Experts (MoE)</option><option value="week08-midterm.html">Week 8 · Midterm Exam</option><option value="week09-react-agents.html" selected>Week 9 · AI Agents &amp; ReAct</option><option value="week10-multi-agent.html">Week 10 · Multi-Agent Systems</option><option value="week11-mcp.html">Week 11 · Model Context Protocol (MCP)</option><option value="week12-lams.html">Week 12 · Large Action Models (LAMs)</option><option value="week13-diffusion.html">Week 13 · Diffusion Models</option><option value="week14-project.html">Week 14 · Project Development &amp; Final Testing</option><option value="week15-competition.html">Week 15 · Competition Day &amp; Presentations</option><option value="week16-final.html">Week 16 · Final Exam</option></select><a class="btn ghost" href="week10-multi-agent.html" title="Multi-Agent Systems">Next ›</a></nav>
+  <button id="btn-panel" class="btn accent" title="Show or hide the editor / animation panel">⇆ Panel</button><div class="status" id="py-status"><span class="dot"></span><span id="py-status-text">Python loads on first run</span></div>
+</header><main class="lesson panel-closed" id="lesson"><article class="lesson-content" id="lesson-content"><div class="lesson-head"><div class="eyebrow">Week 9 · ILO K2, P2</div><h1>AI Agents &amp; ReAct</h1>
+<p class="lesson-intro"><b>Topics:</b> AI agents, ReAct loop, tool use, short- and long-term memory<br><b>Project milestone:</b> Research Agent using ReAct with search and scraping tools, relevance scoring and ChromaDB storage; 10+ sources per topic</p></div>
+<div class="sim-strip"><div class="sim-strip-head">Animations for this week — open them in the panel</div><div class="sim-strip-items"><button class="sim-chip" data-display="react-loop"><span class="sim-chip-kind">Agents</span>▶ Display: ReAct agent loop</button><button class="sim-chip" data-display="rag"><span class="sim-chip-kind">LangChain</span>▶ Display: RAG pipeline</button></div></div>
+<details class="contents"><summary>Contents (11 sections)</summary><ol><li><a href="#1-introduction-to-react-agents">1. Introduction to ReAct Agents</a></li><li><a href="#2-setting-up-the-environment">2. Setting Up the Environment</a></li><li><a href="#3-creating-the-basic-agent-class">3. Creating the Basic Agent Class</a></li><li><a href="#4-defining-the-react-prompt">4. Defining the ReAct Prompt</a></li><li><a href="#5-implementing-the-tools">5. Implementing the Tools</a></li><li><a href="#6-creating-the-agent-loop">6. Creating the Agent Loop</a></li><li><a href="#7-complete-example">7. Complete Example</a></li><li><a href="#8-complete-code-architecture">8. Complete Code Architecture</a></li><li><a href="#9-extensions">9. Extensions</a></li><li><a href="#10-key-takeaways">10. Key Takeaways</a></li><li><a href="#key-terms">Key Terms</a></li></ol></details>
+<h2 id="1-introduction-to-react-agents">1. Introduction to ReAct Agents</h2>
 <p>The <strong>ReAct (Reasoning + Acting)</strong> pattern lets a language model solve complex tasks by alternating between <em>reasoning</em> about the problem and <em>acting</em> with tools. The model breaks a problem down, takes an action, observes the result, and uses that observation to guide its next step.</p>
 <p>The cycle is:</p>
-<div class="highlight"><pre><span></span><code>Thought → Action → Observation → Thought → … → Answer
-</code></pre></div>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">Thought → Action → Observation → Thought → … → Answer</code></pre></div>
 <blockquote>
 <p><strong>Key Insight:</strong> separating reasoning from tool use lets a language model handle problems that neither capability could solve alone.</p>
 </blockquote>
 <h2 id="2-setting-up-the-environment">2. Setting Up the Environment</h2>
 <p>Import the libraries, load the API key from a <code>.env</code> file, create an OpenAI client, and send a test message to confirm the connection works.</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># environment_setup.py</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">openai</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">httpx</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="dotenv, httpx, openai" title="Needs dotenv, httpx, openai — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden># environment_setup.py
+import openai
+import re
+import httpx
+import os
+from dotenv import load_dotenv
 
-<span class="n">_</span> <span class="o">=</span> <span class="n">load_dotenv</span><span class="p">()</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">openai</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenAI</span>
+_ = load_dotenv()
+from openai import OpenAI
 
-<span class="n">client</span> <span class="o">=</span> <span class="n">OpenAI</span><span class="p">()</span>
+client = OpenAI()
 
-<span class="c1"># Test the OpenAI client</span>
-<span class="n">chat_completion</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="n">model</span><span class="o">=</span><span class="s2">"gpt-3.5-turbo"</span><span class="p">,</span>
-    <span class="n">messages</span><span class="o">=</span><span class="p">[{</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"user"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="s2">"Hello world"</span><span class="p">}]</span>
-<span class="p">)</span>
+# Test the OpenAI client
+chat_completion = client.chat.completions.create(
+    model=&quot;gpt-3.5-turbo&quot;,
+    messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Hello world&quot;}]
+)
 
-<span class="nb">print</span><span class="p">(</span><span class="n">chat_completion</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
-</code></pre></div>
+print(chat_completion.choices[0].message.content)</textarea><pre><code class="language-python"># environment_setup.py
+import openai
+import re
+import httpx
+import os
+from dotenv import load_dotenv
+
+_ = load_dotenv()
+from openai import OpenAI
+
+client = OpenAI()
+
+# Test the OpenAI client
+chat_completion = client.chat.completions.create(
+    model=&quot;gpt-3.5-turbo&quot;,
+    messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Hello world&quot;}]
+)
+
+print(chat_completion.choices[0].message.content)</code></pre></div>
 <h2 id="3-creating-the-basic-agent-class">3. Creating the Basic Agent Class</h2>
 <p>The <code>Agent</code> class keeps the <strong>conversation history</strong> and an optional system message. The constructor sets up that state; <code>__call__</code> appends the user's message, queries the model and stores the reply; <code>execute</code> sends the full history to the API.</p>
 <blockquote>
 <p><strong>Design Pattern:</strong> the agent is <em>stateful</em> — it keeps the full conversation history internally, so each new call builds on everything that came before.</p>
 </blockquote>
-<div class="highlight"><pre><span></span><code><span class="c1"># agent.py</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">Agent</span><span class="p">:</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="o">=</span><span class="s2">""</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">system</span> <span class="o">=</span> <span class="n">system</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">messages</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"system"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="n">system</span><span class="p">})</span>
+<div class="runnable"><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden># agent.py
+class Agent:
+    def __init__(self, system=&quot;&quot;):
+        self.system = system
+        self.messages = []
+        if self.system:
+            self.messages.append({&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: system})
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"user"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="n">message</span><span class="p">})</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"assistant"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="n">result</span><span class="p">})</span>
-        <span class="k">return</span> <span class="n">result</span>
+    def __call__(self, message):
+        self.messages.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: message})
+        result = self.execute()
+        self.messages.append({&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: result})
+        return result
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">completion</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-                        <span class="n">model</span><span class="o">=</span><span class="s2">"gpt-4o"</span><span class="p">,</span>
-                        <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-                        <span class="n">messages</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">completion</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span>
-</code></pre></div>
+    def execute(self):
+        completion = client.chat.completions.create(
+                        model=&quot;gpt-4o&quot;,
+                        temperature=0,
+                        messages=self.messages)
+        return completion.choices[0].message.content</textarea><pre><code class="language-python"># agent.py
+class Agent:
+    def __init__(self, system=&quot;&quot;):
+        self.system = system
+        self.messages = []
+        if self.system:
+            self.messages.append({&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: system})
+
+    def __call__(self, message):
+        self.messages.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: message})
+        result = self.execute()
+        self.messages.append({&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: result})
+        return result
+
+    def execute(self):
+        completion = client.chat.completions.create(
+                        model=&quot;gpt-4o&quot;,
+                        temperature=0,
+                        messages=self.messages)
+        return completion.choices[0].message.content</code></pre></div>
 <h2 id="4-defining-the-react-prompt">4. Defining the ReAct Prompt</h2>
 <p>The system prompt teaches the model the <strong>Thought, Action, PAUSE, Observation</strong> loop, lists the available tools (a calculator and a dog-breed weight lookup), and includes a worked example session.</p>
 <blockquote>
 <p><strong>Important:</strong> the <code>PAUSE</code> keyword tells the model to stop generating after it requests an action, so the program can run the tool and feed the result back as an <code>Observation</code>.</p>
 </blockquote>
-<div class="highlight"><pre><span></span><code><span class="c1"># react_prompt.py</span>
-<span class="n">prompt</span> <span class="o">=</span> <span class="s2">"""</span>
-<span class="s2">You run in a loop of Thought, Action, PAUSE, Observation.</span>
-<span class="s2">At the end of the loop you output an Answer</span>
-<span class="s2">Use Thought to describe your thoughts about the question you have been asked.</span>
-<span class="s2">Use Action to run one of the actions available to you - then return PAUSE.</span>
-<span class="s2">Observation will be the result of running those actions.</span>
+<div class="runnable"><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden># react_prompt.py
+prompt = &quot;&quot;&quot;
+You run in a loop of Thought, Action, PAUSE, Observation.
+At the end of the loop you output an Answer
+Use Thought to describe your thoughts about the question you have been asked.
+Use Action to run one of the actions available to you - then return PAUSE.
+Observation will be the result of running those actions.
 
-<span class="s2">Your available actions are:</span>
+Your available actions are:
 
-<span class="s2">calculate:</span>
-<span class="s2">e.g. calculate: 4 * 7 / 3</span>
-<span class="s2">Runs a calculation and returns the number - uses Python so be sure to use floating point syntax if necessary</span>
+calculate:
+e.g. calculate: 4 * 7 / 3
+Runs a calculation and returns the number - uses Python so be sure to use floating point syntax if necessary
 
-<span class="s2">average_dog_weight:</span>
-<span class="s2">e.g. average_dog_weight: Collie</span>
-<span class="s2">returns average weight of a dog when given the breed</span>
+average_dog_weight:
+e.g. average_dog_weight: Collie
+returns average weight of a dog when given the breed
 
-<span class="s2">Example session:</span>
+Example session:
 
-<span class="s2">Question: How much does a Bulldog weigh?</span>
-<span class="s2">Thought: I should look the dogs weight using average_dog_weight</span>
-<span class="s2">Action: average_dog_weight: Bulldog</span>
-<span class="s2">PAUSE</span>
+Question: How much does a Bulldog weigh?
+Thought: I should look the dogs weight using average_dog_weight
+Action: average_dog_weight: Bulldog
+PAUSE
 
-<span class="s2">You will be called again with this:</span>
+You will be called again with this:
 
-<span class="s2">Observation: A Bulldog weights 51 lbs</span>
+Observation: A Bulldog weights 51 lbs
 
-<span class="s2">You then output:</span>
+You then output:
 
-<span class="s2">Answer: A bulldog weights 51 lbs</span>
-<span class="s2">"""</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-</code></pre></div>
+Answer: A bulldog weights 51 lbs
+&quot;&quot;&quot;.strip()</textarea><pre><code class="language-python"># react_prompt.py
+prompt = &quot;&quot;&quot;
+You run in a loop of Thought, Action, PAUSE, Observation.
+At the end of the loop you output an Answer
+Use Thought to describe your thoughts about the question you have been asked.
+Use Action to run one of the actions available to you - then return PAUSE.
+Observation will be the result of running those actions.
+
+Your available actions are:
+
+calculate:
+e.g. calculate: 4 * 7 / 3
+Runs a calculation and returns the number - uses Python so be sure to use floating point syntax if necessary
+
+average_dog_weight:
+e.g. average_dog_weight: Collie
+returns average weight of a dog when given the breed
+
+Example session:
+
+Question: How much does a Bulldog weigh?
+Thought: I should look the dogs weight using average_dog_weight
+Action: average_dog_weight: Bulldog
+PAUSE
+
+You will be called again with this:
+
+Observation: A Bulldog weights 51 lbs
+
+You then output:
+
+Answer: A bulldog weights 51 lbs
+&quot;&quot;&quot;.strip()</code></pre></div>
 <h2 id="5-implementing-the-tools">5. Implementing the Tools</h2>
 <p>Two tools: a <strong>calculator</strong> that evaluates arithmetic expressions safely with Python's <code>ast</code> module (never <code>eval()</code> on model output), and a <strong>breed-weight lookup</strong> with fixed sample values matched case-insensitively. A dictionary (<code>known_actions</code>) maps each action name to its function. The tools are deliberately simple; real agents would connect to APIs, databases or other external systems.</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># tools.py</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">ast</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">operator</span>
+<div class="runnable"><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden># tools.py
+import ast
+import operator
 
-<span class="n">_OPS</span> <span class="o">=</span> <span class="p">{</span><span class="n">ast</span><span class="o">.</span><span class="n">Add</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Sub</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">sub</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Mult</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">mul</span><span class="p">,</span>
-        <span class="n">ast</span><span class="o">.</span><span class="n">Div</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">truediv</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Pow</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">pow</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Mod</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">mod</span><span class="p">,</span>
-        <span class="n">ast</span><span class="o">.</span><span class="n">USub</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">neg</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">UAdd</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">pos</span><span class="p">}</span>
+_OPS = {ast.Add: operator.add, ast.Sub: operator.sub, ast.Mult: operator.mul,
+        ast.Div: operator.truediv, ast.Pow: operator.pow, ast.Mod: operator.mod,
+        ast.USub: operator.neg, ast.UAdd: operator.pos}
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_safe_eval</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
-    <span class="c1"># Walk the parsed expression tree; only numbers and arithmetic operators are allowed</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Expression</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_safe_eval</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Constant</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
-        <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">BinOp</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">)</span> <span class="ow">in</span> <span class="n">_OPS</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_OPS</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">)](</span><span class="n">_safe_eval</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="p">),</span> <span class="n">_safe_eval</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">right</span><span class="p">))</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">UnaryOp</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">)</span> <span class="ow">in</span> <span class="n">_OPS</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_OPS</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">)](</span><span class="n">_safe_eval</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">operand</span><span class="p">))</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unsupported expression: </span><span class="si">{</span><span class="n">ast</span><span class="o">.</span><span class="n">unparse</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+def _safe_eval(node):
+    # Walk the parsed expression tree; only numbers and arithmetic operators are allowed
+    if isinstance(node, ast.Expression):
+        return _safe_eval(node.body)
+    if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
+        return node.value
+    if isinstance(node, ast.BinOp) and type(node.op) in _OPS:
+        return _OPS[type(node.op)](_safe_eval(node.left), _safe_eval(node.right))
+    if isinstance(node, ast.UnaryOp) and type(node.op) in _OPS:
+        return _OPS[type(node.op)](_safe_eval(node.operand))
+    raise ValueError(f&quot;Unsupported expression: {ast.unparse(node)}&quot;)
 
-<span class="k">def</span><span class="w"> </span><span class="nf">calculate</span><span class="p">(</span><span class="n">what</span><span class="p">):</span>
-    <span class="c1"># Safe arithmetic evaluator (never call eval() on model output)</span>
-    <span class="k">return</span> <span class="n">_safe_eval</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">what</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"eval"</span><span class="p">))</span>
+def calculate(what):
+    # Safe arithmetic evaluator (never call eval() on model output)
+    return _safe_eval(ast.parse(what.strip(), mode=&quot;eval&quot;))
 
-<span class="k">def</span><span class="w"> </span><span class="nf">average_dog_weight</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>   <span class="c1"># exact, case-insensitive match (not a substring test)</span>
-    <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"scottish terrier"</span><span class="p">:</span>
-        <span class="k">return</span><span class="p">(</span><span class="s2">"Scottish Terriers average 20 lbs"</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"border collie"</span><span class="p">:</span>
-        <span class="k">return</span><span class="p">(</span><span class="s2">"a Border Collies average weight is 37 lbs"</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"toy poodle"</span><span class="p">:</span>
-        <span class="k">return</span><span class="p">(</span><span class="s2">"a toy poodles average weight is 7 lbs"</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span><span class="p">(</span><span class="s2">"An average dog weights 50 lbs"</span><span class="p">)</span>
+def average_dog_weight(name):
+    name = name.strip().lower()   # exact, case-insensitive match (not a substring test)
+    if name == &quot;scottish terrier&quot;:
+        return(&quot;Scottish Terriers average 20 lbs&quot;)
+    elif name == &quot;border collie&quot;:
+        return(&quot;a Border Collies average weight is 37 lbs&quot;)
+    elif name == &quot;toy poodle&quot;:
+        return(&quot;a toy poodles average weight is 7 lbs&quot;)
+    else:
+        return(&quot;An average dog weights 50 lbs&quot;)
 
-<span class="n">known_actions</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">"calculate"</span><span class="p">:</span> <span class="n">calculate</span><span class="p">,</span>
-    <span class="s2">"average_dog_weight"</span><span class="p">:</span> <span class="n">average_dog_weight</span>
-<span class="p">}</span>
-</code></pre></div>
+known_actions = {
+    &quot;calculate&quot;: calculate,
+    &quot;average_dog_weight&quot;: average_dog_weight
+}</textarea><pre><code class="language-python"># tools.py
+import ast
+import operator
+
+_OPS = {ast.Add: operator.add, ast.Sub: operator.sub, ast.Mult: operator.mul,
+        ast.Div: operator.truediv, ast.Pow: operator.pow, ast.Mod: operator.mod,
+        ast.USub: operator.neg, ast.UAdd: operator.pos}
+
+def _safe_eval(node):
+    # Walk the parsed expression tree; only numbers and arithmetic operators are allowed
+    if isinstance(node, ast.Expression):
+        return _safe_eval(node.body)
+    if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
+        return node.value
+    if isinstance(node, ast.BinOp) and type(node.op) in _OPS:
+        return _OPS[type(node.op)](_safe_eval(node.left), _safe_eval(node.right))
+    if isinstance(node, ast.UnaryOp) and type(node.op) in _OPS:
+        return _OPS[type(node.op)](_safe_eval(node.operand))
+    raise ValueError(f&quot;Unsupported expression: {ast.unparse(node)}&quot;)
+
+def calculate(what):
+    # Safe arithmetic evaluator (never call eval() on model output)
+    return _safe_eval(ast.parse(what.strip(), mode=&quot;eval&quot;))
+
+def average_dog_weight(name):
+    name = name.strip().lower()   # exact, case-insensitive match (not a substring test)
+    if name == &quot;scottish terrier&quot;:
+        return(&quot;Scottish Terriers average 20 lbs&quot;)
+    elif name == &quot;border collie&quot;:
+        return(&quot;a Border Collies average weight is 37 lbs&quot;)
+    elif name == &quot;toy poodle&quot;:
+        return(&quot;a toy poodles average weight is 7 lbs&quot;)
+    else:
+        return(&quot;An average dog weights 50 lbs&quot;)
+
+known_actions = {
+    &quot;calculate&quot;: calculate,
+    &quot;average_dog_weight&quot;: average_dog_weight
+}</code></pre></div>
 <h2 id="6-creating-the-agent-loop">6. Creating the Agent Loop</h2>
 <p>The <code>query</code> function starts an agent with the ReAct prompt and sends it the question. It uses a <strong>regular expression</strong> to find any requested <code>Action:</code> line, runs the matching tool, and sends the result back as an <code>Observation:</code>. The loop ends when the model produces no further action.</p>
 <blockquote>
 <p><strong>Safety Feature:</strong> the <code>max_turns</code> limit stops the loop from running indefinitely.</p>
 </blockquote>
-<div class="highlight"><pre><span></span><code><span class="c1"># agent_loop.py</span>
-<span class="n">action_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">'^Action: (\w+): (.*)$'</span><span class="p">)</span>   <span class="c1"># python regular expression to select action</span>
+<div class="runnable"><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden># agent_loop.py
+action_re = re.compile(r&#x27;^Action: (\w+): (.*)$&#x27;)   # python regular expression to select action
 
-<span class="k">def</span><span class="w"> </span><span class="nf">query</span><span class="p">(</span><span class="n">question</span><span class="p">,</span> <span class="n">max_turns</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
-    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">bot</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
-    <span class="n">next_prompt</span> <span class="o">=</span> <span class="n">question</span>
-    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">max_turns</span><span class="p">:</span>
-        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">bot</span><span class="p">(</span><span class="n">next_prompt</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
-        <span class="n">actions</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">action_re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">action_re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-        <span class="p">]</span>
-        <span class="k">if</span> <span class="n">actions</span><span class="p">:</span>
-            <span class="c1"># There is an action to run</span>
-            <span class="n">action</span><span class="p">,</span> <span class="n">action_input</span> <span class="o">=</span> <span class="n">actions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">action</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">known_actions</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"Unknown action: </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">action_input</span><span class="p">))</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">" -- running </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">action_input</span><span class="p">))</span>
-            <span class="n">observation</span> <span class="o">=</span> <span class="n">known_actions</span><span class="p">[</span><span class="n">action</span><span class="p">](</span><span class="n">action_input</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">"Observation:"</span><span class="p">,</span> <span class="n">observation</span><span class="p">)</span>
-            <span class="n">next_prompt</span> <span class="o">=</span> <span class="s2">"Observation: </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">observation</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span>
-</code></pre></div>
+def query(question, max_turns=5):
+    i = 0
+    bot = Agent(prompt)
+    next_prompt = question
+    while i &lt; max_turns:
+        i += 1
+        result = bot(next_prompt)
+        print(result)
+        actions = [
+            action_re.match(a)
+            for a in result.split(&#x27;\n&#x27;)
+            if action_re.match(a)
+        ]
+        if actions:
+            # There is an action to run
+            action, action_input = actions[0].groups()
+            if action not in known_actions:
+                raise Exception(&quot;Unknown action: {}: {}&quot;.format(action, action_input))
+            print(&quot; -- running {} {}&quot;.format(action, action_input))
+            observation = known_actions[action](action_input)
+            print(&quot;Observation:&quot;, observation)
+            next_prompt = &quot;Observation: {}&quot;.format(observation)
+        else:
+            return</textarea><textarea class="setup" hidden>import re</textarea><pre><code class="language-python"># agent_loop.py
+action_re = re.compile(r&#x27;^Action: (\w+): (.*)$&#x27;)   # python regular expression to select action
+
+def query(question, max_turns=5):
+    i = 0
+    bot = Agent(prompt)
+    next_prompt = question
+    while i &lt; max_turns:
+        i += 1
+        result = bot(next_prompt)
+        print(result)
+        actions = [
+            action_re.match(a)
+            for a in result.split(&#x27;\n&#x27;)
+            if action_re.match(a)
+        ]
+        if actions:
+            # There is an action to run
+            action, action_input = actions[0].groups()
+            if action not in known_actions:
+                raise Exception(&quot;Unknown action: {}: {}&quot;.format(action, action_input))
+            print(&quot; -- running {} {}&quot;.format(action, action_input))
+            observation = known_actions[action](action_input)
+            print(&quot;Observation:&quot;, observation)
+            next_prompt = &quot;Observation: {}&quot;.format(observation)
+        else:
+            return</code></pre></div>
 <p>Agent loop diagram:</p>
-<div class="highlight"><pre><span></span><code>User Question → Agent Reasoning → Action Extraction (regex) → Tool Execution → Return Observation
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">User Question → Agent Reasoning → Action Extraction (regex) → Tool Execution → Return Observation
                      ↑                                                              |
-                     └──────────────────────────────────────────────────────────────┘
-</code></pre></div>
+                     └──────────────────────────────────────────────────────────────┘</code></pre></div>
 <h2 id="7-complete-example">7. Complete Example</h2>
 <p>A multi-step question about the combined weight of two dogs. The agent looks up each breed, adds the weights, and returns the total — showing how a multi-step problem is split into smaller steps.</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># complex_example.py</span>
-<span class="n">question</span> <span class="o">=</span> <span class="s2">"""I have 2 dogs, a border collie and a scottish terrier. </span><span class="se">\</span>
-<span class="s2">What is their combined weight"""</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden># complex_example.py
+question = &quot;&quot;&quot;I have 2 dogs, a border collie and a scottish terrier. \
+What is their combined weight&quot;&quot;&quot;
 
-<span class="n">query</span><span class="p">(</span><span class="n">question</span><span class="p">)</span>
-<span class="c1"># The agent will:</span>
-<span class="c1"># 1. Look up the weight of a border collie</span>
-<span class="c1"># 2. Look up the weight of a scottish terrier</span>
-<span class="c1"># 3. Calculate the sum of the weights</span>
-<span class="c1"># 4. Provide the final answer</span>
-</code></pre></div>
+query(question)
+# The agent will:
+# 1. Look up the weight of a border collie
+# 2. Look up the weight of a scottish terrier
+# 3. Calculate the sum of the weights
+# 4. Provide the final answer</textarea><pre><code class="language-python"># complex_example.py
+question = &quot;&quot;&quot;I have 2 dogs, a border collie and a scottish terrier. \
+What is their combined weight&quot;&quot;&quot;
+
+query(question)
+# The agent will:
+# 1. Look up the weight of a border collie
+# 2. Look up the weight of a scottish terrier
+# 3. Calculate the sum of the weights
+# 4. Provide the final answer</code></pre></div>
 <p>Example session trace:</p>
-<div class="highlight"><pre><span></span><code>Question:    I have 2 dogs, a border collie and a scottish terrier. What is their combined weight?
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">Question:    I have 2 dogs, a border collie and a scottish terrier. What is their combined weight?
 Thought:     I need to find the weight of a border collie and a scottish terrier, then add them together.
 Action:      average_dog_weight: Border Collie
 PAUSE
@@ -228,145 +359,276 @@ Thought:     Now I can calculate the total weight by adding the two weights toge
 Action:      calculate: 37 + 20
 PAUSE
 Observation: 57
-Answer:      The combined weight of your border collie and scottish terrier is 57 lbs.
-</code></pre></div>
+Answer:      The combined weight of your border collie and scottish terrier is 57 lbs.</code></pre></div>
 <h2 id="8-complete-code-architecture">8. Complete Code Architecture</h2>
 <p>All the pieces combined into a single script with a main entry point.</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># react_agent.py</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">ast</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">operator</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">openai</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenAI</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="dotenv, openai" title="Needs dotenv, openai — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden># react_agent.py
+import ast
+import operator
+import re
+from dotenv import load_dotenv
+from openai import OpenAI
 
-<span class="n">_</span> <span class="o">=</span> <span class="n">load_dotenv</span><span class="p">()</span>
-<span class="n">client</span> <span class="o">=</span> <span class="n">OpenAI</span><span class="p">()</span>
-
-
-<span class="k">class</span><span class="w"> </span><span class="nc">Agent</span><span class="p">:</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="o">=</span><span class="s2">""</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">system</span> <span class="o">=</span> <span class="n">system</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">messages</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"system"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="n">system</span><span class="p">})</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"user"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="n">message</span><span class="p">})</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"assistant"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="n">result</span><span class="p">})</span>
-        <span class="k">return</span> <span class="n">result</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">completion</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-                        <span class="n">model</span><span class="o">=</span><span class="s2">"gpt-4o"</span><span class="p">,</span>
-                        <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-                        <span class="n">messages</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">completion</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span>
+_ = load_dotenv()
+client = OpenAI()
 
 
-<span class="n">prompt</span> <span class="o">=</span> <span class="s2">"""</span>
-<span class="s2">You run in a loop of Thought, Action, PAUSE, Observation.</span>
-<span class="s2">At the end of the loop you output an Answer</span>
-<span class="s2">Use Thought to describe your thoughts about the question you have been asked.</span>
-<span class="s2">Use Action to run one of the actions available to you - then return PAUSE.</span>
-<span class="s2">Observation will be the result of running those actions.</span>
+class Agent:
+    def __init__(self, system=&quot;&quot;):
+        self.system = system
+        self.messages = []
+        if self.system:
+            self.messages.append({&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: system})
 
-<span class="s2">Your available actions are:</span>
+    def __call__(self, message):
+        self.messages.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: message})
+        result = self.execute()
+        self.messages.append({&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: result})
+        return result
 
-<span class="s2">calculate:</span>
-<span class="s2">e.g. calculate: 4 * 7 / 3</span>
-<span class="s2">Runs a calculation and returns the number - uses Python so be sure to use floating point syntax if necessary</span>
-
-<span class="s2">average_dog_weight:</span>
-<span class="s2">e.g. average_dog_weight: Collie</span>
-<span class="s2">returns average weight of a dog when given the breed</span>
-
-<span class="s2">Example session:</span>
-
-<span class="s2">Question: How much does a Bulldog weigh?</span>
-<span class="s2">Thought: I should look the dogs weight using average_dog_weight</span>
-<span class="s2">Action: average_dog_weight: Bulldog</span>
-<span class="s2">PAUSE</span>
-
-<span class="s2">You will be called again with this:</span>
-
-<span class="s2">Observation: A Bulldog weights 51 lbs</span>
-
-<span class="s2">You then output:</span>
-
-<span class="s2">Answer: A bulldog weights 51 lbs</span>
-<span class="s2">"""</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    def execute(self):
+        completion = client.chat.completions.create(
+                        model=&quot;gpt-4o&quot;,
+                        temperature=0,
+                        messages=self.messages)
+        return completion.choices[0].message.content
 
 
-<span class="n">_OPS</span> <span class="o">=</span> <span class="p">{</span><span class="n">ast</span><span class="o">.</span><span class="n">Add</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Sub</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">sub</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Mult</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">mul</span><span class="p">,</span>
-        <span class="n">ast</span><span class="o">.</span><span class="n">Div</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">truediv</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Pow</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">pow</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Mod</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">mod</span><span class="p">,</span>
-        <span class="n">ast</span><span class="o">.</span><span class="n">USub</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">neg</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">UAdd</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">pos</span><span class="p">}</span>
+prompt = &quot;&quot;&quot;
+You run in a loop of Thought, Action, PAUSE, Observation.
+At the end of the loop you output an Answer
+Use Thought to describe your thoughts about the question you have been asked.
+Use Action to run one of the actions available to you - then return PAUSE.
+Observation will be the result of running those actions.
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_safe_eval</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
-    <span class="c1"># Walk the parsed expression tree; only numbers and arithmetic operators are allowed</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Expression</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_safe_eval</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Constant</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
-        <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">BinOp</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">)</span> <span class="ow">in</span> <span class="n">_OPS</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_OPS</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">)](</span><span class="n">_safe_eval</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="p">),</span> <span class="n">_safe_eval</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">right</span><span class="p">))</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">UnaryOp</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">)</span> <span class="ow">in</span> <span class="n">_OPS</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_OPS</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">)](</span><span class="n">_safe_eval</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">operand</span><span class="p">))</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unsupported expression: </span><span class="si">{</span><span class="n">ast</span><span class="o">.</span><span class="n">unparse</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+Your available actions are:
 
-<span class="k">def</span><span class="w"> </span><span class="nf">calculate</span><span class="p">(</span><span class="n">what</span><span class="p">):</span>
-    <span class="c1"># Safe arithmetic evaluator (never call eval() on model output)</span>
-    <span class="k">return</span> <span class="n">_safe_eval</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">what</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"eval"</span><span class="p">))</span>
+calculate:
+e.g. calculate: 4 * 7 / 3
+Runs a calculation and returns the number - uses Python so be sure to use floating point syntax if necessary
 
-<span class="k">def</span><span class="w"> </span><span class="nf">average_dog_weight</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>   <span class="c1"># exact, case-insensitive match (not a substring test)</span>
-    <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"scottish terrier"</span><span class="p">:</span>
-        <span class="k">return</span><span class="p">(</span><span class="s2">"Scottish Terriers average 20 lbs"</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"border collie"</span><span class="p">:</span>
-        <span class="k">return</span><span class="p">(</span><span class="s2">"a Border Collies average weight is 37 lbs"</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"toy poodle"</span><span class="p">:</span>
-        <span class="k">return</span><span class="p">(</span><span class="s2">"a toy poodles average weight is 7 lbs"</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span><span class="p">(</span><span class="s2">"An average dog weights 50 lbs"</span><span class="p">)</span>
+average_dog_weight:
+e.g. average_dog_weight: Collie
+returns average weight of a dog when given the breed
 
-<span class="n">known_actions</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">"calculate"</span><span class="p">:</span> <span class="n">calculate</span><span class="p">,</span>
-    <span class="s2">"average_dog_weight"</span><span class="p">:</span> <span class="n">average_dog_weight</span>
-<span class="p">}</span>
+Example session:
 
-<span class="n">action_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">'^Action: (\w+): (.*)$'</span><span class="p">)</span>   <span class="c1"># python regular expression to select action</span>
+Question: How much does a Bulldog weigh?
+Thought: I should look the dogs weight using average_dog_weight
+Action: average_dog_weight: Bulldog
+PAUSE
 
-<span class="k">def</span><span class="w"> </span><span class="nf">query</span><span class="p">(</span><span class="n">question</span><span class="p">,</span> <span class="n">max_turns</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
-    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">bot</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
-    <span class="n">next_prompt</span> <span class="o">=</span> <span class="n">question</span>
-    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">max_turns</span><span class="p">:</span>
-        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">bot</span><span class="p">(</span><span class="n">next_prompt</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
-        <span class="n">actions</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">action_re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">action_re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-        <span class="p">]</span>
-        <span class="k">if</span> <span class="n">actions</span><span class="p">:</span>
-            <span class="c1"># There is an action to run</span>
-            <span class="n">action</span><span class="p">,</span> <span class="n">action_input</span> <span class="o">=</span> <span class="n">actions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">action</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">known_actions</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"Unknown action: </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">action_input</span><span class="p">))</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">" -- running </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">action_input</span><span class="p">))</span>
-            <span class="n">observation</span> <span class="o">=</span> <span class="n">known_actions</span><span class="p">[</span><span class="n">action</span><span class="p">](</span><span class="n">action_input</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">"Observation:"</span><span class="p">,</span> <span class="n">observation</span><span class="p">)</span>
-            <span class="n">next_prompt</span> <span class="o">=</span> <span class="s2">"Observation: </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">observation</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span>
+You will be called again with this:
+
+Observation: A Bulldog weights 51 lbs
+
+You then output:
+
+Answer: A bulldog weights 51 lbs
+&quot;&quot;&quot;.strip()
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
-    <span class="n">question</span> <span class="o">=</span> <span class="s2">"""I have 2 dogs, a border collie and a scottish terrier. </span><span class="se">\</span>
-<span class="s2">What is their combined weight"""</span>
-    <span class="n">query</span><span class="p">(</span><span class="n">question</span><span class="p">)</span>
-</code></pre></div>
+_OPS = {ast.Add: operator.add, ast.Sub: operator.sub, ast.Mult: operator.mul,
+        ast.Div: operator.truediv, ast.Pow: operator.pow, ast.Mod: operator.mod,
+        ast.USub: operator.neg, ast.UAdd: operator.pos}
+
+def _safe_eval(node):
+    # Walk the parsed expression tree; only numbers and arithmetic operators are allowed
+    if isinstance(node, ast.Expression):
+        return _safe_eval(node.body)
+    if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
+        return node.value
+    if isinstance(node, ast.BinOp) and type(node.op) in _OPS:
+        return _OPS[type(node.op)](_safe_eval(node.left), _safe_eval(node.right))
+    if isinstance(node, ast.UnaryOp) and type(node.op) in _OPS:
+        return _OPS[type(node.op)](_safe_eval(node.operand))
+    raise ValueError(f&quot;Unsupported expression: {ast.unparse(node)}&quot;)
+
+def calculate(what):
+    # Safe arithmetic evaluator (never call eval() on model output)
+    return _safe_eval(ast.parse(what.strip(), mode=&quot;eval&quot;))
+
+def average_dog_weight(name):
+    name = name.strip().lower()   # exact, case-insensitive match (not a substring test)
+    if name == &quot;scottish terrier&quot;:
+        return(&quot;Scottish Terriers average 20 lbs&quot;)
+    elif name == &quot;border collie&quot;:
+        return(&quot;a Border Collies average weight is 37 lbs&quot;)
+    elif name == &quot;toy poodle&quot;:
+        return(&quot;a toy poodles average weight is 7 lbs&quot;)
+    else:
+        return(&quot;An average dog weights 50 lbs&quot;)
+
+known_actions = {
+    &quot;calculate&quot;: calculate,
+    &quot;average_dog_weight&quot;: average_dog_weight
+}
+
+action_re = re.compile(r&#x27;^Action: (\w+): (.*)$&#x27;)   # python regular expression to select action
+
+def query(question, max_turns=5):
+    i = 0
+    bot = Agent(prompt)
+    next_prompt = question
+    while i &lt; max_turns:
+        i += 1
+        result = bot(next_prompt)
+        print(result)
+        actions = [
+            action_re.match(a)
+            for a in result.split(&#x27;\n&#x27;)
+            if action_re.match(a)
+        ]
+        if actions:
+            # There is an action to run
+            action, action_input = actions[0].groups()
+            if action not in known_actions:
+                raise Exception(&quot;Unknown action: {}: {}&quot;.format(action, action_input))
+            print(&quot; -- running {} {}&quot;.format(action, action_input))
+            observation = known_actions[action](action_input)
+            print(&quot;Observation:&quot;, observation)
+            next_prompt = &quot;Observation: {}&quot;.format(observation)
+        else:
+            return
+
+
+if __name__ == &quot;__main__&quot;:
+    question = &quot;&quot;&quot;I have 2 dogs, a border collie and a scottish terrier. \
+What is their combined weight&quot;&quot;&quot;
+    query(question)</textarea><pre><code class="language-python"># react_agent.py
+import ast
+import operator
+import re
+from dotenv import load_dotenv
+from openai import OpenAI
+
+_ = load_dotenv()
+client = OpenAI()
+
+
+class Agent:
+    def __init__(self, system=&quot;&quot;):
+        self.system = system
+        self.messages = []
+        if self.system:
+            self.messages.append({&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: system})
+
+    def __call__(self, message):
+        self.messages.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: message})
+        result = self.execute()
+        self.messages.append({&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: result})
+        return result
+
+    def execute(self):
+        completion = client.chat.completions.create(
+                        model=&quot;gpt-4o&quot;,
+                        temperature=0,
+                        messages=self.messages)
+        return completion.choices[0].message.content
+
+
+prompt = &quot;&quot;&quot;
+You run in a loop of Thought, Action, PAUSE, Observation.
+At the end of the loop you output an Answer
+Use Thought to describe your thoughts about the question you have been asked.
+Use Action to run one of the actions available to you - then return PAUSE.
+Observation will be the result of running those actions.
+
+Your available actions are:
+
+calculate:
+e.g. calculate: 4 * 7 / 3
+Runs a calculation and returns the number - uses Python so be sure to use floating point syntax if necessary
+
+average_dog_weight:
+e.g. average_dog_weight: Collie
+returns average weight of a dog when given the breed
+
+Example session:
+
+Question: How much does a Bulldog weigh?
+Thought: I should look the dogs weight using average_dog_weight
+Action: average_dog_weight: Bulldog
+PAUSE
+
+You will be called again with this:
+
+Observation: A Bulldog weights 51 lbs
+
+You then output:
+
+Answer: A bulldog weights 51 lbs
+&quot;&quot;&quot;.strip()
+
+
+_OPS = {ast.Add: operator.add, ast.Sub: operator.sub, ast.Mult: operator.mul,
+        ast.Div: operator.truediv, ast.Pow: operator.pow, ast.Mod: operator.mod,
+        ast.USub: operator.neg, ast.UAdd: operator.pos}
+
+def _safe_eval(node):
+    # Walk the parsed expression tree; only numbers and arithmetic operators are allowed
+    if isinstance(node, ast.Expression):
+        return _safe_eval(node.body)
+    if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
+        return node.value
+    if isinstance(node, ast.BinOp) and type(node.op) in _OPS:
+        return _OPS[type(node.op)](_safe_eval(node.left), _safe_eval(node.right))
+    if isinstance(node, ast.UnaryOp) and type(node.op) in _OPS:
+        return _OPS[type(node.op)](_safe_eval(node.operand))
+    raise ValueError(f&quot;Unsupported expression: {ast.unparse(node)}&quot;)
+
+def calculate(what):
+    # Safe arithmetic evaluator (never call eval() on model output)
+    return _safe_eval(ast.parse(what.strip(), mode=&quot;eval&quot;))
+
+def average_dog_weight(name):
+    name = name.strip().lower()   # exact, case-insensitive match (not a substring test)
+    if name == &quot;scottish terrier&quot;:
+        return(&quot;Scottish Terriers average 20 lbs&quot;)
+    elif name == &quot;border collie&quot;:
+        return(&quot;a Border Collies average weight is 37 lbs&quot;)
+    elif name == &quot;toy poodle&quot;:
+        return(&quot;a toy poodles average weight is 7 lbs&quot;)
+    else:
+        return(&quot;An average dog weights 50 lbs&quot;)
+
+known_actions = {
+    &quot;calculate&quot;: calculate,
+    &quot;average_dog_weight&quot;: average_dog_weight
+}
+
+action_re = re.compile(r&#x27;^Action: (\w+): (.*)$&#x27;)   # python regular expression to select action
+
+def query(question, max_turns=5):
+    i = 0
+    bot = Agent(prompt)
+    next_prompt = question
+    while i &lt; max_turns:
+        i += 1
+        result = bot(next_prompt)
+        print(result)
+        actions = [
+            action_re.match(a)
+            for a in result.split(&#x27;\n&#x27;)
+            if action_re.match(a)
+        ]
+        if actions:
+            # There is an action to run
+            action, action_input = actions[0].groups()
+            if action not in known_actions:
+                raise Exception(&quot;Unknown action: {}: {}&quot;.format(action, action_input))
+            print(&quot; -- running {} {}&quot;.format(action, action_input))
+            observation = known_actions[action](action_input)
+            print(&quot;Observation:&quot;, observation)
+            next_prompt = &quot;Observation: {}&quot;.format(observation)
+        else:
+            return
+
+
+if __name__ == &quot;__main__&quot;:
+    question = &quot;&quot;&quot;I have 2 dogs, a border collie and a scottish terrier. \
+What is their combined weight&quot;&quot;&quot;
+    query(question)</code></pre></div>
 <h2 id="9-extensions">9. Extensions</h2>
 <ul>
 <li><strong>More tools:</strong> web search, API calls, database queries.</li>
@@ -399,14 +661,68 @@ Answer:      The combined weight of your border collie and scottish terrier is 5
 <li><strong>known_actions:</strong> dictionary mapping action names to Python functions.</li>
 <li><strong>max_turns:</strong> iteration cap that prevents endless loops.</li>
 </ul>
-  <div class="pager"><a href="week08-midterm.html"><small>Previous</small>Week 8: Midterm Exam</a><a class="next" href="week10-multi-agent.html"><small>Next</small>Week 10: Multi-Agent Systems</a></div>
-  <footer style="margin-top:3rem;padding-top:1rem;border-top:1px solid var(--border);font-size:.84rem;color:var(--muted)">
-This site is based on the course site <a href="https://albanna-tutorials.com/cs/">albanna-tutorials.com/cs</a> by Dr. Abdulkarim Albanna, used with the author's permission.
-</footer>
-</main><aside class="rail">
-  <div class="rail-tabs"><button class="active" data-panel="panel-sims">Simulations</button><button data-panel="panel-code">Test code</button></div>
-  <div class="rail-panel active" id="panel-sims"><p class="rail-intro">Interactive teaching aids for this week. Each opens full-size with step controls and teaching notes.</p><button class="sim-card" data-sim="react-loop"><span class="sim-kind">Agents · animation</span><span class="sim-title">ReAct agent loop</span><span class="sim-desc">Thought → Action → Observation on a growing scratchpad, including a tool error.</span></button><button class="sim-card" data-sim="rag"><span class="sim-kind">LangChain · animation</span><span class="sim-title">RAG pipeline</span><span class="sim-desc">Load → split → embed → store → query → top-k → grounded prompt, in 2-D embedding space.</span></button></div>
-  <div class="rail-panel" id="panel-code"><p class="rail-intro"><b>Run ▶</b> executes pure-Python/NumPy snippets in your browser (Pyodide). Snippets marked <i>local</i> need the course environment (PyTorch, Transformers, LangChain…) — copy them into VS Code.</p><div class="snippet"><div class="snippet-head"><span>Regex action extraction, no API key needed</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 1. Regex action extraction, no API key needed
+<h2 id="try-it-yourself">Try it yourself</h2>
+<p class="lesson-intro"><b>▶ Try it</b> runs an example in the editor panel, inside your browser — change the code and press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to run it again. Examples marked <b>✎ Open in editor</b> need libraries or API keys that cannot run in a browser (PyTorch, Transformers, LangChain, OpenAI…): read them in the editor, then copy them to VS Code and run them in the course environment.</p><h3 id="run-in-your-browser">Run in your browser</h3><p class="lesson-intro">Self-contained versions of this week's mechanisms, written with NumPy, scikit-learn or plain Python so they run here.</p><div class="runnable"><div class="code-title">A ReAct loop with a scripted model and real tools</div><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden>import ast, operator, re
+
+def calculate(expr):
+    ops = {ast.Add: operator.add, ast.Sub: operator.sub, ast.Mult: operator.mul, ast.Div: operator.truediv, ast.Pow: operator.pow}
+    def ev(n):
+        if isinstance(n, ast.Constant) and isinstance(n.value, (int, float)): return n.value
+        if isinstance(n, ast.BinOp) and type(n.op) in ops: return ops[type(n.op)](ev(n.left), ev(n.right))
+        raise ValueError(&quot;unsupported expression&quot;)
+    return ev(ast.parse(expr, mode=&quot;eval&quot;).body)
+
+def lookup(term):
+    facts = {&quot;amman population&quot;: &quot;about 4.06 million (2024 estimate)&quot;}
+    return facts.get(term.lower(), &quot;no result&quot;)
+
+tools = {&quot;calculate&quot;: calculate, &quot;lookup&quot;: lookup}
+
+script = iter([                       # what an LLM would generate, one turn at a time
+    &quot;Thought: I need the population first.\nAction: lookup: Amman population&quot;,
+    &quot;Thought: Now compute 17% of 4.06 million.\nAction: calculate: 0.17 * 4060000&quot;,
+    &quot;Thought: I have the answer.\nAnswer: about 690,200 people&quot;,
+])
+action_re = re.compile(r&quot;^Action: (\w+): (.*)$&quot;)
+
+for turn in range(1, 6):
+    reply = next(script)
+    print(reply)
+    if reply.splitlines()[-1].startswith(&quot;Answer:&quot;):
+        break
+    m = next(action_re.match(l) for l in reply.splitlines() if action_re.match(l))
+    tool, arg = m.groups()
+    print(f&quot;Observation: {tools[tool](arg)}\n&quot;)</textarea><pre><code class="language-python">import ast, operator, re
+
+def calculate(expr):
+    ops = {ast.Add: operator.add, ast.Sub: operator.sub, ast.Mult: operator.mul, ast.Div: operator.truediv, ast.Pow: operator.pow}
+    def ev(n):
+        if isinstance(n, ast.Constant) and isinstance(n.value, (int, float)): return n.value
+        if isinstance(n, ast.BinOp) and type(n.op) in ops: return ops[type(n.op)](ev(n.left), ev(n.right))
+        raise ValueError(&quot;unsupported expression&quot;)
+    return ev(ast.parse(expr, mode=&quot;eval&quot;).body)
+
+def lookup(term):
+    facts = {&quot;amman population&quot;: &quot;about 4.06 million (2024 estimate)&quot;}
+    return facts.get(term.lower(), &quot;no result&quot;)
+
+tools = {&quot;calculate&quot;: calculate, &quot;lookup&quot;: lookup}
+
+script = iter([                       # what an LLM would generate, one turn at a time
+    &quot;Thought: I need the population first.\nAction: lookup: Amman population&quot;,
+    &quot;Thought: Now compute 17% of 4.06 million.\nAction: calculate: 0.17 * 4060000&quot;,
+    &quot;Thought: I have the answer.\nAnswer: about 690,200 people&quot;,
+])
+action_re = re.compile(r&quot;^Action: (\w+): (.*)$&quot;)
+
+for turn in range(1, 6):
+    reply = next(script)
+    print(reply)
+    if reply.splitlines()[-1].startswith(&quot;Answer:&quot;):
+        break
+    m = next(action_re.match(l) for l in reply.splitlines() if action_re.match(l))
+    tool, arg = m.groups()
+    print(f&quot;Observation: {tools[tool](arg)}\n&quot;)</code></pre></div><h3 id="test-code">Test code for the course environment</h3><div class="runnable"><div class="code-title">Regex action extraction, no API key needed</div><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden># 1. Regex action extraction, no API key needed
 import re
 action_re = re.compile(r&#x27;^Action: (\w+): (.*)$&#x27;)
 sample = &quot;&quot;&quot;Thought: I should look the dogs weight using average_dog_weight
@@ -414,7 +730,15 @@ Action: average_dog_weight: Bulldog
 PAUSE&quot;&quot;&quot;
 actions = [action_re.match(a) for a in sample.split(&#x27;\n&#x27;) if action_re.match(a)]
 print(actions[0].groups())            # (&#x27;average_dog_weight&#x27;, &#x27;Bulldog&#x27;)
-print(action_re.match(&quot;Answer: 57 lbs&quot;))   # None → loop would terminate</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Tools + dispatch table, exercised directly</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 2. Tools + dispatch table, exercised directly
+print(action_re.match(&quot;Answer: 57 lbs&quot;))   # None → loop would terminate</textarea><pre><code class="language-python"># 1. Regex action extraction, no API key needed
+import re
+action_re = re.compile(r&#x27;^Action: (\w+): (.*)$&#x27;)
+sample = &quot;&quot;&quot;Thought: I should look the dogs weight using average_dog_weight
+Action: average_dog_weight: Bulldog
+PAUSE&quot;&quot;&quot;
+actions = [action_re.match(a) for a in sample.split(&#x27;\n&#x27;) if action_re.match(a)]
+print(actions[0].groups())            # (&#x27;average_dog_weight&#x27;, &#x27;Bulldog&#x27;)
+print(action_re.match(&quot;Answer: 57 lbs&quot;))   # None → loop would terminate</code></pre></div><div class="runnable"><div class="code-title">Tools + dispatch table, exercised directly</div><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden># 2. Tools + dispatch table, exercised directly
 import ast, operator
 
 _OPS = {ast.Add: operator.add, ast.Sub: operator.sub, ast.Mult: operator.mul,
@@ -459,7 +783,52 @@ for action, arg in [(&quot;average_dog_weight&quot;, &quot;Border Collie&quot;),
 try:
     calculate(&quot;__import__(&#x27;os&#x27;).system(&#x27;ls&#x27;)&quot;)    # rejected by the safe evaluator
 except ValueError as e:
-    print(&quot;blocked:&quot;, e)</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Run the full ReAct loop offline with a scripted fake LLM (same Agent/query code,</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 3. Run the full ReAct loop offline with a scripted fake LLM (same Agent/query code, no OpenAI call)
+    print(&quot;blocked:&quot;, e)</textarea><pre><code class="language-python"># 2. Tools + dispatch table, exercised directly
+import ast, operator
+
+_OPS = {ast.Add: operator.add, ast.Sub: operator.sub, ast.Mult: operator.mul,
+        ast.Div: operator.truediv, ast.Pow: operator.pow, ast.Mod: operator.mod,
+        ast.USub: operator.neg, ast.UAdd: operator.pos}
+
+def _safe_eval(node):
+    # Walk the parsed expression tree; only numbers and arithmetic operators are allowed
+    if isinstance(node, ast.Expression):
+        return _safe_eval(node.body)
+    if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
+        return node.value
+    if isinstance(node, ast.BinOp) and type(node.op) in _OPS:
+        return _OPS[type(node.op)](_safe_eval(node.left), _safe_eval(node.right))
+    if isinstance(node, ast.UnaryOp) and type(node.op) in _OPS:
+        return _OPS[type(node.op)](_safe_eval(node.operand))
+    raise ValueError(f&quot;Unsupported expression: {ast.unparse(node)}&quot;)
+
+def calculate(what):
+    # Safe arithmetic evaluator (never call eval() on model output)
+    return _safe_eval(ast.parse(what.strip(), mode=&quot;eval&quot;))
+
+def average_dog_weight(name):
+    name = name.strip().lower()   # exact, case-insensitive match (not a substring test)
+    if name == &quot;scottish terrier&quot;:
+        return(&quot;Scottish Terriers average 20 lbs&quot;)
+    elif name == &quot;border collie&quot;:
+        return(&quot;a Border Collies average weight is 37 lbs&quot;)
+    elif name == &quot;toy poodle&quot;:
+        return(&quot;a toy poodles average weight is 7 lbs&quot;)
+    else:
+        return(&quot;An average dog weights 50 lbs&quot;)
+
+known_actions = {&quot;calculate&quot;: calculate, &quot;average_dog_weight&quot;: average_dog_weight}
+for action, arg in [(&quot;average_dog_weight&quot;, &quot;Border Collie&quot;),
+                    (&quot;average_dog_weight&quot;, &quot;Scottish Terrier&quot;),
+                    (&quot;calculate&quot;, &quot;37 + 20&quot;),
+                    (&quot;average_dog_weight&quot;, &quot;scottish terrier&quot;),   # lowercase still matches
+                    (&quot;average_dog_weight&quot;, &quot;Terrier&quot;)]:           # partial name → default
+    print(f&quot;{action}({arg!r}) -&gt; {known_actions[action](arg)}&quot;)
+
+try:
+    calculate(&quot;__import__(&#x27;os&#x27;).system(&#x27;ls&#x27;)&quot;)    # rejected by the safe evaluator
+except ValueError as e:
+    print(&quot;blocked:&quot;, e)</code></pre></div><div class="runnable"><div class="code-title">Run the full ReAct loop offline with a scripted fake LLM (same Agent/query code, no OpenAI</div><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden># 3. Run the full ReAct loop offline with a scripted fake LLM (same Agent/query code, no OpenAI call)
 #    (run test 2 first so that calculate() is defined)
 import re
 scripted = iter([
@@ -494,20 +863,310 @@ def query(question, max_turns=5):
         obs = known_actions[action](arg); print(&quot; -- running&quot;, action, arg); print(&quot;Observation:&quot;, obs)
         next_prompt = f&quot;Observation: {obs}&quot;
 
-print(&quot;messages in history:&quot;, query(&quot;I have 2 dogs, a border collie and a scottish terrier. What is their combined weight&quot;))</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Live run against OpenAI (needs OPENAI_API_KEY in .env): the lesson&#x27;s own entry p</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 4. Live run against OpenAI (needs OPENAI_API_KEY in .env): the lesson&#x27;s own entry point
+print(&quot;messages in history:&quot;, query(&quot;I have 2 dogs, a border collie and a scottish terrier. What is their combined weight&quot;))</textarea><textarea class="setup" hidden># agent.py
+class Agent:
+    def __init__(self, system=&quot;&quot;):
+        self.system = system
+        self.messages = []
+        if self.system:
+            self.messages.append({&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: system})
+
+    def __call__(self, message):
+        self.messages.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: message})
+        result = self.execute()
+        self.messages.append({&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: result})
+        return result
+
+    def execute(self):
+        completion = client.chat.completions.create(
+                        model=&quot;gpt-4o&quot;,
+                        temperature=0,
+                        messages=self.messages)
+        return completion.choices[0].message.content
+
+# react_prompt.py
+prompt = &quot;&quot;&quot;
+You run in a loop of Thought, Action, PAUSE, Observation.
+At the end of the loop you output an Answer
+Use Thought to describe your thoughts about the question you have been asked.
+Use Action to run one of the actions available to you - then return PAUSE.
+Observation will be the result of running those actions.
+
+Your available actions are:
+
+calculate:
+e.g. calculate: 4 * 7 / 3
+Runs a calculation and returns the number - uses Python so be sure to use floating point syntax if necessary
+
+average_dog_weight:
+e.g. average_dog_weight: Collie
+returns average weight of a dog when given the breed
+
+Example session:
+
+Question: How much does a Bulldog weigh?
+Thought: I should look the dogs weight using average_dog_weight
+Action: average_dog_weight: Bulldog
+PAUSE
+
+You will be called again with this:
+
+Observation: A Bulldog weights 51 lbs
+
+You then output:
+
+Answer: A bulldog weights 51 lbs
+&quot;&quot;&quot;.strip()
+
+# tools.py
+import ast
+import operator
+
+_OPS = {ast.Add: operator.add, ast.Sub: operator.sub, ast.Mult: operator.mul,
+        ast.Div: operator.truediv, ast.Pow: operator.pow, ast.Mod: operator.mod,
+        ast.USub: operator.neg, ast.UAdd: operator.pos}
+
+def _safe_eval(node):
+    # Walk the parsed expression tree; only numbers and arithmetic operators are allowed
+    if isinstance(node, ast.Expression):
+        return _safe_eval(node.body)
+    if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
+        return node.value
+    if isinstance(node, ast.BinOp) and type(node.op) in _OPS:
+        return _OPS[type(node.op)](_safe_eval(node.left), _safe_eval(node.right))
+    if isinstance(node, ast.UnaryOp) and type(node.op) in _OPS:
+        return _OPS[type(node.op)](_safe_eval(node.operand))
+    raise ValueError(f&quot;Unsupported expression: {ast.unparse(node)}&quot;)
+
+def calculate(what):
+    # Safe arithmetic evaluator (never call eval() on model output)
+    return _safe_eval(ast.parse(what.strip(), mode=&quot;eval&quot;))
+
+def average_dog_weight(name):
+    name = name.strip().lower()   # exact, case-insensitive match (not a substring test)
+    if name == &quot;scottish terrier&quot;:
+        return(&quot;Scottish Terriers average 20 lbs&quot;)
+    elif name == &quot;border collie&quot;:
+        return(&quot;a Border Collies average weight is 37 lbs&quot;)
+    elif name == &quot;toy poodle&quot;:
+        return(&quot;a toy poodles average weight is 7 lbs&quot;)
+    else:
+        return(&quot;An average dog weights 50 lbs&quot;)
+
+known_actions = {
+    &quot;calculate&quot;: calculate,
+    &quot;average_dog_weight&quot;: average_dog_weight
+}
+
+import re
+# agent_loop.py
+action_re = re.compile(r&#x27;^Action: (\w+): (.*)$&#x27;)   # python regular expression to select action
+
+def query(question, max_turns=5):
+    i = 0
+    bot = Agent(prompt)
+    next_prompt = question
+    while i &lt; max_turns:
+        i += 1
+        result = bot(next_prompt)
+        print(result)
+        actions = [
+            action_re.match(a)
+            for a in result.split(&#x27;\n&#x27;)
+            if action_re.match(a)
+        ]
+        if actions:
+            # There is an action to run
+            action, action_input = actions[0].groups()
+            if action not in known_actions:
+                raise Exception(&quot;Unknown action: {}: {}&quot;.format(action, action_input))
+            print(&quot; -- running {} {}&quot;.format(action, action_input))
+            observation = known_actions[action](action_input)
+            print(&quot;Observation:&quot;, observation)
+            next_prompt = &quot;Observation: {}&quot;.format(observation)
+        else:
+            return
+
+import ast, operator, re
+
+def calculate(expr):
+    ops = {ast.Add: operator.add, ast.Sub: operator.sub, ast.Mult: operator.mul, ast.Div: operator.truediv, ast.Pow: operator.pow}
+    def ev(n):
+        if isinstance(n, ast.Constant) and isinstance(n.value, (int, float)): return n.value
+        if isinstance(n, ast.BinOp) and type(n.op) in ops: return ops[type(n.op)](ev(n.left), ev(n.right))
+        raise ValueError(&quot;unsupported expression&quot;)
+    return ev(ast.parse(expr, mode=&quot;eval&quot;).body)
+
+def lookup(term):
+    facts = {&quot;amman population&quot;: &quot;about 4.06 million (2024 estimate)&quot;}
+    return facts.get(term.lower(), &quot;no result&quot;)
+
+tools = {&quot;calculate&quot;: calculate, &quot;lookup&quot;: lookup}
+
+script = iter([                       # what an LLM would generate, one turn at a time
+    &quot;Thought: I need the population first.\nAction: lookup: Amman population&quot;,
+    &quot;Thought: Now compute 17% of 4.06 million.\nAction: calculate: 0.17 * 4060000&quot;,
+    &quot;Thought: I have the answer.\nAnswer: about 690,200 people&quot;,
+])
+action_re = re.compile(r&quot;^Action: (\w+): (.*)$&quot;)
+
+for turn in range(1, 6):
+    reply = next(script)
+    print(reply)
+    if reply.splitlines()[-1].startswith(&quot;Answer:&quot;):
+        break
+    m = next(action_re.match(l) for l in reply.splitlines() if action_re.match(l))
+    tool, arg = m.groups()
+    print(f&quot;Observation: {tools[tool](arg)}\n&quot;)
+
+# 1. Regex action extraction, no API key needed
+import re
+action_re = re.compile(r&#x27;^Action: (\w+): (.*)$&#x27;)
+sample = &quot;&quot;&quot;Thought: I should look the dogs weight using average_dog_weight
+Action: average_dog_weight: Bulldog
+PAUSE&quot;&quot;&quot;
+actions = [action_re.match(a) for a in sample.split(&#x27;\n&#x27;) if action_re.match(a)]
+print(actions[0].groups())            # (&#x27;average_dog_weight&#x27;, &#x27;Bulldog&#x27;)
+print(action_re.match(&quot;Answer: 57 lbs&quot;))   # None → loop would terminate
+
+# 2. Tools + dispatch table, exercised directly
+import ast, operator
+
+_OPS = {ast.Add: operator.add, ast.Sub: operator.sub, ast.Mult: operator.mul,
+        ast.Div: operator.truediv, ast.Pow: operator.pow, ast.Mod: operator.mod,
+        ast.USub: operator.neg, ast.UAdd: operator.pos}
+
+def _safe_eval(node):
+    # Walk the parsed expression tree; only numbers and arithmetic operators are allowed
+    if isinstance(node, ast.Expression):
+        return _safe_eval(node.body)
+    if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
+        return node.value
+    if isinstance(node, ast.BinOp) and type(node.op) in _OPS:
+        return _OPS[type(node.op)](_safe_eval(node.left), _safe_eval(node.right))
+    if isinstance(node, ast.UnaryOp) and type(node.op) in _OPS:
+        return _OPS[type(node.op)](_safe_eval(node.operand))
+    raise ValueError(f&quot;Unsupported expression: {ast.unparse(node)}&quot;)
+
+def calculate(what):
+    # Safe arithmetic evaluator (never call eval() on model output)
+    return _safe_eval(ast.parse(what.strip(), mode=&quot;eval&quot;))
+
+def average_dog_weight(name):
+    name = name.strip().lower()   # exact, case-insensitive match (not a substring test)
+    if name == &quot;scottish terrier&quot;:
+        return(&quot;Scottish Terriers average 20 lbs&quot;)
+    elif name == &quot;border collie&quot;:
+        return(&quot;a Border Collies average weight is 37 lbs&quot;)
+    elif name == &quot;toy poodle&quot;:
+        return(&quot;a toy poodles average weight is 7 lbs&quot;)
+    else:
+        return(&quot;An average dog weights 50 lbs&quot;)
+
+known_actions = {&quot;calculate&quot;: calculate, &quot;average_dog_weight&quot;: average_dog_weight}
+for action, arg in [(&quot;average_dog_weight&quot;, &quot;Border Collie&quot;),
+                    (&quot;average_dog_weight&quot;, &quot;Scottish Terrier&quot;),
+                    (&quot;calculate&quot;, &quot;37 + 20&quot;),
+                    (&quot;average_dog_weight&quot;, &quot;scottish terrier&quot;),   # lowercase still matches
+                    (&quot;average_dog_weight&quot;, &quot;Terrier&quot;)]:           # partial name → default
+    print(f&quot;{action}({arg!r}) -&gt; {known_actions[action](arg)}&quot;)
+
+try:
+    calculate(&quot;__import__(&#x27;os&#x27;).system(&#x27;ls&#x27;)&quot;)    # rejected by the safe evaluator
+except ValueError as e:
+    print(&quot;blocked:&quot;, e)</textarea><pre><code class="language-python"># 3. Run the full ReAct loop offline with a scripted fake LLM (same Agent/query code, no OpenAI call)
+#    (run test 2 first so that calculate() is defined)
+import re
+scripted = iter([
+    &quot;Thought: I need both weights.\nAction: average_dog_weight: Border Collie\nPAUSE&quot;,
+    &quot;Thought: Now the terrier.\nAction: average_dog_weight: Scottish Terrier\nPAUSE&quot;,
+    &quot;Thought: Add them.\nAction: calculate: 37 + 20\nPAUSE&quot;,
+    &quot;Answer: The combined weight is 57 lbs.&quot;,
+])
+
+class Agent:
+    def __init__(self, system=&quot;&quot;):
+        self.messages = [{&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: system}] if system else []
+    def __call__(self, message):
+        self.messages.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: message})
+        result = next(scripted)                     # stand-in for client.chat.completions.create
+        self.messages.append({&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: result})
+        return result
+
+known_actions = {&quot;calculate&quot;: calculate,                      # the safe ast-based calculate() from test 2
+                 &quot;average_dog_weight&quot;: lambda n: {&quot;border collie&quot;: &quot;a Border Collies average weight is 37 lbs&quot;,
+                                                  &quot;scottish terrier&quot;: &quot;Scottish Terriers average 20 lbs&quot;}.get(n.strip().lower(), &quot;An average dog weights 50 lbs&quot;)}
+action_re = re.compile(r&#x27;^Action: (\w+): (.*)$&#x27;)
+
+def query(question, max_turns=5):
+    bot, next_prompt = Agent(&quot;ReAct prompt&quot;), question
+    for i in range(max_turns):
+        result = bot(next_prompt); print(result)
+        actions = [action_re.match(a) for a in result.split(&#x27;\n&#x27;) if action_re.match(a)]
+        if not actions:
+            return len(bot.messages)
+        action, arg = actions[0].groups()
+        obs = known_actions[action](arg); print(&quot; -- running&quot;, action, arg); print(&quot;Observation:&quot;, obs)
+        next_prompt = f&quot;Observation: {obs}&quot;
+
+print(&quot;messages in history:&quot;, query(&quot;I have 2 dogs, a border collie and a scottish terrier. What is their combined weight&quot;))</code></pre></div><div class="runnable local"><div class="code-title">Live run against OpenAI (needs OPENAI_API_KEY in .env): the lesson&#x27;s own entry point</div><button class="try local" data-run="0" data-needs="dotenv, openai" title="Needs dotenv, openai — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden># 4. Live run against OpenAI (needs OPENAI_API_KEY in .env): the lesson&#x27;s own entry point
 #    pip install openai python-dotenv
 from dotenv import load_dotenv; _ = load_dotenv()
 from openai import OpenAI
 client = OpenAI()
 # paste the Agent class, prompt, tools, known_actions and query() from section 8 here, then:
-# query(&quot;I have 2 dogs, a border collie and a scottish terrier. What is their combined weight&quot;)</code></pre><div class="out"></div></div></div>
-</aside></div><div class="sim-overlay" id="sim-overlay" role="dialog" aria-modal="true">
-  <div class="sim-window"><div class="sim-head"><div><div class="sim-kind" id="sim-kind"></div><h3 id="sim-title"></h3></div><span class="spacer"></span><button class="btn-xs" id="sim-close">✕ Close (Esc)</button></div><div class="sim-body" id="sim-body"></div></div>
+# query(&quot;I have 2 dogs, a border collie and a scottish terrier. What is their combined weight&quot;)</textarea><pre><code class="language-python"># 4. Live run against OpenAI (needs OPENAI_API_KEY in .env): the lesson&#x27;s own entry point
+#    pip install openai python-dotenv
+from dotenv import load_dotenv; _ = load_dotenv()
+from openai import OpenAI
+client = OpenAI()
+# paste the Agent class, prompt, tools, known_actions and query() from section 8 here, then:
+# query(&quot;I have 2 dogs, a border collie and a scottish terrier. What is their combined weight&quot;)</code></pre></div>
+<div class="lesson-nav"><a href="week08-midterm.html">‹ Week 8: Midterm Exam</a><a href="week10-multi-agent.html">Week 10: Multi-Agent Systems ›</a></div>
+<footer class="site-footer">
+This site is based on the course site <a href="https://albanna-tutorials.com/cs/">albanna-tutorials.com/cs</a> by Dr. Abdulkarim Albanna, used with the author's permission.
+</footer></article><div id="splitter" class="splitter" role="separator" aria-orientation="vertical" title="Drag to resize"></div><aside class="workbench" id="workbench">
+  <div class="wb-tabs">
+    <button class="wb-tab active" data-mode="code">⌨ Code</button>
+    <button class="wb-tab" data-mode="anim">◉ Animation</button>
+    <span class="spacer"></span>
+    <button class="btn ghost wb-close" id="btn-close" title="Hide panel">✕</button>
+  </div>
+  <section class="wb-mode wb-code active" data-mode="code">
+    <div class="wb-toolbar">
+      <span class="wb-title" id="wb-title">Editor</span>
+      <span class="spacer"></span>
+      <button id="btn-run" class="btn primary" title="Run (Ctrl+Enter)">▶ Run</button>
+      <button id="btn-reset" class="btn ghost" title="Restore the original code">Reset</button>
+      <button id="btn-copy" class="btn ghost" title="Copy code">Copy</button>
+      <button id="btn-clear" class="btn ghost" title="Clear output">Clear</button>
+    </div>
+    <div class="editor-wrap"><textarea id="editor"># Press "▶ Try it" on any example in the lesson,
+# or write Python here and press Ctrl+Enter.
+import numpy as np
+print(np.round(np.linspace(0, 1, 5), 2))</textarea></div>
+    <div class="output-head"><span>Output</span><span id="run-time" class="muted small"></span></div>
+    <div id="output" class="output" aria-live="polite"></div>
+  </section>
+  <section class="wb-mode wb-anim" data-mode="anim">
+    <div class="wb-toolbar light">
+      <select id="anim-select" aria-label="Choose animation"><optgroup label="This week"><option value="react-loop">ReAct agent loop</option><option value="rag">RAG pipeline</option></optgroup><optgroup label="Other weeks"><option value="matrix-multiply">Matrix multiplication, step by step</option><option value="vectors">Vectors, dot product &amp; cosine similarity</option><option value="attention">Self-attention: Q·Kᵀ → softmax → ·V</option><option value="tokenizer">Subword tokenisation</option><option value="positional">Positional encoding</option><option value="classifier">Decision boundary, threshold &amp; F1</option><option value="bio-tagging">NER: BIO tags &amp; entity-level F1</option><option value="langgraph">LangGraph StateGraph</option><option value="sampling">Temperature, top-k, top-p</option><option value="moe">Mixture of Experts router</option><option value="multi-agent">Multi-agent research pipeline</option><option value="mcp">MCP message flow</option><option value="lam">Browser agent: perceive → plan → act</option><option value="diffusion">Diffusion: noising &amp; denoising</option></optgroup></select>
+      <span class="spacer"></span>
+      <button id="btn-full" class="btn ghost" title="Open full screen">⤢ Full screen</button>
+    </div>
+    <div class="anim-host" id="anim-host"><p class="muted anim-empty">Press <b>▶ Display</b> on an animation in the lesson, or choose one above.</p></div>
+  </section>
+</aside></main><div class="sim-overlay" id="sim-overlay" role="dialog" aria-modal="true">
+  <div class="sim-window"><div class="sim-head"><div><div class="sim-kind" id="sim-kind"></div><h3 id="sim-title"></h3></div><span class="spacer"></span><button class="btn ghost" id="sim-close">✕ Close (Esc)</button></div><div class="sim-body" id="sim-body"></div></div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
-<script>document.addEventListener('DOMContentLoaded',()=>{if(window.hljs)hljs.highlightAll();if(window.renderMathInElement)renderMathInElement(document.body,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});});</script>
+<script src="../assets/vendor/codemirror/codemirror.js"></script>
+<script src="../assets/vendor/codemirror/python.js"></script>
+<script src="../assets/vendor/codemirror/matchbrackets.js"></script>
+<script src="../assets/vendor/codemirror/closebrackets.js"></script>
+<script>window.CS_PYODIDE_URL = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";</script>
 <script src="../assets/js/sims/core.js"></script>
 <script src="../assets/js/sims/matrix-multiply.js"></script><script src="../assets/js/sims/vectors.js"></script><script src="../assets/js/sims/attention.js"></script><script src="../assets/js/sims/tokenizer.js"></script><script src="../assets/js/sims/positional.js"></script><script src="../assets/js/sims/classifier.js"></script><script src="../assets/js/sims/bio-tagging.js"></script><script src="../assets/js/sims/rag.js"></script><script src="../assets/js/sims/langgraph.js"></script><script src="../assets/js/sims/sampling.js"></script><script src="../assets/js/sims/moe.js"></script><script src="../assets/js/sims/react-loop.js"></script><script src="../assets/js/sims/multi-agent.js"></script><script src="../assets/js/sims/mcp.js"></script><script src="../assets/js/sims/lam.js"></script><script src="../assets/js/sims/diffusion.js"></script>
 <script src="../assets/js/site.js"></script>

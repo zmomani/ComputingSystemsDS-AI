@@ -4,29 +4,26 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Week 7: Mixture of Experts (MoE) · Computing Systems for DS & AI</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<meta name="description" content="Interactive course site for 606363 Computing Systems for Data Science and AI, University of Petra. Python runs in your browser; every week has simulations and animations.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231f3a5f'/><text x='16' y='22' font-size='14' font-family='monospace' fill='white' text-anchor='middle'>AI</text></svg>">
+<link rel="stylesheet" href="../assets/vendor/codemirror/codemirror.css">
+<link rel="stylesheet" href="../assets/vendor/codemirror/material-darker.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
 <link rel="stylesheet" href="../assets/css/site.css">
 </head>
 <body><header class="topbar">
-  <button class="btn-icon" id="menu-toggle" aria-label="Menu">☰</button>
-  <a class="brand" href="../index.html">606363 · Computing Systems for DS & AI<small>University of Petra</small></a>
-  <span class="spacer"></span>
-  <nav class="week-nav"><a class="btn-icon" href="week06-llms.html" title="Large Language Models (LLMs)">← Wk 6</a><a class="btn-icon" href="week08-midterm.html" title="Midterm Exam">Wk 8 →</a></nav>
-  <a class="btn-icon" href="../index.html#curriculum">Curriculum</a>
-  <a class="btn-icon" href="../index.html#simulations">Simulations</a>
-  <button class="btn-icon" id="theme-toggle" aria-label="Toggle dark mode">◐</button>
-</header><div class="layout"><aside class="sidebar">
-  <h4>Course</h4><ul class="outline"><li><a class="" href="../lessons/syllabus.html"><span class="wk">·</span><span>Course Syllabus</span></a></li><li><a class="" href="../lessons/project.html"><span class="wk">·</span><span>Final Project</span></a></li></ul>
-  <h4>16-week curriculum</h4><ul class="outline"><li><a class="" href="../lessons/week01-transformers.html"><span class="wk">01</span><span>Transformer Architecture</span></a></li><li><a class="" href="../lessons/week02-text-classification.html"><span class="wk">02</span><span>Text Classification</span></a></li><li><a class="soon" href="../lessons/week03-ner.html"><span class="wk">03</span><span>Named Entity Recognition (NER)</span></a></li><li><a class="" href="../lessons/week04-langchain.html"><span class="wk">04</span><span>LangChain Fundamentals</span></a></li><li><a class="" href="../lessons/week05-langgraph.html"><span class="wk">05</span><span>LangGraph</span></a></li><li><a class="" href="../lessons/week06-llms.html"><span class="wk">06</span><span>Large Language Models (LLMs)</span></a></li><li><a class="active" href="../lessons/week07-moe.html"><span class="wk">07</span><span>Mixture of Experts (MoE)</span></a></li><li><a class="" href="../lessons/week08-midterm.html"><span class="wk">08</span><span>Midterm Exam</span></a></li><li><a class="" href="../lessons/week09-react-agents.html"><span class="wk">09</span><span>AI Agents &amp; ReAct</span></a></li><li><a class="" href="../lessons/week10-multi-agent.html"><span class="wk">10</span><span>Multi-Agent Systems</span></a></li><li><a class="" href="../lessons/week11-mcp.html"><span class="wk">11</span><span>Model Context Protocol (MCP)</span></a></li><li><a class="soon" href="../lessons/week12-lams.html"><span class="wk">12</span><span>Large Action Models (LAMs)</span></a></li><li><a class="" href="../lessons/week13-diffusion.html"><span class="wk">13</span><span>Diffusion Models</span></a></li><li><a class="" href="../lessons/week14-project.html"><span class="wk">14</span><span>Project Development &amp; Final Testing</span></a></li><li><a class="" href="../lessons/week15-competition.html"><span class="wk">15</span><span>Competition Day &amp; Presentations</span></a></li><li><a class="" href="../lessons/week16-final.html"><span class="wk">16</span><span>Final Exam</span></a></li></ul>
-  <h4>On this page</h4><ul class="toc" id="toc"></ul>
-</aside><main class="main">
-  <div class="lesson-head"><div class="eyebrow">Week 7 · ILO K1, T1</div><h1>Mixture of Experts (MoE)</h1>
-  <p class="credit"><b>Topics:</b> MoE architecture, routing, Mixtral, DeepSeek-MoE, dense vs. MoE trade-offs<br><b>Project milestone:</b> MoE comparison report, optional Mixtral integration, model selection logic. Checkpoint 1: demo the NLP pipeline</p></div>
-  <div class="callout sim"><div class="sim-strip"><b style="margin-right:4px">Simulations for this week:</b><button class="chip" data-sim="moe">▶ Mixture of Experts router</button><button class="chip" data-sim="sampling">▶ Temperature, top-k, top-p</button></div></div>
-  <h2 id="what-is-mixture-of-experts-moe">What is Mixture of Experts (MoE)?</h2>
+  <a class="brand" href="../index.html">
+    <span class="brand-mark">AI</span>
+    <span class="brand-text"><strong>Computing Systems for DS &amp; AI</strong><span class="muted"> · 606363 · University of Petra</span></span>
+  </a>
+  <nav class="topnav"><a class="btn ghost" href="week06-llms.html" title="Large Language Models (LLMs)">‹ Prev</a><select id="lesson-select" aria-label="Choose lesson"><option value="">Lessons…</option><option value="syllabus.html">Course Syllabus</option><option value="project.html">Final Project</option><option value="week01-transformers.html">Week 1 · Transformer Architecture</option><option value="week02-text-classification.html">Week 2 · Text Classification</option><option value="week03-ner.html">Week 3 · Named Entity Recognition (NER)</option><option value="week04-langchain.html">Week 4 · LangChain Fundamentals</option><option value="week05-langgraph.html">Week 5 · LangGraph</option><option value="week06-llms.html">Week 6 · Large Language Models (LLMs)</option><option value="week07-moe.html" selected>Week 7 · Mixture of Experts (MoE)</option><option value="week08-midterm.html">Week 8 · Midterm Exam</option><option value="week09-react-agents.html">Week 9 · AI Agents &amp; ReAct</option><option value="week10-multi-agent.html">Week 10 · Multi-Agent Systems</option><option value="week11-mcp.html">Week 11 · Model Context Protocol (MCP)</option><option value="week12-lams.html">Week 12 · Large Action Models (LAMs)</option><option value="week13-diffusion.html">Week 13 · Diffusion Models</option><option value="week14-project.html">Week 14 · Project Development &amp; Final Testing</option><option value="week15-competition.html">Week 15 · Competition Day &amp; Presentations</option><option value="week16-final.html">Week 16 · Final Exam</option></select><a class="btn ghost" href="week08-midterm.html" title="Midterm Exam">Next ›</a></nav>
+  <button id="btn-panel" class="btn accent" title="Show or hide the editor / animation panel">⇆ Panel</button><div class="status" id="py-status"><span class="dot"></span><span id="py-status-text">Python loads on first run</span></div>
+</header><main class="lesson panel-closed" id="lesson"><article class="lesson-content" id="lesson-content"><div class="lesson-head"><div class="eyebrow">Week 7 · ILO K1, T1</div><h1>Mixture of Experts (MoE)</h1>
+<p class="lesson-intro"><b>Topics:</b> MoE architecture, routing, Mixtral, DeepSeek-MoE, dense vs. MoE trade-offs<br><b>Project milestone:</b> MoE comparison report, optional Mixtral integration, model selection logic. Checkpoint 1: demo the NLP pipeline</p></div>
+<div class="sim-strip"><div class="sim-strip-head">Animations for this week — open them in the panel</div><div class="sim-strip-items"><button class="sim-chip" data-display="moe"><span class="sim-chip-kind">MoE</span>▶ Display: Mixture of Experts router</button><button class="sim-chip" data-display="sampling"><span class="sim-chip-kind">LLMs</span>▶ Display: Temperature, top-k, top-p</button></div></div>
+<details class="contents"><summary>Contents (11 sections)</summary><ol><li><a href="#what-is-mixture-of-experts-moe">What is Mixture of Experts (MoE)?</a></li><li><a href="#how-moe-works-in-llms">How MoE Works in LLMs</a></li><li><a href="#key-components">Key Components</a></li><li><a href="#advantages-of-moe">Advantages of MoE</a></li><li><a href="#real-world-implementations">Real-World Implementations</a></li><li><a href="#code-examples-building-an-moe-layer-in-pytorch">Code Examples: Building an MoE Layer in PyTorch</a></li><li><a href="#formulas-summary">Formulas (summary)</a></li><li><a href="#technical-challenges">Technical Challenges</a></li><li><a href="#future-directions">Future Directions</a></li><li><a href="#key-terms">Key Terms</a></li><li><a href="#resources">Resources</a></li></ol></details>
+<h2 id="what-is-mixture-of-experts-moe">What is Mixture of Experts (MoE)?</h2>
 <p>Mixture of Experts is a neural network architecture that replaces a single dense model with <strong>several specialized sub-models called experts</strong>. In LLMs, MoE swaps the dense feedforward (FFN) layers of the transformer for sets of expert networks, so the <em>total</em> parameter count can grow enormously while the compute spent <em>per token</em> stays manageable.</p>
 <p>A <strong>router</strong> (gating network) decides which experts process each token, so only a small subset of the parameters is active at any time. Typical configurations use 8–64 experts per layer with top-2 routing, leaving roughly 20% of parameters active per token.</p>
 <blockquote>
@@ -236,218 +233,411 @@
 </table>
 <h2 id="code-examples-building-an-moe-layer-in-pytorch">Code Examples: Building an MoE Layer in PyTorch</h2>
 <h3 id="step-1-the-expert-network-a-feedforward-sub-model">Step 1: The Expert Network — a feedforward sub-model</h3>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn.functional</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">F</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>import torch
+import torch.nn as nn
+import torch.nn.functional as F
 
-<span class="c1"># A single Expert = a 2-layer feedforward network (same as a transformer FFN)</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">Expert</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_model</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">d_ff</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fc1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">d_ff</span><span class="p">)</span>   <span class="c1"># expand</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">d_ff</span><span class="p">,</span> <span class="n">d_model</span><span class="p">)</span>   <span class="c1"># project back</span>
+# A single Expert = a 2-layer feedforward network (same as a transformer FFN)
+class Expert(nn.Module):
+    def __init__(self, d_model: int, d_ff: int):
+        super().__init__()
+        self.fc1 = nn.Linear(d_model, d_ff)   # expand
+        self.fc2 = nn.Linear(d_ff, d_model)   # project back
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-        <span class="c1"># x: [num_tokens, d_model]</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fc1</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+    def forward(self, x: torch.Tensor) -&gt; torch.Tensor:
+        # x: [num_tokens, d_model]
+        return self.fc2(F.relu(self.fc1(x)))
 
-<span class="c1"># Try it out</span>
-<span class="n">expert</span> <span class="o">=</span> <span class="n">Expert</span><span class="p">(</span><span class="n">d_model</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">d_ff</span><span class="o">=</span><span class="mi">2048</span><span class="p">)</span>
-<span class="n">tokens</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">512</span><span class="p">)</span>   <span class="c1"># batch of 4 tokens</span>
-<span class="n">output</span> <span class="o">=</span> <span class="n">expert</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Input:  </span><span class="si">{</span><span class="n">tokens</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>   <span class="c1"># [4, 512]</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Output: </span><span class="si">{</span><span class="n">output</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>   <span class="c1"># [4, 512] — same shape!</span>
-</code></pre></div>
+# Try it out
+expert = Expert(d_model=512, d_ff=2048)
+tokens = torch.randn(4, 512)   # batch of 4 tokens
+output = expert(tokens)
+print(f&quot;Input:  {tokens.shape}&quot;)   # [4, 512]
+print(f&quot;Output: {output.shape}&quot;)   # [4, 512] — same shape!</textarea><pre><code class="language-python">import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+# A single Expert = a 2-layer feedforward network (same as a transformer FFN)
+class Expert(nn.Module):
+    def __init__(self, d_model: int, d_ff: int):
+        super().__init__()
+        self.fc1 = nn.Linear(d_model, d_ff)   # expand
+        self.fc2 = nn.Linear(d_ff, d_model)   # project back
+
+    def forward(self, x: torch.Tensor) -&gt; torch.Tensor:
+        # x: [num_tokens, d_model]
+        return self.fc2(F.relu(self.fc1(x)))
+
+# Try it out
+expert = Expert(d_model=512, d_ff=2048)
+tokens = torch.randn(4, 512)   # batch of 4 tokens
+output = expert(tokens)
+print(f&quot;Input:  {tokens.shape}&quot;)   # [4, 512]
+print(f&quot;Output: {output.shape}&quot;)   # [4, 512] — same shape!</code></pre></div>
 <h3 id="step-2-the-router-deciding-which-experts-process-each-token">Step 2: The Router — deciding which experts process each token</h3>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">TopKRouter</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Routes each token to the top-k most relevant experts."""</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_model</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_experts</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">top_k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">top_k</span> <span class="o">=</span> <span class="n">top_k</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">num_experts</span> <span class="o">=</span> <span class="n">num_experts</span>
-        <span class="c1"># Learned: maps token embedding → score per expert</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">gate</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">num_experts</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>class TopKRouter(nn.Module):
+    &quot;&quot;&quot;Routes each token to the top-k most relevant experts.&quot;&quot;&quot;
+    def __init__(self, d_model: int, num_experts: int, top_k: int = 2):
+        super().__init__()
+        self.top_k = top_k
+        self.num_experts = num_experts
+        # Learned: maps token embedding → score per expert
+        self.gate = nn.Linear(d_model, num_experts, bias=False)
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
-        <span class="c1"># x: [num_tokens, d_model]</span>
-        <span class="c1"># Step A: raw routing scores for every expert</span>
-        <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>                          <span class="c1"># [num_tokens, num_experts]</span>
-        <span class="c1"># Step B: softmax → probability distribution</span>
-        <span class="n">probs</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>              <span class="c1"># [num_tokens, num_experts]</span>
-        <span class="c1"># Step C: pick the top-k experts per token</span>
-        <span class="n">top_k_probs</span><span class="p">,</span> <span class="n">top_k_idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">top_k</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="c1"># top_k_probs: [num_tokens, k] — how much weight per expert</span>
-        <span class="c1"># top_k_idx:   [num_tokens, k] — which expert indices</span>
-        <span class="c1"># Step D: renormalize so the k weights sum to 1</span>
-        <span class="n">top_k_probs</span> <span class="o">=</span> <span class="n">top_k_probs</span> <span class="o">/</span> <span class="n">top_k_probs</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">top_k_probs</span><span class="p">,</span> <span class="n">top_k_idx</span><span class="p">,</span> <span class="n">probs</span>   <span class="c1"># probs used for load-balancing loss</span>
+    def forward(self, x: torch.Tensor):
+        # x: [num_tokens, d_model]
+        # Step A: raw routing scores for every expert
+        logits = self.gate(x)                          # [num_tokens, num_experts]
+        # Step B: softmax → probability distribution
+        probs = F.softmax(logits, dim=-1)              # [num_tokens, num_experts]
+        # Step C: pick the top-k experts per token
+        top_k_probs, top_k_idx = torch.topk(probs, self.top_k, dim=-1)
+        # top_k_probs: [num_tokens, k] — how much weight per expert
+        # top_k_idx:   [num_tokens, k] — which expert indices
+        # Step D: renormalize so the k weights sum to 1
+        top_k_probs = top_k_probs / top_k_probs.sum(dim=-1, keepdim=True)
+        return top_k_probs, top_k_idx, probs   # probs used for load-balancing loss
 
-<span class="c1"># Example: 4 tokens, 8 experts, select top-2</span>
-<span class="n">router</span> <span class="o">=</span> <span class="n">TopKRouter</span><span class="p">(</span><span class="n">d_model</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">num_experts</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">tokens</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">512</span><span class="p">)</span>
-<span class="n">weights</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">all_probs</span> <span class="o">=</span> <span class="n">router</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+# Example: 4 tokens, 8 experts, select top-2
+router = TopKRouter(d_model=512, num_experts=8, top_k=2)
+tokens = torch.randn(4, 512)
+weights, indices, all_probs = router(tokens)
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Expert indices per token:"</span><span class="p">,</span> <span class="n">indices</span><span class="p">)</span>
-<span class="c1"># e.g. tensor([[3, 6], [1, 7], [0, 2], [5, 3]])</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Expert weights per token: "</span><span class="p">,</span> <span class="n">weights</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">decimals</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
-<span class="c1"># e.g. tensor([[0.62, 0.38], [0.71, 0.29], ...])</span>
-</code></pre></div>
+print(&quot;Expert indices per token:&quot;, indices)
+# e.g. tensor([[3, 6], [1, 7], [0, 2], [5, 3]])
+print(&quot;Expert weights per token: &quot;, weights.round(decimals=2))
+# e.g. tensor([[0.62, 0.38], [0.71, 0.29], ...])</textarea><pre><code class="language-python">class TopKRouter(nn.Module):
+    &quot;&quot;&quot;Routes each token to the top-k most relevant experts.&quot;&quot;&quot;
+    def __init__(self, d_model: int, num_experts: int, top_k: int = 2):
+        super().__init__()
+        self.top_k = top_k
+        self.num_experts = num_experts
+        # Learned: maps token embedding → score per expert
+        self.gate = nn.Linear(d_model, num_experts, bias=False)
+
+    def forward(self, x: torch.Tensor):
+        # x: [num_tokens, d_model]
+        # Step A: raw routing scores for every expert
+        logits = self.gate(x)                          # [num_tokens, num_experts]
+        # Step B: softmax → probability distribution
+        probs = F.softmax(logits, dim=-1)              # [num_tokens, num_experts]
+        # Step C: pick the top-k experts per token
+        top_k_probs, top_k_idx = torch.topk(probs, self.top_k, dim=-1)
+        # top_k_probs: [num_tokens, k] — how much weight per expert
+        # top_k_idx:   [num_tokens, k] — which expert indices
+        # Step D: renormalize so the k weights sum to 1
+        top_k_probs = top_k_probs / top_k_probs.sum(dim=-1, keepdim=True)
+        return top_k_probs, top_k_idx, probs   # probs used for load-balancing loss
+
+# Example: 4 tokens, 8 experts, select top-2
+router = TopKRouter(d_model=512, num_experts=8, top_k=2)
+tokens = torch.randn(4, 512)
+weights, indices, all_probs = router(tokens)
+
+print(&quot;Expert indices per token:&quot;, indices)
+# e.g. tensor([[3, 6], [1, 7], [0, 2], [5, 3]])
+print(&quot;Expert weights per token: &quot;, weights.round(decimals=2))
+# e.g. tensor([[0.62, 0.38], [0.71, 0.29], ...])</code></pre></div>
 <h3 id="step-3-the-moe-layer-combining-router-experts">Step 3: The MoE Layer — combining router + experts</h3>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">MoELayer</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Sparse Mixture of Experts Layer.</span>
-<span class="sd">    Replaces a single FFN in a Transformer with N expert FFNs.</span>
-<span class="sd">    Only k out of N experts activate per token (k &lt;&lt; N).</span>
-<span class="sd">    """</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_model</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">d_ff</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-                 <span class="n">num_experts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span> <span class="n">top_k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">top_k</span> <span class="o">=</span> <span class="n">top_k</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">num_experts</span> <span class="o">=</span> <span class="n">num_experts</span>
-        <span class="c1"># N independent expert networks</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">experts</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">([</span>
-            <span class="n">Expert</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">d_ff</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_experts</span><span class="p">)</span>
-        <span class="p">])</span>
-        <span class="c1"># Router selects which experts process each token</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">router</span> <span class="o">=</span> <span class="n">TopKRouter</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">num_experts</span><span class="p">,</span> <span class="n">top_k</span><span class="p">)</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>class MoELayer(nn.Module):
+    &quot;&quot;&quot;
+    Sparse Mixture of Experts Layer.
+    Replaces a single FFN in a Transformer with N expert FFNs.
+    Only k out of N experts activate per token (k &lt;&lt; N).
+    &quot;&quot;&quot;
+    def __init__(self, d_model: int, d_ff: int,
+                 num_experts: int = 8, top_k: int = 2):
+        super().__init__()
+        self.top_k = top_k
+        self.num_experts = num_experts
+        # N independent expert networks
+        self.experts = nn.ModuleList([
+            Expert(d_model, d_ff) for _ in range(num_experts)
+        ])
+        # Router selects which experts process each token
+        self.router = TopKRouter(d_model, num_experts, top_k)
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
-        <span class="c1"># x: [batch, seq_len, d_model]</span>
-        <span class="n">B</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">D</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span>
-        <span class="c1"># Flatten batch and sequence dims — treat all tokens equally</span>
-        <span class="n">x_flat</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">D</span><span class="p">)</span>                   <span class="c1"># [B*S, d_model]</span>
-        <span class="n">N</span> <span class="o">=</span> <span class="n">x_flat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>                         <span class="c1"># total tokens</span>
+    def forward(self, x: torch.Tensor):
+        # x: [batch, seq_len, d_model]
+        B, S, D = x.shape
+        # Flatten batch and sequence dims — treat all tokens equally
+        x_flat = x.reshape(-1, D)                   # [B*S, d_model]
+        N = x_flat.shape[0]                         # total tokens
 
-        <span class="c1"># Get routing decisions</span>
-        <span class="n">weights</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">all_probs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">router</span><span class="p">(</span><span class="n">x_flat</span><span class="p">)</span>
-        <span class="c1"># weights: [N, top_k] — how much each expert contributes</span>
-        <span class="c1"># indices: [N, top_k] — which expert to use</span>
+        # Get routing decisions
+        weights, indices, all_probs = self.router(x_flat)
+        # weights: [N, top_k] — how much each expert contributes
+        # indices: [N, top_k] — which expert to use
 
-        <span class="n">output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x_flat</span><span class="p">)</span>           <span class="c1"># [N, d_model]</span>
+        output = torch.zeros_like(x_flat)           # [N, d_model]
 
-        <span class="c1"># For each expert slot (0 to top_k-1)</span>
-        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">top_k</span><span class="p">):</span>
-            <span class="n">expert_ids</span>  <span class="o">=</span> <span class="n">indices</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span>             <span class="c1"># [N] which expert for slot k</span>
-            <span class="n">slot_weight</span> <span class="o">=</span> <span class="n">weights</span><span class="p">[:,</span> <span class="n">k</span><span class="p">:</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>         <span class="c1"># [N, 1] contribution weight</span>
+        # For each expert slot (0 to top_k-1)
+        for k in range(self.top_k):
+            expert_ids  = indices[:, k]             # [N] which expert for slot k
+            slot_weight = weights[:, k:k+1]         # [N, 1] contribution weight
 
-            <span class="c1"># Group tokens by their assigned expert and run each expert once</span>
-            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_experts</span><span class="p">):</span>
-                <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">expert_ids</span> <span class="o">==</span> <span class="n">e</span><span class="p">)</span>            <span class="c1"># which tokens go to expert e</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">mask</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-                    <span class="k">continue</span>                        <span class="c1"># skip unused experts (saves compute!)</span>
-                <span class="n">expert_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">experts</span><span class="p">[</span><span class="n">e</span><span class="p">](</span><span class="n">x_flat</span><span class="p">[</span><span class="n">mask</span><span class="p">])</span>   <span class="c1"># [n_e, D]</span>
-                <span class="n">output</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">+=</span> <span class="n">slot_weight</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">*</span> <span class="n">expert_out</span>  <span class="c1"># weighted add</span>
+            # Group tokens by their assigned expert and run each expert once
+            for e in range(self.num_experts):
+                mask = (expert_ids == e)            # which tokens go to expert e
+                if not mask.any():
+                    continue                        # skip unused experts (saves compute!)
+                expert_out = self.experts[e](x_flat[mask])   # [n_e, D]
+                output[mask] += slot_weight[mask] * expert_out  # weighted add
 
-        <span class="k">return</span> <span class="n">output</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">D</span><span class="p">),</span> <span class="n">all_probs</span>   <span class="c1"># restore original shape</span>
+        return output.reshape(B, S, D), all_probs   # restore original shape
 
-<span class="c1"># Test the full MoE layer</span>
-<span class="n">moe</span> <span class="o">=</span> <span class="n">MoELayer</span><span class="p">(</span><span class="n">d_model</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">d_ff</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span> <span class="n">num_experts</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">512</span><span class="p">)</span>                         <span class="c1"># batch=2, seq_len=10</span>
-<span class="n">out</span><span class="p">,</span> <span class="n">probs</span> <span class="o">=</span> <span class="n">moe</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Input:  </span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>                         <span class="c1"># torch.Size([2, 10, 512])</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Output: </span><span class="si">{</span><span class="n">out</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>                       <span class="c1"># torch.Size([2, 10, 512]) ✓</span>
+# Test the full MoE layer
+moe = MoELayer(d_model=512, d_ff=2048, num_experts=8, top_k=2)
+x = torch.randn(2, 10, 512)                         # batch=2, seq_len=10
+out, probs = moe(x)
+print(f&quot;Input:  {x.shape}&quot;)                         # torch.Size([2, 10, 512])
+print(f&quot;Output: {out.shape}&quot;)                       # torch.Size([2, 10, 512]) ✓
 
-<span class="c1"># Count parameters: 8 experts × (512×2048 + 2048 + 2048×512 + 512) = ~16.8M expert params</span>
-<span class="c1"># (plus 8×512 = 4,096 router weights). Only 2/8 experts activate per token = 25% active</span>
-<span class="n">total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">moe</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
-<span class="n">active</span> <span class="o">=</span> <span class="n">total</span> <span class="o">*</span> <span class="p">(</span><span class="n">moe</span><span class="o">.</span><span class="n">top_k</span> <span class="o">/</span> <span class="n">moe</span><span class="o">.</span><span class="n">num_experts</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total params: </span><span class="si">{</span><span class="n">total</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> | Active per token: </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">active</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</code></pre></div>
+# Count parameters: 8 experts × (512×2048 + 2048 + 2048×512 + 512) = ~16.8M expert params
+# (plus 8×512 = 4,096 router weights). Only 2/8 experts activate per token = 25% active
+total = sum(p.numel() for p in moe.parameters())
+active = total * (moe.top_k / moe.num_experts)
+print(f&quot;Total params: {total:,} | Active per token: {int(active):,}&quot;)</textarea><pre><code class="language-python">class MoELayer(nn.Module):
+    &quot;&quot;&quot;
+    Sparse Mixture of Experts Layer.
+    Replaces a single FFN in a Transformer with N expert FFNs.
+    Only k out of N experts activate per token (k &lt;&lt; N).
+    &quot;&quot;&quot;
+    def __init__(self, d_model: int, d_ff: int,
+                 num_experts: int = 8, top_k: int = 2):
+        super().__init__()
+        self.top_k = top_k
+        self.num_experts = num_experts
+        # N independent expert networks
+        self.experts = nn.ModuleList([
+            Expert(d_model, d_ff) for _ in range(num_experts)
+        ])
+        # Router selects which experts process each token
+        self.router = TopKRouter(d_model, num_experts, top_k)
+
+    def forward(self, x: torch.Tensor):
+        # x: [batch, seq_len, d_model]
+        B, S, D = x.shape
+        # Flatten batch and sequence dims — treat all tokens equally
+        x_flat = x.reshape(-1, D)                   # [B*S, d_model]
+        N = x_flat.shape[0]                         # total tokens
+
+        # Get routing decisions
+        weights, indices, all_probs = self.router(x_flat)
+        # weights: [N, top_k] — how much each expert contributes
+        # indices: [N, top_k] — which expert to use
+
+        output = torch.zeros_like(x_flat)           # [N, d_model]
+
+        # For each expert slot (0 to top_k-1)
+        for k in range(self.top_k):
+            expert_ids  = indices[:, k]             # [N] which expert for slot k
+            slot_weight = weights[:, k:k+1]         # [N, 1] contribution weight
+
+            # Group tokens by their assigned expert and run each expert once
+            for e in range(self.num_experts):
+                mask = (expert_ids == e)            # which tokens go to expert e
+                if not mask.any():
+                    continue                        # skip unused experts (saves compute!)
+                expert_out = self.experts[e](x_flat[mask])   # [n_e, D]
+                output[mask] += slot_weight[mask] * expert_out  # weighted add
+
+        return output.reshape(B, S, D), all_probs   # restore original shape
+
+# Test the full MoE layer
+moe = MoELayer(d_model=512, d_ff=2048, num_experts=8, top_k=2)
+x = torch.randn(2, 10, 512)                         # batch=2, seq_len=10
+out, probs = moe(x)
+print(f&quot;Input:  {x.shape}&quot;)                         # torch.Size([2, 10, 512])
+print(f&quot;Output: {out.shape}&quot;)                       # torch.Size([2, 10, 512]) ✓
+
+# Count parameters: 8 experts × (512×2048 + 2048 + 2048×512 + 512) = ~16.8M expert params
+# (plus 8×512 = 4,096 router weights). Only 2/8 experts activate per token = 25% active
+total = sum(p.numel() for p in moe.parameters())
+active = total * (moe.top_k / moe.num_experts)
+print(f&quot;Total params: {total:,} | Active per token: {int(active):,}&quot;)</code></pre></div>
 <h3 id="step-4-load-balancing-loss-preventing-expert-collapse">Step 4: Load Balancing Loss — preventing expert collapse</h3>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">auxiliary_load_balancing_loss</span><span class="p">(</span>
-    <span class="n">router_probs</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>   <span class="c1"># [N, num_experts] — softmax output</span>
-    <span class="n">expert_indices</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="c1"># [N, top_k] — selected expert IDs</span>
-    <span class="n">num_experts</span><span class="p">:</span> <span class="nb">int</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Switch Transformer / Mixtral style auxiliary load-balancing loss.</span>
-<span class="sd">    Encourages all experts to receive roughly equal token counts.</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>def auxiliary_load_balancing_loss(
+    router_probs: torch.Tensor,   # [N, num_experts] — softmax output
+    expert_indices: torch.Tensor, # [N, top_k] — selected expert IDs
+    num_experts: int
+) -&gt; torch.Tensor:
+    &quot;&quot;&quot;
+    Switch Transformer / Mixtral style auxiliary load-balancing loss.
+    Encourages all experts to receive roughly equal token counts.
 
-<span class="sd">    Loss = num_experts * sum_i(f_i * P_i)</span>
-<span class="sd">      f_i = fraction of tokens routed to expert i</span>
-<span class="sd">      P_i = mean router probability for expert i</span>
-<span class="sd">    Both terms should be ~1/num_experts for uniform distribution.</span>
-<span class="sd">    """</span>
-    <span class="n">N</span> <span class="o">=</span> <span class="n">router_probs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    Loss = num_experts * sum_i(f_i * P_i)
+      f_i = fraction of tokens routed to expert i
+      P_i = mean router probability for expert i
+    Both terms should be ~1/num_experts for uniform distribution.
+    &quot;&quot;&quot;
+    N = router_probs.shape[0]
 
-    <span class="c1"># f_i: fraction of tokens dispatched to each expert</span>
-    <span class="n">one_hot</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">one_hot</span><span class="p">(</span><span class="n">expert_indices</span><span class="p">,</span> <span class="n">num_experts</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>   <span class="c1"># [N, k, E]</span>
-    <span class="n">tokens_per_expert</span> <span class="o">=</span> <span class="n">one_hot</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">N</span> <span class="o">*</span> <span class="n">expert_indices</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-    <span class="c1"># Shape: [num_experts] — ideally all equal to 1/num_experts</span>
+    # f_i: fraction of tokens dispatched to each expert
+    one_hot = F.one_hot(expert_indices, num_experts).float()   # [N, k, E]
+    tokens_per_expert = one_hot.sum(dim=[0, 1]) / (N * expert_indices.shape[1])
+    # Shape: [num_experts] — ideally all equal to 1/num_experts
 
-    <span class="c1"># P_i: mean router probability assigned to each expert</span>
-    <span class="n">mean_probs</span> <span class="o">=</span> <span class="n">router_probs</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>   <span class="c1"># Shape: [num_experts] — ideally all equal to 1/num_experts</span>
+    # P_i: mean router probability assigned to each expert
+    mean_probs = router_probs.mean(dim=0)   # Shape: [num_experts] — ideally all equal to 1/num_experts
 
-    <span class="c1"># Dot product × num_experts: 1.0 when perfectly balanced</span>
-    <span class="n">loss</span> <span class="o">=</span> <span class="n">num_experts</span> <span class="o">*</span> <span class="p">(</span><span class="n">tokens_per_expert</span> <span class="o">*</span> <span class="n">mean_probs</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">loss</span>
+    # Dot product × num_experts: 1.0 when perfectly balanced
+    loss = num_experts * (tokens_per_expert * mean_probs).sum()
+    return loss
 
-<span class="c1"># ------ How to use it in your training loop ------</span>
-<span class="n">moe</span> <span class="o">=</span> <span class="n">MoELayer</span><span class="p">(</span><span class="n">d_model</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">d_ff</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span> <span class="n">num_experts</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">512</span><span class="p">)</span>
+# ------ How to use it in your training loop ------
+moe = MoELayer(d_model=512, d_ff=2048, num_experts=8, top_k=2)
+x = torch.randn(2, 10, 512)
 
-<span class="n">out</span><span class="p">,</span> <span class="n">all_probs</span> <span class="o">=</span> <span class="n">moe</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="n">_</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">moe</span><span class="o">.</span><span class="n">router</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">512</span><span class="p">))</span>
+out, all_probs = moe(x)
+_, indices, _ = moe.router(x.reshape(-1, 512))
 
-<span class="c1"># Main task loss (e.g. cross-entropy for language modelling)</span>
-<span class="n">task_loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">2.5</span><span class="p">)</span>   <span class="c1"># placeholder</span>
+# Main task loss (e.g. cross-entropy for language modelling)
+task_loss = torch.tensor(2.5)   # placeholder
 
-<span class="c1"># Add a small load-balancing penalty (coefficient α = 0.01)</span>
-<span class="n">balance_loss</span> <span class="o">=</span> <span class="n">auxiliary_load_balancing_loss</span><span class="p">(</span><span class="n">all_probs</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">num_experts</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
-<span class="n">total_loss</span> <span class="o">=</span> <span class="n">task_loss</span> <span class="o">+</span> <span class="mf">0.01</span> <span class="o">*</span> <span class="n">balance_loss</span>
+# Add a small load-balancing penalty (coefficient α = 0.01)
+balance_loss = auxiliary_load_balancing_loss(all_probs, indices, num_experts=8)
+total_loss = task_loss + 0.01 * balance_loss
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Task loss:    </span><span class="si">{</span><span class="n">task_loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Balance loss: </span><span class="si">{</span><span class="n">balance_loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>   <span class="c1"># ideally close to 1.0</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total loss:   </span><span class="si">{</span><span class="n">total_loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</code></pre></div>
+print(f&quot;Task loss:    {task_loss.item():.4f}&quot;)
+print(f&quot;Balance loss: {balance_loss.item():.4f}&quot;)   # ideally close to 1.0
+print(f&quot;Total loss:   {total_loss.item():.4f}&quot;)</textarea><pre><code class="language-python">def auxiliary_load_balancing_loss(
+    router_probs: torch.Tensor,   # [N, num_experts] — softmax output
+    expert_indices: torch.Tensor, # [N, top_k] — selected expert IDs
+    num_experts: int
+) -&gt; torch.Tensor:
+    &quot;&quot;&quot;
+    Switch Transformer / Mixtral style auxiliary load-balancing loss.
+    Encourages all experts to receive roughly equal token counts.
+
+    Loss = num_experts * sum_i(f_i * P_i)
+      f_i = fraction of tokens routed to expert i
+      P_i = mean router probability for expert i
+    Both terms should be ~1/num_experts for uniform distribution.
+    &quot;&quot;&quot;
+    N = router_probs.shape[0]
+
+    # f_i: fraction of tokens dispatched to each expert
+    one_hot = F.one_hot(expert_indices, num_experts).float()   # [N, k, E]
+    tokens_per_expert = one_hot.sum(dim=[0, 1]) / (N * expert_indices.shape[1])
+    # Shape: [num_experts] — ideally all equal to 1/num_experts
+
+    # P_i: mean router probability assigned to each expert
+    mean_probs = router_probs.mean(dim=0)   # Shape: [num_experts] — ideally all equal to 1/num_experts
+
+    # Dot product × num_experts: 1.0 when perfectly balanced
+    loss = num_experts * (tokens_per_expert * mean_probs).sum()
+    return loss
+
+# ------ How to use it in your training loop ------
+moe = MoELayer(d_model=512, d_ff=2048, num_experts=8, top_k=2)
+x = torch.randn(2, 10, 512)
+
+out, all_probs = moe(x)
+_, indices, _ = moe.router(x.reshape(-1, 512))
+
+# Main task loss (e.g. cross-entropy for language modelling)
+task_loss = torch.tensor(2.5)   # placeholder
+
+# Add a small load-balancing penalty (coefficient α = 0.01)
+balance_loss = auxiliary_load_balancing_loss(all_probs, indices, num_experts=8)
+total_loss = task_loss + 0.01 * balance_loss
+
+print(f&quot;Task loss:    {task_loss.item():.4f}&quot;)
+print(f&quot;Balance loss: {balance_loss.item():.4f}&quot;)   # ideally close to 1.0
+print(f&quot;Total loss:   {total_loss.item():.4f}&quot;)</code></pre></div>
 <h3 id="step-5-using-mixtral-deepseek-via-huggingface-transformers">Step 5: Using Mixtral / DeepSeek via HuggingFace Transformers</h3>
-<div class="highlight"><pre><span></span><code><span class="c1"># Install: pip install transformers accelerate bitsandbytes</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoModelForCausalLM</span><span class="p">,</span> <span class="n">AutoTokenizer</span><span class="p">,</span> <span class="n">BitsAndBytesConfig</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="torch, transformers" title="Needs torch, transformers — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden># Install: pip install transformers accelerate bitsandbytes
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+import torch
 
-<span class="c1"># ── Option A: Mixtral 8x7B (open weights, Apache-2.0) ──────────────────────</span>
-<span class="n">model_name</span> <span class="o">=</span> <span class="s2">"mistralai/Mixtral-8x7B-Instruct-v0.1"</span>
-<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
+# ── Option A: Mixtral 8x7B (open weights, Apache-2.0) ──────────────────────
+model_name = &quot;mistralai/Mixtral-8x7B-Instruct-v0.1&quot;
+tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-<span class="c1"># Load with 4-bit quantization: reduces VRAM from ~90 GB → ~24 GB</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
-    <span class="n">model_name</span><span class="p">,</span>
-    <span class="n">device_map</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">,</span>        <span class="c1"># spread across available GPUs/CPU</span>
-    <span class="n">torch_dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float16</span><span class="p">,</span>
-    <span class="n">quantization_config</span><span class="o">=</span><span class="n">BitsAndBytesConfig</span><span class="p">(</span><span class="n">load_in_4bit</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>   <span class="c1"># requires bitsandbytes</span>
-<span class="p">)</span>
+# Load with 4-bit quantization: reduces VRAM from ~90 GB → ~24 GB
+model = AutoModelForCausalLM.from_pretrained(
+    model_name,
+    device_map=&quot;auto&quot;,        # spread across available GPUs/CPU
+    torch_dtype=torch.float16,
+    quantization_config=BitsAndBytesConfig(load_in_4bit=True),   # requires bitsandbytes
+)
 
-<span class="c1"># Prepare a chat-formatted prompt</span>
-<span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">{</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"user"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="s2">"Explain Mixture of Experts in three sentences."</span><span class="p">}</span>
-<span class="p">]</span>
-<span class="n">input_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">apply_chat_template</span><span class="p">(</span>
-    <span class="n">messages</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">"pt"</span><span class="p">,</span> <span class="n">add_generation_prompt</span><span class="o">=</span><span class="kc">True</span>
-<span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+# Prepare a chat-formatted prompt
+messages = [
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Explain Mixture of Experts in three sentences.&quot;}
+]
+input_ids = tokenizer.apply_chat_template(
+    messages, return_tensors=&quot;pt&quot;, add_generation_prompt=True
+).to(model.device)
 
-<span class="c1"># Generate a response</span>
-<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
-    <span class="n">output_ids</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
-        <span class="n">input_ids</span><span class="p">,</span>
-        <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
-        <span class="n">temperature</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
-        <span class="n">do_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="p">)</span>
+# Generate a response
+with torch.no_grad():
+    output_ids = model.generate(
+        input_ids,
+        max_new_tokens=256,
+        temperature=0.7,
+        do_sample=True,
+    )
 
-<span class="n">response</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
-    <span class="n">output_ids</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">input_ids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:],</span>
-    <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">True</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+response = tokenizer.decode(
+    output_ids[0][input_ids.shape[1]:],
+    skip_special_tokens=True
+)
+print(response)
 
-<span class="c1"># ── Option B: Inspect which experts were activated ─────────────────────────</span>
-<span class="c1"># Access the router logits for interpretability</span>
-<span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">output_router_logits</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">router_logits</span> <span class="o">=</span> <span class="n">outputs</span><span class="o">.</span><span class="n">router_logits</span>   <span class="c1"># tuple of tensors per MoE layer</span>
-<span class="k">for</span> <span class="n">layer_idx</span><span class="p">,</span> <span class="n">logits</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">router_logits</span><span class="p">):</span>
-    <span class="n">top2</span> <span class="o">=</span> <span class="n">logits</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">indices</span>   <span class="c1"># [seq, 2]</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Layer </span><span class="si">{</span><span class="n">layer_idx</span><span class="si">}</span><span class="s2">: top-2 experts used → </span><span class="si">{</span><span class="n">top2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</code></pre></div>
+# ── Option B: Inspect which experts were activated ─────────────────────────
+# Access the router logits for interpretability
+outputs = model(input_ids, output_router_logits=True)
+router_logits = outputs.router_logits   # tuple of tensors per MoE layer
+for layer_idx, logits in enumerate(router_logits):
+    top2 = logits.topk(2, dim=-1).indices   # [seq, 2]
+    print(f&quot;Layer {layer_idx}: top-2 experts used → {top2[0].tolist()}&quot;)</textarea><pre><code class="language-python"># Install: pip install transformers accelerate bitsandbytes
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+import torch
+
+# ── Option A: Mixtral 8x7B (open weights, Apache-2.0) ──────────────────────
+model_name = &quot;mistralai/Mixtral-8x7B-Instruct-v0.1&quot;
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+# Load with 4-bit quantization: reduces VRAM from ~90 GB → ~24 GB
+model = AutoModelForCausalLM.from_pretrained(
+    model_name,
+    device_map=&quot;auto&quot;,        # spread across available GPUs/CPU
+    torch_dtype=torch.float16,
+    quantization_config=BitsAndBytesConfig(load_in_4bit=True),   # requires bitsandbytes
+)
+
+# Prepare a chat-formatted prompt
+messages = [
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Explain Mixture of Experts in three sentences.&quot;}
+]
+input_ids = tokenizer.apply_chat_template(
+    messages, return_tensors=&quot;pt&quot;, add_generation_prompt=True
+).to(model.device)
+
+# Generate a response
+with torch.no_grad():
+    output_ids = model.generate(
+        input_ids,
+        max_new_tokens=256,
+        temperature=0.7,
+        do_sample=True,
+    )
+
+response = tokenizer.decode(
+    output_ids[0][input_ids.shape[1]:],
+    skip_special_tokens=True
+)
+print(response)
+
+# ── Option B: Inspect which experts were activated ─────────────────────────
+# Access the router logits for interpretability
+outputs = model(input_ids, output_router_logits=True)
+router_logits = outputs.router_logits   # tuple of tensors per MoE layer
+for layer_idx, logits in enumerate(router_logits):
+    top2 = logits.topk(2, dim=-1).indices   # [seq, 2]
+    print(f&quot;Layer {layer_idx}: top-2 experts used → {top2[0].tolist()}&quot;)</code></pre></div>
 <h2 id="formulas-summary">Formulas (summary)</h2>
 <ul>
 <li>Router logits: <code>logits = W_gate · x</code>, with <code>W_gate ∈ R^{num_experts × d_model}</code> (no bias).</li>
@@ -502,14 +692,60 @@
 <li>DeepSeek-V3 model: https://huggingface.co/deepseek-ai/DeepSeek-V3</li>
 </ul>
 <p>Images on the original page are credited to Hugging Face, Mistral AI and public research.</p>
-  <div class="pager"><a href="week06-llms.html"><small>Previous</small>Week 6: Large Language Models (LLMs)</a><a class="next" href="week08-midterm.html"><small>Next</small>Week 8: Midterm Exam</a></div>
-  <footer style="margin-top:3rem;padding-top:1rem;border-top:1px solid var(--border);font-size:.84rem;color:var(--muted)">
-This site is based on the course site <a href="https://albanna-tutorials.com/cs/">albanna-tutorials.com/cs</a> by Dr. Abdulkarim Albanna, used with the author's permission.
-</footer>
-</main><aside class="rail">
-  <div class="rail-tabs"><button class="active" data-panel="panel-sims">Simulations</button><button data-panel="panel-code">Test code</button></div>
-  <div class="rail-panel active" id="panel-sims"><p class="rail-intro">Interactive teaching aids for this week. Each opens full-size with step controls and teaching notes.</p><button class="sim-card" data-sim="moe"><span class="sim-kind">MoE · simulation</span><span class="sim-title">Mixture of Experts router</span><span class="sim-desc">Gate softmax picks top-k experts per token; watch load and active-parameter share.</span></button><button class="sim-card" data-sim="sampling"><span class="sim-kind">LLMs · simulation</span><span class="sim-title">Temperature, top-k, top-p</span><span class="sim-desc">Probability bars that sharpen or flatten; truncate and sample the next token.</span></button></div>
-  <div class="rail-panel" id="panel-code"><p class="rail-intro"><b>Run ▶</b> executes pure-Python/NumPy snippets in your browser (Pyodide). Snippets marked <i>local</i> need the course environment (PyTorch, Transformers, LangChain…) — copy them into VS Code.</p><div class="snippet"><div class="snippet-head"><span>The core routing step on its own: softmax → top-k → renormalize</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 1. The core routing step on its own: softmax → top-k → renormalize
+<h2 id="try-it-yourself">Try it yourself</h2>
+<p class="lesson-intro"><b>▶ Try it</b> runs an example in the editor panel, inside your browser — change the code and press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to run it again. Examples marked <b>✎ Open in editor</b> need libraries or API keys that cannot run in a browser (PyTorch, Transformers, LangChain, OpenAI…): read them in the editor, then copy them to VS Code and run them in the course environment.</p><h3 id="run-in-your-browser">Run in your browser</h3><p class="lesson-intro">Self-contained versions of this week's mechanisms, written with NumPy, scikit-learn or plain Python so they run here.</p><div class="runnable"><div class="code-title">A Mixture-of-Experts layer with top-2 routing (NumPy)</div><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden>import numpy as np
+
+rng = np.random.default_rng(42)
+d_model, d_ff, n_experts, top_k, n_tokens = 8, 16, 4, 2, 6
+
+W_gate = rng.normal(0, 0.5, (d_model, n_experts))
+experts = [(rng.normal(0, 0.3, (d_model, d_ff)), rng.normal(0, 0.3, (d_ff, d_model))) for _ in range(n_experts)]
+x = rng.normal(size=(n_tokens, d_model))
+
+logits = x @ W_gate
+probs = np.exp(logits - logits.max(axis=1, keepdims=True)); probs /= probs.sum(axis=1, keepdims=True)
+chosen = np.argsort(probs, axis=1)[:, ::-1][:, :top_k]
+
+y = np.zeros_like(x)
+load = np.zeros(n_experts, dtype=int)
+for t in range(n_tokens):
+    g = probs[t, chosen[t]]; g = g / g.sum()               # renormalise over the chosen experts
+    for gate, e in zip(g, chosen[t]):
+        W1, W2 = experts[e]
+        y[t] += gate * (np.maximum(0, x[t] @ W1) @ W2)      # FFN expert with ReLU
+        load[e] += 1
+    print(f&quot;token {t}: experts {chosen[t].tolist()} with weights {np.round(g, 2).tolist()}&quot;)
+
+params_per_expert = d_model * d_ff + d_ff * d_model
+print(&quot;\nload per expert:&quot;, load)
+print(f&quot;total expert parameters: {n_experts * params_per_expert}, used per token: {top_k * params_per_expert} &quot;
+      f&quot;({top_k / n_experts:.0%})&quot;)</textarea><pre><code class="language-python">import numpy as np
+
+rng = np.random.default_rng(42)
+d_model, d_ff, n_experts, top_k, n_tokens = 8, 16, 4, 2, 6
+
+W_gate = rng.normal(0, 0.5, (d_model, n_experts))
+experts = [(rng.normal(0, 0.3, (d_model, d_ff)), rng.normal(0, 0.3, (d_ff, d_model))) for _ in range(n_experts)]
+x = rng.normal(size=(n_tokens, d_model))
+
+logits = x @ W_gate
+probs = np.exp(logits - logits.max(axis=1, keepdims=True)); probs /= probs.sum(axis=1, keepdims=True)
+chosen = np.argsort(probs, axis=1)[:, ::-1][:, :top_k]
+
+y = np.zeros_like(x)
+load = np.zeros(n_experts, dtype=int)
+for t in range(n_tokens):
+    g = probs[t, chosen[t]]; g = g / g.sum()               # renormalise over the chosen experts
+    for gate, e in zip(g, chosen[t]):
+        W1, W2 = experts[e]
+        y[t] += gate * (np.maximum(0, x[t] @ W1) @ W2)      # FFN expert with ReLU
+        load[e] += 1
+    print(f&quot;token {t}: experts {chosen[t].tolist()} with weights {np.round(g, 2).tolist()}&quot;)
+
+params_per_expert = d_model * d_ff + d_ff * d_model
+print(&quot;\nload per expert:&quot;, load)
+print(f&quot;total expert parameters: {n_experts * params_per_expert}, used per token: {top_k * params_per_expert} &quot;
+      f&quot;({top_k / n_experts:.0%})&quot;)</code></pre></div><h3 id="test-code">Test code for the course environment</h3><div class="runnable local"><div class="code-title">The core routing step on its own: softmax → top-k → renormalize</div><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden># 1. The core routing step on its own: softmax → top-k → renormalize
 import torch, torch.nn.functional as F
 torch.manual_seed(0)
 num_experts, top_k = 8, 2
@@ -519,7 +755,17 @@ probs = F.softmax(gate(x), dim=-1)
 w, idx = torch.topk(probs, top_k, dim=-1)
 w = w / w.sum(dim=-1, keepdim=True)
 print(&quot;experts chosen per token:\n&quot;, idx)
-print(&quot;renormalized weights (rows sum to 1):\n&quot;, w.round(decimals=2), w.sum(-1))</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Show that an MoE layer preserves shape and uses only k/N of its expert parameter</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 2. Show that an MoE layer preserves shape and uses only k/N of its expert parameters
+print(&quot;renormalized weights (rows sum to 1):\n&quot;, w.round(decimals=2), w.sum(-1))</textarea><pre><code class="language-python"># 1. The core routing step on its own: softmax → top-k → renormalize
+import torch, torch.nn.functional as F
+torch.manual_seed(0)
+num_experts, top_k = 8, 2
+gate = torch.nn.Linear(512, num_experts, bias=False)
+x = torch.randn(4, 512)                       # 4 tokens
+probs = F.softmax(gate(x), dim=-1)
+w, idx = torch.topk(probs, top_k, dim=-1)
+w = w / w.sum(dim=-1, keepdim=True)
+print(&quot;experts chosen per token:\n&quot;, idx)
+print(&quot;renormalized weights (rows sum to 1):\n&quot;, w.round(decimals=2), w.sum(-1))</code></pre></div><div class="runnable local"><div class="code-title">Show that an MoE layer preserves shape and uses only k/N of its expert parameters</div><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden># 2. Show that an MoE layer preserves shape and uses only k/N of its expert parameters
 import torch, torch.nn as nn, torch.nn.functional as F
 
 class Expert(nn.Module):
@@ -542,7 +788,30 @@ class MoE(nn.Module):
 
 moe = MoE(); y, p, idx = moe(torch.randn(2, 10, 64))
 total = sum(q.numel() for q in moe.experts.parameters())
-print(&quot;output shape:&quot;, tuple(y.shape), &quot;| expert params:&quot;, total, &quot;| active per token:&quot;, total * moe.k // moe.E)</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Load-balancing loss: balanced vs. collapsed routing</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 3. Load-balancing loss: balanced vs. collapsed routing
+print(&quot;output shape:&quot;, tuple(y.shape), &quot;| expert params:&quot;, total, &quot;| active per token:&quot;, total * moe.k // moe.E)</textarea><pre><code class="language-python"># 2. Show that an MoE layer preserves shape and uses only k/N of its expert parameters
+import torch, torch.nn as nn, torch.nn.functional as F
+
+class Expert(nn.Module):
+    def __init__(s, d, f): super().__init__(); s.fc1, s.fc2 = nn.Linear(d, f), nn.Linear(f, d)
+    def forward(s, x): return s.fc2(F.relu(s.fc1(x)))
+
+class MoE(nn.Module):
+    def __init__(s, d=64, f=256, E=8, k=2):
+        super().__init__(); s.k, s.E = k, E
+        s.experts = nn.ModuleList(Expert(d, f) for _ in range(E)); s.gate = nn.Linear(d, E, bias=False)
+    def forward(s, x):
+        B, S, D = x.shape; xf = x.reshape(-1, D)
+        p = F.softmax(s.gate(xf), -1); w, idx = torch.topk(p, s.k, -1); w = w / w.sum(-1, keepdim=True)
+        out = torch.zeros_like(xf)
+        for slot in range(s.k):
+            for e in range(s.E):
+                m = idx[:, slot] == e
+                if m.any(): out[m] += w[m, slot:slot+1] * s.experts[e](xf[m])
+        return out.reshape(B, S, D), p, idx
+
+moe = MoE(); y, p, idx = moe(torch.randn(2, 10, 64))
+total = sum(q.numel() for q in moe.experts.parameters())
+print(&quot;output shape:&quot;, tuple(y.shape), &quot;| expert params:&quot;, total, &quot;| active per token:&quot;, total * moe.k // moe.E)</code></pre></div><div class="runnable local"><div class="code-title">Load-balancing loss: balanced vs. collapsed routing</div><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden># 3. Load-balancing loss: balanced vs. collapsed routing
 import torch, torch.nn.functional as F
 def aux_loss(probs, idx, E):
     f = F.one_hot(idx, E).float().sum(dim=[0, 1]) / (probs.shape[0] * idx.shape[1])
@@ -553,7 +822,18 @@ uniform_p = torch.full((N, E), 1 / E); uniform_idx = torch.stack([torch.arange(N
 collapsed_p = F.one_hot(torch.zeros(N, dtype=torch.long), E).float() * 0.9 + 0.1 / E
 collapsed_idx = torch.zeros(N, 2, dtype=torch.long)
 print(&quot;balanced  :&quot;, aux_loss(uniform_p, uniform_idx, E).item())    # ≈ 1.0
-print(&quot;collapsed :&quot;, aux_loss(collapsed_p, collapsed_idx, E).item()) # &gt;&gt; 1.0</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Watch the auxiliary loss fix collapse during a toy training loop</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 4. Watch the auxiliary loss fix collapse during a toy training loop
+print(&quot;collapsed :&quot;, aux_loss(collapsed_p, collapsed_idx, E).item()) # &gt;&gt; 1.0</textarea><pre><code class="language-python"># 3. Load-balancing loss: balanced vs. collapsed routing
+import torch, torch.nn.functional as F
+def aux_loss(probs, idx, E):
+    f = F.one_hot(idx, E).float().sum(dim=[0, 1]) / (probs.shape[0] * idx.shape[1])
+    P = probs.mean(0)
+    return E * (f * P).sum()
+E, N = 8, 1000
+uniform_p = torch.full((N, E), 1 / E); uniform_idx = torch.stack([torch.arange(N) % E, (torch.arange(N) + 1) % E], 1)
+collapsed_p = F.one_hot(torch.zeros(N, dtype=torch.long), E).float() * 0.9 + 0.1 / E
+collapsed_idx = torch.zeros(N, 2, dtype=torch.long)
+print(&quot;balanced  :&quot;, aux_loss(uniform_p, uniform_idx, E).item())    # ≈ 1.0
+print(&quot;collapsed :&quot;, aux_loss(collapsed_p, collapsed_idx, E).item()) # &gt;&gt; 1.0</code></pre></div><div class="runnable local"><div class="code-title">Watch the auxiliary loss fix collapse during a toy training loop</div><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden># 4. Watch the auxiliary loss fix collapse during a toy training loop
 import torch, torch.nn.functional as F
 torch.manual_seed(1)
 E, k, d = 8, 2, 32
@@ -567,14 +847,66 @@ for step in range(201):
     loss = E * (f * p.mean(0)).sum()
     opt.zero_grad(); loss.backward(); opt.step()
     if step % 50 == 0:
-        print(f&quot;step {step:3d}  L_aux={loss.item():.3f}  tokens/expert={(f*100).round().int().tolist()}%&quot;)</code></pre><div class="out"></div></div></div>
-</aside></div><div class="sim-overlay" id="sim-overlay" role="dialog" aria-modal="true">
-  <div class="sim-window"><div class="sim-head"><div><div class="sim-kind" id="sim-kind"></div><h3 id="sim-title"></h3></div><span class="spacer"></span><button class="btn-xs" id="sim-close">✕ Close (Esc)</button></div><div class="sim-body" id="sim-body"></div></div>
+        print(f&quot;step {step:3d}  L_aux={loss.item():.3f}  tokens/expert={(f*100).round().int().tolist()}%&quot;)</textarea><pre><code class="language-python"># 4. Watch the auxiliary loss fix collapse during a toy training loop
+import torch, torch.nn.functional as F
+torch.manual_seed(1)
+E, k, d = 8, 2, 32
+gate = torch.nn.Linear(d, E, bias=False)
+with torch.no_grad(): gate.weight[0] += 3.0          # bias the router toward expert 0 (collapse)
+opt = torch.optim.Adam(gate.parameters(), lr=0.05)
+for step in range(201):
+    x = torch.randn(256, d)
+    p = F.softmax(gate(x), -1); _, idx = torch.topk(p, k, -1)
+    f = F.one_hot(idx, E).float().sum([0, 1]) / (256 * k)
+    loss = E * (f * p.mean(0)).sum()
+    opt.zero_grad(); loss.backward(); opt.step()
+    if step % 50 == 0:
+        print(f&quot;step {step:3d}  L_aux={loss.item():.3f}  tokens/expert={(f*100).round().int().tolist()}%&quot;)</code></pre></div>
+<div class="lesson-nav"><a href="week06-llms.html">‹ Week 6: Large Language Models (LLMs)</a><a href="week08-midterm.html">Week 8: Midterm Exam ›</a></div>
+<footer class="site-footer">
+This site is based on the course site <a href="https://albanna-tutorials.com/cs/">albanna-tutorials.com/cs</a> by Dr. Abdulkarim Albanna, used with the author's permission.
+</footer></article><div id="splitter" class="splitter" role="separator" aria-orientation="vertical" title="Drag to resize"></div><aside class="workbench" id="workbench">
+  <div class="wb-tabs">
+    <button class="wb-tab active" data-mode="code">⌨ Code</button>
+    <button class="wb-tab" data-mode="anim">◉ Animation</button>
+    <span class="spacer"></span>
+    <button class="btn ghost wb-close" id="btn-close" title="Hide panel">✕</button>
+  </div>
+  <section class="wb-mode wb-code active" data-mode="code">
+    <div class="wb-toolbar">
+      <span class="wb-title" id="wb-title">Editor</span>
+      <span class="spacer"></span>
+      <button id="btn-run" class="btn primary" title="Run (Ctrl+Enter)">▶ Run</button>
+      <button id="btn-reset" class="btn ghost" title="Restore the original code">Reset</button>
+      <button id="btn-copy" class="btn ghost" title="Copy code">Copy</button>
+      <button id="btn-clear" class="btn ghost" title="Clear output">Clear</button>
+    </div>
+    <div class="editor-wrap"><textarea id="editor"># Press "▶ Try it" on any example in the lesson,
+# or write Python here and press Ctrl+Enter.
+import numpy as np
+print(np.round(np.linspace(0, 1, 5), 2))</textarea></div>
+    <div class="output-head"><span>Output</span><span id="run-time" class="muted small"></span></div>
+    <div id="output" class="output" aria-live="polite"></div>
+  </section>
+  <section class="wb-mode wb-anim" data-mode="anim">
+    <div class="wb-toolbar light">
+      <select id="anim-select" aria-label="Choose animation"><optgroup label="This week"><option value="moe">Mixture of Experts router</option><option value="sampling">Temperature, top-k, top-p</option></optgroup><optgroup label="Other weeks"><option value="matrix-multiply">Matrix multiplication, step by step</option><option value="vectors">Vectors, dot product &amp; cosine similarity</option><option value="attention">Self-attention: Q·Kᵀ → softmax → ·V</option><option value="tokenizer">Subword tokenisation</option><option value="positional">Positional encoding</option><option value="classifier">Decision boundary, threshold &amp; F1</option><option value="bio-tagging">NER: BIO tags &amp; entity-level F1</option><option value="rag">RAG pipeline</option><option value="langgraph">LangGraph StateGraph</option><option value="react-loop">ReAct agent loop</option><option value="multi-agent">Multi-agent research pipeline</option><option value="mcp">MCP message flow</option><option value="lam">Browser agent: perceive → plan → act</option><option value="diffusion">Diffusion: noising &amp; denoising</option></optgroup></select>
+      <span class="spacer"></span>
+      <button id="btn-full" class="btn ghost" title="Open full screen">⤢ Full screen</button>
+    </div>
+    <div class="anim-host" id="anim-host"><p class="muted anim-empty">Press <b>▶ Display</b> on an animation in the lesson, or choose one above.</p></div>
+  </section>
+</aside></main><div class="sim-overlay" id="sim-overlay" role="dialog" aria-modal="true">
+  <div class="sim-window"><div class="sim-head"><div><div class="sim-kind" id="sim-kind"></div><h3 id="sim-title"></h3></div><span class="spacer"></span><button class="btn ghost" id="sim-close">✕ Close (Esc)</button></div><div class="sim-body" id="sim-body"></div></div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
-<script>document.addEventListener('DOMContentLoaded',()=>{if(window.hljs)hljs.highlightAll();if(window.renderMathInElement)renderMathInElement(document.body,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});});</script>
+<script src="../assets/vendor/codemirror/codemirror.js"></script>
+<script src="../assets/vendor/codemirror/python.js"></script>
+<script src="../assets/vendor/codemirror/matchbrackets.js"></script>
+<script src="../assets/vendor/codemirror/closebrackets.js"></script>
+<script>window.CS_PYODIDE_URL = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";</script>
 <script src="../assets/js/sims/core.js"></script>
 <script src="../assets/js/sims/matrix-multiply.js"></script><script src="../assets/js/sims/vectors.js"></script><script src="../assets/js/sims/attention.js"></script><script src="../assets/js/sims/tokenizer.js"></script><script src="../assets/js/sims/positional.js"></script><script src="../assets/js/sims/classifier.js"></script><script src="../assets/js/sims/bio-tagging.js"></script><script src="../assets/js/sims/rag.js"></script><script src="../assets/js/sims/langgraph.js"></script><script src="../assets/js/sims/sampling.js"></script><script src="../assets/js/sims/moe.js"></script><script src="../assets/js/sims/react-loop.js"></script><script src="../assets/js/sims/multi-agent.js"></script><script src="../assets/js/sims/mcp.js"></script><script src="../assets/js/sims/lam.js"></script><script src="../assets/js/sims/diffusion.js"></script>
 <script src="../assets/js/site.js"></script>

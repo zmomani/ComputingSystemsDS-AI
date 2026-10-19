@@ -1,0 +1,1927 @@
+{
+"faf1b1344642e5ca8515fc131591e7be845464880d4a5ca200ae960302275846": [
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+}
+],
+"c88a0bc5ba27ba19df856d4b3bdcc328c9053a8b0b22ac4f13a3a2356f1854b3": [
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'emotions' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'emotions' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'df' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'df' is not defined"
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'tokenizer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'emotions' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'tokenizer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'emotion_encoded' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'X_train' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'X_train' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'X_train' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'lr_clf' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'y_valid' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'X_train' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'trainer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'trainer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'trainer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'classification_report' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'emotions' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'tokenizer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'trainer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'validation_results' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'tokenizer' is not defined"
+}
+],
+"4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945": [],
+"863f3ae7ecfe86f84d80c8439fe3b700e697958dcccf4712b5db0e66770c5bcb": [
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'db' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+}
+],
+"976856bfe36975fc2f3a421eb5067ac64bc79ca3ce46f5034773eda81103f308": [
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'MyState' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'graph' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'graph' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'MessagesState' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'MessagesState' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'graph' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+}
+],
+"abe01a9d024aef5bb9ef097f9ac0e00bbcaba072a1cfec63185c1ed02aff1d5b": [
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+}
+],
+"5e6e605205b975fa0e285d789d871b61ecc0bce32143509d213553170025beab": [
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'nn' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'nn' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'torch' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+}
+],
+"7ba51dbab9cd1b7f942bae6bd3fcf2b499f0b5b5c61f3c251b724632f0e40ec2": [
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "import re",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'query' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "# agent.py\nclass Agent:\n    def __init__(self, system=\"\"):\n        self.system = system\n        self.messages = []\n        if self.system:\n            self.messages.append({\"role\": \"system\", \"content\": system})\n\n    def __call__(self, message):\n        self.messages.append({\"role\": \"user\", \"content\": message})\n        result = self.execute()\n        self.messages.append({\"role\": \"assistant\", \"content\": result})\n        return result\n\n    def execute(self):\n        completion = client.chat.completions.create(\n                        model=\"gpt-4o\",\n                        temperature=0,\n                        messages=self.messages)\n        return completion.choices[0].message.content\n\n# react_prompt.py\nprompt = \"\"\"\nYou run in a loop of Thought, Action, PAUSE, Observation.\nAt the end of the loop you output an Answer\nUse Thought to describe your thoughts about the question you have been asked.\nUse Action to run one of the actions available to you - then return PAUSE.\nObservation will be the result of running those actions.\n\nYour available actions are:\n\ncalculate:\ne.g. calculate: 4 * 7 / 3\nRuns a calculation and returns the number - uses Python so be sure to use floating point syntax if necessary\n\naverage_dog_weight:\ne.g. average_dog_weight: Collie\nreturns average weight of a dog when given the breed\n\nExample session:\n\nQuestion: How much does a Bulldog weigh?\nThought: I should look the dogs weight using average_dog_weight\nAction: average_dog_weight: Bulldog\nPAUSE\n\nYou will be called again with this:\n\nObservation: A Bulldog weights 51 lbs\n\nYou then output:\n\nAnswer: A bulldog weights 51 lbs\n\"\"\".strip()\n\n# tools.py\nimport ast\nimport operator\n\n_OPS = {ast.Add: operator.add, ast.Sub: operator.sub, ast.Mult: operator.mul,\n        ast.Div: operator.truediv, ast.Pow: operator.pow, ast.Mod: operator.mod,\n        ast.USub: operator.neg, ast.UAdd: operator.pos}\n\ndef _safe_eval(node):\n    # Walk the parsed expression tree; only numbers and arithmetic operators are allowed\n    if isinstance(node, ast.Expression):\n        return _safe_eval(node.body)\n    if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):\n        return node.value\n    if isinstance(node, ast.BinOp) and type(node.op) in _OPS:\n        return _OPS[type(node.op)](_safe_eval(node.left), _safe_eval(node.right))\n    if isinstance(node, ast.UnaryOp) and type(node.op) in _OPS:\n        return _OPS[type(node.op)](_safe_eval(node.operand))\n    raise ValueError(f\"Unsupported expression: {ast.unparse(node)}\")\n\ndef calculate(what):\n    # Safe arithmetic evaluator (never call eval() on model output)\n    return _safe_eval(ast.parse(what.strip(), mode=\"eval\"))\n\ndef average_dog_weight(name):\n    name = name.strip().lower()   # exact, case-insensitive match (not a substring test)\n    if name == \"scottish terrier\":\n        return(\"Scottish Terriers average 20 lbs\")\n    elif name == \"border collie\":\n        return(\"a Border Collies average weight is 37 lbs\")\n    elif name == \"toy poodle\":\n        return(\"a toy poodles average weight is 7 lbs\")\n    else:\n        return(\"An average dog weights 50 lbs\")\n\nknown_actions = {\n    \"calculate\": calculate,\n    \"average_dog_weight\": average_dog_weight\n}\n\nimport re\n# agent_loop.py\naction_re = re.compile(r'^Action: (\\w+): (.*)$')   # python regular expression to select action\n\ndef query(question, max_turns=5):\n    i = 0\n    bot = Agent(prompt)\n    next_prompt = question\n    while i < max_turns:\n        i += 1\n        result = bot(next_prompt)\n        print(result)\n        actions = [\n            action_re.match(a)\n            for a in result.split('\\n')\n            if action_re.match(a)\n        ]\n        if actions:\n            # There is an action to run\n            action, action_input = actions[0].groups()\n            if action not in known_actions:\n                raise Exception(\"Unknown action: {}: {}\".format(action, action_input))\n            print(\" -- running {} {}\".format(action, action_input))\n            observation = known_actions[action](action_input)\n            print(\"Observation:\", observation)\n            next_prompt = \"Observation: {}\".format(observation)\n        else:\n            return\n\n# 1. Regex action extraction, no API key needed\nimport re\naction_re = re.compile(r'^Action: (\\w+): (.*)$')\nsample = \"\"\"Thought: I should look the dogs weight using average_dog_weight\nAction: average_dog_weight: Bulldog\nPAUSE\"\"\"\nactions = [action_re.match(a) for a in sample.split('\\n') if action_re.match(a)]\nprint(actions[0].groups())            # ('average_dog_weight', 'Bulldog')\nprint(action_re.match(\"Answer: 57 lbs\"))   # None \u2192 loop would terminate\n\n# 2. Tools + dispatch table, exercised directly\nimport ast, operator\n\n_OPS = {ast.Add: operator.add, ast.Sub: operator.sub, ast.Mult: operator.mul,\n        ast.Div: operator.truediv, ast.Pow: operator.pow, ast.Mod: operator.mod,\n        ast.USub: operator.neg, ast.UAdd: operator.pos}\n\ndef _safe_eval(node):\n    # Walk the parsed expression tree; only numbers and arithmetic operators are allowed\n    if isinstance(node, ast.Expression):\n        return _safe_eval(node.body)\n    if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):\n        return node.value\n    if isinstance(node, ast.BinOp) and type(node.op) in _OPS:\n        return _OPS[type(node.op)](_safe_eval(node.left), _safe_eval(node.right))\n    if isinstance(node, ast.UnaryOp) and type(node.op) in _OPS:\n        return _OPS[type(node.op)](_safe_eval(node.operand))\n    raise ValueError(f\"Unsupported expression: {ast.unparse(node)}\")\n\ndef calculate(what):\n    # Safe arithmetic evaluator (never call eval() on model output)\n    return _safe_eval(ast.parse(what.strip(), mode=\"eval\"))\n\ndef average_dog_weight(name):\n    name = name.strip().lower()   # exact, case-insensitive match (not a substring test)\n    if name == \"scottish terrier\":\n        return(\"Scottish Terriers average 20 lbs\")\n    elif name == \"border collie\":\n        return(\"a Border Collies average weight is 37 lbs\")\n    elif name == \"toy poodle\":\n        return(\"a toy poodles average weight is 7 lbs\")\n    else:\n        return(\"An average dog weights 50 lbs\")\n\nknown_actions = {\"calculate\": calculate, \"average_dog_weight\": average_dog_weight}\nfor action, arg in [(\"average_dog_weight\", \"Border Collie\"),\n                    (\"average_dog_weight\", \"Scottish Terrier\"),\n                    (\"calculate\", \"37 + 20\"),\n                    (\"average_dog_weight\", \"scottish terrier\"),   # lowercase still matches\n                    (\"average_dog_weight\", \"Terrier\")]:           # partial name \u2192 default\n    print(f\"{action}({arg!r}) -> {known_actions[action](arg)}\")\n\ntry:\n    calculate(\"__import__('os').system('ls')\")    # rejected by the safe evaluator\nexcept ValueError as e:\n    print(\"blocked:\", e)",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+}
+],
+"f9c8ebd61299b2b27c7a45c805969b3a7df52cb396325ed92492a7c8b9d62b4d": [
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+}
+],
+"e56f971a2ae788e11d86b9ab911fe58f7329eca00b85516c95a4fbdbedf09bca": [
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+}
+],
+"745fdc831ad0a0b3869c22e752bc42afa4df9dd67aea841b5e57c5f4d3aa43b7": [
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'nn' is not defined"
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+}
+],
+"143ce906f942659caa94444b8ed3a006ec2996bc64ae9a65f8b7f6e4da146e54": [
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+}
+],
+"b0fe597e79624dde2425b4c83a79869c0c2234d6484bee02e0580cce6f84c720": [
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+}
+],
+"8c33ce250322200eeca8ef922fded7f220ac1bf13316f21da46b872366d63fd8": [
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+}
+],
+"2dce553ffeaf9d8cd3982f7cd7d0a7122b571024872748be4c27f730a8656ec7": [
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'emotions' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'emotions' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'df' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'df' is not defined"
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'tokenizer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'emotions' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'tokenizer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'emotion_encoded' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'X_train' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'X_train' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'X_train' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'lr_clf' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'y_valid' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'X_train' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'trainer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'trainer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'trainer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'classification_report' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'emotions' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'tokenizer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'trainer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'validation_results' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'tokenizer' is not defined"
+}
+],
+"ef73858fe80f494935e9435b6c08201540184c04133ad4e41f37ff6271ba9d9c": [
+{
+"run": true,
+"setup": "",
+"reason": ""
+}
+],
+"236d5dab17c9752af4d39b03f2a386ffe4ec01b56b3609c7ddd3ceed9b774d9e": [
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'db' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+}
+],
+"4ce22bb6faaa17783a3c07ea11fbd5bad65577e07f64794ea456f965fb1deeab": [
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'MyState' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'graph' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'graph' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'MessagesState' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'MessagesState' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'graph' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+}
+],
+"27633e5afc1660ddc388373a4517fbcbd76fbefcb03a2488a63a36352244e2ab": [
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+}
+],
+"ea7d7d4e45f4e111e6f11dd898f5064402136b50c44ea262f93e3bf752a364c6": [
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'nn' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'nn' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'torch' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+}
+],
+"c81636129e8583e5ad1b203d60342bd206e4f185463a3078426c1ab6e469f36e": [
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "import re",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'query' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "# agent.py\nclass Agent:\n    def __init__(self, system=\"\"):\n        self.system = system\n        self.messages = []\n        if self.system:\n            self.messages.append({\"role\": \"system\", \"content\": system})\n\n    def __call__(self, message):\n        self.messages.append({\"role\": \"user\", \"content\": message})\n        result = self.execute()\n        self.messages.append({\"role\": \"assistant\", \"content\": result})\n        return result\n\n    def execute(self):\n        completion = client.chat.completions.create(\n                        model=\"gpt-4o\",\n                        temperature=0,\n                        messages=self.messages)\n        return completion.choices[0].message.content\n\n# react_prompt.py\nprompt = \"\"\"\nYou run in a loop of Thought, Action, PAUSE, Observation.\nAt the end of the loop you output an Answer\nUse Thought to describe your thoughts about the question you have been asked.\nUse Action to run one of the actions available to you - then return PAUSE.\nObservation will be the result of running those actions.\n\nYour available actions are:\n\ncalculate:\ne.g. calculate: 4 * 7 / 3\nRuns a calculation and returns the number - uses Python so be sure to use floating point syntax if necessary\n\naverage_dog_weight:\ne.g. average_dog_weight: Collie\nreturns average weight of a dog when given the breed\n\nExample session:\n\nQuestion: How much does a Bulldog weigh?\nThought: I should look the dogs weight using average_dog_weight\nAction: average_dog_weight: Bulldog\nPAUSE\n\nYou will be called again with this:\n\nObservation: A Bulldog weights 51 lbs\n\nYou then output:\n\nAnswer: A bulldog weights 51 lbs\n\"\"\".strip()\n\n# tools.py\nimport ast\nimport operator\n\n_OPS = {ast.Add: operator.add, ast.Sub: operator.sub, ast.Mult: operator.mul,\n        ast.Div: operator.truediv, ast.Pow: operator.pow, ast.Mod: operator.mod,\n        ast.USub: operator.neg, ast.UAdd: operator.pos}\n\ndef _safe_eval(node):\n    # Walk the parsed expression tree; only numbers and arithmetic operators are allowed\n    if isinstance(node, ast.Expression):\n        return _safe_eval(node.body)\n    if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):\n        return node.value\n    if isinstance(node, ast.BinOp) and type(node.op) in _OPS:\n        return _OPS[type(node.op)](_safe_eval(node.left), _safe_eval(node.right))\n    if isinstance(node, ast.UnaryOp) and type(node.op) in _OPS:\n        return _OPS[type(node.op)](_safe_eval(node.operand))\n    raise ValueError(f\"Unsupported expression: {ast.unparse(node)}\")\n\ndef calculate(what):\n    # Safe arithmetic evaluator (never call eval() on model output)\n    return _safe_eval(ast.parse(what.strip(), mode=\"eval\"))\n\ndef average_dog_weight(name):\n    name = name.strip().lower()   # exact, case-insensitive match (not a substring test)\n    if name == \"scottish terrier\":\n        return(\"Scottish Terriers average 20 lbs\")\n    elif name == \"border collie\":\n        return(\"a Border Collies average weight is 37 lbs\")\n    elif name == \"toy poodle\":\n        return(\"a toy poodles average weight is 7 lbs\")\n    else:\n        return(\"An average dog weights 50 lbs\")\n\nknown_actions = {\n    \"calculate\": calculate,\n    \"average_dog_weight\": average_dog_weight\n}\n\nimport re\n# agent_loop.py\naction_re = re.compile(r'^Action: (\\w+): (.*)$')   # python regular expression to select action\n\ndef query(question, max_turns=5):\n    i = 0\n    bot = Agent(prompt)\n    next_prompt = question\n    while i < max_turns:\n        i += 1\n        result = bot(next_prompt)\n        print(result)\n        actions = [\n            action_re.match(a)\n            for a in result.split('\\n')\n            if action_re.match(a)\n        ]\n        if actions:\n            # There is an action to run\n            action, action_input = actions[0].groups()\n            if action not in known_actions:\n                raise Exception(\"Unknown action: {}: {}\".format(action, action_input))\n            print(\" -- running {} {}\".format(action, action_input))\n            observation = known_actions[action](action_input)\n            print(\"Observation:\", observation)\n            next_prompt = \"Observation: {}\".format(observation)\n        else:\n            return\n\nimport ast, operator, re\n\ndef calculate(expr):\n    ops = {ast.Add: operator.add, ast.Sub: operator.sub, ast.Mult: operator.mul, ast.Div: operator.truediv, ast.Pow: operator.pow}\n    def ev(n):\n        if isinstance(n, ast.Constant) and isinstance(n.value, (int, float)): return n.value\n        if isinstance(n, ast.BinOp) and type(n.op) in ops: return ops[type(n.op)](ev(n.left), ev(n.right))\n        raise ValueError(\"unsupported expression\")\n    return ev(ast.parse(expr, mode=\"eval\").body)\n\ndef lookup(term):\n    facts = {\"amman population\": \"about 4.06 million (2024 estimate)\"}\n    return facts.get(term.lower(), \"no result\")\n\ntools = {\"calculate\": calculate, \"lookup\": lookup}\n\nscript = iter([                       # what an LLM would generate, one turn at a time\n    \"Thought: I need the population first.\\nAction: lookup: Amman population\",\n    \"Thought: Now compute 17% of 4.06 million.\\nAction: calculate: 0.17 * 4060000\",\n    \"Thought: I have the answer.\\nAnswer: about 690,200 people\",\n])\naction_re = re.compile(r\"^Action: (\\w+): (.*)$\")\n\nfor turn in range(1, 6):\n    reply = next(script)\n    print(reply)\n    if reply.splitlines()[-1].startswith(\"Answer:\"):\n        break\n    m = next(action_re.match(l) for l in reply.splitlines() if action_re.match(l))\n    tool, arg = m.groups()\n    print(f\"Observation: {tools[tool](arg)}\\n\")\n\n# 1. Regex action extraction, no API key needed\nimport re\naction_re = re.compile(r'^Action: (\\w+): (.*)$')\nsample = \"\"\"Thought: I should look the dogs weight using average_dog_weight\nAction: average_dog_weight: Bulldog\nPAUSE\"\"\"\nactions = [action_re.match(a) for a in sample.split('\\n') if action_re.match(a)]\nprint(actions[0].groups())            # ('average_dog_weight', 'Bulldog')\nprint(action_re.match(\"Answer: 57 lbs\"))   # None \u2192 loop would terminate\n\n# 2. Tools + dispatch table, exercised directly\nimport ast, operator\n\n_OPS = {ast.Add: operator.add, ast.Sub: operator.sub, ast.Mult: operator.mul,\n        ast.Div: operator.truediv, ast.Pow: operator.pow, ast.Mod: operator.mod,\n        ast.USub: operator.neg, ast.UAdd: operator.pos}\n\ndef _safe_eval(node):\n    # Walk the parsed expression tree; only numbers and arithmetic operators are allowed\n    if isinstance(node, ast.Expression):\n        return _safe_eval(node.body)\n    if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):\n        return node.value\n    if isinstance(node, ast.BinOp) and type(node.op) in _OPS:\n        return _OPS[type(node.op)](_safe_eval(node.left), _safe_eval(node.right))\n    if isinstance(node, ast.UnaryOp) and type(node.op) in _OPS:\n        return _OPS[type(node.op)](_safe_eval(node.operand))\n    raise ValueError(f\"Unsupported expression: {ast.unparse(node)}\")\n\ndef calculate(what):\n    # Safe arithmetic evaluator (never call eval() on model output)\n    return _safe_eval(ast.parse(what.strip(), mode=\"eval\"))\n\ndef average_dog_weight(name):\n    name = name.strip().lower()   # exact, case-insensitive match (not a substring test)\n    if name == \"scottish terrier\":\n        return(\"Scottish Terriers average 20 lbs\")\n    elif name == \"border collie\":\n        return(\"a Border Collies average weight is 37 lbs\")\n    elif name == \"toy poodle\":\n        return(\"a toy poodles average weight is 7 lbs\")\n    else:\n        return(\"An average dog weights 50 lbs\")\n\nknown_actions = {\"calculate\": calculate, \"average_dog_weight\": average_dog_weight}\nfor action, arg in [(\"average_dog_weight\", \"Border Collie\"),\n                    (\"average_dog_weight\", \"Scottish Terrier\"),\n                    (\"calculate\", \"37 + 20\"),\n                    (\"average_dog_weight\", \"scottish terrier\"),   # lowercase still matches\n                    (\"average_dog_weight\", \"Terrier\")]:           # partial name \u2192 default\n    print(f\"{action}({arg!r}) -> {known_actions[action](arg)}\")\n\ntry:\n    calculate(\"__import__('os').system('ls')\")    # rejected by the safe evaluator\nexcept ValueError as e:\n    print(\"blocked:\", e)",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+}
+],
+"53541cdb2d922e39cc003717656a03f7786ddede00c1ad53f5a4bffa0df114a6": [
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+}
+],
+"84f1514519438d22b29533e118a229ab94f5b9837735aee4a4691c32ae4d6f67": [
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+}
+],
+"c9877efda8cf9fc2f22c381f94bb32434424cfd94928f5224af24d2af118bfc6": [
+{
+"run": true,
+"setup": "",
+"reason": ""
+}
+],
+"1517ee2207f03b9d7f761d561ed9d949fe13afdfd894ea8fe5880e71b240c9d4": [
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'nn' is not defined"
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+}
+],
+"9caf3db41d945d72a9845092bc6887fa2e28643ac4777937f09a1f146ae35c0d": [
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'emotions' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'emotions' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'df' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'df' is not defined"
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'tokenizer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'emotions' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'tokenizer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'emotion_encoded' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'X_train' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'X_train' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'X_train' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'lr_clf' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'y_valid' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'X_train' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'trainer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'trainer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'trainer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'classification_report' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'emotions' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'trainer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'validation_results' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+}
+],
+"cab72ed51e5856e1ea4e846b5b85d1cab62d3bfc8f24ac7d7a7be17046f6be3c": [
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+}
+],
+"4ef520a321521ca18eeaf5a1304fb2ef75582ef863dc1cccec656c110be55ff7": [
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+}
+]
+}

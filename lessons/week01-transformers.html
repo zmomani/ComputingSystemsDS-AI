@@ -4,29 +4,26 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Week 1: Transformer Architecture · Computing Systems for DS & AI</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<meta name="description" content="Interactive course site for 606363 Computing Systems for Data Science and AI, University of Petra. Python runs in your browser; every week has simulations and animations.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231f3a5f'/><text x='16' y='22' font-size='14' font-family='monospace' fill='white' text-anchor='middle'>AI</text></svg>">
+<link rel="stylesheet" href="../assets/vendor/codemirror/codemirror.css">
+<link rel="stylesheet" href="../assets/vendor/codemirror/material-darker.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
 <link rel="stylesheet" href="../assets/css/site.css">
 </head>
 <body><header class="topbar">
-  <button class="btn-icon" id="menu-toggle" aria-label="Menu">☰</button>
-  <a class="brand" href="../index.html">606363 · Computing Systems for DS & AI<small>University of Petra</small></a>
-  <span class="spacer"></span>
-  <nav class="week-nav"><a class="btn-icon" href="week02-text-classification.html" title="Text Classification">Wk 2 →</a></nav>
-  <a class="btn-icon" href="../index.html#curriculum">Curriculum</a>
-  <a class="btn-icon" href="../index.html#simulations">Simulations</a>
-  <button class="btn-icon" id="theme-toggle" aria-label="Toggle dark mode">◐</button>
-</header><div class="layout"><aside class="sidebar">
-  <h4>Course</h4><ul class="outline"><li><a class="" href="../lessons/syllabus.html"><span class="wk">·</span><span>Course Syllabus</span></a></li><li><a class="" href="../lessons/project.html"><span class="wk">·</span><span>Final Project</span></a></li></ul>
-  <h4>16-week curriculum</h4><ul class="outline"><li><a class="active" href="../lessons/week01-transformers.html"><span class="wk">01</span><span>Transformer Architecture</span></a></li><li><a class="" href="../lessons/week02-text-classification.html"><span class="wk">02</span><span>Text Classification</span></a></li><li><a class="soon" href="../lessons/week03-ner.html"><span class="wk">03</span><span>Named Entity Recognition (NER)</span></a></li><li><a class="" href="../lessons/week04-langchain.html"><span class="wk">04</span><span>LangChain Fundamentals</span></a></li><li><a class="" href="../lessons/week05-langgraph.html"><span class="wk">05</span><span>LangGraph</span></a></li><li><a class="" href="../lessons/week06-llms.html"><span class="wk">06</span><span>Large Language Models (LLMs)</span></a></li><li><a class="" href="../lessons/week07-moe.html"><span class="wk">07</span><span>Mixture of Experts (MoE)</span></a></li><li><a class="" href="../lessons/week08-midterm.html"><span class="wk">08</span><span>Midterm Exam</span></a></li><li><a class="" href="../lessons/week09-react-agents.html"><span class="wk">09</span><span>AI Agents &amp; ReAct</span></a></li><li><a class="" href="../lessons/week10-multi-agent.html"><span class="wk">10</span><span>Multi-Agent Systems</span></a></li><li><a class="" href="../lessons/week11-mcp.html"><span class="wk">11</span><span>Model Context Protocol (MCP)</span></a></li><li><a class="soon" href="../lessons/week12-lams.html"><span class="wk">12</span><span>Large Action Models (LAMs)</span></a></li><li><a class="" href="../lessons/week13-diffusion.html"><span class="wk">13</span><span>Diffusion Models</span></a></li><li><a class="" href="../lessons/week14-project.html"><span class="wk">14</span><span>Project Development &amp; Final Testing</span></a></li><li><a class="" href="../lessons/week15-competition.html"><span class="wk">15</span><span>Competition Day &amp; Presentations</span></a></li><li><a class="" href="../lessons/week16-final.html"><span class="wk">16</span><span>Final Exam</span></a></li></ul>
-  <h4>On this page</h4><ul class="toc" id="toc"></ul>
-</aside><main class="main">
-  <div class="lesson-head"><div class="eyebrow">Week 1 · ILO K1</div><h1>Transformer Architecture</h1>
-  <p class="credit"><b>Topics:</b> Transformer architecture, encoder-decoder framework, Hugging Face ecosystem<br><b>Project milestone:</b> Form teams, create the GitHub repo, set up the project and API keys, write a Transformer analysis</p></div>
-  <div class="callout sim"><div class="sim-strip"><b style="margin-right:4px">Simulations for this week:</b><button class="chip" data-sim="attention">▶ Self-attention: Q·Kᵀ → softmax → ·V</button><button class="chip" data-sim="matrix-multiply">▶ Matrix multiplication, step by step</button><button class="chip" data-sim="vectors">▶ Vectors, dot product &amp; cosine similarity</button><button class="chip" data-sim="tokenizer">▶ Subword tokenisation</button><button class="chip" data-sim="positional">▶ Positional encoding</button></div></div>
-  <h2 id="part-understanding-transformer-architecture">Understanding Transformer Architecture</h2>
+  <a class="brand" href="../index.html">
+    <span class="brand-mark">AI</span>
+    <span class="brand-text"><strong>Computing Systems for DS &amp; AI</strong><span class="muted"> · 606363 · University of Petra</span></span>
+  </a>
+  <nav class="topnav"><button class="btn ghost" disabled>‹ Prev</button><select id="lesson-select" aria-label="Choose lesson"><option value="">Lessons…</option><option value="syllabus.html">Course Syllabus</option><option value="project.html">Final Project</option><option value="week01-transformers.html" selected>Week 1 · Transformer Architecture</option><option value="week02-text-classification.html">Week 2 · Text Classification</option><option value="week03-ner.html">Week 3 · Named Entity Recognition (NER)</option><option value="week04-langchain.html">Week 4 · LangChain Fundamentals</option><option value="week05-langgraph.html">Week 5 · LangGraph</option><option value="week06-llms.html">Week 6 · Large Language Models (LLMs)</option><option value="week07-moe.html">Week 7 · Mixture of Experts (MoE)</option><option value="week08-midterm.html">Week 8 · Midterm Exam</option><option value="week09-react-agents.html">Week 9 · AI Agents &amp; ReAct</option><option value="week10-multi-agent.html">Week 10 · Multi-Agent Systems</option><option value="week11-mcp.html">Week 11 · Model Context Protocol (MCP)</option><option value="week12-lams.html">Week 12 · Large Action Models (LAMs)</option><option value="week13-diffusion.html">Week 13 · Diffusion Models</option><option value="week14-project.html">Week 14 · Project Development &amp; Final Testing</option><option value="week15-competition.html">Week 15 · Competition Day &amp; Presentations</option><option value="week16-final.html">Week 16 · Final Exam</option></select><a class="btn ghost" href="week02-text-classification.html" title="Text Classification">Next ›</a></nav>
+  <button id="btn-panel" class="btn accent" title="Show or hide the editor / animation panel">⇆ Panel</button><div class="status" id="py-status"><span class="dot"></span><span id="py-status-text">Python loads on first run</span></div>
+</header><main class="lesson panel-closed" id="lesson"><article class="lesson-content" id="lesson-content"><div class="lesson-head"><div class="eyebrow">Week 1 · ILO K1</div><h1>Transformer Architecture</h1>
+<p class="lesson-intro"><b>Topics:</b> Transformer architecture, encoder-decoder framework, Hugging Face ecosystem<br><b>Project milestone:</b> Form teams, create the GitHub repo, set up the project and API keys, write a Transformer analysis</p></div>
+<div class="sim-strip"><div class="sim-strip-head">Animations for this week — open them in the panel</div><div class="sim-strip-items"><button class="sim-chip" data-display="attention"><span class="sim-chip-kind">Transformers</span>▶ Display: Self-attention: Q·Kᵀ → softmax → ·V</button><button class="sim-chip" data-display="matrix-multiply"><span class="sim-chip-kind">Linear algebra</span>▶ Display: Matrix multiplication, step by step</button><button class="sim-chip" data-display="vectors"><span class="sim-chip-kind">Linear algebra</span>▶ Display: Vectors, dot product &amp; cosine similarity</button><button class="sim-chip" data-display="tokenizer"><span class="sim-chip-kind">Transformers</span>▶ Display: Subword tokenisation</button><button class="sim-chip" data-display="positional"><span class="sim-chip-kind">Transformers</span>▶ Display: Positional encoding</button></div></div>
+<details class="contents"><summary>Contents (44 sections)</summary><ol><li><a href="#part-understanding-transformer-architecture">Understanding Transformer Architecture</a></li><li><a href="#introduction">Introduction</a></li><li><a href="#evolution-of-sequence-models">Evolution of Sequence Models</a></li><li><a href="#transformer-architecture">Transformer Architecture</a></li><li><a href="#key-components">Key Components</a></li><li><a href="#interactive-demonstration">Interactive Demonstration</a></li><li><a href="#code-implementation-examples">Code Implementation Examples</a></li><li><a href="#applications">Applications</a></li><li><a href="#further-resources">Further Resources</a></li><li><a href="#conclusion">Conclusion</a></li><li><a href="#part-transformer-complete-step-by-step-guide-with-one-example">&quot;Transformer — Complete Step-by-Step Guide with One Example&quot;</a></li><li><a href="#1-input-embedding">1. Input Embedding</a></li><li><a href="#2-positional-encoding">2. Positional Encoding</a></li><li><a href="#3-self-attention">3. Self-Attention</a></li><li><a href="#4-multi-head-attention">4. Multi-Head Attention</a></li><li><a href="#5-residual-connection-layer-normalization">5. Residual Connection + Layer Normalization</a></li><li><a href="#6-feed-forward-network-ffn">6. Feed-Forward Network (FFN)</a></li><li><a href="#7-decoder">7. Decoder</a></li><li><a href="#8-linear-softmax">8. Linear + Softmax</a></li><li><a href="#9-full-pipeline-overview">9. Full Pipeline Overview</a></li><li><a href="#10-key-facts-original-paper">10. Key Facts (original paper)</a></li><li><a href="#11-three-types-of-transformer-models">11. Three Types of Transformer Models</a></li><li><a href="#part-transformer-questions-answers">&quot;Transformer: Questions &amp; Answers&quot;</a></li><li><a href="#q1-what-is-a-transformer">Q1. What is a Transformer?</a></li><li><a href="#q2-how-does-the-transformer-solve-the-problems-of-rnns-lstms">Q2. How does the Transformer solve the problems of RNNs / LSTMs?</a></li><li><a href="#q3-what-are-the-main-components-of-the-transformer">Q3. What are the main components of the Transformer?</a></li><li><a href="#q4-what-is-self-attention-and-how-does-it-work-with-example">Q4. What is self-attention, and how does it work? (with example)</a></li><li><a href="#q5-what-are-query-key-and-value-why-three-vectors">Q5. What are Query, Key and Value? Why three vectors?</a></li><li><a href="#q6-what-is-the-self-attention-formula-and-what-does-each-part-do">Q6. What is the self-attention formula, and what does each part do?</a></li><li><a href="#q7-what-is-multi-head-attention-and-why-use-multiple-heads">Q7. What is multi-head attention, and why use multiple heads?</a></li><li><a href="#q8-why-does-the-transformer-need-positional-encoding">Q8. Why does the Transformer need positional encoding?</a></li><li><a href="#q9-what-is-the-sincos-positional-encoding-formula-and-why-sine-and-cosine">Q9. What is the sin/cos positional-encoding formula, and why sine and cosine?</a></li><li><a href="#q10-what-is-masked-self-attention-and-why-is-it-needed">Q10. What is masked self-attention, and why is it needed?</a></li><li><a href="#q11-how-does-cross-attention-differ-from-self-attention">Q11. How does cross-attention differ from self-attention?</a></li><li><a href="#q12-what-are-residual-skip-connections-and-why-do-they-help">Q12. What are residual (skip) connections, and why do they help?</a></li><li><a href="#q13-what-is-layer-normalization">Q13. What is layer normalization?</a></li><li><a href="#q14-what-is-the-feed-forward-network-and-why-is-it-needed">Q14. What is the feed-forward network, and why is it needed?</a></li><li><a href="#q15-what-are-the-three-types-of-transformer-models">Q15. What are the three types of Transformer models?</a></li><li><a href="#q16-what-are-the-key-hyperparameters-of-the-original-transformer">Q16. What are the key hyperparameters of the original Transformer?</a></li><li><a href="#q17-what-is-teacher-forcing">Q17. What is teacher forcing?</a></li><li><a href="#q18-how-does-the-full-translation-pipeline-work">Q18. How does the full translation pipeline work?</a></li><li><a href="#q19-how-do-encoder-attention-and-decoder-attention-differ">Q19. How do encoder attention and decoder attention differ?</a></li><li><a href="#q20-why-is-the-transformer-better-than-a-cnn-for-nlp">Q20. Why is the Transformer better than a CNN for NLP?</a></li><li><a href="#q21-bonus-if-transformers-process-in-parallel-why-is-text-generation-sequential">Q21 (Bonus). If Transformers process in parallel, why is text generation sequential?</a></li></ol></details>
+<h2 class="part" id="part-understanding-transformer-architecture">Understanding Transformer Architecture</h2>
 <p>Companion pages linked from the lesson:</p>
 <h2 id="introduction">Introduction</h2>
 <p>The Transformer architecture was introduced in the 2017 paper <strong>"Attention Is All You Need"</strong> by Vaswani et al. Earlier sequence models processed data one step at a time; the Transformer instead uses <strong>self-attention</strong> to process an entire sequence at once. This parallelism allows Transformers to:</p>
@@ -215,155 +212,213 @@
 </ul>
 <h2 id="code-implementation-examples">Code Implementation Examples</h2>
 <h3 id="self-attention-implementation-pytorch">Self-attention implementation (PyTorch)</h3>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>import torch
+import torch.nn as nn
+import math
 
 
-<span class="k">class</span><span class="w"> </span><span class="nc">SelfAttention</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">embed_size</span><span class="p">,</span> <span class="n">heads</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">embed_size</span> <span class="o">=</span> <span class="n">embed_size</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">heads</span> <span class="o">=</span> <span class="n">heads</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">head_dim</span> <span class="o">=</span> <span class="n">embed_size</span> <span class="o">//</span> <span class="n">heads</span>
+class SelfAttention(nn.Module):
+    def __init__(self, embed_size, heads):
+        super().__init__()
+        self.embed_size = embed_size
+        self.heads = heads
+        self.head_dim = embed_size // heads
 
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">head_dim</span> <span class="o">*</span> <span class="n">heads</span> <span class="o">==</span> <span class="n">embed_size</span><span class="p">,</span> <span class="s2">"Embed size must be divisible by heads"</span>
+        assert self.head_dim * heads == embed_size, &quot;Embed size must be divisible by heads&quot;
 
-        <span class="c1"># Linear projections for queries, keys, values and the output</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">q_linear</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">embed_size</span><span class="p">,</span> <span class="n">embed_size</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">k_linear</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">embed_size</span><span class="p">,</span> <span class="n">embed_size</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">v_linear</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">embed_size</span><span class="p">,</span> <span class="n">embed_size</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fc_out</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">embed_size</span><span class="p">,</span> <span class="n">embed_size</span><span class="p">)</span>
+        # Linear projections for queries, keys, values and the output
+        self.q_linear = nn.Linear(embed_size, embed_size)
+        self.k_linear = nn.Linear(embed_size, embed_size)
+        self.v_linear = nn.Linear(embed_size, embed_size)
+        self.fc_out = nn.Linear(embed_size, embed_size)
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    def forward(self, query, key, value, mask=None):
+        batch_size = query.shape[0]
 
-        <span class="c1"># Project and split into heads: (batch, seq, heads, head_dim) -&gt; (batch, heads, seq, head_dim)</span>
-        <span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q_linear</span><span class="p">(</span><span class="n">query</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">heads</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">head_dim</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-        <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_linear</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">heads</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">head_dim</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-        <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v_linear</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">heads</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">head_dim</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        # Project and split into heads: (batch, seq, heads, head_dim) -&gt; (batch, heads, seq, head_dim)
+        q = self.q_linear(query).view(batch_size, -1, self.heads, self.head_dim).permute(0, 2, 1, 3)
+        k = self.k_linear(key).view(batch_size, -1, self.heads, self.head_dim).permute(0, 2, 1, 3)
+        v = self.v_linear(value).view(batch_size, -1, self.heads, self.head_dim).permute(0, 2, 1, 3)
 
-        <span class="c1"># Scaled dot-product scores: (batch, heads, seq_q, seq_k)</span>
-        <span class="n">scores</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">k</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">head_dim</span><span class="p">)</span>
+        # Scaled dot-product scores: (batch, heads, seq_q, seq_k)
+        scores = torch.matmul(q, k.permute(0, 1, 3, 2)) / math.sqrt(self.head_dim)
 
-        <span class="c1"># Optional mask (used in the decoder)</span>
-        <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">scores</span> <span class="o">=</span> <span class="n">scores</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s2">"-1e20"</span><span class="p">))</span>
+        # Optional mask (used in the decoder)
+        if mask is not None:
+            scores = scores.masked_fill(mask == 0, float(&quot;-1e20&quot;))
 
-        <span class="c1"># Attention weights</span>
-        <span class="n">attention</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        # Attention weights
+        attention = torch.softmax(scores, dim=-1)
 
-        <span class="c1"># Weighted sum of values: (batch, heads, seq, head_dim)</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">attention</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+        # Weighted sum of values: (batch, heads, seq, head_dim)
+        out = torch.matmul(attention, v)
 
-        <span class="c1"># Merge heads: (batch, seq, heads, head_dim) -&gt; (batch, seq, embed_size)</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">embed_size</span><span class="p">)</span>
+        # Merge heads: (batch, seq, heads, head_dim) -&gt; (batch, seq, embed_size)
+        out = out.permute(0, 2, 1, 3).contiguous().view(batch_size, -1, self.embed_size)
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc_out</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-</code></pre></div>
+        return self.fc_out(out)</textarea><pre><code class="language-python">import torch
+import torch.nn as nn
+import math
+
+
+class SelfAttention(nn.Module):
+    def __init__(self, embed_size, heads):
+        super().__init__()
+        self.embed_size = embed_size
+        self.heads = heads
+        self.head_dim = embed_size // heads
+
+        assert self.head_dim * heads == embed_size, &quot;Embed size must be divisible by heads&quot;
+
+        # Linear projections for queries, keys, values and the output
+        self.q_linear = nn.Linear(embed_size, embed_size)
+        self.k_linear = nn.Linear(embed_size, embed_size)
+        self.v_linear = nn.Linear(embed_size, embed_size)
+        self.fc_out = nn.Linear(embed_size, embed_size)
+
+    def forward(self, query, key, value, mask=None):
+        batch_size = query.shape[0]
+
+        # Project and split into heads: (batch, seq, heads, head_dim) -&gt; (batch, heads, seq, head_dim)
+        q = self.q_linear(query).view(batch_size, -1, self.heads, self.head_dim).permute(0, 2, 1, 3)
+        k = self.k_linear(key).view(batch_size, -1, self.heads, self.head_dim).permute(0, 2, 1, 3)
+        v = self.v_linear(value).view(batch_size, -1, self.heads, self.head_dim).permute(0, 2, 1, 3)
+
+        # Scaled dot-product scores: (batch, heads, seq_q, seq_k)
+        scores = torch.matmul(q, k.permute(0, 1, 3, 2)) / math.sqrt(self.head_dim)
+
+        # Optional mask (used in the decoder)
+        if mask is not None:
+            scores = scores.masked_fill(mask == 0, float(&quot;-1e20&quot;))
+
+        # Attention weights
+        attention = torch.softmax(scores, dim=-1)
+
+        # Weighted sum of values: (batch, heads, seq, head_dim)
+        out = torch.matmul(attention, v)
+
+        # Merge heads: (batch, seq, heads, head_dim) -&gt; (batch, seq, embed_size)
+        out = out.permute(0, 2, 1, 3).contiguous().view(batch_size, -1, self.embed_size)
+
+        return self.fc_out(out)</code></pre></div>
 <h3 id="simplified-self-attention-javascript">Simplified self-attention (JavaScript)</h3>
-<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nx">SelfAttention</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="kr">constructor</span><span class="p">(</span><span class="nx">embedSize</span><span class="p">,</span><span class="w"> </span><span class="nx">heads</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">embedSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">embedSize</span><span class="p">;</span>
-<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">heads</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">heads</span><span class="p">;</span>
-<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">headDim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">embedSize</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nx">heads</span><span class="p">);</span>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-javascript">class SelfAttention {
+  constructor(embedSize, heads) {
+    this.embedSize = embedSize;
+    this.heads = heads;
+    this.headDim = Math.floor(embedSize / heads);
 
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">headDim</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">heads</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="nx">embedSize</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="s2">"Embed size must be divisible by heads"</span><span class="p">);</span>
-<span class="w">    </span><span class="p">}</span>
+    if (this.headDim * heads !== embedSize) {
+      throw new Error(&quot;Embed size must be divisible by heads&quot;);
+    }
 
-<span class="w">    </span><span class="c1">// Weight matrices (random init, for demonstration only)</span>
-<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">wQ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">initializeWeights</span><span class="p">(</span><span class="nx">embedSize</span><span class="p">,</span><span class="w"> </span><span class="nx">embedSize</span><span class="p">);</span>
-<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">wK</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">initializeWeights</span><span class="p">(</span><span class="nx">embedSize</span><span class="p">,</span><span class="w"> </span><span class="nx">embedSize</span><span class="p">);</span>
-<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">wV</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">initializeWeights</span><span class="p">(</span><span class="nx">embedSize</span><span class="p">,</span><span class="w"> </span><span class="nx">embedSize</span><span class="p">);</span>
-<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">wO</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">initializeWeights</span><span class="p">(</span><span class="nx">embedSize</span><span class="p">,</span><span class="w"> </span><span class="nx">embedSize</span><span class="p">);</span>
-<span class="w">  </span><span class="p">}</span>
+    // Weight matrices (random init, for demonstration only)
+    this.wQ = this.initializeWeights(embedSize, embedSize);
+    this.wK = this.initializeWeights(embedSize, embedSize);
+    this.wV = this.initializeWeights(embedSize, embedSize);
+    this.wO = this.initializeWeights(embedSize, embedSize);
+  }
 
-<span class="w">  </span><span class="nx">initializeWeights</span><span class="p">(</span><span class="nx">inputDim</span><span class="p">,</span><span class="w"> </span><span class="nx">outputDim</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[];</span>
-<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">let</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nx">inputDim</span><span class="p">;</span><span class="w"> </span><span class="nx">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nx">w</span><span class="p">.</span><span class="nx">push</span><span class="p">([]);</span>
-<span class="w">      </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">let</span><span class="w"> </span><span class="nx">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span><span class="w"> </span><span class="nx">j</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nx">outputDim</span><span class="p">;</span><span class="w"> </span><span class="nx">j</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nx">w</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">push</span><span class="p">((</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">0.5</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.1</span><span class="p">);</span>
-<span class="w">      </span><span class="p">}</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">w</span><span class="p">;</span>
-<span class="w">  </span><span class="p">}</span>
+  initializeWeights(inputDim, outputDim) {
+    const w = [];
+    for (let i = 0; i &lt; inputDim; i++) {
+      w.push([]);
+      for (let j = 0; j &lt; outputDim; j++) {
+        w[i].push((Math.random() - 0.5) * 0.1);
+      }
+    }
+    return w;
+  }
 
-<span class="w">  </span><span class="nx">matMul</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="w"> </span><span class="nx">b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[];</span>
-<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">let</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nx">a</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span><span class="w"> </span><span class="nx">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nx">result</span><span class="p">.</span><span class="nx">push</span><span class="p">([]);</span>
-<span class="w">      </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">let</span><span class="w"> </span><span class="nx">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span><span class="w"> </span><span class="nx">j</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nx">b</span><span class="p">[</span><span class="mf">0</span><span class="p">].</span><span class="nx">length</span><span class="p">;</span><span class="w"> </span><span class="nx">j</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="nx">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span>
-<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">let</span><span class="w"> </span><span class="nx">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span><span class="w"> </span><span class="nx">k</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nx">b</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span><span class="w"> </span><span class="nx">k</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="nx">sum</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="nx">a</span><span class="p">[</span><span class="nx">i</span><span class="p">][</span><span class="nx">k</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">b</span><span class="p">[</span><span class="nx">k</span><span class="p">][</span><span class="nx">j</span><span class="p">];</span>
-<span class="w">        </span><span class="nx">result</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">push</span><span class="p">(</span><span class="nx">sum</span><span class="p">);</span>
-<span class="w">      </span><span class="p">}</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">result</span><span class="p">;</span>
-<span class="w">  </span><span class="p">}</span>
+  matMul(a, b) {
+    const result = [];
+    for (let i = 0; i &lt; a.length; i++) {
+      result.push([]);
+      for (let j = 0; j &lt; b[0].length; j++) {
+        let sum = 0;
+        for (let k = 0; k &lt; b.length; k++) sum += a[i][k] * b[k][j];
+        result[i].push(sum);
+      }
+    }
+    return result;
+  }
 
-<span class="w">  </span><span class="nx">softmax</span><span class="p">(</span><span class="nx">arr</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(...</span><span class="nx">arr</span><span class="p">);</span>
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">exps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">arr</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">x</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nb">Math</span><span class="p">.</span><span class="nx">exp</span><span class="p">(</span><span class="nx">x</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nx">max</span><span class="p">));</span>
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">exps</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">s</span><span class="p">,</span><span class="w"> </span><span class="nx">x</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">s</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">x</span><span class="p">,</span><span class="w"> </span><span class="mf">0</span><span class="p">);</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">exps</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">x</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">x</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nx">sum</span><span class="p">);</span>
-<span class="w">  </span><span class="p">}</span>
+  softmax(arr) {
+    const max = Math.max(...arr);
+    const exps = arr.map(x =&gt; Math.exp(x - max));
+    const sum = exps.reduce((s, x) =&gt; s + x, 0);
+    return exps.map(x =&gt; x / sum);
+  }
 
-<span class="w">  </span><span class="nx">transpose</span><span class="p">(</span><span class="nx">matrix</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">matrix</span><span class="p">[</span><span class="mf">0</span><span class="p">].</span><span class="nx">map</span><span class="p">((</span><span class="nx">_</span><span class="p">,</span><span class="w"> </span><span class="nx">j</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">matrix</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">row</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">row</span><span class="p">[</span><span class="nx">j</span><span class="p">]));</span>
-<span class="w">  </span><span class="p">}</span>
+  transpose(matrix) {
+    return matrix[0].map((_, j) =&gt; matrix.map(row =&gt; row[j]));
+  }
 
-<span class="w">  </span><span class="nx">forward</span><span class="p">(</span><span class="nx">inputs</span><span class="p">,</span><span class="w"> </span><span class="nx">mask</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">batchSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">inputs</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">seqLength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">inputs</span><span class="p">[</span><span class="mf">0</span><span class="p">].</span><span class="nx">length</span><span class="p">;</span>
+  forward(inputs, mask = null) {
+    const batchSize = inputs.length;
+    const seqLength = inputs[0].length;
 
-<span class="w">    </span><span class="c1">// Linear projections</span>
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">Q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">matMul</span><span class="p">(</span><span class="nx">inputs</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">wQ</span><span class="p">);</span>
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">K</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">matMul</span><span class="p">(</span><span class="nx">inputs</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">wK</span><span class="p">);</span>
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">V</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">matMul</span><span class="p">(</span><span class="nx">inputs</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">wV</span><span class="p">);</span>
+    // Linear projections
+    const Q = this.matMul(inputs, this.wQ);
+    const K = this.matMul(inputs, this.wK);
+    const V = this.matMul(inputs, this.wV);
 
-<span class="w">    </span><span class="c1">// (Head splitting / tensor reshaping omitted in this simplified version)</span>
+    // (Head splitting / tensor reshaping omitted in this simplified version)
 
-<span class="w">    </span><span class="c1">// Scores = Q * K^T, scaled by sqrt(headDim)</span>
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">scores</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">matMul</span><span class="p">(</span><span class="nx">Q</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">transpose</span><span class="p">(</span><span class="nx">K</span><span class="p">));</span>
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">scaledScores</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">scores</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">row</span><span class="w"> </span><span class="p">=&gt;</span>
-<span class="w">      </span><span class="nx">row</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">s</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">s</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nb">Math</span><span class="p">.</span><span class="nx">sqrt</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">headDim</span><span class="p">))</span>
-<span class="w">    </span><span class="p">);</span>
+    // Scores = Q * K^T, scaled by sqrt(headDim)
+    const scores = this.matMul(Q, this.transpose(K));
+    const scaledScores = scores.map(row =&gt;
+      row.map(s =&gt; s / Math.sqrt(this.headDim))
+    );
 
-<span class="w">    </span><span class="c1">// Mask placeholder (no logic in the demo)</span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">mask</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* apply mask */</span><span class="w"> </span><span class="p">}</span>
+    // Mask placeholder (no logic in the demo)
+    if (mask) { /* apply mask */ }
 
-<span class="w">    </span><span class="c1">// Softmax over each row -&gt; attention weights</span>
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">attentionWeights</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">scaledScores</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">row</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">softmax</span><span class="p">(</span><span class="nx">row</span><span class="p">));</span>
+    // Softmax over each row -&gt; attention weights
+    const attentionWeights = scaledScores.map(row =&gt; this.softmax(row));
 
-<span class="w">    </span><span class="c1">// Weighted sum of values</span>
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">matMul</span><span class="p">(</span><span class="nx">attentionWeights</span><span class="p">,</span><span class="w"> </span><span class="nx">V</span><span class="p">);</span>
+    // Weighted sum of values
+    const output = this.matMul(attentionWeights, V);
 
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">matMul</span><span class="p">(</span><span class="nx">output</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">wO</span><span class="p">);</span>
-<span class="w">  </span><span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
+    return this.matMul(output, this.wO);
+  }
+}</code></pre></div>
 <h3 id="using-transformers-with-libraries-hugging-face">Using Transformers with libraries (Hugging Face)</h3>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoModel</span><span class="p">,</span> <span class="n">AutoTokenizer</span>
+<div class="runnable local"><button class="try local" data-run="0" data-needs="torch, transformers" title="Needs torch, transformers — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>import torch
+from transformers import AutoModel, AutoTokenizer
 
-<span class="n">model_name</span> <span class="o">=</span> <span class="s2">"bert-base-uncased"</span>
-<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">AutoModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
+model_name = &quot;bert-base-uncased&quot;
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModel.from_pretrained(model_name)
 
-<span class="n">text</span> <span class="o">=</span> <span class="s2">"Understanding transformers is fascinating."</span>
-<span class="n">inputs</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">"pt"</span><span class="p">)</span>
+text = &quot;Understanding transformers is fascinating.&quot;
+inputs = tokenizer(text, return_tensors=&quot;pt&quot;)
 
-<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
-    <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">inputs</span><span class="p">)</span>
+with torch.no_grad():
+    outputs = model(**inputs)
 
-<span class="n">last_hidden_state</span> <span class="o">=</span> <span class="n">outputs</span><span class="o">.</span><span class="n">last_hidden_state</span>
-<span class="n">pooled_output</span> <span class="o">=</span> <span class="n">outputs</span><span class="o">.</span><span class="n">pooler_output</span>
+last_hidden_state = outputs.last_hidden_state
+pooled_output = outputs.pooler_output
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Hidden state shape: </span><span class="si">{</span><span class="n">last_hidden_state</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>  <span class="c1"># [batch_size, sequence_length, hidden_size]</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Pooled output shape: </span><span class="si">{</span><span class="n">pooled_output</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>     <span class="c1"># [batch_size, hidden_size]</span>
-</code></pre></div>
+print(f&quot;Hidden state shape: {last_hidden_state.shape}&quot;)  # [batch_size, sequence_length, hidden_size]
+print(f&quot;Pooled output shape: {pooled_output.shape}&quot;)     # [batch_size, hidden_size]</textarea><pre><code class="language-python">import torch
+from transformers import AutoModel, AutoTokenizer
+
+model_name = &quot;bert-base-uncased&quot;
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModel.from_pretrained(model_name)
+
+text = &quot;Understanding transformers is fascinating.&quot;
+inputs = tokenizer(text, return_tensors=&quot;pt&quot;)
+
+with torch.no_grad():
+    outputs = model(**inputs)
+
+last_hidden_state = outputs.last_hidden_state
+pooled_output = outputs.pooler_output
+
+print(f&quot;Hidden state shape: {last_hidden_state.shape}&quot;)  # [batch_size, sequence_length, hidden_size]
+print(f&quot;Pooled output shape: {pooled_output.shape}&quot;)     # [batch_size, hidden_size]</code></pre></div>
 <h2 id="applications">Applications</h2>
 <h3 id="natural-language-processing">Natural language processing</h3>
 <p>Machine translation (e.g. Google Translate), text summarization, sentiment analysis, named entity recognition, question answering, and text generation with GPT models.</p>
@@ -454,7 +509,7 @@
 <li>Scalability to very large models with steady performance gains</li>
 <li>A foundation for state-of-the-art systems across many applications</li>
 </ul>
-<h2 id="part-transformer-complete-step-by-step-guide-with-one-example">&quot;Transformer — Complete Step-by-Step Guide with One Example&quot;</h2>
+<h2 class="part" id="part-transformer-complete-step-by-step-guide-with-one-example">&quot;Transformer — Complete Step-by-Step Guide with One Example&quot;</h2>
 <p><em>Intermediate · ~30 minutes · AI Applications</em></p>
 <p>In this guide we follow <strong>one example sentence</strong> through the whole Transformer, computing every stage by hand with small example numbers:</p>
 <blockquote>
@@ -466,17 +521,15 @@
 <h2 id="1-input-embedding">1. Input Embedding</h2>
 <p>Each word is first converted into a vector of numbers (its <strong>embedding</strong>). These values are learned during training, so words with similar meanings end up with similar vectors.</p>
 <p>In the example each word becomes a vector of <strong>4 dimensions</strong> (real models use 512):</p>
-<div class="highlight"><pre><span></span><code>"I"        → [0.2, 0.5, 0.1, 0.8]
-"love"     → [0.9, 0.3, 0.7, 0.2]
-"learning" → [0.4, 0.6, 0.5, 0.9]
-</code></pre></div>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">&quot;I&quot;        → [0.2, 0.5, 0.1, 0.8]
+&quot;love&quot;     → [0.9, 0.3, 0.7, 0.2]
+&quot;learning&quot; → [0.4, 0.6, 0.5, 0.9]</code></pre></div>
 <hr />
 <h2 id="2-positional-encoding">2. Positional Encoding</h2>
 <p>The Transformer processes all words <strong>in parallel</strong>, so it has no built-in notion of word order. To tell the model <em>where</em> each word is, a position vector is <strong>added</strong> to each embedding.</p>
 <p>The position vectors are built with sine and cosine functions:</p>
-<div class="highlight"><pre><span></span><code>PE(pos, 2i)   = sin( pos / 10000^(2i/d) )
-PE(pos, 2i+1) = cos( pos / 10000^(2i/d) )
-</code></pre></div>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">PE(pos, 2i)   = sin( pos / 10000^(2i/d) )
+PE(pos, 2i+1) = cos( pos / 10000^(2i/d) )</code></pre></div>
 <ul>
 <li><code>pos</code> = position of the word in the sentence (0, 1, 2, …)</li>
 <li><code>i</code> = index of the dimension</li>
@@ -484,97 +537,84 @@ PE(pos, 2i+1) = cos( pos / 10000^(2i/d) )
 </ul>
 <p>Early dimensions change quickly from one position to the next and later dimensions change slowly — like the hands of a clock — so every position gets a unique pattern.</p>
 <p>Positional encoding vectors for our 3 positions (d = 4):</p>
-<div class="highlight"><pre><span></span><code>PE₀ ("I",        pos 0) → [0.00,  1.00, 0.00, 1.00]
-PE₁ ("love",     pos 1) → [0.84,  0.54, 0.01, 1.00]
-PE₂ ("learning", pos 2) → [0.91, -0.42, 0.02, 1.00]
-</code></pre></div>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">PE₀ (&quot;I&quot;,        pos 0) → [0.00,  1.00, 0.00, 1.00]
+PE₁ (&quot;love&quot;,     pos 1) → [0.84,  0.54, 0.01, 1.00]
+PE₂ (&quot;learning&quot;, pos 2) → [0.91, -0.42, 0.02, 1.00]</code></pre></div>
 <p>Embedding + Positional Encoding:</p>
-<div class="highlight"><pre><span></span><code>"I"        → [0.2, 0.5, 0.1, 0.8] + [0.00,  1.00, 0.00, 1.00] = [0.20, 1.50, 0.10, 1.80]
-"love"     → [0.9, 0.3, 0.7, 0.2] + [0.84,  0.54, 0.01, 1.00] = [1.74, 0.84, 0.71, 1.20]
-"learning" → [0.4, 0.6, 0.5, 0.9] + [0.91, -0.42, 0.02, 1.00] = [1.31, 0.18, 0.52, 1.90]
-</code></pre></div>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">&quot;I&quot;        → [0.2, 0.5, 0.1, 0.8] + [0.00,  1.00, 0.00, 1.00] = [0.20, 1.50, 0.10, 1.80]
+&quot;love&quot;     → [0.9, 0.3, 0.7, 0.2] + [0.84,  0.54, 0.01, 1.00] = [1.74, 0.84, 0.71, 1.20]
+&quot;learning&quot; → [0.4, 0.6, 0.5, 0.9] + [0.91, -0.42, 0.02, 1.00] = [1.31, 0.18, 0.52, 1.90]</code></pre></div>
 <p>These three vectors are the input <strong>X</strong> to the encoder.</p>
 <hr />
 <h2 id="3-self-attention">3. Self-Attention</h2>
 <p>Self-attention lets each word ask: <em>"which other words in the sentence matter for my meaning?"</em></p>
 <h3 id="step-31-create-query-key-and-value">Step 3.1 — Create Query, Key and Value</h3>
 <p>Each input vector is multiplied by three learned weight matrices:</p>
-<div class="highlight"><pre><span></span><code>Q = X × Wq      (Query  — what the word is looking for)
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">Q = X × Wq      (Query  — what the word is looking for)
 K = X × Wk      (Key    — what the word offers to be matched against)
-V = X × Wv      (Value  — the information the word passes on)
-</code></pre></div>
+V = X × Wv      (Value  — the information the word passes on)</code></pre></div>
 <p>For readability the example uses simplified vectors of size 3 (d_k = 3):</p>
-<div class="highlight"><pre><span></span><code>            Q            K            V
-"I"      [1, 0, 1]    [0, 1, 1]    [1, 0, 0]
-"love"   [0, 1, 0]    [1, 1, 0]    [0, 1, 0]
-"learn"  [1, 1, 0]    [0, 0, 1]    [0, 0, 1]
-</code></pre></div>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">            Q            K            V
+&quot;I&quot;      [1, 0, 1]    [0, 1, 1]    [1, 0, 0]
+&quot;love&quot;   [0, 1, 0]    [1, 1, 0]    [0, 1, 0]
+&quot;learn&quot;  [1, 1, 0]    [0, 0, 1]    [0, 0, 1]</code></pre></div>
 <h3 id="step-32-attention-scores-q-kt">Step 3.2 — Attention scores: Q × Kᵀ</h3>
 <p>Each Query is dot-multiplied with every Key:</p>
-<div class="highlight"><pre><span></span><code>Scores = Q × Kᵀ
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">Scores = Q × Kᵀ
 
            I   love  learn
-"I"      [ 1,   1,    1 ]
-"love"   [ 1,   1,    0 ]
-"learn"  [ 1,   2,    0 ]
-</code></pre></div>
+&quot;I&quot;      [ 1,   1,    1 ]
+&quot;love&quot;   [ 1,   1,    0 ]
+&quot;learn&quot;  [ 1,   2,    0 ]</code></pre></div>
 <h3 id="step-33-scale-by-d_k">Step 3.3 — Scale by √d_k</h3>
 <p>Dividing by √d_k (√3 ≈ 1.73) keeps the scores from becoming too large, which would push softmax into saturation (outputs near 0 or 1) and slow learning:</p>
-<div class="highlight"><pre><span></span><code>Scaled = Scores / √3
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">Scaled = Scores / √3
 
-"I"      [0.58, 0.58, 0.58]
-"love"   [0.58, 0.58, 0.00]
-"learn"  [0.58, 1.15, 0.00]
-</code></pre></div>
+&quot;I&quot;      [0.58, 0.58, 0.58]
+&quot;love&quot;   [0.58, 0.58, 0.00]
+&quot;learn&quot;  [0.58, 1.15, 0.00]</code></pre></div>
 <h3 id="step-34-softmax">Step 3.4 — Softmax</h3>
 <p>Softmax converts each row into probabilities that sum to 1:</p>
-<div class="highlight"><pre><span></span><code>Attention weights
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">Attention weights
 
-"I"      [0.33, 0.33, 0.33]
-"love"   [0.39, 0.39, 0.22]
-"learn"  [0.30, 0.53, 0.17]
-</code></pre></div>
+&quot;I&quot;      [0.33, 0.33, 0.33]
+&quot;love&quot;   [0.39, 0.39, 0.22]
+&quot;learn&quot;  [0.30, 0.53, 0.17]</code></pre></div>
 <p>Notice that <strong>"learning" pays the most attention to "love" (0.53)</strong> — the model has linked the two semantically related words.</p>
 <h3 id="step-35-multiply-by-v">Step 3.5 — Multiply by V</h3>
 <p>Each output is the weighted sum of the Value vectors:</p>
-<div class="highlight"><pre><span></span><code>Output = softmax(Q × Kᵀ / √d_k) × V
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">Output = softmax(Q × Kᵀ / √d_k) × V
 
-"I"      → [0.33, 0.33, 0.33]
-"love"   → [0.39, 0.39, 0.22]
-"learn"  → [0.30, 0.53, 0.17]
-</code></pre></div>
+&quot;I&quot;      → [0.33, 0.33, 0.33]
+&quot;love&quot;   → [0.39, 0.39, 0.22]
+&quot;learn&quot;  → [0.30, 0.53, 0.17]</code></pre></div>
 <p>The complete formula:</p>
-<div class="highlight"><pre><span></span><code>Attention(Q, K, V) = softmax( Q × Kᵀ / √d_k ) × V
-</code></pre></div>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">Attention(Q, K, V) = softmax( Q × Kᵀ / √d_k ) × V</code></pre></div>
 <hr />
 <h2 id="4-multi-head-attention">4. Multi-Head Attention</h2>
 <p>Instead of running attention once, the Transformer runs it <strong>several times in parallel</strong>. Each run is a <strong>head</strong> with its own Wq, Wk, Wv, and each head learns a different kind of relationship — e.g. grammar, nearby words, or meaning. The original model uses <strong>8 heads</strong>.</p>
-<div class="highlight"><pre><span></span><code>head₁ = Attention(X×Wq¹, X×Wk¹, X×Wv¹)
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">head₁ = Attention(X×Wq¹, X×Wk¹, X×Wv¹)
 head₂ = Attention(X×Wq², X×Wk², X×Wv²)
 ...
 head₈ = Attention(X×Wq⁸, X×Wk⁸, X×Wv⁸)
 
-MultiHead(Q, K, V) = Concat(head₁, …, head₈) × Wᴼ
-</code></pre></div>
+MultiHead(Q, K, V) = Concat(head₁, …, head₈) × Wᴼ</code></pre></div>
 <p>The example uses <strong>2 heads</strong> for the word "learn":</p>
-<div class="highlight"><pre><span></span><code>Head 1 ("learn") → [0.30, 0.53, 0.17]
-Head 2 ("learn") → [0.45, 0.10, 0.45]
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">Head 1 (&quot;learn&quot;) → [0.30, 0.53, 0.17]
+Head 2 (&quot;learn&quot;) → [0.45, 0.10, 0.45]
 
 Concat             → [0.30, 0.53, 0.17, 0.45, 0.10, 0.45]
-× Wᴼ (project back) → [0.30, 0.40, 0.30]
-</code></pre></div>
+× Wᴼ (project back) → [0.30, 0.40, 0.30]</code></pre></div>
 <hr />
 <h2 id="5-residual-connection-layer-normalization">5. Residual Connection + Layer Normalization</h2>
 <h3 id="residual-skip-connection">Residual (skip) connection</h3>
 <p>The input of each sub-layer is <strong>added back</strong> to its output. This preserves the original information and helps gradients flow through deep networks (prevents vanishing gradients):</p>
-<div class="highlight"><pre><span></span><code>output = x + Sublayer(x)
-</code></pre></div>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">output = x + Sublayer(x)</code></pre></div>
 <h3 id="layer-normalization">Layer Normalization</h3>
 <p>The result is then normalized to zero mean and unit variance, followed by learnable scale (γ) and shift (β):</p>
-<div class="highlight"><pre><span></span><code>LayerNorm(x) = (x − μ) / √(σ² + ε) × γ + β
-</code></pre></div>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">LayerNorm(x) = (x − μ) / √(σ² + ε) × γ + β</code></pre></div>
 <p>Worked example for "learn" (first 3 dimensions):</p>
-<div class="highlight"><pre><span></span><code>x (input)          = [1.31, 0.18, 0.52]
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">x (input)          = [1.31, 0.18, 0.52]
 Attention output   = [0.30, 0.53, 0.17]
 After residual     = [1.61, 0.71, 0.69]
 
@@ -582,34 +622,29 @@ After residual     = [1.61, 0.71, 0.69]
 σ² (variance)      = 0.18
 √(σ² + ε)          ≈ 0.43
 
-LayerNorm output   = [1.41, -0.68, -0.73]
-</code></pre></div>
+LayerNorm output   = [1.41, -0.68, -0.73]</code></pre></div>
 <hr />
 <h2 id="6-feed-forward-network-ffn">6. Feed-Forward Network (FFN)</h2>
 <p>Each position is passed <strong>independently</strong> through a small two-layer network. The first layer expands the dimension (512 → 2048 in the real model), a ReLU sets negative values to zero, and the second layer projects back to the original size:</p>
-<div class="highlight"><pre><span></span><code>FFN(x) = max(0, x × W₁ + b₁) × W₂ + b₂
-</code></pre></div>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">FFN(x) = max(0, x × W₁ + b₁) × W₂ + b₂</code></pre></div>
 <p>Worked example:</p>
-<div class="highlight"><pre><span></span><code>Input              = [1.41, -0.68, -0.73]
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">Input              = [1.41, -0.68, -0.73]
 After W₁ + b₁      = [2.1, -0.3, 1.5, -1.2]
 After ReLU         = [2.1,  0.0, 1.5,  0.0]
-After W₂ + b₂      = [0.8,  0.5, 0.3]
-</code></pre></div>
+After W₂ + b₂      = [0.8,  0.5, 0.3]</code></pre></div>
 <p>A second <strong>residual connection + LayerNorm</strong> follows the FFN. The result is the <strong>encoder output</strong> — a contextualized representation of every input word. The whole encoder block (sections 3–6) is repeated <strong>6 times</strong>.</p>
 <hr />
 <h2 id="7-decoder">7. Decoder</h2>
 <p>The decoder generates the translation <strong>one word at a time</strong>. Suppose it has already produced "أنا" and "أحب" and is now generating the third word (shown as <code>???</code>):</p>
-<div class="highlight"><pre><span></span><code>Decoder input so far: ["أنا", "أحب", ???]
-</code></pre></div>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">Decoder input so far: [&quot;أنا&quot;, &quot;أحب&quot;, ???]</code></pre></div>
 <p>Each decoder layer has <strong>three</strong> sub-layers.</p>
 <h3 id="71-masked-self-attention">7.1 Masked Self-Attention</h3>
 <p>The decoder must not look at <strong>future</strong> words (they have not been generated yet). Future positions are masked by setting their scores to −∞ <strong>before</strong> softmax, so they get a weight of exactly 0.</p>
-<div class="highlight"><pre><span></span><code>Scores before mask            After mask                    After softmax
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">Scores before mask            After mask                    After softmax
           أنا  أحب  ???              أنا   أحب   ???                 أنا   أحب   ???
-"أنا"   [0.8, 0.5, 0.3]      "أنا"  [0.8,  -∞,   -∞ ]      "أنا"  [1.00, 0.00, 0.00]
-"أحب"   [0.6, 0.9, 0.4]      "أحب"  [0.6,  0.9,  -∞ ]      "أحب"  [0.43, 0.57, 0.00]
-"???"   [0.3, 0.7, 0.8]      "???"  [0.3,  0.7,  0.8]      "???"  [0.24, 0.36, 0.40]
-</code></pre></div>
+&quot;أنا&quot;   [0.8, 0.5, 0.3]      &quot;أنا&quot;  [0.8,  -∞,   -∞ ]      &quot;أنا&quot;  [1.00, 0.00, 0.00]
+&quot;أحب&quot;   [0.6, 0.9, 0.4]      &quot;أحب&quot;  [0.6,  0.9,  -∞ ]      &quot;أحب&quot;  [0.43, 0.57, 0.00]
+&quot;???&quot;   [0.3, 0.7, 0.8]      &quot;???&quot;  [0.3,  0.7,  0.8]      &quot;???&quot;  [0.24, 0.36, 0.40]</code></pre></div>
 <p>Each word attends only to itself and the words before it.</p>
 <h3 id="72-cross-attention-encoderdecoder-attention">7.2 Cross-Attention (Encoder–Decoder Attention)</h3>
 <p>Here the decoder looks at the <strong>input sentence</strong>:</p>
@@ -617,37 +652,35 @@ After W₂ + b₂      = [0.8,  0.5, 0.3]
 <li><strong>Q</strong> comes from the decoder (the Arabic words so far)</li>
 <li><strong>K</strong> and <strong>V</strong> come from the <strong>encoder output</strong> (the English words)</li>
 </ul>
-<div class="highlight"><pre><span></span><code>Q for "???"              = [0.5, 0.8, 0.3]
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">Q for &quot;???&quot;              = [0.5, 0.8, 0.3]
 
 Scores against encoder keys:
-   "I"        → 0.53
-   "love"     → 0.90
-   "learning" → 0.83
+   &quot;I&quot;        → 0.53
+   &quot;love&quot;     → 0.90
+   &quot;learning&quot; → 0.83
 
-Softmax → [0.26, 0.38, 0.36]
-</code></pre></div>
+Softmax → [0.26, 0.38, 0.36]</code></pre></div>
 <p>The third Arabic word attends most strongly to "love" and "learning" — exactly the English words it needs to translate.</p>
 <h3 id="73-feed-forward-residual-layernorm">7.3 Feed-Forward + Residual + LayerNorm</h3>
 <p>As in the encoder. The decoder block is also repeated <strong>6 times</strong>.</p>
 <hr />
 <h2 id="8-linear-softmax">8. Linear + Softmax</h2>
 <p>The final decoder vector is projected by a <strong>linear layer</strong> onto the whole vocabulary (which can be ~50,000 words), then <strong>softmax</strong> turns the scores into probabilities:</p>
-<div class="highlight"><pre><span></span><code>Decoder output for "???" = [0.25, 0.60, 0.15]
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">Decoder output for &quot;???&quot; = [0.25, 0.60, 0.15]
 
 Linear → Softmax over the vocabulary:
-   "أنا"     → 0.02
-   "أحب"     → 0.05
-   "التعلم"  → 0.85   ← highest
-   "كتاب"    → 0.03
-   "بيت"     → 0.05
-</code></pre></div>
+   &quot;أنا&quot;     → 0.02
+   &quot;أحب&quot;     → 0.05
+   &quot;التعلم&quot;  → 0.85   ← highest
+   &quot;كتاب&quot;    → 0.03
+   &quot;بيت&quot;     → 0.05</code></pre></div>
 <p>The word with the highest probability, <strong>"التعلم"</strong>, is selected.</p>
 <p><strong>Final output: أنا أحب التعلم</strong> ✅</p>
 <hr />
 <h2 id="9-full-pipeline-overview">9. Full Pipeline Overview</h2>
-<div class="highlight"><pre><span></span><code>                 ENCODER (×6 layers)                          DECODER (×6 layers)
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">                 ENCODER (×6 layers)                          DECODER (×6 layers)
  ┌────────────────────────────────────────┐      ┌────────────────────────────────────────────┐
- │  "I love learning"                     │      │  Output so far: ["أنا", "أحب", ...]        │
+ │  &quot;I love learning&quot;                     │      │  Output so far: [&quot;أنا&quot;, &quot;أحب&quot;, ...]        │
  │        ↓                               │      │        ↓                                   │
  │  Input Embedding                       │      │  Output Embedding                          │
  │        ↓                               │      │        ↓                                   │
@@ -667,11 +700,10 @@ Linear → Softmax over the vocabulary:
                                                  │        ↓                                   │
                                                  │  Linear → Softmax                          │
                                                  │        ↓                                   │
-                                                 │  Next word: "التعلم"                       │
+                                                 │  Next word: &quot;التعلم&quot;                       │
                                                  └────────────────────────────────────────────┘
 
- Final output: أنا أحب التعلم
-</code></pre></div>
+ Final output: أنا أحب التعلم</code></pre></div>
 <hr />
 <h2 id="10-key-facts-original-paper">10. Key Facts (original paper)</h2>
 <table>
@@ -759,7 +791,7 @@ Linear → Softmax over the vocabulary:
 <hr />
 <p><em>Prepared by Dr. Abdulkarim Albanna — AI Applications Course.</em>
 <em>Related pages on the original site: <a href="week01-transformers.html">Transformer Overview</a> · <a href="week01-transformers.html#part-transformer-questions-answers">Transformer Q&amp;A</a> · <a href="week01-transformers.html#part-transformer-complete-step-by-step-guide-with-one-example">الشرح بالعربي</a></em></p>
-<h2 id="part-transformer-questions-answers">&quot;Transformer: Questions &amp; Answers&quot;</h2>
+<h2 class="part" id="part-transformer-questions-answers">&quot;Transformer: Questions &amp; Answers&quot;</h2>
 <p><em>21 questions covering every component of the Transformer architecture.</em>
 <em>Intermediate · 21 Questions · Covers All Components · Exam Ready</em></p>
 <hr />
@@ -849,8 +881,7 @@ Linear → Softmax over the vocabulary:
 <p>Why three separate vectors? Because keeping them separate lets the model learn <strong>different representations</strong> for the three roles: how a word <em>searches</em>, how it <em>gets found</em>, and what it <em>contributes</em>. Using one vector for all three would force a single representation to do all three jobs.</p>
 <hr />
 <h2 id="q6-what-is-the-self-attention-formula-and-what-does-each-part-do">Q6. What is the self-attention formula, and what does each part do?</h2>
-<div class="highlight"><pre><span></span><code>Attention(Q, K, V) = softmax( Q × Kᵀ / √dₖ ) × V
-</code></pre></div>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">Attention(Q, K, V) = softmax( Q × Kᵀ / √dₖ ) × V</code></pre></div>
 <table>
 <thead>
 <tr>
@@ -880,10 +911,9 @@ Linear → Softmax over the vocabulary:
 <hr />
 <h2 id="q7-what-is-multi-head-attention-and-why-use-multiple-heads">Q7. What is multi-head attention, and why use multiple heads?</h2>
 <p>Instead of one attention computation, the Transformer runs <strong>h heads in parallel</strong>, each with its own learned projection matrices. Their outputs are <strong>concatenated</strong> and projected once more:</p>
-<div class="highlight"><pre><span></span><code>MultiHead(Q, K, V) = Concat(head₁, …, headₕ) × Wᴼ
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">MultiHead(Q, K, V) = Concat(head₁, …, headₕ) × Wᴼ
 
-headᵢ = Attention( Q × WᵢQ,  K × WᵢK,  V × WᵢV )
-</code></pre></div>
+headᵢ = Attention( Q × WᵢQ,  K × WᵢK,  V × WᵢV )</code></pre></div>
 <p>Why multiple heads?</p>
 <ul>
 <li>Each head can <strong>specialize</strong> in a different kind of relationship — e.g. one head learns <strong>grammar</strong> (subject–verb), one learns <strong>nearby words</strong>, one learns <strong>meaning</strong> (semantic similarity).</li>
@@ -893,14 +923,12 @@ headᵢ = Attention( Q × WᵢQ,  K × WᵢK,  V × WᵢV )
 <hr />
 <h2 id="q8-why-does-the-transformer-need-positional-encoding">Q8. Why does the Transformer need positional encoding?</h2>
 <p>Self-attention treats the input as a <strong>set</strong>: it processes all tokens at once and has <strong>no built-in notion of order</strong>. Without position information, these two sentences look identical to the model:</p>
-<div class="highlight"><pre><span></span><code>"The cat ate the fish"  =  "The fish ate the cat"
-</code></pre></div>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">&quot;The cat ate the fish&quot;  =  &quot;The fish ate the cat&quot;</code></pre></div>
 <p>Positional encoding <strong>adds a position-specific vector</strong> to every token embedding so the model knows <em>where</em> each word is.</p>
 <hr />
 <h2 id="q9-what-is-the-sincos-positional-encoding-formula-and-why-sine-and-cosine">Q9. What is the sin/cos positional-encoding formula, and why sine and cosine?</h2>
-<div class="highlight"><pre><span></span><code>PE(pos, 2i)   = sin( pos / 10000^(2i/d) )
-PE(pos, 2i+1) = cos( pos / 10000^(2i/d) )
-</code></pre></div>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">PE(pos, 2i)   = sin( pos / 10000^(2i/d) )
+PE(pos, 2i+1) = cos( pos / 10000^(2i/d) )</code></pre></div>
 <ul>
 <li><code>pos</code> — position of the token; <code>i</code> — dimension index; <code>d</code> — model dimension.</li>
 <li><strong>Even</strong> dimensions use <strong>sine</strong>, <strong>odd</strong> dimensions use <strong>cosine</strong>.</li>
@@ -915,11 +943,10 @@ PE(pos, 2i+1) = cos( pos / 10000^(2i/d) )
 <hr />
 <h2 id="q10-what-is-masked-self-attention-and-why-is-it-needed">Q10. What is masked self-attention, and why is it needed?</h2>
 <p>In the <strong>decoder</strong>, each word may attend only to <strong>itself and earlier words</strong>. Future positions are <strong>masked</strong> by setting their scores to <strong>−∞ before softmax</strong>, so they receive a weight of exactly <strong>0</strong>.</p>
-<div class="highlight"><pre><span></span><code>When generating "love" in "I love learning":
-   Can see:    "I"         ✅
-   Can see:    "love"      ✅ (itself)
-   Cannot see: "learning"  ❌ (future — not generated yet)
-</code></pre></div>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">When generating &quot;love&quot; in &quot;I love learning&quot;:
+   Can see:    &quot;I&quot;         ✅
+   Can see:    &quot;love&quot;      ✅ (itself)
+   Cannot see: &quot;learning&quot;  ❌ (future — not generated yet)</code></pre></div>
 <p>Why? During training the whole target sentence is available at once. Without the mask the decoder could simply <strong>copy the next word</strong> instead of learning to predict it. Masking forces it to predict from earlier tokens only — the same situation it faces at inference time.</p>
 <hr />
 <h2 id="q11-how-does-cross-attention-differ-from-self-attention">Q11. How does cross-attention differ from self-attention?</h2>
@@ -957,8 +984,7 @@ PE(pos, 2i+1) = cos( pos / 10000^(2i/d) )
 <p>Example: when the decoder produces the Arabic word for "learning", its Query attends to the encoder's representation of <strong>"learning"</strong> (and "love") in "I love learning".</p>
 <hr />
 <h2 id="q12-what-are-residual-skip-connections-and-why-do-they-help">Q12. What are residual (skip) connections, and why do they help?</h2>
-<div class="highlight"><pre><span></span><code>output = x + Sublayer(x)
-</code></pre></div>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">output = x + Sublayer(x)</code></pre></div>
 <p>The input of each sub-layer is <strong>added back</strong> to its output.</p>
 <p>Benefits:</p>
 <ul>
@@ -968,8 +994,7 @@ PE(pos, 2i+1) = cos( pos / 10000^(2i/d) )
 </ul>
 <hr />
 <h2 id="q13-what-is-layer-normalization">Q13. What is layer normalization?</h2>
-<div class="highlight"><pre><span></span><code>LayerNorm(x) = γ × (x − μ) / √(σ² + ε) + β
-</code></pre></div>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">LayerNorm(x) = γ × (x − μ) / √(σ² + ε) + β</code></pre></div>
 <table>
 <thead>
 <tr>
@@ -1003,8 +1028,7 @@ PE(pos, 2i+1) = cos( pos / 10000^(2i/d) )
 <p>Purpose: every position's vector is re-centred to <strong>zero mean and unit variance</strong>, which <strong>stabilizes training</strong>, allows <strong>higher learning rates</strong>, and reduces sensitivity to initialization. Unlike batch normalization, it normalizes across the <strong>features of one token</strong>, so it does not depend on the batch.</p>
 <hr />
 <h2 id="q14-what-is-the-feed-forward-network-and-why-is-it-needed">Q14. What is the feed-forward network, and why is it needed?</h2>
-<div class="highlight"><pre><span></span><code>FFN(x) = max(0, x·W₁ + b₁) · W₂ + b₂
-</code></pre></div>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">FFN(x) = max(0, x·W₁ + b₁) · W₂ + b₂</code></pre></div>
 <ul>
 <li>Two linear layers with a <strong>ReLU</strong> in between.</li>
 <li>The hidden layer <strong>expands to 4×</strong> the model dimension: <strong>512 → 2048 → 512</strong>.</li>
@@ -1090,10 +1114,9 @@ PE(pos, 2i+1) = cos( pos / 10000^(2i/d) )
 <hr />
 <h2 id="q17-what-is-teacher-forcing">Q17. What is teacher forcing?</h2>
 <p>During training, at each step the decoder is fed the <strong>correct previous word from the target sentence</strong>, not its own (possibly wrong) prediction.</p>
-<div class="highlight"><pre><span></span><code>Step 1: Input = [START]              → predict "أنا"
-Step 2: Input = [START, أنا]         → predict "أحب"    (correct "أنا", not model's guess)
-Step 3: Input = [START, أنا, أحب]    → predict "التعلم"
-</code></pre></div>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">Step 1: Input = [START]              → predict &quot;أنا&quot;
+Step 2: Input = [START, أنا]         → predict &quot;أحب&quot;    (correct &quot;أنا&quot;, not model&#x27;s guess)
+Step 3: Input = [START, أنا, أحب]    → predict &quot;التعلم&quot;</code></pre></div>
 <p>Benefits:</p>
 <ul>
 <li><strong>Faster training</strong> — all positions can be computed in parallel because the whole target is known.</li>
@@ -1194,14 +1217,96 @@ Step 3: Input = [START, أنا, أحب]    → predict "التعلم"
 <hr />
 <p><em>Prepared by Dr. Abdulkarim Albanna — AI Applications Course.</em>
 <em>Related pages on the original site: <a href="week01-transformers.html">Transformer Overview</a> · <a href="week01-transformers.html#part-transformer-complete-step-by-step-guide-with-one-example">Step-by-Step Guide</a> · <a href="week01-transformers.html#part-transformer-complete-step-by-step-guide-with-one-example">الشرح بالعربي</a></em></p>
-  <div class="pager"><span></span><a class="next" href="week02-text-classification.html"><small>Next</small>Week 2: Text Classification</a></div>
-  <footer style="margin-top:3rem;padding-top:1rem;border-top:1px solid var(--border);font-size:.84rem;color:var(--muted)">
-This site is based on the course site <a href="https://albanna-tutorials.com/cs/">albanna-tutorials.com/cs</a> by Dr. Abdulkarim Albanna, used with the author's permission.
-</footer>
-</main><aside class="rail">
-  <div class="rail-tabs"><button class="active" data-panel="panel-sims">Simulations</button><button data-panel="panel-code">Test code</button></div>
-  <div class="rail-panel active" id="panel-sims"><p class="rail-intro">Interactive teaching aids for this week. Each opens full-size with step controls and teaching notes.</p><button class="sim-card" data-sim="attention"><span class="sim-kind">Transformers · animation</span><span class="sim-title">Self-attention: Q·Kᵀ → softmax → ·V</span><span class="sim-desc">Five stages of scaled dot-product attention on a 4-token sentence, with heatmaps.</span></button><button class="sim-card" data-sim="matrix-multiply"><span class="sim-kind">Linear algebra · animation</span><span class="sim-title">Matrix multiplication, step by step</span><span class="sim-desc">Row of A × column of B, one cell at a time, with the running sum.</span></button><button class="sim-card" data-sim="vectors"><span class="sim-kind">Linear algebra · interactive</span><span class="sim-title">Vectors, dot product &amp; cosine similarity</span><span class="sim-desc">Drag two vectors; see u+v, u·v, θ and cos θ — the geometry behind embeddings.</span></button><button class="sim-card" data-sim="tokenizer"><span class="sim-kind">Transformers · interactive</span><span class="sim-title">Subword tokenisation</span><span class="sim-desc">Type text, see WordPiece-style tokens, IDs and the embedding lookup.</span></button><button class="sim-card" data-sim="positional"><span class="sim-kind">Transformers · interactive</span><span class="sim-title">Positional encoding</span><span class="sim-desc">Sinusoid heatmap and per-dimension waves; why attention needs position.</span></button></div>
-  <div class="rail-panel" id="panel-code"><p class="rail-intro"><b>Run ▶</b> executes pure-Python/NumPy snippets in your browser (Pyodide). Snippets marked <i>local</i> need the course environment (PyTorch, Transformers, LangChain…) — copy them into VS Code.</p><div class="snippet"><div class="snippet-head"><span>Scaled dot-product attention from scratch (NumPy)</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 1. Scaled dot-product attention from scratch (NumPy)
+<h2 id="try-it-yourself">Try it yourself</h2>
+<p class="lesson-intro"><b>▶ Try it</b> runs an example in the editor panel, inside your browser — change the code and press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to run it again. Examples marked <b>✎ Open in editor</b> need libraries or API keys that cannot run in a browser (PyTorch, Transformers, LangChain, OpenAI…): read them in the editor, then copy them to VS Code and run them in the course environment.</p><h3 id="run-in-your-browser">Run in your browser</h3><p class="lesson-intro">Self-contained versions of this week's mechanisms, written with NumPy, scikit-learn or plain Python so they run here.</p><div class="runnable"><div class="code-title">Scaled dot-product attention for a 4-token sentence (NumPy)</div><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden>import numpy as np
+
+tokens = [&quot;The&quot;, &quot;cat&quot;, &quot;sat&quot;, &quot;down&quot;]
+Q = np.array([[1, 0, 1], [0, 2, 0], [1, 1, 0], [0, 0, 1]], dtype=float)
+K = np.array([[1, 0, 0], [0, 2, 1], [0, 1, 1], [1, 0, 1]], dtype=float)
+V = np.array([[1, 0], [0, 1], [1, 1], [0, 0]], dtype=float)
+
+d_k = Q.shape[1]
+scores = Q @ K.T / np.sqrt(d_k)                      # (4, 4)
+weights = np.exp(scores - scores.max(axis=1, keepdims=True))
+weights /= weights.sum(axis=1, keepdims=True)         # softmax per row
+output = weights @ V                                  # (4, 2)
+
+np.set_printoptions(precision=2, suppress=True)
+print(&quot;attention weights (rows = queries):&quot;)
+for t, row in zip(tokens, weights):
+    print(f&quot;  {t:&gt;5}&quot;, row)
+print(&quot;\noutput vectors:\n&quot;, output)
+print(&quot;\nEach row of weights sums to 1:&quot;, weights.sum(axis=1))</textarea><pre><code class="language-python">import numpy as np
+
+tokens = [&quot;The&quot;, &quot;cat&quot;, &quot;sat&quot;, &quot;down&quot;]
+Q = np.array([[1, 0, 1], [0, 2, 0], [1, 1, 0], [0, 0, 1]], dtype=float)
+K = np.array([[1, 0, 0], [0, 2, 1], [0, 1, 1], [1, 0, 1]], dtype=float)
+V = np.array([[1, 0], [0, 1], [1, 1], [0, 0]], dtype=float)
+
+d_k = Q.shape[1]
+scores = Q @ K.T / np.sqrt(d_k)                      # (4, 4)
+weights = np.exp(scores - scores.max(axis=1, keepdims=True))
+weights /= weights.sum(axis=1, keepdims=True)         # softmax per row
+output = weights @ V                                  # (4, 2)
+
+np.set_printoptions(precision=2, suppress=True)
+print(&quot;attention weights (rows = queries):&quot;)
+for t, row in zip(tokens, weights):
+    print(f&quot;  {t:&gt;5}&quot;, row)
+print(&quot;\noutput vectors:\n&quot;, output)
+print(&quot;\nEach row of weights sums to 1:&quot;, weights.sum(axis=1))</code></pre></div><div class="runnable"><div class="code-title">Sinusoidal positional encoding</div><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden>import numpy as np
+
+def positional_encoding(n_positions, d_model):
+    pos = np.arange(n_positions)[:, None]
+    i = np.arange(d_model)[None, :]
+    angle = pos / np.power(10000, (2 * (i // 2)) / d_model)
+    return np.where(i % 2 == 0, np.sin(angle), np.cos(angle))
+
+pe = positional_encoding(6, 8)
+np.set_printoptions(precision=3, suppress=True)
+print(pe)
+# Nearby positions get similar vectors; the dot product falls off with distance
+print(&quot;\nsimilarity of position 0 with positions 0..5:&quot;, pe @ pe[0])</textarea><pre><code class="language-python">import numpy as np
+
+def positional_encoding(n_positions, d_model):
+    pos = np.arange(n_positions)[:, None]
+    i = np.arange(d_model)[None, :]
+    angle = pos / np.power(10000, (2 * (i // 2)) / d_model)
+    return np.where(i % 2 == 0, np.sin(angle), np.cos(angle))
+
+pe = positional_encoding(6, 8)
+np.set_printoptions(precision=3, suppress=True)
+print(pe)
+# Nearby positions get similar vectors; the dot product falls off with distance
+print(&quot;\nsimilarity of position 0 with positions 0..5:&quot;, pe @ pe[0])</code></pre></div><div class="runnable"><div class="code-title">Matrix multiplication by hand vs NumPy</div><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden>import numpy as np
+
+A = np.array([[-1, 4, 2], [4, -2, 3]])      # 2 x 3
+B = np.array([[0, -2], [-2, 4], [4, 1]])    # 3 x 2
+
+C = np.zeros((A.shape[0], B.shape[1]), dtype=int)
+for i in range(A.shape[0]):
+    for j in range(B.shape[1]):
+        terms = [A[i, k] * B[k, j] for k in range(A.shape[1])]
+        C[i, j] = sum(terms)
+        print(f&quot;c[{i+1},{j+1}] = &quot; + &quot; + &quot;.join(f&quot;({A[i,k]})({B[k,j]})&quot; for k in range(A.shape[1])) + f&quot; = {C[i, j]}&quot;)
+
+print(&quot;\nby hand:\n&quot;, C)
+print(&quot;A @ B:\n&quot;, A @ B)
+print(&quot;same result:&quot;, np.array_equal(C, A @ B))</textarea><pre><code class="language-python">import numpy as np
+
+A = np.array([[-1, 4, 2], [4, -2, 3]])      # 2 x 3
+B = np.array([[0, -2], [-2, 4], [4, 1]])    # 3 x 2
+
+C = np.zeros((A.shape[0], B.shape[1]), dtype=int)
+for i in range(A.shape[0]):
+    for j in range(B.shape[1]):
+        terms = [A[i, k] * B[k, j] for k in range(A.shape[1])]
+        C[i, j] = sum(terms)
+        print(f&quot;c[{i+1},{j+1}] = &quot; + &quot; + &quot;.join(f&quot;({A[i,k]})({B[k,j]})&quot; for k in range(A.shape[1])) + f&quot; = {C[i, j]}&quot;)
+
+print(&quot;\nby hand:\n&quot;, C)
+print(&quot;A @ B:\n&quot;, A @ B)
+print(&quot;same result:&quot;, np.array_equal(C, A @ B))</code></pre></div><h3 id="test-code">Test code for the course environment</h3><div class="runnable"><div class="code-title">Scaled dot-product attention from scratch (NumPy)</div><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden># 1. Scaled dot-product attention from scratch (NumPy)
 import numpy as np
 
 def softmax(x, axis=-1):
@@ -1222,7 +1327,28 @@ Wq, Wk, Wv = (rng.normal(size=(d, d)) * 0.3 for _ in range(3))
 out, w = attention(X @ Wq, X @ Wk, X @ Wv)
 print(&quot;attention weights (rows sum to 1):\n&quot;, w.round(3))
 print(&quot;row sums:&quot;, w.sum(axis=1).round(6))
-print(&quot;output shape:&quot;, out.shape)</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Check the PyTorch SelfAttention module from the lesson</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 2. Check the PyTorch SelfAttention module from the lesson
+print(&quot;output shape:&quot;, out.shape)</textarea><pre><code class="language-python"># 1. Scaled dot-product attention from scratch (NumPy)
+import numpy as np
+
+def softmax(x, axis=-1):
+    x = x - x.max(axis=axis, keepdims=True)
+    e = np.exp(x)
+    return e / e.sum(axis=axis, keepdims=True)
+
+def attention(Q, K, V):
+    d_k = Q.shape[-1]
+    scores = Q @ K.T / np.sqrt(d_k)
+    weights = softmax(scores)
+    return weights @ V, weights
+
+rng = np.random.default_rng(0)
+seq, d = 5, 8
+X = rng.normal(size=(seq, d))
+Wq, Wk, Wv = (rng.normal(size=(d, d)) * 0.3 for _ in range(3))
+out, w = attention(X @ Wq, X @ Wk, X @ Wv)
+print(&quot;attention weights (rows sum to 1):\n&quot;, w.round(3))
+print(&quot;row sums:&quot;, w.sum(axis=1).round(6))
+print(&quot;output shape:&quot;, out.shape)</code></pre></div><div class="runnable local"><div class="code-title">Check the PyTorch SelfAttention module from the lesson</div><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden># 2. Check the PyTorch SelfAttention module from the lesson
 import torch
 from torch import nn
 import math
@@ -1256,7 +1382,41 @@ print(sa(x, x, x).shape)                # torch.Size([2, 7, 64])
 
 # causal mask: position i may only attend to j &lt;= i
 mask = torch.tril(torch.ones(7, 7))[None, None]   # (1,1,7,7)
-print(sa(x, x, x, mask=mask).shape)</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Sinusoidal positional encoding heatmap</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 3. Sinusoidal positional encoding heatmap
+print(sa(x, x, x, mask=mask).shape)</textarea><pre><code class="language-python"># 2. Check the PyTorch SelfAttention module from the lesson
+import torch
+from torch import nn
+import math
+
+class SelfAttention(nn.Module):
+    def __init__(self, embed_size, heads):
+        super().__init__()
+        self.embed_size, self.heads = embed_size, heads
+        self.head_dim = embed_size // heads
+        assert self.head_dim * heads == embed_size
+        self.q_linear = nn.Linear(embed_size, embed_size)
+        self.k_linear = nn.Linear(embed_size, embed_size)
+        self.v_linear = nn.Linear(embed_size, embed_size)
+        self.fc_out = nn.Linear(embed_size, embed_size)
+
+    def forward(self, query, key, value, mask=None):
+        B = query.shape[0]
+        q = self.q_linear(query).view(B, -1, self.heads, self.head_dim).permute(0, 2, 1, 3)
+        k = self.k_linear(key).view(B, -1, self.heads, self.head_dim).permute(0, 2, 1, 3)
+        v = self.v_linear(value).view(B, -1, self.heads, self.head_dim).permute(0, 2, 1, 3)
+        scores = torch.matmul(q, k.permute(0, 1, 3, 2)) / math.sqrt(self.head_dim)
+        if mask is not None:
+            scores = scores.masked_fill(mask == 0, float(&quot;-1e20&quot;))
+        att = torch.softmax(scores, dim=-1)
+        out = torch.matmul(att, v).permute(0, 2, 1, 3).contiguous().view(B, -1, self.embed_size)
+        return self.fc_out(out)
+
+x = torch.randn(2, 7, 64)               # batch=2, seq=7, embed=64
+sa = SelfAttention(embed_size=64, heads=8)
+print(sa(x, x, x).shape)                # torch.Size([2, 7, 64])
+
+# causal mask: position i may only attend to j &lt;= i
+mask = torch.tril(torch.ones(7, 7))[None, None]   # (1,1,7,7)
+print(sa(x, x, x, mask=mask).shape)</code></pre></div><div class="runnable"><div class="code-title">Sinusoidal positional encoding heatmap</div><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden># 3. Sinusoidal positional encoding heatmap
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -1273,7 +1433,24 @@ pe = positional_encoding(50, 64)
 plt.imshow(pe, cmap=&quot;RdBu&quot;, aspect=&quot;auto&quot;)
 plt.xlabel(&quot;dimension&quot;); plt.ylabel(&quot;position&quot;); plt.colorbar()
 plt.title(&quot;Sinusoidal positional encoding&quot;)
-plt.show()</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Run BERT with Hugging Face and inspect output shapes</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 4. Run BERT with Hugging Face and inspect output shapes
+plt.show()</textarea><pre><code class="language-python"># 3. Sinusoidal positional encoding heatmap
+import numpy as np
+import matplotlib.pyplot as plt
+
+def positional_encoding(seq_len, d_model):
+    pos = np.arange(seq_len)[:, None]
+    i = np.arange(d_model)[None, :]
+    angle = pos / np.power(10000, (2 * (i // 2)) / d_model)
+    pe = np.zeros((seq_len, d_model))
+    pe[:, 0::2] = np.sin(angle[:, 0::2])
+    pe[:, 1::2] = np.cos(angle[:, 1::2])
+    return pe
+
+pe = positional_encoding(50, 64)
+plt.imshow(pe, cmap=&quot;RdBu&quot;, aspect=&quot;auto&quot;)
+plt.xlabel(&quot;dimension&quot;); plt.ylabel(&quot;position&quot;); plt.colorbar()
+plt.title(&quot;Sinusoidal positional encoding&quot;)
+plt.show()</code></pre></div><div class="runnable local"><div class="code-title">Run BERT with Hugging Face and inspect output shapes</div><button class="try local" data-run="0" data-needs="torch, transformers" title="Needs torch, transformers — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden># 4. Run BERT with Hugging Face and inspect output shapes
 import torch
 from transformers import AutoModel, AutoTokenizer
 
@@ -1287,14 +1464,66 @@ with torch.no_grad():
 
 print(tokenizer.convert_ids_to_tokens(inputs[&quot;input_ids&quot;][0]))
 print(&quot;Hidden state shape:&quot;, outputs.last_hidden_state.shape)  # [1, seq_len, 768]
-print(&quot;Pooled output shape:&quot;, outputs.pooler_output.shape)     # [1, 768]</code></pre><div class="out"></div></div></div>
-</aside></div><div class="sim-overlay" id="sim-overlay" role="dialog" aria-modal="true">
-  <div class="sim-window"><div class="sim-head"><div><div class="sim-kind" id="sim-kind"></div><h3 id="sim-title"></h3></div><span class="spacer"></span><button class="btn-xs" id="sim-close">✕ Close (Esc)</button></div><div class="sim-body" id="sim-body"></div></div>
+print(&quot;Pooled output shape:&quot;, outputs.pooler_output.shape)     # [1, 768]</textarea><pre><code class="language-python"># 4. Run BERT with Hugging Face and inspect output shapes
+import torch
+from transformers import AutoModel, AutoTokenizer
+
+model_name = &quot;bert-base-uncased&quot;
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModel.from_pretrained(model_name)
+
+inputs = tokenizer(&quot;Understanding transformers is fascinating.&quot;, return_tensors=&quot;pt&quot;)
+with torch.no_grad():
+    outputs = model(**inputs)
+
+print(tokenizer.convert_ids_to_tokens(inputs[&quot;input_ids&quot;][0]))
+print(&quot;Hidden state shape:&quot;, outputs.last_hidden_state.shape)  # [1, seq_len, 768]
+print(&quot;Pooled output shape:&quot;, outputs.pooler_output.shape)     # [1, 768]</code></pre></div>
+<div class="lesson-nav"><a href="../index.html">‹ All lessons</a><a href="week02-text-classification.html">Week 2: Text Classification ›</a></div>
+<footer class="site-footer">
+This site is based on the course site <a href="https://albanna-tutorials.com/cs/">albanna-tutorials.com/cs</a> by Dr. Abdulkarim Albanna, used with the author's permission.
+</footer></article><div id="splitter" class="splitter" role="separator" aria-orientation="vertical" title="Drag to resize"></div><aside class="workbench" id="workbench">
+  <div class="wb-tabs">
+    <button class="wb-tab active" data-mode="code">⌨ Code</button>
+    <button class="wb-tab" data-mode="anim">◉ Animation</button>
+    <span class="spacer"></span>
+    <button class="btn ghost wb-close" id="btn-close" title="Hide panel">✕</button>
+  </div>
+  <section class="wb-mode wb-code active" data-mode="code">
+    <div class="wb-toolbar">
+      <span class="wb-title" id="wb-title">Editor</span>
+      <span class="spacer"></span>
+      <button id="btn-run" class="btn primary" title="Run (Ctrl+Enter)">▶ Run</button>
+      <button id="btn-reset" class="btn ghost" title="Restore the original code">Reset</button>
+      <button id="btn-copy" class="btn ghost" title="Copy code">Copy</button>
+      <button id="btn-clear" class="btn ghost" title="Clear output">Clear</button>
+    </div>
+    <div class="editor-wrap"><textarea id="editor"># Press "▶ Try it" on any example in the lesson,
+# or write Python here and press Ctrl+Enter.
+import numpy as np
+print(np.round(np.linspace(0, 1, 5), 2))</textarea></div>
+    <div class="output-head"><span>Output</span><span id="run-time" class="muted small"></span></div>
+    <div id="output" class="output" aria-live="polite"></div>
+  </section>
+  <section class="wb-mode wb-anim" data-mode="anim">
+    <div class="wb-toolbar light">
+      <select id="anim-select" aria-label="Choose animation"><optgroup label="This week"><option value="attention">Self-attention: Q·Kᵀ → softmax → ·V</option><option value="matrix-multiply">Matrix multiplication, step by step</option><option value="vectors">Vectors, dot product &amp; cosine similarity</option><option value="tokenizer">Subword tokenisation</option><option value="positional">Positional encoding</option></optgroup><optgroup label="Other weeks"><option value="classifier">Decision boundary, threshold &amp; F1</option><option value="bio-tagging">NER: BIO tags &amp; entity-level F1</option><option value="rag">RAG pipeline</option><option value="langgraph">LangGraph StateGraph</option><option value="sampling">Temperature, top-k, top-p</option><option value="moe">Mixture of Experts router</option><option value="react-loop">ReAct agent loop</option><option value="multi-agent">Multi-agent research pipeline</option><option value="mcp">MCP message flow</option><option value="lam">Browser agent: perceive → plan → act</option><option value="diffusion">Diffusion: noising &amp; denoising</option></optgroup></select>
+      <span class="spacer"></span>
+      <button id="btn-full" class="btn ghost" title="Open full screen">⤢ Full screen</button>
+    </div>
+    <div class="anim-host" id="anim-host"><p class="muted anim-empty">Press <b>▶ Display</b> on an animation in the lesson, or choose one above.</p></div>
+  </section>
+</aside></main><div class="sim-overlay" id="sim-overlay" role="dialog" aria-modal="true">
+  <div class="sim-window"><div class="sim-head"><div><div class="sim-kind" id="sim-kind"></div><h3 id="sim-title"></h3></div><span class="spacer"></span><button class="btn ghost" id="sim-close">✕ Close (Esc)</button></div><div class="sim-body" id="sim-body"></div></div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
-<script>document.addEventListener('DOMContentLoaded',()=>{if(window.hljs)hljs.highlightAll();if(window.renderMathInElement)renderMathInElement(document.body,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});});</script>
+<script src="../assets/vendor/codemirror/codemirror.js"></script>
+<script src="../assets/vendor/codemirror/python.js"></script>
+<script src="../assets/vendor/codemirror/matchbrackets.js"></script>
+<script src="../assets/vendor/codemirror/closebrackets.js"></script>
+<script>window.CS_PYODIDE_URL = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";</script>
 <script src="../assets/js/sims/core.js"></script>
 <script src="../assets/js/sims/matrix-multiply.js"></script><script src="../assets/js/sims/vectors.js"></script><script src="../assets/js/sims/attention.js"></script><script src="../assets/js/sims/tokenizer.js"></script><script src="../assets/js/sims/positional.js"></script><script src="../assets/js/sims/classifier.js"></script><script src="../assets/js/sims/bio-tagging.js"></script><script src="../assets/js/sims/rag.js"></script><script src="../assets/js/sims/langgraph.js"></script><script src="../assets/js/sims/sampling.js"></script><script src="../assets/js/sims/moe.js"></script><script src="../assets/js/sims/react-loop.js"></script><script src="../assets/js/sims/multi-agent.js"></script><script src="../assets/js/sims/mcp.js"></script><script src="../assets/js/sims/lam.js"></script><script src="../assets/js/sims/diffusion.js"></script>
 <script src="../assets/js/site.js"></script>
