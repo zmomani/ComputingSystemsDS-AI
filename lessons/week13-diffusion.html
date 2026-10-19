@@ -19,8 +19,9 @@
   </a>
   <nav class="topnav"><a class="btn ghost" href="week12-lams.html" title="Large Action Models (LAMs)">‹ Prev</a><select id="lesson-select" aria-label="Choose lesson"><option value="">Lessons…</option><option value="syllabus.html">Course Syllabus</option><option value="project.html">Final Project</option><option value="week01-transformers.html">Week 1 · Transformer Architecture</option><option value="week02-text-classification.html">Week 2 · Text Classification</option><option value="week03-ner.html">Week 3 · Named Entity Recognition (NER)</option><option value="week04-langchain.html">Week 4 · LangChain Fundamentals</option><option value="week05-langgraph.html">Week 5 · LangGraph</option><option value="week06-llms.html">Week 6 · Large Language Models (LLMs)</option><option value="week07-moe.html">Week 7 · Mixture of Experts (MoE)</option><option value="week08-midterm.html">Week 8 · Midterm Exam</option><option value="week09-react-agents.html">Week 9 · AI Agents &amp; ReAct</option><option value="week10-multi-agent.html">Week 10 · Multi-Agent Systems</option><option value="week11-mcp.html">Week 11 · Model Context Protocol (MCP)</option><option value="week12-lams.html">Week 12 · Large Action Models (LAMs)</option><option value="week13-diffusion.html" selected>Week 13 · Diffusion Models</option><option value="week14-project.html">Week 14 · Project Development &amp; Final Testing</option><option value="week15-competition.html">Week 15 · Competition Day &amp; Presentations</option><option value="week16-final.html">Week 16 · Final Exam</option></select><a class="btn ghost" href="week14-project.html" title="Project Development &amp; Final Testing">Next ›</a></nav>
   <button id="btn-panel" class="btn accent" title="Show or hide the editor / animation panel">⇆ Panel</button><div class="status" id="py-status"><span class="dot"></span><span id="py-status-text">Python loads on first run</span></div>
-</header><main class="lesson panel-closed" id="lesson"><article class="lesson-content" id="lesson-content"><div class="lesson-head"><div class="eyebrow">Week 13 · ILO K1, P1</div><h1>Diffusion Models</h1>
+</header><main class="lesson panel-closed" id="lesson" data-colab="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week13-diffusion.ipynb"><article class="lesson-content" id="lesson-content"><div class="lesson-head"><div class="eyebrow">Week 13 · ILO K1, P1</div><h1>Diffusion Models</h1>
 <p class="lesson-intro"><b>Topics:</b> Diffusion models, denoising architectures, Stable Diffusion, DALL-E<br><b>Project milestone:</b> Illustration Agent that generates figures for reports, plus a Streamlit UI with PDF download</p></div>
+<div class="colab-bar"><a class="btn colab" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week13-diffusion.ipynb" target="_blank" rel="noopener"><span class="colab-logo">CO</span> Open this week's code in Google Colab</a><span class="muted small">Runs the PyTorch, Transformers and LangChain examples that cannot run in the browser — free, nothing to install.</span></div>
 <div class="sim-strip"><div class="sim-strip-head">Animations for this week — open them in the panel</div><div class="sim-strip-items"><button class="sim-chip" data-display="diffusion"><span class="sim-chip-kind">Diffusion</span>▶ Display: Diffusion: noising &amp; denoising</button></div></div>
 <details class="contents"><summary>Contents (10 sections)</summary><ol><li><a href="#1-introduction-to-diffusion-models">1. Introduction to Diffusion Models</a></li><li><a href="#2-fundamentals">2. Fundamentals</a></li><li><a href="#3-forward-diffusion-process">3. Forward Diffusion Process</a></li><li><a href="#4-reverse-diffusion-process">4. Reverse Diffusion Process</a></li><li><a href="#5-neural-network-architecture">5. Neural Network Architecture</a></li><li><a href="#6-training-diffusion-models">6. Training Diffusion Models</a></li><li><a href="#7-applications">7. Applications</a></li><li><a href="#8-advanced-topics">8. Advanced Topics</a></li><li><a href="#9-learning-resources">9. Learning Resources</a></li><li><a href="#10-conclusion">10. Conclusion</a></li></ol></details>
 <h2 id="1-introduction-to-diffusion-models">1. Introduction to Diffusion Models</h2>
@@ -82,7 +83,7 @@
 <blockquote>
 <p><strong>Important insight.</strong> The forward process is never used to generate images. It only defines the mathematical framework for learning the reverse process, which does the generating.</p>
 </blockquote>
-<div class="runnable local"><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>def forward_diffusion_sample(x_0, t, device):
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>def forward_diffusion_sample(x_0, t, device):
     &quot;&quot;&quot;
     Takes an image and a timestep as input and
     returns the noisy version of it at timestep t
@@ -123,7 +124,7 @@
 1. Start with random Gaussian noise x_T.
 2. For t = T down to 1: predict the noise with the network, then compute the less-noisy sample with the denoising formula.
 3. Return x₀ as the generated output.</p>
-<div class="runnable local"><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>def sample(model, n_samples, device, image_size):
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>def sample(model, n_samples, device, image_size):
     &quot;&quot;&quot;
     Samples n_samples new images from the model
     &quot;&quot;&quot;
@@ -196,7 +197,7 @@
 - <strong>Attention layers</strong> — many implementations add self-attention at certain resolutions.</p>
 <p><strong>Key architectural elements</strong>
 - <strong>ResNet blocks</strong> — the U-Net backbone: group normalization, SiLU activation, 3×3 convolutions, and a skip connection adding input to output.</p>
-<div class="runnable local"><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>class ResidualBlock(nn.Module):
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>class ResidualBlock(nn.Module):
     def __init__(self, in_channels, out_channels, time_emb_dim):
         super().__init__()
         self.time_mlp = nn.Linear(time_emb_dim, out_channels)
@@ -239,7 +240,7 @@
 <li><strong>Self-attention blocks</strong> — capture long-range dependencies, as in transformers; often placed in the middle of the U-Net where feature maps are medium resolution.</li>
 <li><strong>Timestep embeddings</strong> — convert t into a high-dimensional sinusoidal embedding, pass it through an MLP, and inject it into each residual block.</li>
 </ul>
-<div class="runnable local"><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>def timestep_embedding(timesteps, dim, max_period=10000):
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>def timestep_embedding(timesteps, dim, max_period=10000):
     &quot;&quot;&quot;
     Create sinusoidal timestep embeddings.
     &quot;&quot;&quot;
@@ -289,7 +290,7 @@
 5. Predict the noise with the network.
 6. Compute the loss between predicted and true noise.
 7. Update parameters with gradient descent.</p>
-<div class="runnable local"><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden>def train_step(model, x_0, optimizer):
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>def train_step(model, x_0, optimizer):
     batch_size = x_0.shape[0]
 
     # Sample random timesteps
@@ -414,7 +415,7 @@
 <h2 id="10-conclusion">10. Conclusion</h2>
 <p>Diffusion models are stable to train, produce high-quality and controllable output, are theoretically grounded, and are architecturally flexible. Continued growth is expected across modalities and domains.</p>
 <h2 id="try-it-yourself">Try it yourself</h2>
-<p class="lesson-intro"><b>▶ Try it</b> runs an example in the editor panel, inside your browser — change the code and press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to run it again. Examples marked <b>✎ Open in editor</b> need libraries or API keys that cannot run in a browser (PyTorch, Transformers, LangChain, OpenAI…): read them in the editor, then copy them to VS Code and run them in the course environment.</p><h3 id="run-in-your-browser">Run in your browser</h3><p class="lesson-intro">Self-contained versions of this week's mechanisms, written with NumPy, scikit-learn or plain Python so they run here.</p><div class="runnable"><div class="code-title">Forward diffusion: noising an image in closed form (NumPy + matplotlib)</div><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden>import numpy as np
+<p class="lesson-intro"><b>▶ Try it</b> runs an example in the editor panel, inside your browser — change the code and press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to run it again. Examples that use PyTorch, Transformers, LangChain or an API cannot run in a browser: press <b>▶ Run in Colab</b> to run them in Google Colab (free, nothing to install), or copy them to VS Code.</p><h3 id="run-in-your-browser">Run in your browser</h3><p class="lesson-intro">Self-contained versions of this week's mechanisms, written with NumPy, scikit-learn or plain Python so they run here.</p><div class="runnable"><div class="code-title">Forward diffusion: noising an image in closed form (NumPy + matplotlib)</div><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden>import numpy as np
 import matplotlib.pyplot as plt
 
 T = 1000
@@ -500,7 +501,7 @@ ab = alpha_bar(betas_linear)
 x0, t = 1.0, 500
 eps = np.random.randn()
 x_t = np.sqrt(ab[t - 1]) * x0 + np.sqrt(1 - ab[t - 1]) * eps   # ab[0] is alpha_bar_1
-print(&quot;x_t =&quot;, round(x_t, 3))</code></pre></div><div class="runnable local"><div class="code-title">Train a tiny DDPM on a 2-D toy dataset and sample from it (PyTorch)</div><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden># 2. Train a tiny DDPM on a 2-D toy dataset and sample from it (PyTorch)
+print(&quot;x_t =&quot;, round(x_t, 3))</code></pre></div><div class="runnable local"><div class="code-title">Train a tiny DDPM on a 2-D toy dataset and sample from it (PyTorch)</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 2. Train a tiny DDPM on a 2-D toy dataset and sample from it (PyTorch)
 import math, torch, torch.nn as nn, torch.nn.functional as F
 
 torch.manual_seed(0)
@@ -604,7 +605,7 @@ def sample(n=500):
     return x
 
 xs = sample()
-print(&quot;sampled x-means by cluster:&quot;, xs[xs[:, 0] &lt; 0, 0].mean().item(), xs[xs[:, 0] &gt; 0, 0].mean().item())</code></pre></div><div class="runnable local"><div class="code-title">Sinusoidal timestep embeddings: nearby timesteps are close, distant ones are not</div><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden># 3. Sinusoidal timestep embeddings: nearby timesteps are close, distant ones are not
+print(&quot;sampled x-means by cluster:&quot;, xs[xs[:, 0] &lt; 0, 0].mean().item(), xs[xs[:, 0] &gt; 0, 0].mean().item())</code></pre></div><div class="runnable local"><div class="code-title">Sinusoidal timestep embeddings: nearby timesteps are close, distant ones are not</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 3. Sinusoidal timestep embeddings: nearby timesteps are close, distant ones are not
 import math, torch
 
 def timestep_embedding(timesteps, dim, max_period=10000):
@@ -628,7 +629,7 @@ def timestep_embedding(timesteps, dim, max_period=10000):
 e = timestep_embedding(torch.tensor([10, 11, 500]), 32)
 cos = torch.nn.functional.cosine_similarity
 print(&quot;sim(10,11) =&quot;, round(cos(e[0:1], e[1:2]).item(), 3))
-print(&quot;sim(10,500)=&quot;, round(cos(e[0:1], e[2:3]).item(), 3))</code></pre></div><div class="runnable local"><div class="code-title">Classifier-free guidance arithmetic on noise predictions</div><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor; run it in your local environment">✎ Open in editor</button><button class="copy">Copy</button><textarea class="src" hidden># 4. Classifier-free guidance arithmetic on noise predictions
+print(&quot;sim(10,500)=&quot;, round(cos(e[0:1], e[2:3]).item(), 3))</code></pre></div><div class="runnable local"><div class="code-title">Classifier-free guidance arithmetic on noise predictions</div><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week's notebook)">▶ Run in Colab</a><button class="try local" data-run="0" data-needs="torch" title="Needs torch — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 4. Classifier-free guidance arithmetic on noise predictions
 import torch
 
 eps_uncond = torch.tensor([0.10, -0.20])   # eps_theta(x_t, None, t)

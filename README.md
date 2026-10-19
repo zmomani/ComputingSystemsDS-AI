@@ -9,7 +9,7 @@ Each lesson page works like the Programming for Data Science tutorial: the lesso
 | Button | What happens |
 |---|---|
 | **▶ Try it** | Opens the panel's **Code** tab, loads the example into a live Python editor (CodeMirror) and runs it in the browser with Pyodide. Students edit and re-run with `Ctrl+Enter`. NumPy, pandas, scikit-learn and matplotlib load automatically; figures and DataFrames render in the output. |
-| **✎ Open in editor** | For code that needs libraries a browser cannot run (PyTorch, Transformers, LangChain, OpenAI…). The code opens in the editor with a note to run it in VS Code. |
+| **▶ Run in Colab** | For code that needs libraries a browser cannot run (PyTorch, Transformers, LangChain, OpenAI…). Opens that week's notebook (`notebooks/*.ipynb`) in Google Colab, where it runs for free; **✎ Editor** shows the code in the panel. |
 | **▶ Display** | Opens the panel's **Animation** tab on the chosen animation; **⤢ Full screen** enlarges it. |
 
 Every week also has a **Try it yourself** section with browser-runnable examples of that week's mechanisms (`content/browser-examples.py`).
@@ -49,6 +49,8 @@ assets/js/sims/         simulation modules
 build/build.py          generator: content/*.md → lessons/*.html + index.html
 build/classify.py       decides which examples run in the browser (cached in build/runnable-cache.json)
 content/browser-examples.py  browser-runnable examples added to each week
+notebooks/*.ipynb       one Colab notebook per lesson (generated: all the lesson's code in order)
+build/notebook_check.py executes the notebooks and marks illustrative fragments (build/notebook-fragments.json)
 assets/vendor/          CodeMirror (MIT), from the pds-tutorial template
 build/check.py          headless-browser smoke test (loads every page and simulation)
 ```

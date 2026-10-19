@@ -1,0 +1,21 @@
+{
+ "project": [],
+ "syllabus": [],
+ "week01-transformers": [],
+ "week02-text-classification": [],
+ "week03-ner": [],
+ "week04-langchain": [],
+ "week05-langgraph": [
+  "7cc5ea8e563c3088",
+  "82599ff31cb5fdd1",
+  "672e40cb893f141a",
+  "3cb31e7140373b13"
+ ],
+ "week06-llms": [],
+ "week07-moe": [],
+ "week09-react-agents": [],
+ "week10-multi-agent": [],
+ "week11-mcp": [],
+ "week12-lams": [],
+ "week13-diffusion": []
+}

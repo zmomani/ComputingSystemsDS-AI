@@ -186,6 +186,21 @@ kbd { font-family: var(--mono); font-size: .8em; background: #eef1f5; border: 1p
 .runnable .code-title + .try, .runnable .code-title ~ .copy { top: 1.95rem; }
 .codeblock .code-title ~ .copy { top: 1.95rem; }
 
+/* Google Colab */
+.colab-bar { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .8rem; margin: .2rem 0 .8rem; }
+.btn.colab { background: #fff; color: #1b1f24; border: 1px solid #c9d0da; font-weight: 600; }
+.btn.colab:hover { border-color: #f9ab00; }
+.colab-logo { display: inline-block; font-family: var(--mono); font-weight: 800; font-size: .72rem; color: #fff; background: linear-gradient(90deg, #e8710a 50%, #f9ab00 50%); border-radius: 4px; padding: 1px 4px; margin-right: 3px; vertical-align: 1px; }
+.local-btns { position: absolute; top: .45rem; right: .45rem; display: flex; gap: .3rem; z-index: 1; }
+.local-btns .try { position: static; text-decoration: none; }
+.runnable .try.colab-try { background: #e8710a; color: #fff; }
+.runnable.local .copy { right: 11.4rem; }
+.runnable .code-title + .local-btns { top: 1.95rem; }
+.colab-note { color: #ffd28a; font-family: var(--font); font-size: .9rem; white-space: normal; }
+.colab-note p { margin: .2rem 0 .6rem; }
+.colab-note .small { color: #9fb0c3; }
+.colab-note .btn.ghost { color: #d6deea; border-color: #3a4656; }
+
 /* animation launchers in the lesson */
 .sim-strip { margin: 1rem 0 1.2rem; border: 1px solid #d9c6a6; border-radius: 10px; background: #fffaf2; overflow: hidden; }
 .sim-strip-head { padding: .5rem .9rem; background: var(--accent-soft); border-bottom: 1px solid #ecdcc0; font-weight: 600; font-size: .92rem; color: #7a4f14; }

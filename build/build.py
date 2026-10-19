@@ -188,8 +188,92 @@ def classify_page():
     CACHE[key] = res
     return res
 
-def finalize(page_html):
+REPO = 'zmomani/ComputingSystemsDS-AI'
+NB_DIR = ROOT / 'notebooks'
+PIP_NAMES = {'dotenv': 'python-dotenv', 'sentence_transformers': 'sentence-transformers', 'a2a': 'a2a-sdk', 'tavily': 'tavily-python',
+             'langchain_openai': 'langchain-openai', 'langchain_core': 'langchain-core', 'langchain_community': 'langchain-community',
+             'langchain_ollama': 'langchain-ollama', 'langchain_chroma': 'langchain-chroma', 'langchain_text_splitters': 'langchain-text-splitters',
+             'langchain_huggingface': 'langchain-huggingface', 'langchain_anthropic': 'langchain-anthropic', 'langchain_tavily': 'langchain-tavily',
+             'langgraph': 'langgraph', 'mcp': 'mcp', 'chromadb': 'chromadb', 'datasets': 'datasets', 'evaluate': 'evaluate', 'seqeval': 'seqeval',
+             'gradio': 'gradio', 'diffusers': 'diffusers', 'openai': 'openai', 'langchain': 'langchain', 'ollama': 'ollama', 'playwright': 'playwright',
+             'accelerate': 'accelerate', 'bitsandbytes': 'bitsandbytes', 'umap': 'umap-learn', 'streamlit': 'streamlit', 'faiss': 'faiss-cpu'}
+COLAB_PREINSTALLED = {'torch', 'torchvision', 'transformers', 'numpy', 'pandas', 'sklearn', 'matplotlib', 'scipy', 'requests', 'httpx', 'PIL', 'tqdm', 'huggingface_hub', 'seaborn', 'tensorflow', 'keras', 'IPython', 'google'}
+
+try: NB_FRAGMENTS = json.loads((ROOT / 'build' / 'notebook-fragments.json').read_text())
+except Exception: NB_FRAGMENTS = {}
+SCRIPT_FILE = re.compile(r'Path\(__file__\)|\bdjango\b|INSTALLED_APPS|urlpatterns|mcp\.run\(|\bstreamlit\b|uvicorn\.run\(|app\.run\(|\bst\.(title|write|button)\(')
+
+def colab_url(slug):
+    return f'https://colab.research.google.com/github/{REPO}/blob/main/notebooks/{slug}.ipynb'
+
+def write_notebook(slug, title, page_html, res):
+    """One notebook per page: every Python example in page order, under the heading it appears in."""
+    if not PAGE_BLOCKS: return False
+    md = lambda t: {'cell_type': 'markdown', 'metadata': {}, 'source': t}
+    code = lambda t: {'cell_type': 'code', 'metadata': {}, 'execution_count': None, 'outputs': [], 'source': t}
+    mods = set()
+    for c, _ in PAGE_BLOCKS: mods |= imported_modules(c)
+    pip = sorted({PIP_NAMES[m] for m in mods if m in PIP_NAMES and m not in COLAB_PREINSTALLED})
+    cells = [md(f'# {title}\n\n606363 Computing Systems for Data Science and AI — every code example from the lesson page, in order.\n\n'
+                f'Lesson page: https://zmomani.github.io/ComputingSystemsDS-AI/lessons/{slug}.html\n\n'
+                '**How to use:** run the cells from the top (Runtime → Run all, or Shift+Enter cell by cell). Later examples often reuse '
+                'variables from earlier ones. Examples that call OpenAI or other APIs need a key: add it with the 🔑 Secrets panel '
+                'on the left, or set `os.environ["OPENAI_API_KEY"] = "..."` in a cell. Examples that use Ollama need a local Ollama server and '
+                'will not work in Colab. For GPU examples choose Runtime → Change runtime type → T4 GPU.')]
+    if pip: cells.append(code('# Libraries this lesson uses that are not preinstalled in Colab\n%pip install -q ' + ' '.join(pip)))
+    alltext = '\n'.join(c for c, _ in PAGE_BLOCKS)
+    common = []
+    if re.search(r'\bmath\.', alltext): common.append('import math')
+    if re.search(r'\bnp\.', alltext): common.append('import numpy as np')
+    if re.search(r'\bpd\.', alltext): common.append('import pandas as pd')
+    if re.search(r'\bplt\.', alltext): common.append('import matplotlib.pyplot as plt')
+    if re.search(r'\b(torch|nn|F)\.', alltext): common += ['import torch', 'import torch.nn as nn', 'import torch.nn.functional as F']
+    if 'asyncio.run(' in alltext or re.search(r'^await ', alltext, re.M):
+        common += ['import nest_asyncio', 'nest_asyncio.apply()   # lets asyncio.run() work inside a notebook']
+    if common: cells.append(code('# Imports that some of the lesson\'s code fragments assume\n' + '\n'.join(common)))
+    frags = set(NB_FRAGMENTS.get(slug, []))
+    import hashlib
+    used_files = set()
+    positions = [(m.start(), int(m.group(1))) for m in re.finditer(r'PYBLOCK(\d+)XEND', page_html)]
+    last_head = None
+    for pos, i in positions:
+        heads = re.findall(r'<h[23][^>]*>(.*?)</h[23]>', page_html[:pos], re.S)
+        head = re.sub(r'<[^>]+>', '', heads[-1]).strip() if heads else ''
+        c, t = PAGE_BLOCKS[i]
+        if head and head != last_head: cells.append(md(f'## {html.unescape(head)}')); last_head = head
+        if t: cells.append(md(f'**{t}**'))
+        if SCRIPT_FILE.search(c):
+            fm = (re.search(r'[Ss]ave (?:it )?as ([\w./-]+\.py)', '\n'.join(c.split('\n')[:4]))
+                  or re.search(r'([\w./-]+\.py)\b', f'{t or ""} {head} ' + c.split('\n', 1)[0]))
+            fname = fm.group(1).lstrip('./') if fm else ('mcp_server.py' if 'mcp.run(' in c else f'example_{i + 1}.py')
+            if fname in used_files: fname = fname.replace('.py', f'_{i + 1}.py')
+            used_files.add(fname)
+            note = (f'This code is a file of an application, not a notebook step. The cell saves it as `{fname}`; '
+                    'run it from a terminal on your computer (or with `!python ' + fname + '` here, if it is a script).')
+            cells.append(md(note))
+            if '/' in fname: cells.append(code(f'!mkdir -p {fname.rsplit("/", 1)[0]}'))
+            cells.append(code(f'%%writefile {fname}\n' + c))
+        elif hashlib.sha256(c.encode()).hexdigest()[:16] in frags:
+            cells.append(md('*Illustrative snippet — it shows the pattern explained above and is not meant to run on its own '
+                            '(it uses names from a larger program).*\n\n```python\n' + c + '\n```'))
+        else:
+            cells.append(code(c))
+    nb = {'cells': cells, 'metadata': {'kernelspec': {'display_name': 'Python 3', 'language': 'python', 'name': 'python3'},
+          'language_info': {'name': 'python'}, 'colab': {'provenance': []}}, 'nbformat': 4, 'nbformat_minor': 5}
+    for k, cell in enumerate(nb['cells']):
+        cell['id'] = f'{slug[:12]}-{k:03d}'.replace('_', '-')
+        cell['source'] = [l for l in cell['source'].splitlines(keepends=True)]
+    NB_DIR.mkdir(exist_ok=True)
+    (NB_DIR / f'{slug}.ipynb').write_text(json.dumps(nb, indent=1, ensure_ascii=False), encoding='utf-8')
+    return True
+
+def finalize(page_html, slug=None, title=None):
     res = classify_page()
+    has_nb = write_notebook(slug, title, page_html, res) if slug else False
+    colab = colab_url(slug) if has_nb else ''
+    page_html = page_html.replace('COLABLINKX', (f'<div class="colab-bar"><a class="btn colab" href="{colab}" target="_blank" rel="noopener">'
+        '<span class="colab-logo">CO</span> Open this week\'s code in Google Colab</a><span class="muted small">Runs the PyTorch, Transformers and LangChain '
+        'examples that cannot run in the browser — free, nothing to install.</span></div>') if has_nb else '')
     def block(i):
         code, title = PAGE_BLOCKS[i]; r = res[i]
         return python_block_html(code, title, r['run'], r.get('setup', ''), r.get('reason', ''))
@@ -207,7 +291,8 @@ def python_block_html(code, title, run, setup, reason):
         btn = f'<button class="try" data-run="1">▶ Try it</button>'
         return f'<div class="runnable">{head}{btn}<button class="copy">Copy</button><textarea class="src" hidden>{esc}</textarea>{setup_ta}{pre}</div>'
     miss = ', '.join(missing_modules(code)) or ('code from the earlier examples in this lesson' if 'NameError' in reason else 'an API key or local files')
-    btn = f'<button class="try local" data-run="0" data-needs="{html.escape(miss)}" title="Needs {html.escape(miss)} — opens in the editor; run it in your local environment">✎ Open in editor</button>'
+    btn = (f'<span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week\'s notebook)">▶ Run in Colab</a>'
+           f'<button class="try local" data-run="0" data-needs="{html.escape(miss)}" title="Needs {html.escape(miss)} — opens in the editor">✎ Editor</button></span>')
     return f'<div class="runnable local">{head}{btn}<button class="copy">Copy</button><textarea class="src" hidden>{esc}</textarea>{pre}</div>'
 
 def md_to_html(text):
@@ -423,7 +508,7 @@ def try_section(snippets, week=None):
     browser = BROWSER_EXAMPLES.get(week, [])
     if not snippets and not browser: return ''
     out = '''<h2 id="try-it-yourself">Try it yourself</h2>
-<p class="lesson-intro"><b>▶ Try it</b> runs an example in the editor panel, inside your browser — change the code and press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to run it again. Examples marked <b>✎ Open in editor</b> need libraries or API keys that cannot run in a browser (PyTorch, Transformers, LangChain, OpenAI…): read them in the editor, then copy them to VS Code and run them in the course environment.</p>'''
+<p class="lesson-intro"><b>▶ Try it</b> runs an example in the editor panel, inside your browser — change the code and press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to run it again. Examples that use PyTorch, Transformers, LangChain or an API cannot run in a browser: press <b>▶ Run in Colab</b> to run them in Google Colab (free, nothing to install), or copy them to VS Code.</p>'''
     if browser:
         out += '<h3 id="run-in-your-browser">Run in your browser</h3><p class="lesson-intro">Self-contained versions of this week\'s mechanisms, written with NumPy, scikit-learn or plain Python so they run here.</p>'
         out += ''.join(code_block_html(code, 'python', title) for title, code in browser)
@@ -434,9 +519,11 @@ def try_section(snippets, week=None):
 
 # ---------------------------------------------------------------- pages
 def lesson_shell(title, active_slug, prev, nxt, inner, sims):
-    inner = finalize(inner)
+    has_nb = bool(PAGE_BLOCKS)
+    inner = finalize(inner, active_slug, title)
+    data = f' data-colab="{colab_url(active_slug)}"' if has_nb else ''
     return (head(title, 1) + topbar(1, active_slug, prev, nxt, workbench=True) +
-            f'<main class="lesson panel-closed" id="lesson"><article class="lesson-content" id="lesson-content">{inner}</article>'
+            f'<main class="lesson panel-closed" id="lesson"{data}><article class="lesson-content" id="lesson-content">{inner}</article>'
             f'<div id="splitter" class="splitter" role="separator" aria-orientation="vertical" title="Drag to resize"></div>{workbench(sims)}</main>' +
             scripts(1, workbench=True))
 
@@ -450,6 +537,7 @@ def lesson_page(w, prev, nxt):
     nav = f'''<div class="lesson-nav">{f'<a href="{prev[0]}">‹ Week {prev[2]}: {html.escape(prev[1])}</a>' if prev else '<a href="../index.html">‹ All lessons</a>'}{f'<a href="{nxt[0]}">Week {nxt[2]}: {html.escape(nxt[1])} ›</a>' if nxt else '<a href="../index.html">All lessons ›</a>'}</div>'''
     inner = f'''<div class="lesson-head"><div class="eyebrow">Week {w["n"]} · ILO {html.escape(w["ilo"])}</div><h1>{html.escape(w["title"])}</h1>
 <p class="lesson-intro"><b>Topics:</b> {html.escape(w["topics"])}<br><b>Project milestone:</b> {html.escape(w["milestone"])}</p></div>
+COLABLINKX
 {sim_buttons(w["sims"], "Animations for this week — open them in the panel")}
 {contents_box(body)}
 {body}
@@ -461,6 +549,7 @@ def lesson_page(w, prev, nxt):
 def extra_page(p):
     body, snippets = render_body(p['files'])
     inner = f'''<div class="lesson-head"><div class="eyebrow">{COURSE_CODE}</div><h1>{html.escape(p["title"])}</h1></div>
+COLABLINKX
 {sim_buttons(p["sims"], "Related animations")}
 {contents_box(body)}{body}{try_section(snippets)}
 <div class="lesson-nav"><a href="../index.html">‹ All lessons</a><span></span></div>{footer()}'''

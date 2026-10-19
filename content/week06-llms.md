@@ -365,10 +365,10 @@ print("sampled token id:", tok, "| nucleus:", kept)
 # 3. Context-window scale: how many tokens is a document? (needs: pip install tiktoken)
 import tiktoken
 enc = tiktoken.get_encoding("cl100k_base")
-text = open(__file__).read()  # any file you like
+text = "Large language models read text as tokens, not as words or characters. " * 200  # or: open("any_file.txt").read()
 n = len(enc.encode(text))
 for model, ctx in [("Llama 3", 128_000), ("Maverick", 1_000_000), ("Scout", 10_000_000)]:
-    print(f"{model:9s} window holds ~{ctx // n:,} copies of this file ({n} tokens)")
+    print(f"{model:9s} window holds ~{ctx // n:,} copies of this text ({n} tokens)")
 ```
 
 ```python

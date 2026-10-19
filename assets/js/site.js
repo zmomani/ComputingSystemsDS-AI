@@ -110,6 +110,21 @@
   $("#btn-full").addEventListener("click", () => openOverlay(animId || animSel.value));
   $$("[data-display]").forEach((b) => b.addEventListener("click", () => { openPanel("anim"); showAnim(b.dataset.display); }));
 
+  /* ------------------------------------------------ Google Colab links */
+  const COLAB = lesson.dataset.colab || "";
+  $$("[data-colab-link]").forEach((a) => { if (COLAB) a.href = COLAB; else a.remove(); });
+  function colabNote(what) {
+    const browser = document.getElementById("run-in-your-browser");
+    const d = document.createElement("div"); d.className = "colab-note";
+    d.innerHTML = `<p>${what}</p><p>` +
+      (COLAB ? `<a class="btn colab" href="${COLAB}" target="_blank" rel="noopener"><span class="colab-logo">CO</span> Run it in Google Colab</a> ` : "") +
+      (browser ? `<button class="btn ghost" data-goto-browser>Run the in-browser version</button>` : "") +
+      `</p><p class="small">In Colab the examples are in the same order as on this page — run the cells from the top so earlier code is defined. Or copy the code and run it in VS Code.</p>`;
+    el.out.appendChild(d);
+    const g = d.querySelector("[data-goto-browser]");
+    if (g) g.addEventListener("click", () => browser.scrollIntoView({ behavior: "smooth", block: "start" }));
+  }
+
   /* ------------------------------------------------ editor + Python (Pyodide) */
   const el = {
     run: $("#btn-run"), reset: $("#btn-reset"), clear: $("#btn-clear"), copy: $("#btn-copy"),
@@ -206,9 +221,7 @@ builtins.input = input
       const mods = await loadPackagesFor(py, setup + "\n" + code);
       const unavailable = mods.filter((m) => !BROWSER_PKGS[m] && !py.runPython(`__import__("importlib.util").util.find_spec(${JSON.stringify(m)}) is not None`));
       if (unavailable.length) {
-        out("note", `This example needs ${unavailable.join(", ")}, which cannot run inside a web browser.\n` +
-          `Read through the code here, then copy it (Copy button) and run it in VS Code with the course environment` +
-          ` (pip install ${unavailable.map((m) => ({ sklearn: "scikit-learn", dotenv: "python-dotenv", langchain_openai: "langchain-openai", langchain_core: "langchain-core", langchain_community: "langchain-community" }[m] || m)).join(" ")}).\n`);
+        colabNote(`This example needs <b>${unavailable.join(", ")}</b>, which cannot run inside a web browser.`);
         return;
       }
       const ns = py.globals.get("dict")();
@@ -244,7 +257,7 @@ builtins.input = input
     editor.setValue(code); clearOut();
     el.title.textContent = title;
     if (setup) out("note", "This example continues an earlier one in the lesson; that code runs first, silently.\n");
-    if (local) out("note", `✎ This example needs ${needs}, so it cannot run in the browser.\nStudy it here, then use Copy and run it in VS Code with the course environment.\n`);
+    if (local) colabNote(`This example needs <b>${needs}</b>, so it cannot run in the browser.`);
     setTimeout(() => { editor.refresh(); editor.focus(); }, 0);
   }
 
