@@ -89,7 +89,7 @@
 <li>Common technique: store all previous interactions, actions, and conversations in an <strong>external vector database</strong>; retrieve relevant pieces when needed. This is <strong>Retrieval-Augmented Generation (RAG)</strong> (figures: "Vector Database Creation", "Vector Database Retrieval").</li>
 </ul>
 <h3 id="memory-types-coala">Memory types (CoALA)</h3>
-<p>The paper <em>Cognitive Architectures for Language Agents</em> couples psychological memory types to LLM agents. Two are defined on the page:</p>
+<p>The paper <em>Cognitive Architectures for Language Agents</em> (CoALA) couples four psychological memory types — working, episodic, semantic and procedural — to LLM agents. Two are defined on the page:</p>
 <table>
 <thead>
 <tr>
@@ -238,7 +238,7 @@
 </ul>
 <h3 id="key-components">Key components</h3>
 <ul>
-<li><strong>Agent Card</strong> — a public metadata file (JSON) describing an agent's capabilities, skills, endpoint URL, and authentication requirements. Clients use it for discovery.</li>
+<li><strong>Agent Card</strong> — a public metadata file (JSON, served at <code>/.well-known/agent-card.json</code>) describing an agent's capabilities, skills, endpoint URL, and authentication requirements. Clients use it for discovery.</li>
 <li><strong>Task-oriented communication</strong> — work is organized as tasks with a defined lifecycle. A task may complete immediately or remain active for an extended period.</li>
 <li><strong>Messages, Parts, Artifacts</strong> — agents exchange messages whose content is carried as <em>parts</em> (text, files, or structured data); a finished task may return <em>artifacts</em>.</li>
 <li><strong>UX / capability negotiation</strong> — agents negotiate the right content format, explicitly including user-interface capabilities.</li>
@@ -253,32 +253,40 @@
 </thead>
 <tbody>
 <tr>
+<td><code>protocolVersion</code></td>
+<td>A2A protocol version the agent speaks</td>
+</tr>
+<tr>
 <td><code>name</code>, <code>description</code>, <code>version</code></td>
 <td>Display name, what the agent does, version string</td>
 </tr>
 <tr>
-<td><code>url</code></td>
-<td>The agent's A2A endpoint</td>
+<td><code>url</code>, <code>preferredTransport</code></td>
+<td>The agent's A2A endpoint and its transport (<code>JSONRPC</code>, <code>GRPC</code> or <code>HTTP+JSON</code>)</td>
 </tr>
 <tr>
-<td><code>authentication.type</code></td>
-<td>Auth method (sample: <code>oauth2</code>)</td>
+<td><code>securitySchemes</code></td>
+<td>Named auth schemes (sample: an <code>oauth2</code> authorization-code flow with <code>authorizationUrl</code>, <code>tokenUrl</code> and <code>scopes</code>)</td>
 </tr>
 <tr>
-<td><code>authentication.authorizationUrl</code>, <code>tokenUrl</code>, <code>scopes</code></td>
-<td>OAuth2 endpoints and permitted scopes</td>
+<td><code>security</code></td>
+<td>Which scheme(s) and scopes a client must present</td>
 </tr>
 <tr>
 <td><code>capabilities.streaming</code></td>
 <td>Whether SSE streaming is supported</td>
 </tr>
 <tr>
-<td><code>capabilities.multimodal</code></td>
-<td>Whether multiple content types are supported</td>
+<td><code>capabilities.pushNotifications</code></td>
+<td>Whether the agent can push task updates to a client webhook</td>
+</tr>
+<tr>
+<td><code>defaultInputModes</code>, <code>defaultOutputModes</code></td>
+<td>Media types the agent accepts and produces (e.g. <code>text/plain</code>, <code>application/json</code>)</td>
 </tr>
 <tr>
 <td><code>skills[]</code></td>
-<td>Each with <code>name</code>, <code>description</code>, and typed <code>parameters</code></td>
+<td>Each with <code>id</code>, <code>name</code>, <code>description</code>, <code>tags</code>, optional <code>examples</code>, <code>inputModes</code>, <code>outputModes</code></td>
 </tr>
 </tbody>
 </table>
@@ -289,42 +297,47 @@
 <li><strong>Task Processing</strong> — the remote agent completes the task immediately or enters a <em>working</em> state for longer operations.</li>
 <li><strong>Status Updates</strong> — for long-running tasks, the remote agent streams status updates over SSE.</li>
 <li><strong>Message Exchange</strong> — agents exchange text, files, or structured data as parts to collaborate.</li>
-<li><strong>Task Completion</strong> — the task reaches a terminal state (<em>completed</em>, <em>failed</em>, or <em>canceled</em>) and may return artifacts.</li>
+<li><strong>Task Completion</strong> — the task reaches a terminal state (<em>completed</em>, <em>failed</em>, <em>canceled</em>, or <em>rejected</em>) and may return artifacts. Along the way it may pause in <em>input-required</em> or <em>auth-required</em> until the client responds.</li>
 </ol>
 <h3 id="sample-a2a-agent-card-json">Sample A2A Agent Card (JSON)</h3>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"protocolVersion"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.3.0"</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Recruitment Assistant"</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"An agent that helps find and evaluate job candidates"</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.0.0"</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">"url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://recruitment-agent.example.com/a2a"</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">"authentication"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"oauth2"</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">"authorizationUrl"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://auth.example.com/authorize"</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">"tokenUrl"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://auth.example.com/token"</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">"scopes"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"read"</span><span class="p">,</span><span class="w"> </span><span class="s2">"write"</span><span class="p">]</span>
-<span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">"capabilities"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">"streaming"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">"multimodal"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
-<span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">"skills"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">    </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"findCandidates"</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Find candidates matching job requirements"</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">"parameters"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">"jobTitle"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">          </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"The job title to search for"</span>
-<span class="w">        </span><span class="p">},</span>
-<span class="w">        </span><span class="nt">"skills"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">          </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"array"</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Required skills for the position"</span>
-<span class="w">        </span><span class="p">},</span>
-<span class="w">        </span><span class="nt">"location"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">          </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Preferred location for the candidate"</span>
+<span class="w">  </span><span class="nt">"preferredTransport"</span><span class="p">:</span><span class="w"> </span><span class="s2">"JSONRPC"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"securitySchemes"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"oauth"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"oauth2"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"flows"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"authorizationCode"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">"authorizationUrl"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://auth.example.com/authorize"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"tokenUrl"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://auth.example.com/token"</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">"scopes"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">"read"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Read candidate data"</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">"write"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Create and update candidate records"</span>
+<span class="w">          </span><span class="p">}</span>
 <span class="w">        </span><span class="p">}</span>
 <span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"security"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">"oauth"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"read"</span><span class="p">,</span><span class="w"> </span><span class="s2">"write"</span><span class="p">]</span><span class="w"> </span><span class="p">}],</span>
+<span class="w">  </span><span class="nt">"capabilities"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"streaming"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"pushNotifications"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"defaultInputModes"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"text/plain"</span><span class="p">,</span><span class="w"> </span><span class="s2">"application/json"</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">"defaultOutputModes"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"text/plain"</span><span class="p">,</span><span class="w"> </span><span class="s2">"application/json"</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">"skills"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"find-candidates"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"findCandidates"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Find candidates matching a job title, required skills and preferred location"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"tags"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"recruiting"</span><span class="p">,</span><span class="w"> </span><span class="s2">"search"</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">"examples"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"Find Python developers in Amman with Spark experience"</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">"inputModes"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"application/json"</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">"outputModes"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"application/json"</span><span class="p">]</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">]</span>
 <span class="p">}</span>
@@ -372,45 +385,25 @@
 <li><strong>AI Response Generation</strong> — the model uses the retrieved data to produce a more informed response.</li>
 </ol>
 <h3 id="sample-mcp-server-implementation-python">Sample MCP server implementation (Python)</h3>
-<p>As on the source page. Note: this is illustrative pseudo-SDK code; the official <code>mcp</code> Python SDK uses <code>FastMCP</code> and <code>@mcp.tool()</code> (see the Week 11 test code).</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">mcp.server</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCPServer</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">mcp.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">Capability</span><span class="p">,</span> <span class="n">Action</span>
+<p>Using the official <code>mcp</code> Python SDK (<code>pip install "mcp[cli]"</code>). The tool's JSON schema is generated from the type hints and docstring; see Week 11 for the matching client.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">mcp.server</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCPServer</span>   <span class="c1"># mcp 1.x: from mcp.server.fastmcp import FastMCP as MCPServer</span>
 
 <span class="c1"># Create a simple MCP server</span>
-<span class="n">server</span> <span class="o">=</span> <span class="n">MCPServer</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"FileReader"</span><span class="p">,</span>
-                   <span class="n">description</span><span class="o">=</span><span class="s2">"Reads files from the local filesystem"</span><span class="p">)</span>
+<span class="n">mcp</span> <span class="o">=</span> <span class="n">MCPServer</span><span class="p">(</span><span class="s2">"FileReader"</span><span class="p">,</span> <span class="n">instructions</span><span class="o">=</span><span class="s2">"Reads files from the local filesystem"</span><span class="p">)</span>
 
-<span class="c1"># Define a capability</span>
-<span class="n">file_capability</span> <span class="o">=</span> <span class="n">Capability</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">"read_file"</span><span class="p">,</span>
-    <span class="n">description</span><span class="o">=</span><span class="s2">"Reads content from a file"</span><span class="p">,</span>
-    <span class="n">parameters</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">"path"</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"string"</span><span class="p">,</span>
-            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Path to the file"</span>
-        <span class="p">}</span>
-    <span class="p">},</span>
-    <span class="n">returns</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">"content"</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"string"</span><span class="p">,</span>
-            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Content of the file"</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">)</span>
-
-<span class="c1"># Implement the capability</span>
-<span class="nd">@server</span><span class="o">.</span><span class="n">implement</span><span class="p">(</span><span class="n">file_capability</span><span class="p">)</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">read_file</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<span class="c1"># Define and implement a tool (the schema is derived from the signature)</span>
+<span class="nd">@mcp</span><span class="o">.</span><span class="n">tool</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_file</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Reads content from a file."""</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">content</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">"content"</span><span class="p">:</span> <span class="n">content</span><span class="p">}</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span>
 
-<span class="c1"># Start the server</span>
+<span class="c1"># Start the server (stdio transport by default)</span>
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
-    <span class="n">server</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">mcp</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 </code></pre></div>
 <h3 id="mcp-scenarios">MCP scenarios</h3>
 <p><strong>Document analysis</strong> — a lawyer reviewing legal documents.
@@ -459,7 +452,7 @@
 <tr>
 <td>Key components</td>
 <td>Agent Cards, Tasks, Messages, Parts, Artifacts</td>
-<td>Hosts, Clients, Servers, Tools, Resources</td>
+<td>Hosts, Clients, Servers, Tools, Resources, Prompts</td>
 </tr>
 <tr>
 <td>Discovery mechanism</td>
@@ -468,8 +461,8 @@
 </tr>
 <tr>
 <td>Transport</td>
-<td>HTTP, SSE, JSON-RPC</td>
-<td>stdio, HTTP/SSE, WebSockets*</td>
+<td>HTTP(S) with JSON-RPC 2.0 (plus gRPC and HTTP+JSON/REST bindings); SSE for streaming</td>
+<td>stdio; Streamable HTTP (the earlier HTTP+SSE transport is legacy) — both carry JSON-RPC 2.0</td>
 </tr>
 <tr>
 <td>Ideal use case</td>
@@ -483,7 +476,6 @@
 </tr>
 </tbody>
 </table>
-<p>* As on the source page. The official MCP specification defines stdio and streamable HTTP transports; WebSockets is not a standard transport.</p>
 <h2 id="use-cases">Use cases</h2>
 <table>
 <thead>
@@ -535,11 +527,11 @@
 </ul>
 <h2 id="resources">Resources</h2>
 <ul>
-<li>A2A official website — https://google.github.io/A2A/</li>
-<li>A2A GitHub repository — https://github.com/google/A2A</li>
+<li>A2A official website — https://a2a-protocol.org/</li>
+<li>A2A GitHub repository — https://github.com/a2aproject/A2A</li>
 <li>MCP official website — https://modelcontextprotocol.io/</li>
 <li>MCP GitHub repository — https://github.com/modelcontextprotocol</li>
-<li>A2A discussions — https://github.com/google/A2A/discussions</li>
+<li>A2A discussions — https://github.com/a2aproject/A2A/discussions</li>
 <li>MCP discussions — https://github.com/modelcontextprotocol/modelcontextprotocol/discussions</li>
 <li>Google A2A announcement — https://developers.googleblog.com/en/a2a-a-new-era-of-agent-interoperability/</li>
 <li>Anthropic MCP announcement — https://www.anthropic.com/news/model-context-protocol</li>
@@ -608,14 +600,17 @@ store = np.stack([embed(d) for d in docs])
 query = &quot;when is the deadline?&quot;
 scores = store @ embed(query)
 print(&quot;retrieved:&quot;, docs[int(scores.argmax())])</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Supervisor routing in a multi-agent system</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 4. Supervisor routing in a multi-agent system
+import re
+
 AGENTS = {
     &quot;math&quot;:   lambda task: f&quot;[math agent] {eval(task)}&quot;,
     &quot;writer&quot;: lambda task: f&quot;[writer agent] Draft: {task.title()}&quot;,
 }
 
 def supervisor(task):
-    agent = &quot;math&quot; if any(c in task for c in &quot;+-*/&quot;) else &quot;writer&quot;
-    return AGENTS[agent](task)
+    # route to the math agent only if the whole task is an arithmetic expression
+    is_math = re.fullmatch(r&quot;[\d\s+\-*/().]+&quot;, task) is not None
+    return AGENTS[&quot;math&quot; if is_math else &quot;writer&quot;](task)
 
 for t in [&quot;12*12&quot;, &quot;introduce multi-agent systems&quot;]:
     print(supervisor(t))</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Parse an Agent Card and check whether it advertises a needed skill</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 1. Parse an Agent Card and check whether it advertises a needed skill
@@ -624,24 +619,26 @@ import json
 card = json.loads(&quot;&quot;&quot;{
   &quot;name&quot;: &quot;Recruitment Assistant&quot;, &quot;version&quot;: &quot;1.0.0&quot;,
   &quot;url&quot;: &quot;https://recruitment-agent.example.com/a2a&quot;,
-  &quot;capabilities&quot;: {&quot;streaming&quot;: true, &quot;multimodal&quot;: true},
-  &quot;skills&quot;: [{&quot;name&quot;: &quot;findCandidates&quot;,
-              &quot;parameters&quot;: {&quot;jobTitle&quot;: {&quot;type&quot;: &quot;string&quot;},
-                             &quot;skills&quot;: {&quot;type&quot;: &quot;array&quot;},
-                             &quot;location&quot;: {&quot;type&quot;: &quot;string&quot;}}}]
+  &quot;capabilities&quot;: {&quot;streaming&quot;: true, &quot;pushNotifications&quot;: false},
+  &quot;defaultInputModes&quot;: [&quot;text/plain&quot;, &quot;application/json&quot;],
+  &quot;defaultOutputModes&quot;: [&quot;application/json&quot;],
+  &quot;skills&quot;: [{&quot;id&quot;: &quot;find-candidates&quot;, &quot;name&quot;: &quot;findCandidates&quot;,
+              &quot;description&quot;: &quot;Find candidates matching job requirements&quot;,
+              &quot;tags&quot;: [&quot;recruiting&quot;, &quot;search&quot;]}]
 }&quot;&quot;&quot;)
 
 def has_skill(card, name):
-    return any(s[&quot;name&quot;] == name for s in card[&quot;skills&quot;])
+    return any(s[&quot;name&quot;] == name or s[&quot;id&quot;] == name for s in card[&quot;skills&quot;])
 
 print(card[&quot;name&quot;], &quot;supports findCandidates:&quot;, has_skill(card, &quot;findCandidates&quot;))
 print(&quot;streams:&quot;, card[&quot;capabilities&quot;][&quot;streaming&quot;])</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Task lifecycle state machine</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 2. Task lifecycle state machine
 TRANSITIONS = {
-    &quot;submitted&quot;: {&quot;working&quot;, &quot;canceled&quot;},
-    &quot;working&quot;: {&quot;input-required&quot;, &quot;completed&quot;, &quot;failed&quot;, &quot;canceled&quot;},
-    &quot;input-required&quot;: {&quot;working&quot;, &quot;canceled&quot;},
+    &quot;submitted&quot;: {&quot;working&quot;, &quot;auth-required&quot;, &quot;rejected&quot;, &quot;canceled&quot;},
+    &quot;working&quot;: {&quot;input-required&quot;, &quot;auth-required&quot;, &quot;completed&quot;, &quot;failed&quot;, &quot;canceled&quot;},
+    &quot;input-required&quot;: {&quot;working&quot;, &quot;canceled&quot;},   # interrupted: waiting on the client
+    &quot;auth-required&quot;: {&quot;working&quot;, &quot;canceled&quot;},    # interrupted: waiting on credentials
 }
-TERMINAL = {&quot;completed&quot;, &quot;failed&quot;, &quot;canceled&quot;}
+TERMINAL = {&quot;completed&quot;, &quot;failed&quot;, &quot;canceled&quot;, &quot;rejected&quot;}
 
 class Task:
     def __init__(self):
@@ -656,35 +653,38 @@ class Task:
 t = Task()
 for s in [&quot;working&quot;, &quot;input-required&quot;, &quot;working&quot;, &quot;completed&quot;]:
     t.move(s)
-print(&quot; -&gt; &quot;.join(t.history))</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Build a JSON-RPC 2.0 &#x27;tasks/send&#x27; request with a multi-part message</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 3. Build a JSON-RPC 2.0 &#x27;tasks/send&#x27; request with a multi-part message
+print(&quot; -&gt; &quot;.join(t.history))</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Build a JSON-RPC 2.0 &#x27;message/send&#x27; request with a multi-part message</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 3. Build a JSON-RPC 2.0 &#x27;message/send&#x27; request with a multi-part message
 import json, uuid
 
-def tasks_send(text, data):
+def message_send(text, data):
     return {
         &quot;jsonrpc&quot;: &quot;2.0&quot;,
         &quot;id&quot;: str(uuid.uuid4()),
-        &quot;method&quot;: &quot;tasks/send&quot;,
+        &quot;method&quot;: &quot;message/send&quot;,
         &quot;params&quot;: {
-            &quot;id&quot;: str(uuid.uuid4()),
             &quot;message&quot;: {
+                &quot;messageId&quot;: str(uuid.uuid4()),
                 &quot;role&quot;: &quot;user&quot;,
                 &quot;parts&quot;: [
-                    {&quot;type&quot;: &quot;text&quot;, &quot;text&quot;: text},
-                    {&quot;type&quot;: &quot;data&quot;, &quot;data&quot;: data},
+                    {&quot;kind&quot;: &quot;text&quot;, &quot;text&quot;: text},
+                    {&quot;kind&quot;: &quot;data&quot;, &quot;data&quot;: data},
                 ],
             },
         },
     }
 
-print(json.dumps(tasks_send(&quot;Find Python developers in Amman&quot;,
+print(json.dumps(message_send(&quot;Find Python developers in Amman&quot;,
                             {&quot;jobTitle&quot;: &quot;Data Engineer&quot;, &quot;skills&quot;: [&quot;Python&quot;, &quot;Spark&quot;]}),
                  indent=2))</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Simulate SSE status updates from a long-running remote agent</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 4. Simulate SSE status updates from a long-running remote agent
-import time
+import json, time
 
 def remote_agent_stream():
     for i, state in enumerate([&quot;working&quot;, &quot;working&quot;, &quot;working&quot;, &quot;completed&quot;]):
         time.sleep(0.2)
-        yield f&quot;event: TaskStatusUpdateEvent\ndata: {{\&quot;state\&quot;: \&quot;{state}\&quot;, \&quot;progress\&quot;: {25*(i+1)}}}\n\n&quot;
+        event = {&quot;kind&quot;: &quot;status-update&quot;, &quot;taskId&quot;: &quot;task-1&quot;, &quot;contextId&quot;: &quot;ctx-1&quot;,
+                 &quot;status&quot;: {&quot;state&quot;: state}, &quot;final&quot;: state == &quot;completed&quot;}
+        # each SSE chunk carries one JSON-RPC response whose result is a TaskStatusUpdateEvent
+        yield &quot;data: &quot; + json.dumps({&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;id&quot;: 1, &quot;result&quot;: event}) + &quot;\n\n&quot;
 
 for chunk in remote_agent_stream():
     print(chunk, end=&quot;&quot;)</code></pre><div class="out"></div></div></div>

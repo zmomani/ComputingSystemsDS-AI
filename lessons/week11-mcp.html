@@ -30,7 +30,7 @@
 <p>Visual Guide to MCP. Level: Intermediate · ~25 min.</p>
 </blockquote>
 <h2 id="introduction">Introduction</h2>
-<p>The Model Context Protocol is changing how AI assistants connect to data sources and tools. <strong>Think of it as a USB-C for AI</strong>: just as USB-C gives devices one standard way to connect, MCP gives AI systems one standard way to connect to data — a universal connector that standardizes integration. [Figure: Visual Guide to MCP]</p>
+<p>The Model Context Protocol is changing how AI assistants connect to data sources and tools. <strong>Think of it as a USB-C for AI</strong>: just as USB-C gives devices one standard way to connect, MCP gives AI systems one standard way to connect to data — a universal connector that standardizes integration. <em>Figure: Visual Guide to MCP</em></p>
 <h3 id="why-mcp-matters">Why MCP matters</h3>
 <ul>
 <li>Standardizes how AI models connect to data sources.</li>
@@ -40,14 +40,14 @@
 <li>Gives flexibility to switch between LLM providers.</li>
 </ul>
 <h2 id="what-is-mcp">What is MCP?</h2>
-<p>MCP is an open standard introduced by Anthropic for connecting AI applications with external tools, data sources, and systems. It addresses a core problem: AI models are isolated from data trapped in silos and legacy systems, and every new integration needs custom work.</p>
+<p>MCP is an open standard introduced by Anthropic in November 2024 for connecting AI applications with external tools, data sources, and systems. Messages are JSON-RPC 2.0, carried over <strong>stdio</strong> (the client launches the server as a subprocess) or <strong>Streamable HTTP</strong> (the earlier HTTP+SSE transport is legacy). It addresses a core problem: AI models are isolated from data trapped in silos and legacy systems, and every new integration needs custom work.</p>
 <p><strong>Key characteristics</strong>
 - <strong>Secure</strong> — access stays within your own security boundaries.
 - <strong>Open</strong> — a community-driven, open-source standard anyone can contribute to.
 - <strong>Interoperable</strong> — works across different LLM providers.
 - <strong>Extensible</strong> — adapts to many kinds of data sources.</p>
 <h2 id="mcp-architecture">MCP Architecture</h2>
-<p>MCP uses a <strong>client–server</strong> design with three components. [Figure: General MCP architecture showing the relationship between components]</p>
+<p>MCP uses a <strong>client–server</strong> design with three components. <em>Figure: General MCP architecture showing the relationship between components</em></p>
 <table>
 <thead>
 <tr>
@@ -66,16 +66,16 @@
 </tr>
 <tr>
 <td><strong>MCP Server</strong></td>
-<td>Lightweight programs that each expose specific capabilities and connect to the actual data sources and tools.</td>
+<td>Lightweight programs that each expose specific capabilities — <strong>tools</strong> (functions the model can call), <strong>resources</strong> (data the host can read) and <strong>prompts</strong> (reusable templates) — and connect to the actual data sources and tools.</td>
 </tr>
 </tbody>
 </table>
 <p><strong>Data sources</strong>
 - <strong>Local data sources</strong> — files, databases, and services on your computer. MCP servers can access them without sending the data to external services.
 - <strong>Remote services</strong> — external systems reached over the internet through APIs, e.g. GitHub, Slack, weather services.</p>
-<p>The design is modular, and sensitive data stays within your security boundaries. [Figure: Animated visualization of MCP data flow]</p>
+<p>The design is modular, and sensitive data stays within your security boundaries. <em>Figure: Animated visualization of MCP data flow</em></p>
 <h2 id="how-mcp-works">How MCP Works</h2>
-<p>[Figure: MCP workflow showing interaction between components]</p>
+<p><em>Figure: MCP workflow showing interaction between components</em></p>
 <ol>
 <li><strong>User query</strong> — the user asks an AI assistant a question through an MCP host such as Claude Desktop.</li>
 <li><strong>AI determines context needs</strong> — the model recognizes it needs more information and identifies which servers may have it.</li>
@@ -91,62 +91,42 @@
 - <strong>Access controls</strong> — built-in authentication and authorization protect data sources.</p>
 <h2 id="implementation-examples">Implementation Examples</h2>
 <h3 id="example-1-accessing-local-files">Example 1: Accessing local files</h3>
-<p><em>Scenario:</em> a user asks Claude to analyze a spreadsheet on their local machine. [Figure: Example of MCP in action with Claude]
+<p><em>Scenario:</em> a user asks Claude to analyze a spreadsheet on their local machine. <em>Figure: Example of MCP in action with Claude</em>
 1. Claude recognizes it needs local files.
 2. The host queries the Local Files MCP server.
 3. The server opens the file <strong>with the user's permission</strong>.
 4. Claude receives the file content in a standard format.
 5. Claude analyzes the data and responds.</p>
 <h3 id="example-2-integrating-with-github">Example 2: Integrating with GitHub</h3>
-<p><em>Scenario:</em> a developer asks an AI coding assistant to explain recent changes in a GitHub repository. [Figure: Detailed example of MCP implementation flow]
+<p><em>Scenario:</em> a developer asks an AI coding assistant to explain recent changes in a GitHub repository. <em>Figure: Detailed example of MCP implementation flow</em>
 1. The AI recognizes it needs GitHub data.
 2. The host connects to the GitHub MCP server.
 3. The server authenticates with GitHub and retrieves the commit history.
 4. The AI receives the repository data in a formatted structure.
 5. The AI analyzes the changes and explains them.</p>
 <h3 id="sample-mcp-server-implementation-python">Sample MCP server implementation (Python)</h3>
-<p>As on the source page. This is illustrative pseudo-SDK code (the imports <code>mcp.server.MCPServer</code> and <code>mcp.schema.Capability</code> do not exist in the official SDK); the <strong>Test code</strong> section shows the equivalent with the real <code>mcp</code> package.</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">mcp.server</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCPServer</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">mcp.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">Capability</span><span class="p">,</span> <span class="n">Action</span>
+<p>Using the official <code>mcp</code> Python SDK (<code>pip install "mcp[cli]"</code>). The tool's input schema is generated from the function signature and docstring; the <strong>Test code</strong> section adds a matching client.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">mcp.server</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCPServer</span>   <span class="c1"># mcp 1.x: from mcp.server.fastmcp import FastMCP as MCPServer</span>
 
 <span class="c1"># Create a simple MCP server</span>
-<span class="n">server</span> <span class="o">=</span> <span class="n">MCPServer</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"FileReader"</span><span class="p">,</span>
-                   <span class="n">description</span><span class="o">=</span><span class="s2">"Reads files from the local filesystem"</span><span class="p">)</span>
+<span class="n">mcp</span> <span class="o">=</span> <span class="n">MCPServer</span><span class="p">(</span><span class="s2">"FileReader"</span><span class="p">,</span> <span class="n">instructions</span><span class="o">=</span><span class="s2">"Reads files from the local filesystem"</span><span class="p">)</span>
 
-<span class="c1"># Define a capability</span>
-<span class="n">file_capability</span> <span class="o">=</span> <span class="n">Capability</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">"read_file"</span><span class="p">,</span>
-    <span class="n">description</span><span class="o">=</span><span class="s2">"Reads content from a file"</span><span class="p">,</span>
-    <span class="n">parameters</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">"path"</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"string"</span><span class="p">,</span>
-            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Path to the file"</span>
-        <span class="p">}</span>
-    <span class="p">},</span>
-    <span class="n">returns</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">"content"</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"string"</span><span class="p">,</span>
-            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Content of the file"</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">)</span>
-
-<span class="c1"># Implement the capability</span>
-<span class="nd">@server</span><span class="o">.</span><span class="n">implement</span><span class="p">(</span><span class="n">file_capability</span><span class="p">)</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">read_file</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<span class="c1"># Define and implement a tool (the JSON schema is derived from the type hints)</span>
+<span class="nd">@mcp</span><span class="o">.</span><span class="n">tool</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_file</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Reads content from a file."""</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">content</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">"content"</span><span class="p">:</span> <span class="n">content</span><span class="p">}</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span>
 
-<span class="c1"># Start the server</span>
+<span class="c1"># Start the server (stdio transport by default)</span>
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
-    <span class="n">server</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">mcp</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 </code></pre></div>
 <h3 id="available-servers">Available servers</h3>
-<p>[Figure: Claude Desktop MCP implementation]</p>
+<p><em>Figure: Claude Desktop MCP implementation</em></p>
 <table>
 <thead>
 <tr>
@@ -190,7 +170,7 @@
 </tbody>
 </table>
 <h2 id="benefits-of-mcp">Benefits of MCP</h2>
-<p>[Figure: How MCP enhances AI capabilities and security]</p>
+<p><em>Figure: How MCP enhances AI capabilities and security</em></p>
 <p><strong>For developers</strong>
 - Simplified integration — one protocol works with multiple AI models.
 - Modularity — components can be built and maintained independently.
@@ -213,7 +193,7 @@
 - Advanced AI workflows that span multiple systems.
 - Context-awareness that carries across different applications.</p>
 <h2 id="use-cases">Use Cases</h2>
-<p>[Figure: Various MCP applications across industries]</p>
+<p><em>Figure: Various MCP applications across industries</em></p>
 <table>
 <thead>
 <tr>
@@ -255,8 +235,8 @@
 </ul>
 <h2 id="getting-started">Getting Started</h2>
 <ul>
-<li><strong>Explore:</strong> GitHub repository — https://github.com/modelcontextprotocol · Quickstart — https://modelcontextprotocol.io/quickstart · Docs — https://modelcontextprotocol.io/docs · Examples — https://modelcontextprotocol.io/examples</li>
-<li><strong>Contribute:</strong> https://modelcontextprotocol.io/development/contributing · Discussions — https://github.com/orgs/modelcontextprotocol/discussions</li>
+<li><strong>Explore:</strong> GitHub repository — https://github.com/modelcontextprotocol · Quickstart — https://modelcontextprotocol.io/docs/develop/build-server · Docs — https://modelcontextprotocol.io/docs/getting-started/intro · Examples — https://modelcontextprotocol.io/examples</li>
+<li><strong>Contribute:</strong> https://modelcontextprotocol.io/community/contributing · Discussions — https://github.com/orgs/modelcontextprotocol/discussions</li>
 <li><strong>Try it:</strong> Download Claude Desktop — https://claude.ai/download</li>
 <li><strong>Announcement:</strong> https://www.anthropic.com/news/model-context-protocol</li>
 </ul>
@@ -268,10 +248,10 @@ This site is based on the course site <a href="https://albanna-tutorials.com/cs/
   <div class="rail-tabs"><button class="active" data-panel="panel-sims">Simulations</button><button data-panel="panel-code">Test code</button></div>
   <div class="rail-panel active" id="panel-sims"><p class="rail-intro">Interactive teaching aids for this week. Each opens full-size with step controls and teaching notes.</p><button class="sim-card" data-sim="mcp"><span class="sim-kind">MCP · animation</span><span class="sim-title">MCP message flow</span><span class="sim-desc">Sequence diagram of host, client, server and JSON-RPC messages for one tool call.</span></button><button class="sim-card" data-sim="react-loop"><span class="sim-kind">Agents · animation</span><span class="sim-title">ReAct agent loop</span><span class="sim-desc">Thought → Action → Observation on a growing scratchpad, including a tool error.</span></button></div>
   <div class="rail-panel" id="panel-code"><p class="rail-intro"><b>Run ▶</b> executes pure-Python/NumPy snippets in your browser (Pyodide). Snippets marked <i>local</i> need the course environment (PyTorch, Transformers, LangChain…) — copy them into VS Code.</p><div class="snippet"><div class="snippet-head"><span>A real MCP server with the official SDK (pip install &quot;mcp[cli]&quot;)</span><span class="spacer"></span><span class="btn-xs" style="cursor:default;opacity:.6" title="Needs a local Python environment with the course libraries">local</span><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 1. A real MCP server with the official SDK (pip install &quot;mcp[cli]&quot;)
-#    Run: python server.py   (speaks JSON-RPC over stdio)
-from mcp.server.fastmcp import FastMCP
+#    Save as server.py and run: python server.py   (speaks JSON-RPC over stdio)
+from mcp.server import MCPServer   # mcp 1.x: from mcp.server.fastmcp import FastMCP as MCPServer
 
-mcp = FastMCP(&quot;FileReader&quot;)
+mcp = MCPServer(&quot;FileReader&quot;)
 
 @mcp.tool()
 def read_file(path: str) -&gt; str:

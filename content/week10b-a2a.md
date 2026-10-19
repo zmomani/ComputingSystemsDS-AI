@@ -7,7 +7,7 @@ source: https://albanna-tutorials.com/a2a.html
 
 > Standardizing communication between AI agents and data sources. Level: Intermediate · AI Agents · ~25 min.
 >
-> Course page by Dr. Abedal-Kareem Al-Banna (Al-banna Tutorials). Google's Agent2Agent (A2A) protocol and Anthropic's Model Context Protocol (MCP) are presented as two complementary protocols that are changing how AI systems interact.
+> Course page by Dr. Abdulkarim Albanna (Al-banna Tutorials). Google's Agent2Agent (A2A) protocol and Anthropic's Model Context Protocol (MCP) are presented as two complementary protocols that are changing how AI systems interact.
 
 ## A2A (Agent2Agent Protocol)
 
@@ -21,7 +21,7 @@ A2A is an open protocol announced by Google in April 2025. It is designed to let
 - **Modality agnostic** — multiple content formats, including audio and video.
 
 ### Key components
-- **Agent Card** — a public metadata file (JSON) describing an agent's capabilities, skills, endpoint URL, and authentication requirements. Clients use it for discovery.
+- **Agent Card** — a public metadata file (JSON, served at `/.well-known/agent-card.json`) describing an agent's capabilities, skills, endpoint URL, and authentication requirements. Clients use it for discovery.
 - **Task-oriented communication** — work is organized as tasks with a defined lifecycle. A task may complete immediately or remain active for an extended period.
 - **Messages, Parts, Artifacts** — agents exchange messages whose content is carried as *parts* (text, files, or structured data); a finished task may return *artifacts*.
 - **UX / capability negotiation** — agents negotiate the right content format, explicitly including user-interface capabilities.
@@ -29,13 +29,15 @@ A2A is an open protocol announced by Google in April 2025. It is designed to let
 ### Agent Card fields (from the sample)
 | Field | Meaning |
 |---|---|
+| `protocolVersion` | A2A protocol version the agent speaks |
 | `name`, `description`, `version` | Display name, what the agent does, version string |
-| `url` | The agent's A2A endpoint |
-| `authentication.type` | Auth method (sample: `oauth2`) |
-| `authentication.authorizationUrl`, `tokenUrl`, `scopes` | OAuth2 endpoints and permitted scopes |
+| `url`, `preferredTransport` | The agent's A2A endpoint and its transport (`JSONRPC`, `GRPC` or `HTTP+JSON`) |
+| `securitySchemes` | Named auth schemes (sample: an `oauth2` authorization-code flow with `authorizationUrl`, `tokenUrl` and `scopes`) |
+| `security` | Which scheme(s) and scopes a client must present |
 | `capabilities.streaming` | Whether SSE streaming is supported |
-| `capabilities.multimodal` | Whether multiple content types are supported |
-| `skills[]` | Each with `name`, `description`, and typed `parameters` |
+| `capabilities.pushNotifications` | Whether the agent can push task updates to a client webhook |
+| `defaultInputModes`, `defaultOutputModes` | Media types the agent accepts and produces (e.g. `text/plain`, `application/json`) |
+| `skills[]` | Each with `id`, `name`, `description`, `tags`, optional `examples`, `inputModes`, `outputModes` |
 
 ### A2A workflow (step by step)
 1. **Agent Discovery** — the client agent reads the remote agent's Agent Card to learn its capabilities and endpoints.
@@ -43,44 +45,49 @@ A2A is an open protocol announced by Google in April 2025. It is designed to let
 3. **Task Processing** — the remote agent completes the task immediately or enters a *working* state for longer operations.
 4. **Status Updates** — for long-running tasks, the remote agent streams status updates over SSE.
 5. **Message Exchange** — agents exchange text, files, or structured data as parts to collaborate.
-6. **Task Completion** — the task reaches a terminal state (*completed*, *failed*, or *canceled*) and may return artifacts.
+6. **Task Completion** — the task reaches a terminal state (*completed*, *failed*, *canceled*, or *rejected*) and may return artifacts. Along the way it may pause in *input-required* or *auth-required* until the client responds.
 
 ### Sample A2A Agent Card (JSON)
 
 ```json
 {
+  "protocolVersion": "0.3.0",
   "name": "Recruitment Assistant",
   "description": "An agent that helps find and evaluate job candidates",
   "version": "1.0.0",
   "url": "https://recruitment-agent.example.com/a2a",
-  "authentication": {
-    "type": "oauth2",
-    "authorizationUrl": "https://auth.example.com/authorize",
-    "tokenUrl": "https://auth.example.com/token",
-    "scopes": ["read", "write"]
-  },
-  "capabilities": {
-    "streaming": true,
-    "multimodal": true
-  },
-  "skills": [
-    {
-      "name": "findCandidates",
-      "description": "Find candidates matching job requirements",
-      "parameters": {
-        "jobTitle": {
-          "type": "string",
-          "description": "The job title to search for"
-        },
-        "skills": {
-          "type": "array",
-          "description": "Required skills for the position"
-        },
-        "location": {
-          "type": "string",
-          "description": "Preferred location for the candidate"
+  "preferredTransport": "JSONRPC",
+  "securitySchemes": {
+    "oauth": {
+      "type": "oauth2",
+      "flows": {
+        "authorizationCode": {
+          "authorizationUrl": "https://auth.example.com/authorize",
+          "tokenUrl": "https://auth.example.com/token",
+          "scopes": {
+            "read": "Read candidate data",
+            "write": "Create and update candidate records"
+          }
         }
       }
+    }
+  },
+  "security": [{ "oauth": ["read", "write"] }],
+  "capabilities": {
+    "streaming": true,
+    "pushNotifications": false
+  },
+  "defaultInputModes": ["text/plain", "application/json"],
+  "defaultOutputModes": ["text/plain", "application/json"],
+  "skills": [
+    {
+      "id": "find-candidates",
+      "name": "findCandidates",
+      "description": "Find candidates matching a job title, required skills and preferred location",
+      "tags": ["recruiting", "search"],
+      "examples": ["Find Python developers in Amman with Spark experience"],
+      "inputModes": ["application/json"],
+      "outputModes": ["application/json"]
     }
   ]
 }
@@ -129,47 +136,27 @@ MCP is an open standard from Anthropic (announced November 2024) that standardiz
 6. **AI Response Generation** — the model uses the retrieved data to produce a more informed response.
 
 ### Sample MCP server implementation (Python)
-As on the source page. Note: this is illustrative pseudo-SDK code; the official `mcp` Python SDK uses `FastMCP` and `@mcp.tool()` (see the Week 11 test code).
+Using the official `mcp` Python SDK (`pip install "mcp[cli]"`). The tool's JSON schema is generated from the type hints and docstring; see Week 11 for the matching client.
 
 ```python
-from mcp.server import MCPServer
-from mcp.schema import Capability, Action
+from mcp.server import MCPServer   # mcp 1.x: from mcp.server.fastmcp import FastMCP as MCPServer
 
 # Create a simple MCP server
-server = MCPServer(name="FileReader",
-                   description="Reads files from the local filesystem")
+mcp = MCPServer("FileReader", instructions="Reads files from the local filesystem")
 
-# Define a capability
-file_capability = Capability(
-    name="read_file",
-    description="Reads content from a file",
-    parameters={
-        "path": {
-            "type": "string",
-            "description": "Path to the file"
-        }
-    },
-    returns={
-        "content": {
-            "type": "string",
-            "description": "Content of the file"
-        }
-    }
-)
-
-# Implement the capability
-@server.implement(file_capability)
-def read_file(path):
+# Define and implement a tool (the schema is derived from the signature)
+@mcp.tool()
+def read_file(path: str) -> str:
+    """Reads content from a file."""
     try:
-        with open(path, 'r') as f:
-            content = f.read()
-        return {"content": content}
+        with open(path, "r") as f:
+            return f.read()
     except Exception as e:
-        return {"error": str(e)}
+        return f"error: {e}"
 
-# Start the server
+# Start the server (stdio transport by default)
 if __name__ == "__main__":
-    server.start()
+    mcp.run()
 ```
 
 ### MCP scenarios
@@ -201,13 +188,11 @@ if __name__ == "__main__":
 | Primary purpose | Communication between different AI agents | Connecting AI models to data sources and tools |
 | Focus | Agent-to-agent collaboration | Agent-to-data / agent-to-tool connection |
 | Communication pattern | Task-based messages between agents | Request–response for tools and data |
-| Key components | Agent Cards, Tasks, Messages, Parts, Artifacts | Hosts, Clients, Servers, Tools, Resources |
+| Key components | Agent Cards, Tasks, Messages, Parts, Artifacts | Hosts, Clients, Servers, Tools, Resources, Prompts |
 | Discovery mechanism | Agent Cards and capability advertising | Host discovers available servers |
-| Transport | HTTP, SSE, JSON-RPC | stdio, HTTP/SSE, WebSockets* |
+| Transport | HTTP(S) with JSON-RPC 2.0 (plus gRPC and HTTP+JSON/REST bindings); SSE for streaming | stdio; Streamable HTTP (the earlier HTTP+SSE transport is legacy) — both carry JSON-RPC 2.0 |
 | Ideal use case | Multi-agent workflows requiring collaboration | A single agent that needs external systems |
 | Announced | April 2025 | November 2024 |
-
-\* As on the source page. The official MCP specification defines stdio and streamable HTTP transports; WebSockets is not a standard transport.
 
 ## Use cases
 
@@ -225,19 +210,19 @@ if __name__ == "__main__":
 - **Research assistant** — assistants access academic papers, experimental data, and simulation results to analyze and synthesize findings (heavily MCP).
 
 ## Resources
-- A2A official website — https://google.github.io/A2A/
-- A2A GitHub repository — https://github.com/google/A2A
+- A2A official website — https://a2a-protocol.org/
+- A2A GitHub repository — https://github.com/a2aproject/A2A
 - MCP official website — https://modelcontextprotocol.io/
 - MCP GitHub repository — https://github.com/modelcontextprotocol
-- A2A discussions — https://github.com/google/A2A/discussions
+- A2A discussions — https://github.com/a2aproject/A2A/discussions
 - MCP discussions — https://github.com/modelcontextprotocol/modelcontextprotocol/discussions
 - Google A2A announcement — https://developers.googleblog.com/en/a2a-a-new-era-of-agent-interoperability/
 - Anthropic MCP announcement — https://www.anthropic.com/news/model-context-protocol
 
 ## Key concepts worth simulating
 
-- **Agent Card discovery**: a client fetches `/.well-known/agent.json` from several agents, parses skills/capabilities, and picks the agent whose skill matches the task.
-- **Task lifecycle state machine**: submitted → working → (input-required ↔ working) → completed | failed | canceled; animate transitions and which ones are terminal.
+- **Agent Card discovery**: a client fetches `/.well-known/agent-card.json` from several agents, parses skills/capabilities, and picks the agent whose skill matches the task.
+- **Task lifecycle state machine**: submitted → working → (input-required / auth-required ↔ working) → completed | failed | canceled | rejected; animate transitions and which ones are terminal.
 - **SSE streaming of status updates**: a long-running task emitting `TaskStatusUpdateEvent` chunks over a single HTTP connection versus polling.
 - **Messages made of Parts**: a message carrying a TextPart + FilePart + DataPart; show how a multimodal-incapable agent negotiates a text-only format.
 - **Multi-agent research handoff**: primary agent splits a task into subtasks, dispatches them to three remote agents in parallel via JSON-RPC, collects artifacts, and merges them.
@@ -252,15 +237,16 @@ import json
 card = json.loads("""{
   "name": "Recruitment Assistant", "version": "1.0.0",
   "url": "https://recruitment-agent.example.com/a2a",
-  "capabilities": {"streaming": true, "multimodal": true},
-  "skills": [{"name": "findCandidates",
-              "parameters": {"jobTitle": {"type": "string"},
-                             "skills": {"type": "array"},
-                             "location": {"type": "string"}}}]
+  "capabilities": {"streaming": true, "pushNotifications": false},
+  "defaultInputModes": ["text/plain", "application/json"],
+  "defaultOutputModes": ["application/json"],
+  "skills": [{"id": "find-candidates", "name": "findCandidates",
+              "description": "Find candidates matching job requirements",
+              "tags": ["recruiting", "search"]}]
 }""")
 
 def has_skill(card, name):
-    return any(s["name"] == name for s in card["skills"])
+    return any(s["name"] == name or s["id"] == name for s in card["skills"])
 
 print(card["name"], "supports findCandidates:", has_skill(card, "findCandidates"))
 print("streams:", card["capabilities"]["streaming"])
@@ -269,11 +255,12 @@ print("streams:", card["capabilities"]["streaming"])
 ```python
 # 2. Task lifecycle state machine
 TRANSITIONS = {
-    "submitted": {"working", "canceled"},
-    "working": {"input-required", "completed", "failed", "canceled"},
-    "input-required": {"working", "canceled"},
+    "submitted": {"working", "auth-required", "rejected", "canceled"},
+    "working": {"input-required", "auth-required", "completed", "failed", "canceled"},
+    "input-required": {"working", "canceled"},   # interrupted: waiting on the client
+    "auth-required": {"working", "canceled"},    # interrupted: waiting on credentials
 }
-TERMINAL = {"completed", "failed", "canceled"}
+TERMINAL = {"completed", "failed", "canceled", "rejected"}
 
 class Task:
     def __init__(self):
@@ -292,39 +279,42 @@ print(" -> ".join(t.history))
 ```
 
 ```python
-# 3. Build a JSON-RPC 2.0 'tasks/send' request with a multi-part message
+# 3. Build a JSON-RPC 2.0 'message/send' request with a multi-part message
 import json, uuid
 
-def tasks_send(text, data):
+def message_send(text, data):
     return {
         "jsonrpc": "2.0",
         "id": str(uuid.uuid4()),
-        "method": "tasks/send",
+        "method": "message/send",
         "params": {
-            "id": str(uuid.uuid4()),
             "message": {
+                "messageId": str(uuid.uuid4()),
                 "role": "user",
                 "parts": [
-                    {"type": "text", "text": text},
-                    {"type": "data", "data": data},
+                    {"kind": "text", "text": text},
+                    {"kind": "data", "data": data},
                 ],
             },
         },
     }
 
-print(json.dumps(tasks_send("Find Python developers in Amman",
+print(json.dumps(message_send("Find Python developers in Amman",
                             {"jobTitle": "Data Engineer", "skills": ["Python", "Spark"]}),
                  indent=2))
 ```
 
 ```python
 # 4. Simulate SSE status updates from a long-running remote agent
-import time
+import json, time
 
 def remote_agent_stream():
     for i, state in enumerate(["working", "working", "working", "completed"]):
         time.sleep(0.2)
-        yield f"event: TaskStatusUpdateEvent\ndata: {{\"state\": \"{state}\", \"progress\": {25*(i+1)}}}\n\n"
+        event = {"kind": "status-update", "taskId": "task-1", "contextId": "ctx-1",
+                 "status": {"state": state}, "final": state == "completed"}
+        # each SSE chunk carries one JSON-RPC response whose result is a TaskStatusUpdateEvent
+        yield "data: " + json.dumps({"jsonrpc": "2.0", "id": 1, "result": event}) + "\n\n"
 
 for chunk in remote_agent_stream():
     print(chunk, end="")

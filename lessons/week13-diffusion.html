@@ -65,7 +65,7 @@
 | Schedule | Formula | Notes |
 |---|---|---|
 | Linear | βₜ = β₁ + (β_T − β₁) · (t−1)/(T−1) | Used in the original DDPM paper; can destroy most information around the halfway point |
-| Cosine | βₜ = 1 − cos²(((t/T + s)/(1 + s)) · π/2) / cos²((s/(1 + s)) · π/2) | Introduced by OpenAI; preserves more information early, allows as few as ~50 steps |
+| Cosine | ᾱₜ = cos²(((t/T + s)/(1 + s)) · π/2) / cos²((s/(1 + s)) · π/2),  βₜ = 1 − ᾱₜ/ᾱₜ₋₁ (clipped to ≤ 0.999) | Introduced by OpenAI (Nichol &amp; Dhariwal, 2021; s = 0.008); preserves more information early, allows as few as ~50 steps |
 | Quadratic | βₜ = β₁ + (β_T − β₁) · ((t−1)/(T−1))² | Adds noise faster later; can help preserve important structure early |</p>
 <h2 id="3-forward-diffusion-process">3. Forward Diffusion Process</h2>
 <p>The forward process gradually adds Gaussian noise until the data becomes pure noise.</p>
@@ -91,10 +91,12 @@
 <span class="sd">    returns the noisy version of it at timestep t</span>
 <span class="sd">    """</span>
     <span class="n">noise</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn_like</span><span class="p">(</span><span class="n">x_0</span><span class="p">)</span>
-    <span class="n">sqrt_alphas_cumprod_t</span> <span class="o">=</span> <span class="n">sqrt_alphas_cumprod</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
-    <span class="n">sqrt_one_minus_alphas_cumprod_t</span> <span class="o">=</span> <span class="n">sqrt_one_minus_alphas_cumprod</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
+    <span class="c1"># t may be a batch of timesteps: reshape the coefficients to (batch, 1, 1, 1)</span>
+    <span class="c1"># so they broadcast over the channel and spatial dimensions of x_0</span>
+    <span class="n">sqrt_alphas_cumprod_t</span> <span class="o">=</span> <span class="n">sqrt_alphas_cumprod</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">sqrt_one_minus_alphas_cumprod_t</span> <span class="o">=</span> <span class="n">sqrt_one_minus_alphas_cumprod</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 
-    <span class="c1"># Forward diffusion formula: mean + variance</span>
+    <span class="c1"># Forward diffusion formula: mean + std * noise</span>
     <span class="k">return</span> <span class="n">sqrt_alphas_cumprod_t</span> <span class="o">*</span> <span class="n">x_0</span> <span class="o">+</span> <span class="n">sqrt_one_minus_alphas_cumprod_t</span> <span class="o">*</span> <span class="n">noise</span><span class="p">,</span> <span class="n">noise</span>
 </code></pre></div>
 <h2 id="4-reverse-diffusion-process">4. Reverse Diffusion Process</h2>
@@ -139,7 +141,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">noise</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
-            <span class="c1"># Compute the denoised x_0 at this step</span>
+            <span class="c1"># Compute the less-noisy sample x_{t-1} (DDPM reverse step, sigma_t = sqrt(beta_t))</span>
             <span class="n">x</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha_hat</span><span class="p">))</span> <span class="o">*</span> <span class="n">predicted_noise</span><span class="p">)</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span> <span class="o">*</span> <span class="n">noise</span>
 
     <span class="c1"># Rescale to [0, 1] for images</span>
@@ -227,11 +229,8 @@
     <span class="c1"># Sample random timesteps</span>
     <span class="n">t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">timesteps</span><span class="p">,</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,),</span> <span class="n">device</span><span class="o">=</span><span class="n">x_0</span><span class="o">.</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
 
-    <span class="c1"># Sample random noise</span>
-    <span class="n">noise</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn_like</span><span class="p">(</span><span class="n">x_0</span><span class="p">)</span>
-
-    <span class="c1"># Get noisy samples</span>
-    <span class="n">x_t</span> <span class="o">=</span> <span class="n">get_noisy_samples</span><span class="p">(</span><span class="n">x_0</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">noise</span><span class="p">)</span>
+    <span class="c1"># Get noisy samples (and the noise that was added) via the closed-form forward process</span>
+    <span class="n">x_t</span><span class="p">,</span> <span class="n">noise</span> <span class="o">=</span> <span class="n">forward_diffusion_sample</span><span class="p">(</span><span class="n">x_0</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">x_0</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
 
     <span class="c1"># Predict noise</span>
     <span class="n">predicted_noise</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x_t</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
@@ -281,7 +280,7 @@
 |---|---|---|---|---|
 | DALL-E 2 | CLIP + diffusion | Cascaded diffusion models; CLIP image embeddings | Strong photorealism and composition | Closed source, limited customization |
 | Stable Diffusion | Latent diffusion | Works in compressed latent space; open source | Efficient, customizable, large community of extensions | Can be less coherent than DALL-E 2 |
-| Midjourney | Proprietary diffusion | Focus on artistic quality; Discord interface | Strong aesthetics and artistic styles | Less control; Discord-only |
+| Midjourney | Proprietary diffusion | Focus on artistic quality; Discord interface (web app added later) | Strong aesthetics and artistic styles | Less control; closed source |
 | Google Imagen | Cascaded diffusion | T5 text encoder; super-resolution diffusion | Strong text alignment, high resolution | Limited public access |</p>
 <p><strong>Future directions</strong>
 - Multimodal models unifying text, image, audio, and video.
@@ -358,7 +357,7 @@ for name, b in [(&quot;linear&quot;, betas_linear), (&quot;cosine&quot;, betas_c
 ab = alpha_bar(betas_linear)
 x0, t = 1.0, 500
 eps = np.random.randn()
-x_t = np.sqrt(ab[t]) * x0 + np.sqrt(1 - ab[t]) * eps
+x_t = np.sqrt(ab[t - 1]) * x0 + np.sqrt(1 - ab[t - 1]) * eps   # ab[0] is alpha_bar_1
 print(&quot;x_t =&quot;, round(x_t, 3))</code></pre><div class="out"></div></div><div class="snippet"><div class="snippet-head"><span>Train a tiny DDPM on a 2-D toy dataset and sample from it (PyTorch)</span><span class="spacer"></span><button class="btn-xs run-btn">Run ▶</button><button class="btn-xs copy-snip">Copy</button></div><pre><code class="language-python"># 2. Train a tiny DDPM on a 2-D toy dataset and sample from it (PyTorch)
 import math, torch, torch.nn as nn, torch.nn.functional as F
 

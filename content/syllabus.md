@@ -2,11 +2,11 @@
 week: 0
 title: Course Syllabus — 606363 Computing Systems for Data Science and AI
 source: https://albanna-tutorials.com/cs/syllabus.html
-author: Dr. Abed Alkarim Banna (Dr. Abdulkarim Albanna), University of Petra
+author: Dr. Abdulkarim Albanna, University of Petra
 ---
 # Course Syllabus — 606363 Computing Systems for Data Science and AI
 
-> Syllabus by Dr. Abed Alkarim Banna (Dr. Abdulkarim Albanna), Faculty of Information Technology, University of Petra. Content below is a close paraphrase of the original page (read through a paraphrasing fetch tool); all numbers, weights, weeks and references are preserved as stated. The original page contains no code.
+> Syllabus by Dr. Abdulkarim Albanna, Faculty of Information Technology, University of Petra.
 
 ## Course Information
 
@@ -18,7 +18,7 @@ author: Dr. Abed Alkarim Banna (Dr. Abdulkarim Albanna), University of Petra
 | Faculty | Faculty of Information Technology, University of Petra |
 | Credit hours | 3 |
 | Prerequisite | 606362 |
-| Course coordinator | Dr. Abed Alkarim Banna |
+| Course coordinator | Dr. Abdulkarim Albanna |
 
 ## Course Description
 

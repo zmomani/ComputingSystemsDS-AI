@@ -7,7 +7,7 @@ source: https://albanna-tutorials.com/llm_agents.html
 
 > Explore the fascinating world of Large Language Model Agents. Level: Intermediate · ~30 min.
 >
-> Course page by Dr. Abedal-Kareem Al-Banna (Al-banna Tutorials), based on the tutorial "A Visual Guide to LLM Agents" by Maarten Grootendorst (https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-llm-agents). Images and original content are © Maarten Grootendorst; the diagrams referenced below (44 figures) live on the source page and are not reproduced here.
+> Course page by Dr. Abdulkarim Albanna (Al-banna Tutorials), based on the tutorial "A Visual Guide to LLM Agents" by Maarten Grootendorst (https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-llm-agents). Images and original content are © Maarten Grootendorst; the diagrams referenced below (44 figures) live on the source page and are not reproduced here.
 
 ## 1. Introduction to LLMs
 
@@ -46,7 +46,7 @@ source: https://albanna-tutorials.com/llm_agents.html
 - Common technique: store all previous interactions, actions, and conversations in an **external vector database**; retrieve relevant pieces when needed. This is **Retrieval-Augmented Generation (RAG)** (figures: "Vector Database Creation", "Vector Database Retrieval").
 
 ### Memory types (CoALA)
-The paper *Cognitive Architectures for Language Agents* couples psychological memory types to LLM agents. Two are defined on the page:
+The paper *Cognitive Architectures for Language Agents* (CoALA) couples four psychological memory types — working, episodic, semantic and procedural — to LLM agents. Two are defined on the page:
 
 | Memory type | Definition |
 |---|---|
@@ -221,14 +221,17 @@ print("retrieved:", docs[int(scores.argmax())])
 
 ```python
 # 4. Supervisor routing in a multi-agent system
+import re
+
 AGENTS = {
     "math":   lambda task: f"[math agent] {eval(task)}",
     "writer": lambda task: f"[writer agent] Draft: {task.title()}",
 }
 
 def supervisor(task):
-    agent = "math" if any(c in task for c in "+-*/") else "writer"
-    return AGENTS[agent](task)
+    # route to the math agent only if the whole task is an arithmetic expression
+    is_math = re.fullmatch(r"[\d\s+\-*/().]+", task) is not None
+    return AGENTS["math" if is_math else "writer"](task)
 
 for t in ["12*12", "introduce multi-agent systems"]:
     print(supervisor(t))

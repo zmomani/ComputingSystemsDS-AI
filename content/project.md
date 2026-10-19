@@ -2,15 +2,13 @@
 week: 0
 title: Final Project — Multi-Agent Research Assistant
 source: https://albanna-tutorials.com/cs/project_research_assistant.html
-author: Dr. Abdulkarim Albanna (Dr. Abedal-Kareem Al-Banna), University of Petra
+author: Dr. Abdulkarim Albanna, University of Petra
 ---
 # Final Project — Multi-Agent Research Assistant
 
 > *Automated Research, Writing & Review System.* Course 606363, Computing Systems for Data Science and AI, 2nd semester 2025–2026. Instructor: Dr. Abdulkarim Albanna, Faculty of Information Technology, Data Science and AI, University of Petra.
 >
 > **Team size:** 2–3 students · **Difficulty:** Advanced · **Deadline:** Week 14 · **Competition Day:** Week 15
->
-> Content is a close paraphrase of Dr. Albanna's page (read via a paraphrasing fetch tool); all numbers, names, agent specs and rubric values are preserved. The `ResearchState` schema is reconstructed field-for-field from the original.
 
 ## 1. Project Overview
 
@@ -329,26 +327,24 @@ Code must be the team's original work. Open-source libraries and LLM APIs are al
 - [ ] MoE vs. dense comparison report with benchmarks
 - [ ] Technical report: architecture, design decisions, NER and classification evaluation, challenges, results
 - [ ] Demo video (5 minutes) showing NER, classification, browser actions and illustrations
-- [ ] Three sample research reports on different topics, with entity summaries, classification reports and illustrations
-- [ ] Live presentation (15 minutes with Q&A)
+- [ ] Five sample research reports on different topics, with entity summaries, classification reports and illustrations
+- [ ] Live presentation (10 minutes plus Q&A)
 - [ ] Week 7 Checkpoint 1 demo (NLP pipeline)
 - [ ] Week 11 Checkpoint 2 demo (full pipeline with MCP) and peer-feedback round
 - [ ] Peer review of two other teams' reports
 - [ ] **Deadline: Week 14**
-
-> The page lists 5 test reports in Phase 7 and 3 sample reports in the submission checklist, and a 15-minute presentation here vs. 10 minutes on Competition Day. Confirm with the instructor.
 
 ## 10. Project Grading
 
 | Component | Weight | Notes |
 |---|---|---|
 | Competition score | 40% | Average across the 3 unseen topics |
-| Architecture & topic coverage | 20% | All 12 course topics represented |
+| Architecture & topic coverage | 20% | All 12 course topics (Weeks 1–7 and 9–13) represented |
 | Code quality & documentation | 15% | |
 | Live presentation | 15% | 10-minute demo plus Q&A |
 | Peer review | 10% | Each team reviews two other teams; graded on review quality |
 
-(These are the weights *within* the project; the project itself is 30% of the course grade — see the syllabus.)
+(These are the weights *within* the project's competition and final-submission component, which is 20% of the course grade — 8% competition score, 4% architecture, 3% code quality, 3% presentation, 2% peer review. Weekly deliverables add a further 10%, so the project as a whole is 30% of the course grade — see the syllabus.)
 
 ## 11. Expected Output Example
 

@@ -7,11 +7,11 @@ source: https://albanna-tutorials.com/mcp.html
 
 > Visual Guide to MCP. Level: Intermediate · ~25 min.
 >
-> Course page by Dr. Abedal-Kareem Al-Banna (Al-banna Tutorials). The page's diagrams (MCP Overview, MCP Architecture, MCP Flow Animation, MCP Workflow, MCP Example Flow, Claude Desktop MCP implementation, MCP Architecture Benefits, MCP Use Cases) are referenced in brackets where they appear.
+> Course page by Dr. Abdulkarim Albanna (Al-banna Tutorials). The page's diagrams (MCP Overview, MCP Architecture, MCP Flow Animation, MCP Workflow, MCP Example Flow, Claude Desktop MCP implementation, MCP Architecture Benefits, MCP Use Cases) are described in italic captions where they appear.
 
 ## Introduction
 
-The Model Context Protocol is changing how AI assistants connect to data sources and tools. **Think of it as a USB-C for AI**: just as USB-C gives devices one standard way to connect, MCP gives AI systems one standard way to connect to data — a universal connector that standardizes integration. [Figure: Visual Guide to MCP]
+The Model Context Protocol is changing how AI assistants connect to data sources and tools. **Think of it as a USB-C for AI**: just as USB-C gives devices one standard way to connect, MCP gives AI systems one standard way to connect to data — a universal connector that standardizes integration. *Figure: Visual Guide to MCP*
 
 ### Why MCP matters
 - Standardizes how AI models connect to data sources.
@@ -22,7 +22,7 @@ The Model Context Protocol is changing how AI assistants connect to data sources
 
 ## What is MCP?
 
-MCP is an open standard introduced by Anthropic for connecting AI applications with external tools, data sources, and systems. It addresses a core problem: AI models are isolated from data trapped in silos and legacy systems, and every new integration needs custom work.
+MCP is an open standard introduced by Anthropic in November 2024 for connecting AI applications with external tools, data sources, and systems. Messages are JSON-RPC 2.0, carried over **stdio** (the client launches the server as a subprocess) or **Streamable HTTP** (the earlier HTTP+SSE transport is legacy). It addresses a core problem: AI models are isolated from data trapped in silos and legacy systems, and every new integration needs custom work.
 
 **Key characteristics**
 - **Secure** — access stays within your own security boundaries.
@@ -32,23 +32,23 @@ MCP is an open standard introduced by Anthropic for connecting AI applications w
 
 ## MCP Architecture
 
-MCP uses a **client–server** design with three components. [Figure: General MCP architecture showing the relationship between components]
+MCP uses a **client–server** design with three components. *Figure: General MCP architecture showing the relationship between components*
 
 | Component | Role |
 |---|---|
 | **MCP Host** | Applications such as Claude Desktop, IDEs, or other AI-powered tools that want data through MCP. The host is where the user interacts. |
 | **MCP Client** | Maintains a **1:1 connection** with each server and manages the protocol communication between host and server. |
-| **MCP Server** | Lightweight programs that each expose specific capabilities and connect to the actual data sources and tools. |
+| **MCP Server** | Lightweight programs that each expose specific capabilities — **tools** (functions the model can call), **resources** (data the host can read) and **prompts** (reusable templates) — and connect to the actual data sources and tools. |
 
 **Data sources**
 - **Local data sources** — files, databases, and services on your computer. MCP servers can access them without sending the data to external services.
 - **Remote services** — external systems reached over the internet through APIs, e.g. GitHub, Slack, weather services.
 
-The design is modular, and sensitive data stays within your security boundaries. [Figure: Animated visualization of MCP data flow]
+The design is modular, and sensitive data stays within your security boundaries. *Figure: Animated visualization of MCP data flow*
 
 ## How MCP Works
 
-[Figure: MCP workflow showing interaction between components]
+*Figure: MCP workflow showing interaction between components*
 
 1. **User query** — the user asks an AI assistant a question through an MCP host such as Claude Desktop.
 2. **AI determines context needs** — the model recognizes it needs more information and identifies which servers may have it.
@@ -66,7 +66,7 @@ The design is modular, and sensitive data stays within your security boundaries.
 ## Implementation Examples
 
 ### Example 1: Accessing local files
-*Scenario:* a user asks Claude to analyze a spreadsheet on their local machine. [Figure: Example of MCP in action with Claude]
+*Scenario:* a user asks Claude to analyze a spreadsheet on their local machine. *Figure: Example of MCP in action with Claude*
 1. Claude recognizes it needs local files.
 2. The host queries the Local Files MCP server.
 3. The server opens the file **with the user's permission**.
@@ -74,7 +74,7 @@ The design is modular, and sensitive data stays within your security boundaries.
 5. Claude analyzes the data and responds.
 
 ### Example 2: Integrating with GitHub
-*Scenario:* a developer asks an AI coding assistant to explain recent changes in a GitHub repository. [Figure: Detailed example of MCP implementation flow]
+*Scenario:* a developer asks an AI coding assistant to explain recent changes in a GitHub repository. *Figure: Detailed example of MCP implementation flow*
 1. The AI recognizes it needs GitHub data.
 2. The host connects to the GitHub MCP server.
 3. The server authenticates with GitHub and retrieves the commit history.
@@ -82,51 +82,31 @@ The design is modular, and sensitive data stays within your security boundaries.
 5. The AI analyzes the changes and explains them.
 
 ### Sample MCP server implementation (Python)
-As on the source page. This is illustrative pseudo-SDK code (the imports `mcp.server.MCPServer` and `mcp.schema.Capability` do not exist in the official SDK); the **Test code** section shows the equivalent with the real `mcp` package.
+Using the official `mcp` Python SDK (`pip install "mcp[cli]"`). The tool's input schema is generated from the function signature and docstring; the **Test code** section adds a matching client.
 
 ```python
-from mcp.server import MCPServer
-from mcp.schema import Capability, Action
+from mcp.server import MCPServer   # mcp 1.x: from mcp.server.fastmcp import FastMCP as MCPServer
 
 # Create a simple MCP server
-server = MCPServer(name="FileReader",
-                   description="Reads files from the local filesystem")
+mcp = MCPServer("FileReader", instructions="Reads files from the local filesystem")
 
-# Define a capability
-file_capability = Capability(
-    name="read_file",
-    description="Reads content from a file",
-    parameters={
-        "path": {
-            "type": "string",
-            "description": "Path to the file"
-        }
-    },
-    returns={
-        "content": {
-            "type": "string",
-            "description": "Content of the file"
-        }
-    }
-)
-
-# Implement the capability
-@server.implement(file_capability)
-def read_file(path):
+# Define and implement a tool (the JSON schema is derived from the type hints)
+@mcp.tool()
+def read_file(path: str) -> str:
+    """Reads content from a file."""
     try:
-        with open(path, 'r') as f:
-            content = f.read()
-        return {"content": content}
+        with open(path, "r") as f:
+            return f.read()
     except Exception as e:
-        return {"error": str(e)}
+        return f"error: {e}"
 
-# Start the server
+# Start the server (stdio transport by default)
 if __name__ == "__main__":
-    server.start()
+    mcp.run()
 ```
 
 ### Available servers
-[Figure: Claude Desktop MCP implementation]
+*Figure: Claude Desktop MCP implementation*
 
 | Server | What it connects to |
 |---|---|
@@ -141,7 +121,7 @@ if __name__ == "__main__":
 
 ## Benefits of MCP
 
-[Figure: How MCP enhances AI capabilities and security]
+*Figure: How MCP enhances AI capabilities and security*
 
 **For developers**
 - Simplified integration — one protocol works with multiple AI models.
@@ -170,7 +150,7 @@ if __name__ == "__main__":
 
 ## Use Cases
 
-[Figure: Various MCP applications across industries]
+*Figure: Various MCP applications across industries*
 
 | Domain | Applications |
 |---|---|
@@ -189,8 +169,8 @@ if __name__ == "__main__":
 - **Zed, Replit, Codeium, and Sourcegraph** are working with MCP to improve their platforms so AI agents can retrieve relevant information more effectively.
 
 ## Getting Started
-- **Explore:** GitHub repository — https://github.com/modelcontextprotocol · Quickstart — https://modelcontextprotocol.io/quickstart · Docs — https://modelcontextprotocol.io/docs · Examples — https://modelcontextprotocol.io/examples
-- **Contribute:** https://modelcontextprotocol.io/development/contributing · Discussions — https://github.com/orgs/modelcontextprotocol/discussions
+- **Explore:** GitHub repository — https://github.com/modelcontextprotocol · Quickstart — https://modelcontextprotocol.io/docs/develop/build-server · Docs — https://modelcontextprotocol.io/docs/getting-started/intro · Examples — https://modelcontextprotocol.io/examples
+- **Contribute:** https://modelcontextprotocol.io/community/contributing · Discussions — https://github.com/orgs/modelcontextprotocol/discussions
 - **Try it:** Download Claude Desktop — https://claude.ai/download
 - **Announcement:** https://www.anthropic.com/news/model-context-protocol
 
@@ -208,10 +188,10 @@ if __name__ == "__main__":
 
 ```python
 # 1. A real MCP server with the official SDK (pip install "mcp[cli]")
-#    Run: python server.py   (speaks JSON-RPC over stdio)
-from mcp.server.fastmcp import FastMCP
+#    Save as server.py and run: python server.py   (speaks JSON-RPC over stdio)
+from mcp.server import MCPServer   # mcp 1.x: from mcp.server.fastmcp import FastMCP as MCPServer
 
-mcp = FastMCP("FileReader")
+mcp = MCPServer("FileReader")
 
 @mcp.tool()
 def read_file(path: str) -> str:

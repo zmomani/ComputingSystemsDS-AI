@@ -5,7 +5,7 @@ source: https://albanna-tutorials.com/diffusion.html
 ---
 # Understanding Diffusion Models
 
-> Course page by Dr. Abedal-Kareem Al-Banna (Al-banna Tutorials). Code samples are PyTorch, as on the source page.
+> Course page by Dr. Abdulkarim Albanna (Al-banna Tutorials). Code samples are PyTorch, as on the source page.
 
 ## 1. Introduction to Diffusion Models
 
@@ -51,7 +51,7 @@ Diffusion models destroy structure in data with a **forward process**, then lear
 | Schedule | Formula | Notes |
 |---|---|---|
 | Linear | βₜ = β₁ + (β_T − β₁) · (t−1)/(T−1) | Used in the original DDPM paper; can destroy most information around the halfway point |
-| Cosine | βₜ = 1 − cos²(((t/T + s)/(1 + s)) · π/2) / cos²((s/(1 + s)) · π/2) | Introduced by OpenAI; preserves more information early, allows as few as ~50 steps |
+| Cosine | ᾱₜ = cos²(((t/T + s)/(1 + s)) · π/2) / cos²((s/(1 + s)) · π/2),  βₜ = 1 − ᾱₜ/ᾱₜ₋₁ (clipped to ≤ 0.999) | Introduced by OpenAI (Nichol & Dhariwal, 2021; s = 0.008); preserves more information early, allows as few as ~50 steps |
 | Quadratic | βₜ = β₁ + (β_T − β₁) · ((t−1)/(T−1))² | Adds noise faster later; can help preserve important structure early |
 
 ## 3. Forward Diffusion Process
@@ -81,10 +81,12 @@ def forward_diffusion_sample(x_0, t, device):
     returns the noisy version of it at timestep t
     """
     noise = torch.randn_like(x_0)
-    sqrt_alphas_cumprod_t = sqrt_alphas_cumprod[t]
-    sqrt_one_minus_alphas_cumprod_t = sqrt_one_minus_alphas_cumprod[t]
+    # t may be a batch of timesteps: reshape the coefficients to (batch, 1, 1, 1)
+    # so they broadcast over the channel and spatial dimensions of x_0
+    sqrt_alphas_cumprod_t = sqrt_alphas_cumprod[t].reshape(-1, 1, 1, 1).to(device)
+    sqrt_one_minus_alphas_cumprod_t = sqrt_one_minus_alphas_cumprod[t].reshape(-1, 1, 1, 1).to(device)
 
-    # Forward diffusion formula: mean + variance
+    # Forward diffusion formula: mean + std * noise
     return sqrt_alphas_cumprod_t * x_0 + sqrt_one_minus_alphas_cumprod_t * noise, noise
 ```
 
@@ -137,7 +139,7 @@ def sample(model, n_samples, device, image_size):
             else:
                 noise = torch.zeros_like(x)
 
-            # Compute the denoised x_0 at this step
+            # Compute the less-noisy sample x_{t-1} (DDPM reverse step, sigma_t = sqrt(beta_t))
             x = 1 / torch.sqrt(alpha) * (x - ((1 - alpha) / torch.sqrt(1 - alpha_hat)) * predicted_noise) + torch.sqrt(beta) * noise
 
     # Rescale to [0, 1] for images
@@ -242,11 +244,8 @@ def train_step(model, x_0, optimizer):
     # Sample random timesteps
     t = torch.randint(1, timesteps, (batch_size,), device=x_0.device).long()
 
-    # Sample random noise
-    noise = torch.randn_like(x_0)
-
-    # Get noisy samples
-    x_t = get_noisy_samples(x_0, t, noise)
+    # Get noisy samples (and the noise that was added) via the closed-form forward process
+    x_t, noise = forward_diffusion_sample(x_0, t, x_0.device)
 
     # Predict noise
     predicted_noise = model(x_t, t)
@@ -303,7 +302,7 @@ Covered areas: text-to-image generation, image editing, video, audio, 3D content
 |---|---|---|---|---|
 | DALL-E 2 | CLIP + diffusion | Cascaded diffusion models; CLIP image embeddings | Strong photorealism and composition | Closed source, limited customization |
 | Stable Diffusion | Latent diffusion | Works in compressed latent space; open source | Efficient, customizable, large community of extensions | Can be less coherent than DALL-E 2 |
-| Midjourney | Proprietary diffusion | Focus on artistic quality; Discord interface | Strong aesthetics and artistic styles | Less control; Discord-only |
+| Midjourney | Proprietary diffusion | Focus on artistic quality; Discord interface (web app added later) | Strong aesthetics and artistic styles | Less control; closed source |
 | Google Imagen | Cascaded diffusion | T5 text encoder; super-resolution diffusion | Strong text alignment, high resolution | Limited public access |
 
 **Future directions**
@@ -363,7 +362,7 @@ Diffusion models are stable to train, produce high-quality and controllable outp
 ## Key concepts worth simulating
 
 - **Forward diffusion**: an image (or 2-D point cloud) progressively noised over T steps with slider for t; show xₜ = √ᾱₜ·x₀ + √(1−ᾱₜ)·ε and the closed-form jump to any t.
-- **Noise schedules**: plot βₜ, αₜ and ᾱₜ for linear vs cosine vs quadratic; show signal-to-noise ratio √ᾱₜ/√(1−ᾱₜ) collapsing at different rates.
+- **Noise schedules**: plot βₜ, αₜ and ᾱₜ for linear vs cosine vs quadratic; show the signal-to-noise ratio ᾱₜ/(1−ᾱₜ) collapsing at different rates.
 - **Reverse denoising**: animate the sampling loop from x_T to x₀ on a toy 2-D dataset (e.g. two moons / Swiss roll) with a small MLP ε_θ; toggle the σₜ·z term to see stochastic vs deterministic paths.
 - **Noise-prediction training**: live loss curve of ‖ε − ε_θ(xₜ, t)‖² as the toy model trains; show predicted vs true noise vectors.
 - **Sinusoidal timestep embedding**: heat-map of the embedding matrix over t and dimension; show how nearby timesteps get similar vectors.
@@ -396,7 +395,7 @@ for name, b in [("linear", betas_linear), ("cosine", betas_cosine)]:
 ab = alpha_bar(betas_linear)
 x0, t = 1.0, 500
 eps = np.random.randn()
-x_t = np.sqrt(ab[t]) * x0 + np.sqrt(1 - ab[t]) * eps
+x_t = np.sqrt(ab[t - 1]) * x0 + np.sqrt(1 - ab[t - 1]) * eps   # ab[0] is alpha_bar_1
 print("x_t =", round(x_t, 3))
 ```
 
