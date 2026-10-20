@@ -5,7 +5,6 @@ source: https://albanna-tutorials.com/diffusion.html
 ---
 # Understanding Diffusion Models
 
-> Course page by Dr. Abdulkarim Albanna (Al-banna Tutorials). Code samples are PyTorch, as on the source page.
 
 ## 1. Introduction to Diffusion Models
 

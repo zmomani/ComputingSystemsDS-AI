@@ -6,13 +6,13 @@ author: Dr. Abedal-Kareem Al-Banna (Dr. Abdulkarim Albanna), University of Petra
 ---
 # Understanding Transformer Architecture
 
-> *An interactive guide to modern neural networks.* Material by Dr. Abedal-Kareem Al-Banna (ilmy / albanna-tutorials.com). The original page was created with JavaScript, D3.js and MathJax; its interactive visualizations are described in text below.
-
 Companion pages linked from the lesson:
 
 - Worked example, "I love learning" → "أنا أحب التعلم", with actual calculations for every Transformer operation (English): https://albanna-tutorials.com/transformer-step-by-step.html
 - Same worked example in Arabic: https://albanna-tutorials.com/transformer-step-by-step-ar.html
 - Transformer Q&A (21 questions): https://albanna-tutorials.com/transformer-qa.html
+
+*An interactive guide to modern neural networks.*
 
 ## Introduction
 
@@ -38,8 +38,6 @@ The Transformer architecture was introduced in the 2017 paper **"Attention Is Al
 - Text-to-image models (DALL-E, Stable Diffusion)
 - Multimodal systems (CLIP, Flamingo)
 
-*Interactive element on the original page:* an animated architecture overview, plus links to the "I love learning" worked example above.
-
 ## Evolution of Sequence Models
 
 ### Recurrent Neural Networks (RNNs)
@@ -63,9 +61,9 @@ The Transformer architecture was introduced in the 2017 paper **"Attention Is Al
 - Scale efficiently with computing resources
 - Avoid recurrence, which makes deeper architectures practical
 
-### Performance comparison (interactive)
+### Performance comparison
 
-The original page provides an interactive comparison widget with controls for **sequence length** (short, medium, long) and **task** (machine translation, text summarization, text classification, question answering) that contrasts the three model families.
+The table compares the three model families across sequence lengths and tasks such as machine translation, text summarization, text classification and question answering.
 
 | Property | RNN | LSTM | Transformer |
 |---|---|---|---|
@@ -128,7 +126,7 @@ Self-attention lets every position in a sequence attend to every other position.
 
 The scaling by √d_k keeps the dot products from growing large and pushing softmax into regions with extremely small gradients.
 
-*Interactive visualization:* sentence **"The cat sat on the mat because it was comfortable."** Clicking a word shows how strongly it attends to every other word (e.g. "it" attending to "cat"/"mat").
+For example, in **"The cat sat on the mat because it was comfortable."** the word "it" attends strongly to "cat" and "mat" — attention is how the model resolves what "it" refers to. Open the **Self-attention** animation at the top of this lesson to follow the computation step by step.
 
 ### Multi-head attention
 
@@ -139,7 +137,7 @@ Instead of a single attention function, the model runs **h** attention heads in 
 - Greater representational power
 - An ensemble-like effect within a single layer
 
-*Interactive visualization:* sentence **"The movie was great but too long."** with four toggleable heads:
+For example, in **"The movie was great but too long."** four heads can specialise in different relationships:
 
 | Head | Focus |
 |---|---|
@@ -158,7 +156,7 @@ $$PE_{(pos, 2i+1)} = \cos\left(pos / 10000^{2i/d_{model}}\right)$$
 
 where *pos* is the token position and *i* is the dimension index. Sinusoids at different frequencies let the model learn to attend by relative position.
 
-*Interactive visualization:* a heatmap with positions as rows and dimensions as columns. Sequence length can be set to 5, 25 or 50 and the encoding dimension to 8, 32 or 64.
+Viewed as a heatmap (positions as rows, dimensions as columns), low dimensions oscillate quickly and high dimensions slowly. Open the **Positional encoding** animation at the top of this lesson to explore it.
 
 ### Feed-forward networks
 
@@ -169,11 +167,11 @@ $$\text{FFN}(x) = \max(0, xW_1 + b_1)W_2 + b_2$$
 - The inner (hidden) dimension is typically 4× the model dimension
 - It adds non-linearity and substantially increases model capacity
 
-*Interactive visualization:* an input slider from −3 to 3, hidden-layer size 1×, 4× or 8×, showing the input, the output after the first layer (post-ReLU) and the final output.
+For an input between −3 and 3, the first layer followed by ReLU produces a piecewise-linear function; a wider hidden layer (4× or 8×) can represent more complex shapes.
 
-## Interactive Demonstration
+## How a Sentence Flows Through the Model
 
-**Sequence processing demo.** Sentence: *"The transformer model revolutionized natural language processing with its attention mechanism."* Controls: Process Sentence, Previous Step, Next Step, Auto Play, Reset. The demo walks through tokenization → embedding → positional encoding → attention → feed-forward → output, one step at a time.
+Take the sentence *"The transformer model revolutionized natural language processing with its attention mechanism."* It passes through tokenization → embedding → positional encoding → attention → feed-forward → output, one stage at a time. The animations at the top of this lesson (tokenisation, positional encoding, self-attention) show each stage.
 
 **Attention patterns by task.**
 

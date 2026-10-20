@@ -22,7 +22,8 @@
 </header><main class="lesson panel-closed" id="lesson" data-colab="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/project.ipynb" data-codespaces="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" data-guide="https://github.com/zmomani/ComputingSystemsDS-AI/blob/main/CODESPACES.md"><article class="lesson-content" id="lesson-content"><div class="lesson-head"><div class="eyebrow">606363</div><h1>Final Project: Multi-Agent Research Assistant</h1></div>
 <div class="colab-bar"><a class="btn codespaces" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener">⧉ Open this week's code in Codespaces</a><a class="muted small" href="https://github.com/zmomani/ComputingSystemsDS-AI/blob/main/CODESPACES.md" target="_blank" rel="noopener">How to use Codespaces</a></div>
 <div class="sim-strip"><div class="sim-strip-head">Related animations</div><div class="sim-strip-items"><button class="sim-chip" data-display="multi-agent"><span class="sim-chip-kind">Multi-agent</span>▶ Display: Multi-agent research pipeline</button><button class="sim-chip" data-display="langgraph"><span class="sim-chip-kind">LangGraph</span>▶ Display: LangGraph StateGraph</button><button class="sim-chip" data-display="react-loop"><span class="sim-chip-kind">Agents</span>▶ Display: ReAct agent loop</button></div></div>
-<details class="contents"><summary>Contents (12 sections)</summary><ol><li><a href="#1-project-overview">1. Project Overview</a></li><li><a href="#2-mapping-to-course-topics">2. Mapping to Course Topics</a></li><li><a href="#3-system-architecture">3. System Architecture</a></li><li><a href="#4-technology-stack">4. Technology Stack</a></li><li><a href="#5-agent-specifications">5. Agent Specifications</a></li><li><a href="#6-shared-state-schema">6. Shared State Schema</a></li><li><a href="#7-competition-format-competition-based-learning">7. Competition Format (Competition-Based Learning)</a></li><li><a href="#8-phase-by-phase-timeline">8. Phase-by-Phase Timeline</a></li><li><a href="#9-submission-requirements">9. Submission Requirements</a></li><li><a href="#10-project-grading">10. Project Grading</a></li><li><a href="#11-expected-output-example">11. Expected Output Example</a></li><li><a href="#12-useful-links">12. Useful Links</a></li></ol></details><blockquote>
+<details class="contents"><summary>Contents (16 sections)</summary><ol><li><a href="#part-final-project-multi-agent-research-assistant">Final Project — Multi-Agent Research Assistant</a></li><li><a href="#1-project-overview">1. Project Overview</a></li><li><a href="#2-mapping-to-course-topics">2. Mapping to Course Topics</a></li><li><a href="#3-system-architecture">3. System Architecture</a></li><li><a href="#4-technology-stack">4. Technology Stack</a></li><li><a href="#5-agent-specifications">5. Agent Specifications</a></li><li><a href="#6-shared-state-schema">6. Shared State Schema</a></li><li><a href="#7-competition-format-competition-based-learning">7. Competition Format (Competition-Based Learning)</a></li><li><a href="#8-phase-by-phase-timeline">8. Phase-by-Phase Timeline</a></li><li><a href="#9-submission-requirements">9. Submission Requirements</a></li><li><a href="#10-project-grading">10. Project Grading</a></li><li><a href="#11-expected-output-example">11. Expected Output Example</a></li><li><a href="#12-useful-links">12. Useful Links</a></li><li><a href="#part-project-setup-and-common-errors">Project Setup and Common Errors</a></li><li><a href="#your-teams-repository">Your team's repository</a></li><li><a href="#common-errors-and-how-to-fix-them">Common errors and how to fix them</a></li></ol></details><h2 class="part" id="part-final-project-multi-agent-research-assistant">Final Project — Multi-Agent Research Assistant</h2>
+<blockquote>
 <p><strong>Team size:</strong> 2–3 students · <strong>Difficulty:</strong> Advanced · <strong>Deadline:</strong> Week 14 · <strong>Competition Day:</strong> Week 15</p>
 </blockquote>
 <h2 id="1-project-overview">1. Project Overview</h2>
@@ -628,7 +629,239 @@ class ResearchState(TypedDict):
 <li>Tavily: https://tavily.com</li>
 <li>Course home: ../index.html · Syllabus: syllabus.html</li>
 <li>Instructor: abanna@uop.edu.jo · GitHub https://github.com/abedbanna · Hugging Face https://huggingface.co/abedbanna</li>
-</ul><h2 id="try-it-yourself">Try it yourself</h2>
+</ul>
+<h2 class="part" id="part-project-setup-and-common-errors">Project Setup and Common Errors</h2>
+<h2 id="your-teams-repository">Your team's repository</h2>
+<p>Your project must live in a GitHub repository that belongs to your team — not in the course repository and not only inside a codespace.</p>
+<ul>
+<li>You cannot save to the course repository. The <strong>Open in Codespaces</strong> buttons on this site open a codespace of <code>zmomani/ComputingSystemsDS-AI</code>, which is read-only for students. It is fine for practising with the lesson code, but nothing you write there can be pushed.</li>
+<li><strong>A codespace is temporary.</strong> GitHub deletes a codespace that has not been used for a while (30 days by default). Work that was never pushed to a repository is lost with it.</li>
+<li><strong>Your repository is part of the grade.</strong> The project requires a GitHub repository with a clean commit history and a README, and the commit history shows each member's contribution.</li>
+</ul>
+<h3 id="set-it-up-once-week-1">Set it up once (Week 1)</h3>
+<ol>
+<li><strong>One team member</strong> opens the project starter repository: <a href="https://github.com/zmomani/cs606363-project-starter">github.com/zmomani/cs606363-project-starter</a> and clicks <strong>Use this template → Create a new repository</strong>. Owner: your own account. Name: <code>cs606363-team-&lt;number&gt;</code>. Visibility: <strong>Private</strong>.</li>
+<li>In the new repository: <strong>Settings → Collaborators → Add people</strong> — add every team member and the instructor (<code>zmomani</code>).</li>
+<li><strong>Every member</strong> opens the team repository and clicks <strong>Code → Codespaces → Create codespace on main</strong>. The codespace has the same set-up as the course environment: Python 3.12 and all the course libraries.</li>
+<li>Add your API keys once: <strong>GitHub → Settings → Codespaces → Secrets → New secret</strong> (<code>OPENAI_API_KEY</code>, <code>TAVILY_API_KEY</code>), and give each secret access to your team repository. Restart the codespace.</li>
+<li>Check that everything works from a fresh start: in the terminal run <code>streamlit run app.py</code>. The starter pipeline runs end to end with placeholder agents, so you can build one real agent at a time.</li>
+</ol>
+<h3 id="every-working-session">Every working session</h3>
+<ol>
+<li>Open <strong>your team's</strong> codespace from <a href="https://github.com/codespaces">https://github.com/codespaces</a> (not a new one each time).</li>
+<li><strong>Pull first</strong>: Source Control panel → <strong>⋯ → Pull</strong>, or <code>git pull</code> in the terminal, so you have your teammates' latest work.</li>
+<li>Work, then <strong>commit and push</strong> before you stop: Source Control panel → write a message → <strong>Commit</strong> → <strong>Sync Changes</strong>. Small commits with clear messages (<code>Add NER agent with spaCy</code>, <code>Fix critic score threshold</code>).</li>
+<li><strong>Stop the codespace</strong> when you finish (Codespaces menu, bottom-left → <strong>Stop Current Codespace</strong>). A stopped codespace does not use your free monthly hours.</li>
+</ol>
+<h3 id="how-to-organise-the-code">How to organise the code</h3>
+<p>The starter follows one rule: <strong>the application is made of <code>.py</code> files; notebooks are only for experiments and evaluation.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Folder / file</th>
+<th>What goes there</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agents/</code></td>
+<td>One <code>.py</code> file per agent (research, classification, NER, analyzer, writer, critic, illustration). Each exposes a function that takes the shared state and returns an update.</td>
+</tr>
+<tr>
+<td><code>graph.py</code></td>
+<td>The LangGraph orchestrator: the shared state, the nodes, the edges and the human checkpoint.</td>
+</tr>
+<tr>
+<td><code>app.py</code></td>
+<td>The Streamlit interface.</td>
+</tr>
+<tr>
+<td><code>notebooks/</code></td>
+<td>Experiments, model evaluation (classification and NER reports), benchmarks. Notebooks <code>import</code> from <code>agents/</code> — never copy code out of a notebook into the app.</td>
+</tr>
+<tr>
+<td><code>models/</code></td>
+<td>Small trained models or links to them on the Hugging Face Hub. Large files do not belong in Git.</td>
+</tr>
+<tr>
+<td><code>tests/</code></td>
+<td><code>pytest</code> tests; at least one that runs the whole pipeline.</td>
+</tr>
+</tbody>
+</table>
+<p>Train models that need a GPU (fine-tuning in Week 2 and 3, diffusion in Week 13) in Google Colab, push the trained model to the Hugging Face Hub, and load it from there in your code.</p>
+<h3 id="working-as-a-team-without-conflicts">Working as a team without conflicts</h3>
+<ul>
+<li>Give each member their own agent files — two people editing the same file at the same time is the most common source of merge conflicts.</li>
+<li>Pull before you start, push when you finish; do not keep work unpushed for days.</li>
+<li>If VS Code shows a <strong>merge conflict</strong>, open the file, choose <em>Accept Current</em>, <em>Accept Incoming</em> or <em>Accept Both</em> for each marked block, save, commit, and push. Ask your teammate when you are unsure which version is right.</li>
+<li>Never commit <code>.env</code> or API keys. The starter's <code>.gitignore</code> already excludes <code>.env</code>.</li>
+</ul>
+<h2 id="common-errors-and-how-to-fix-them">Common errors and how to fix them</h2>
+<p>Read the <strong>last line</strong> of the error message first — it names the problem. Then find it below.</p>
+<h3 id="setting-up-and-running">Setting up and running</h3>
+<table>
+<thead>
+<tr>
+<th>Error or symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ModuleNotFoundError: No module named '…'</code></td>
+<td>The library is not installed in the Python that runs your code (often: a different Python on your laptop, or a notebook kernel that is not the codespace's Python).</td>
+<td>In Codespaces choose the kernel <strong>Python 3.12</strong> (<code>/usr/local/bin/python</code>). Install missing libraries with <code>python -m pip install &lt;name&gt;</code> in the terminal and add them to <code>requirements.txt</code>.</td>
+</tr>
+<tr>
+<td><code>openai.AuthenticationError</code>, <code>401</code>, or <code>api_key must be set</code></td>
+<td>No API key, or a wrong one.</td>
+<td>Add the key as a Codespaces secret (then restart the codespace) or put it in <code>.env</code> and call <code>load_dotenv()</code> at the start of your program. Check for spaces or quotes around the key.</td>
+</tr>
+<tr>
+<td><code>RateLimitError</code> / <code>429</code> / <code>insufficient_quota</code></td>
+<td>Too many requests, or no credit left on the API account.</td>
+<td>Wait and retry; add a short delay or retry with back-off; use a cheaper model while developing (<code>gpt-4o-mini</code>) or a local Ollama model.</td>
+</tr>
+<tr>
+<td><code>Connection refused</code> on <code>localhost:11434</code></td>
+<td>Ollama is not running.</td>
+<td><code>bash scripts/start-ollama.sh</code>, then retry.</td>
+</tr>
+<tr>
+<td>The app starts but the page does not open</td>
+<td>The port is not forwarded to your browser.</td>
+<td>Open the <strong>Ports</strong> tab in VS Code and click the globe icon next to 8501 (Streamlit), 8000 (Django) or 7860 (Gradio).</td>
+</tr>
+<tr>
+<td><code>Address already in use</code></td>
+<td>The app is already running from an earlier attempt.</td>
+<td>Stop the old one with <strong>Ctrl + C</strong> in its terminal, or run on another port: <code>streamlit run app.py --server.port 8502</code>.</td>
+</tr>
+<tr>
+<td><code>playwright._impl._errors.Error: Executable doesn't exist</code></td>
+<td>The Chromium browser for Playwright is not installed.</td>
+<td><code>python -m playwright install chromium</code></td>
+</tr>
+<tr>
+<td>The codespace is very slow, or <code>Killed</code> while loading a model</td>
+<td>The model needs more memory than the codespace has.</td>
+<td>Use a smaller model (for example <code>distilbert-base-uncased</code>, <code>llama3.2:1b</code>), or run that step in Colab.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="moving-code-from-a-notebook-to-a-py-file">Moving code from a notebook to a <code>.py</code> file</h3>
+<table>
+<thead>
+<tr>
+<th>Error or symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>NameError: name 'df' is not defined</code></td>
+<td>The notebook depended on a cell that was later changed, deleted or run out of order. A script always starts from nothing.</td>
+<td>In the notebook use <strong>Restart → Run All</strong>. If it fails there, fix it there first.</td>
+</tr>
+<tr>
+<td><code>SyntaxError</code> on <code>!pip install …</code> or <code>%matplotlib inline</code></td>
+<td><code>!</code> and <code>%</code> are notebook commands, not Python.</td>
+<td>Delete them; install packages in the terminal.</td>
+</tr>
+<tr>
+<td>The script runs but prints nothing</td>
+<td>A notebook displays the value of the last line automatically; a script does not.</td>
+<td>Use <code>print(...)</code>. For plots add <code>plt.show()</code>.</td>
+</tr>
+<tr>
+<td><code>SyntaxError: 'await' outside function</code></td>
+<td>Notebooks allow <code>await</code> at the top level; scripts do not.</td>
+<td>In a script: <code>asyncio.run(main())</code> inside <code>if __name__ == "__main__":</code>.</td>
+</tr>
+<tr>
+<td><code>RuntimeError: asyncio.run() cannot be called from a running event loop</code></td>
+<td>The opposite case: <code>asyncio.run</code> inside a notebook.</td>
+<td>In a notebook use <code>await main()</code>.</td>
+</tr>
+<tr>
+<td><code>FileNotFoundError</code> for a file that exists</td>
+<td>A notebook runs in its own folder; a script runs from where you started it.</td>
+<td>Build paths from the file's location: <code>Path(__file__).parent / "data" / "file.csv"</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="git-and-github">Git and GitHub</h3>
+<table>
+<thead>
+<tr>
+<th>Error or symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Permission denied</code> / <code>403</code> when pushing</td>
+<td>You are in a codespace of the course repository, which you cannot push to.</td>
+<td>Work in your <strong>team</strong> repository's codespace. To keep changes made in the wrong place, copy the files into your team codespace before deleting the old one.</td>
+</tr>
+<tr>
+<td><code>rejected … (fetch first)</code> / <code>Updates were rejected</code></td>
+<td>A teammate pushed before you.</td>
+<td>Pull first (Sync Changes does both), resolve any conflicts, then push.</td>
+</tr>
+<tr>
+<td><code>CONFLICT (content): Merge conflict in …</code></td>
+<td>You and a teammate changed the same lines.</td>
+<td>Resolve as described above, then commit and push.</td>
+</tr>
+<tr>
+<td><code>File … is larger than 100 MB</code></td>
+<td>A model or dataset file was committed.</td>
+<td>Remove it from the commit, add the folder to <code>.gitignore</code>, and store the model on the Hugging Face Hub instead.</td>
+</tr>
+<tr>
+<td>A key appears in a commit</td>
+<td><code>.env</code> or a key in code was committed.</td>
+<td>Revoke the key on the provider's website immediately and create a new one — deleting the file is not enough, the key stays in the history.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="langgraph-and-agents">LangGraph and agents</h3>
+<table>
+<thead>
+<tr>
+<th>Error or symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>KeyError</code> reading the state</td>
+<td>A node reads a key that no earlier node has set.</td>
+<td>Give every state key a default value in the initial state, or use <code>state.get("key")</code>.</td>
+</tr>
+<tr>
+<td><code>GraphRecursionError</code></td>
+<td>The graph keeps looping (for example writer ↔ critic) without reaching <code>END</code>.</td>
+<td>Add a counter to the state and stop after a fixed number of rounds; check that the routing function can return the exit route.</td>
+</tr>
+<tr>
+<td><code>InvalidUpdateError</code></td>
+<td>Two nodes running in parallel write the same key.</td>
+<td>Give that key a reducer (<code>Annotated[list, operator.add]</code>) or let only one node write it.</td>
+</tr>
+<tr>
+<td>The agent repeats the same tool call</td>
+<td>The tool result is not added back to the messages, so the model never sees it.</td>
+<td>Return the tool output as a message in the node's update.</td>
+</tr>
+</tbody>
+</table><h2 id="try-it-yourself">Try it yourself</h2>
 <p class="lesson-intro"><b>▶ Try it</b> runs an example in the editor panel, inside your browser — change the code and press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to run it again. Examples that use PyTorch, Transformers, LangChain or an API cannot run in a browser: press <b>⧉ Open in Codespaces</b> and run them in the course environment (this lesson's code is in <code>notebooks/</code>).</p><h3 id="test-code">Test code for the course environment</h3><div class="runnable local"><div class="code-title">Minimal LangGraph skeleton with the Critic revision loop</div><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="langgraph, typing_extensions" title="Needs langgraph, typing_extensions — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 1. Minimal LangGraph skeleton with the Critic revision loop
 #    pip install langgraph typing_extensions
 from typing import List, Optional

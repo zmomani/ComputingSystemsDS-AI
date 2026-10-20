@@ -298,17 +298,6 @@ print(processor.batch_decode(outputs[:, inputs["input_ids"].shape[-1]:], skip_sp
 
 **When will Behemoth be released?** No date has been announced. It is still in training and serves as a teacher model for Scout and Maverick.
 
-## Figures on the original page
-1. Meta's LLAMA4 Models — The Next Generation of AI
-2. LLAMA4 Mixture-of-Experts Architecture
-3. LLAMA4 Benchmark Comparison with Competing Models
-4. LLAMA4 Scout's Long Context Capability Visualization
-5. LLAMA4 Behemoth Architecture Overview
-6. LLAMA4 Performance on Image Understanding Benchmarks
-7. LLAMA4 Setting New Standards in AI Performance
-8. LLAMA4 Powering Various Real-World Applications
-9. Meta AI interface powered by LLAMA4
-
 ## Resources
 - Official site and downloads: https://www.llama.com — https://www.llama.com/llama-downloads/
 - Documentation: https://www.llama.com/docs/

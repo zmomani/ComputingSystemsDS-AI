@@ -59,9 +59,13 @@ Open a terminal with **Ctrl + `** (back-tick).
 
 ## Save your work and your free hours
 
+* **This codespace is for practising with the lesson code — you cannot push to the course repository.** Your project lives in
+  your team's own repository; see *Project Setup and Common Errors* on the course site
+  (https://zmomani.github.io/ComputingSystemsDS-AI/lessons/project.html#part-project-setup-and-common-errors).
+  To keep your own lesson experiments, click **Fork** on the course repository and open codespaces from your fork.
+* Codespaces are deleted after a period of inactivity (30 days by default). Commit and push regularly.
 * Personal GitHub accounts include a monthly allowance of free Codespaces hours (more with the GitHub Student Developer Pack).
-  A codespace that is **stopped** does not use hours — stop it when you finish: *Codespaces menu (bottom-left) → Stop Current Codespace*.
-* Codespaces are deleted after a period of inactivity. Keep your project in **your own repository** and commit and push regularly.
+  A **stopped** codespace does not use hours — stop it when you finish: *Codespaces menu (bottom-left) → Stop Current Codespace*.
 
 ## Running on your own computer instead
 

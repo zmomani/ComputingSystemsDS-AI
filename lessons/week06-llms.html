@@ -23,7 +23,7 @@
 <p class="lesson-intro"><b>Topics:</b> LLM evolution, model families, open vs. closed models, prompting, Ollama<br><b>Project milestone:</b> Configure LLM parameters, benchmark 2+ models, track token usage and cost</p></div>
 <div class="colab-bar"><a class="btn codespaces" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener">⧉ Open this week's code in Codespaces</a><a class="muted small" href="https://github.com/zmomani/ComputingSystemsDS-AI/blob/main/CODESPACES.md" target="_blank" rel="noopener">How to use Codespaces</a></div>
 <div class="sim-strip"><div class="sim-strip-head">Animations for this week — open them in the panel</div><div class="sim-strip-items"><button class="sim-chip" data-display="sampling"><span class="sim-chip-kind">LLMs</span>▶ Display: Temperature, top-k, top-p</button><button class="sim-chip" data-display="tokenizer"><span class="sim-chip-kind">Transformers</span>▶ Display: Subword tokenisation</button><button class="sim-chip" data-display="attention"><span class="sim-chip-kind">Transformers</span>▶ Display: Self-attention: Q·Kᵀ → softmax → ·V</button></div></div>
-<details class="contents"><summary>Contents (12 sections)</summary><ol><li><a href="#introduction">Introduction</a></li><li><a href="#why-llama4-matters">Why LLAMA4 Matters</a></li><li><a href="#what-is-llama4">What Is LLAMA4?</a></li><li><a href="#the-models-scout-maverick-and-behemoth">The Models: Scout, Maverick and Behemoth</a></li><li><a href="#key-features">Key Features</a></li><li><a href="#technical-specifications">Technical Specifications</a></li><li><a href="#benchmarks">Benchmarks</a></li><li><a href="#how-to-use-llama4">How to Use LLAMA4</a></li><li><a href="#use-cases">Use Cases</a></li><li><a href="#faq">FAQ</a></li><li><a href="#figures-on-the-original-page">Figures on the original page</a></li><li><a href="#resources">Resources</a></li></ol></details>
+<details class="contents"><summary>Contents (11 sections)</summary><ol><li><a href="#introduction">Introduction</a></li><li><a href="#why-llama4-matters">Why LLAMA4 Matters</a></li><li><a href="#what-is-llama4">What Is LLAMA4?</a></li><li><a href="#the-models-scout-maverick-and-behemoth">The Models: Scout, Maverick and Behemoth</a></li><li><a href="#key-features">Key Features</a></li><li><a href="#technical-specifications">Technical Specifications</a></li><li><a href="#benchmarks">Benchmarks</a></li><li><a href="#how-to-use-llama4">How to Use LLAMA4</a></li><li><a href="#use-cases">Use Cases</a></li><li><a href="#faq">FAQ</a></li><li><a href="#resources">Resources</a></li></ol></details>
 <h2 id="introduction">Introduction</h2>
 <p>LLAMA4 is Meta's most advanced family of large language models to date: <strong>natively multimodal, open-weight</strong> models that process text and images in a single backbone and use a <strong>mixture-of-experts (MoE)</strong> design for efficiency. The lesson is written as an approximately 30-minute read.</p>
 <h2 id="why-llama4-matters">Why LLAMA4 Matters</h2>
@@ -615,18 +615,6 @@ print(processor.batch_decode(outputs[:, inputs[&quot;input_ids&quot;].shape[-1]:
 <p><strong>Which languages are supported?</strong> Twelve officially (Arabic, English, French, German, Hindi, Indonesian, Italian, Portuguese, Spanish, Tagalog, Thai, Vietnamese), though pre-training covered 200 languages.</p>
 <p><strong>Is it available for commercial use?</strong> Yes, under the Llama 4 Community License, subject to its terms and Meta's acceptable use policy.</p>
 <p><strong>When will Behemoth be released?</strong> No date has been announced. It is still in training and serves as a teacher model for Scout and Maverick.</p>
-<h2 id="figures-on-the-original-page">Figures on the original page</h2>
-<ol>
-<li>Meta's LLAMA4 Models — The Next Generation of AI</li>
-<li>LLAMA4 Mixture-of-Experts Architecture</li>
-<li>LLAMA4 Benchmark Comparison with Competing Models</li>
-<li>LLAMA4 Scout's Long Context Capability Visualization</li>
-<li>LLAMA4 Behemoth Architecture Overview</li>
-<li>LLAMA4 Performance on Image Understanding Benchmarks</li>
-<li>LLAMA4 Setting New Standards in AI Performance</li>
-<li>LLAMA4 Powering Various Real-World Applications</li>
-<li>Meta AI interface powered by LLAMA4</li>
-</ol>
 <h2 id="resources">Resources</h2>
 <ul>
 <li>Official site and downloads: https://www.llama.com — https://www.llama.com/llama-downloads/</li>

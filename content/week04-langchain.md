@@ -5,7 +5,6 @@ source: https://albanna-tutorials.com/langchain.html
 ---
 # LangChain Fundamentals
 
-> Material by Dr. Abedal-Kareem Al-Banna (ilmy / albanna-tutorials.com). Original page: "LangChain Python Tutorial" — Beginner level, about 10 minutes. The test code at the end of this file was written for the course.
 
 ## Welcome to LangChain Python
 

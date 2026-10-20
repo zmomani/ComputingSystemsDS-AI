@@ -8,8 +8,6 @@ source: https://albanna-tutorials.com/transformer-qa.html
 *21 questions covering every component of the Transformer architecture.*
 *Intermediate · 21 Questions · Covers All Components · Exam Ready*
 
-*Material by Dr. Abdulkarim Albanna (Dr. Abedal-Kareem Al-Banna), Assistant Professor, Data Science & AI, University of Petra — ilmy / albanna-tutorials.com. Reproduced here for teaching use; formulas, tables and examples are as on the original page, with the prose kept as close to the original as possible.*
-
 ---
 
 ## Q1. What is a Transformer?
@@ -310,5 +308,3 @@ Example: **"I love learning" → "أنا أحب التعلم"**
 
 ---
 
-*Prepared by Dr. Abdulkarim Albanna — AI Applications Course.*
-*Related pages on the original site: [Transformer Overview](https://albanna-tutorials.com/transformer.html) · [Step-by-Step Guide](https://albanna-tutorials.com/transformer-step-by-step.html) · [الشرح بالعربي](https://albanna-tutorials.com/transformer-step-by-step-ar.html)*

@@ -6,7 +6,7 @@ author: Dr. Abedal-Kareem Al-Banna (Dr. Abdulkarim Albanna), University of Petra
 ---
 # Text Classification with Transformers
 
-> *Build Your First NLP Model.* Level: Beginner NLP · Estimated time: ~60 minutes · Stack: Hugging Face, PyTorch, Transformers, scikit-learn. Material by Dr. Abedal-Kareem Al-Banna (ilmy / albanna-tutorials.com), following the approach of Tunstall, von Werra & Wolf, *NLP with Transformers*, Chapter 2.
+*Build your first NLP model.* Level: beginner · about 60 minutes · Hugging Face, PyTorch, Transformers, scikit-learn. The approach follows Tunstall, von Werra & Wolf, *Natural Language Processing with Transformers*, Chapter 2.
 
 ## What You'll Learn
 

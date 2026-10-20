@@ -7,7 +7,8 @@ source: https://albanna-tutorials.com/a2a.html
 
 > Standardizing communication between AI agents and data sources. Level: Intermediate · AI Agents · ~25 min.
 >
-> Course page by Dr. Abdulkarim Albanna (Al-banna Tutorials). Google's Agent2Agent (A2A) protocol and Anthropic's Model Context Protocol (MCP) are presented as two complementary protocols that are changing how AI systems interact.
+
+Google's Agent2Agent (A2A) protocol and Anthropic's Model Context Protocol (MCP) are two complementary protocols that are changing how AI systems interact.
 
 ## A2A (Agent2Agent Protocol)
 

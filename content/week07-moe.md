@@ -15,7 +15,6 @@ A **router** (gating network) decides which experts process each token, so only 
 
 > "Mixture of Experts enable models to be pretrained with far less compute, which means you can dramatically scale up the model or dataset size with the same compute budget as a dense model." — Hugging Face blog
 
-*Figure: Mixture of Experts diagram — multiple specialized expert networks with a routing mechanism that selects the best experts for each token.*
 
 ## How MoE Works in LLMs
 
@@ -26,7 +25,6 @@ A **router** (gating network) decides which experts process each token, so only 
 5. **Output aggregation:** their outputs are merged as a **weighted sum** using the router's probabilities.
 6. **Forward propagation:** the combined output moves on to the next transformer layer.
 
-*Figure: token routing through expert networks in an MoE layer — tokens flow through the router to the selected experts.*
 
 ## Key Components
 
@@ -49,7 +47,6 @@ Prevents **expert collapse**, where the router sends most tokens to one or two e
 - **Expert capacity** limits on how many tokens an expert can process per batch.
 - A **router z-loss** that prevents extreme routing logits (introduced in Google's ST-MoE).
 
-*Figure: MoE layer detailed (Switch layer) — the router selects experts per token and combines their outputs with learned weights.*
 
 ## Advantages of MoE
 
@@ -388,7 +385,6 @@ for layer_idx, logits in enumerate(router_logits):
 - Grok-1 open weights: https://github.com/xai-org/grok-1
 - DeepSeek-V3 model: https://huggingface.co/deepseek-ai/DeepSeek-V3
 
-Images on the original page are credited to Hugging Face, Mistral AI and public research.
 
 ## Key concepts worth simulating
 

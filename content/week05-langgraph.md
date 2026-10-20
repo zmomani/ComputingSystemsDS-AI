@@ -5,7 +5,6 @@ source: https://albanna-tutorials.com/langgraph.html
 ---
 # LangGraph
 
-> Material by Dr. Abedal-Kareem Al-Banna (ilmy / albanna-tutorials.com). Original page: "LangGraph Step-by-Step Tutorial | Week 5" — an 11-step tutorial.
 
 ## Step 1: Introduction to LangGraph
 

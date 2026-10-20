@@ -28,7 +28,7 @@
 <p>Visual Guide to MCP. Level: Intermediate · ~25 min.</p>
 </blockquote>
 <h2 id="introduction">Introduction</h2>
-<p>The Model Context Protocol is changing how AI assistants connect to data sources and tools. <strong>Think of it as a USB-C for AI</strong>: just as USB-C gives devices one standard way to connect, MCP gives AI systems one standard way to connect to data — a universal connector that standardizes integration. <em>Figure: Visual Guide to MCP</em></p>
+<p>The Model Context Protocol is changing how AI assistants connect to data sources and tools. <strong>Think of it as a USB-C for AI</strong>: just as USB-C gives devices one standard way to connect, MCP gives AI systems one standard way to connect to data — a universal connector that standardizes integration.</p>
 <h3 id="why-mcp-matters">Why MCP matters</h3>
 <ul>
 <li>Standardizes how AI models connect to data sources.</li>
@@ -45,7 +45,7 @@
 - <strong>Interoperable</strong> — works across different LLM providers.
 - <strong>Extensible</strong> — adapts to many kinds of data sources.</p>
 <h2 id="mcp-architecture">MCP Architecture</h2>
-<p>MCP uses a <strong>client–server</strong> design with three components. <em>Figure: General MCP architecture showing the relationship between components</em></p>
+<p>MCP uses a <strong>client–server</strong> design with three components.</p>
 <table>
 <thead>
 <tr>
@@ -71,9 +71,8 @@
 <p><strong>Data sources</strong>
 - <strong>Local data sources</strong> — files, databases, and services on your computer. MCP servers can access them without sending the data to external services.
 - <strong>Remote services</strong> — external systems reached over the internet through APIs, e.g. GitHub, Slack, weather services.</p>
-<p>The design is modular, and sensitive data stays within your security boundaries. <em>Figure: Animated visualization of MCP data flow</em></p>
+<p>The design is modular, and sensitive data stays within your security boundaries.</p>
 <h2 id="how-mcp-works">How MCP Works</h2>
-<p><em>Figure: MCP workflow showing interaction between components</em></p>
 <ol>
 <li><strong>User query</strong> — the user asks an AI assistant a question through an MCP host such as Claude Desktop.</li>
 <li><strong>AI determines context needs</strong> — the model recognizes it needs more information and identifies which servers may have it.</li>
@@ -89,14 +88,14 @@
 - <strong>Access controls</strong> — built-in authentication and authorization protect data sources.</p>
 <h2 id="implementation-examples">Implementation Examples</h2>
 <h3 id="example-1-accessing-local-files">Example 1: Accessing local files</h3>
-<p><em>Scenario:</em> a user asks Claude to analyze a spreadsheet on their local machine. <em>Figure: Example of MCP in action with Claude</em>
+<p><em>Scenario:</em> a user asks Claude to analyze a spreadsheet on their local machine.
 1. Claude recognizes it needs local files.
 2. The host queries the Local Files MCP server.
 3. The server opens the file <strong>with the user's permission</strong>.
 4. Claude receives the file content in a standard format.
 5. Claude analyzes the data and responds.</p>
 <h3 id="example-2-integrating-with-github">Example 2: Integrating with GitHub</h3>
-<p><em>Scenario:</em> a developer asks an AI coding assistant to explain recent changes in a GitHub repository. <em>Figure: Detailed example of MCP implementation flow</em>
+<p><em>Scenario:</em> a developer asks an AI coding assistant to explain recent changes in a GitHub repository.
 1. The AI recognizes it needs GitHub data.
 2. The host connects to the GitHub MCP server.
 3. The server authenticates with GitHub and retrieves the commit history.
@@ -140,7 +139,6 @@ def read_file(path: str) -&gt; str:
 if __name__ == &quot;__main__&quot;:
     mcp.run()</code></pre></div>
 <h3 id="available-servers">Available servers</h3>
-<p><em>Figure: Claude Desktop MCP implementation</em></p>
 <table>
 <thead>
 <tr>
@@ -184,7 +182,6 @@ if __name__ == &quot;__main__&quot;:
 </tbody>
 </table>
 <h2 id="benefits-of-mcp">Benefits of MCP</h2>
-<p><em>Figure: How MCP enhances AI capabilities and security</em></p>
 <p><strong>For developers</strong>
 - Simplified integration — one protocol works with multiple AI models.
 - Modularity — components can be built and maintained independently.
@@ -207,7 +204,6 @@ if __name__ == &quot;__main__&quot;:
 - Advanced AI workflows that span multiple systems.
 - Context-awareness that carries across different applications.</p>
 <h2 id="use-cases">Use Cases</h2>
-<p><em>Figure: Various MCP applications across industries</em></p>
 <table>
 <thead>
 <tr>

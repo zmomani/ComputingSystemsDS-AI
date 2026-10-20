@@ -7,11 +7,10 @@ source: https://albanna-tutorials.com/mcp.html
 
 > Visual Guide to MCP. Level: Intermediate · ~25 min.
 >
-> Course page by Dr. Abdulkarim Albanna (Al-banna Tutorials). The page's diagrams (MCP Overview, MCP Architecture, MCP Flow Animation, MCP Workflow, MCP Example Flow, Claude Desktop MCP implementation, MCP Architecture Benefits, MCP Use Cases) are described in italic captions where they appear.
 
 ## Introduction
 
-The Model Context Protocol is changing how AI assistants connect to data sources and tools. **Think of it as a USB-C for AI**: just as USB-C gives devices one standard way to connect, MCP gives AI systems one standard way to connect to data — a universal connector that standardizes integration. *Figure: Visual Guide to MCP*
+The Model Context Protocol is changing how AI assistants connect to data sources and tools. **Think of it as a USB-C for AI**: just as USB-C gives devices one standard way to connect, MCP gives AI systems one standard way to connect to data — a universal connector that standardizes integration.
 
 ### Why MCP matters
 - Standardizes how AI models connect to data sources.
@@ -32,7 +31,7 @@ MCP is an open standard introduced by Anthropic in November 2024 for connecting 
 
 ## MCP Architecture
 
-MCP uses a **client–server** design with three components. *Figure: General MCP architecture showing the relationship between components*
+MCP uses a **client–server** design with three components.
 
 | Component | Role |
 |---|---|
@@ -44,11 +43,10 @@ MCP uses a **client–server** design with three components. *Figure: General MC
 - **Local data sources** — files, databases, and services on your computer. MCP servers can access them without sending the data to external services.
 - **Remote services** — external systems reached over the internet through APIs, e.g. GitHub, Slack, weather services.
 
-The design is modular, and sensitive data stays within your security boundaries. *Figure: Animated visualization of MCP data flow*
+The design is modular, and sensitive data stays within your security boundaries.
 
 ## How MCP Works
 
-*Figure: MCP workflow showing interaction between components*
 
 1. **User query** — the user asks an AI assistant a question through an MCP host such as Claude Desktop.
 2. **AI determines context needs** — the model recognizes it needs more information and identifies which servers may have it.
@@ -66,7 +64,7 @@ The design is modular, and sensitive data stays within your security boundaries.
 ## Implementation Examples
 
 ### Example 1: Accessing local files
-*Scenario:* a user asks Claude to analyze a spreadsheet on their local machine. *Figure: Example of MCP in action with Claude*
+*Scenario:* a user asks Claude to analyze a spreadsheet on their local machine.
 1. Claude recognizes it needs local files.
 2. The host queries the Local Files MCP server.
 3. The server opens the file **with the user's permission**.
@@ -74,7 +72,7 @@ The design is modular, and sensitive data stays within your security boundaries.
 5. Claude analyzes the data and responds.
 
 ### Example 2: Integrating with GitHub
-*Scenario:* a developer asks an AI coding assistant to explain recent changes in a GitHub repository. *Figure: Detailed example of MCP implementation flow*
+*Scenario:* a developer asks an AI coding assistant to explain recent changes in a GitHub repository.
 1. The AI recognizes it needs GitHub data.
 2. The host connects to the GitHub MCP server.
 3. The server authenticates with GitHub and retrieves the commit history.
@@ -106,7 +104,6 @@ if __name__ == "__main__":
 ```
 
 ### Available servers
-*Figure: Claude Desktop MCP implementation*
 
 | Server | What it connects to |
 |---|---|
@@ -121,7 +118,6 @@ if __name__ == "__main__":
 
 ## Benefits of MCP
 
-*Figure: How MCP enhances AI capabilities and security*
 
 **For developers**
 - Simplified integration — one protocol works with multiple AI models.
@@ -150,7 +146,6 @@ if __name__ == "__main__":
 
 ## Use Cases
 
-*Figure: Various MCP applications across industries*
 
 | Domain | Applications |
 |---|---|

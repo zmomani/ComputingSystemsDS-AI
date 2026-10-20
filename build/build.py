@@ -88,7 +88,7 @@ WEEKS = [
 ]
 EXTRA_PAGES = [
   dict(slug='syllabus', title='Course Syllabus', files=['syllabus.md'], sims=[]),
-  dict(slug='project', title='Final Project: Multi-Agent Research Assistant', files=['project.md'], sims=['multi-agent', 'langgraph', 'react-loop']),
+  dict(slug='project', title='Final Project: Multi-Agent Research Assistant', files=['project.md', 'project-setup.md'], sims=['multi-agent', 'langgraph', 'react-loop']),
 ]
 
 # Simulation catalogue (mirrors the JS registry; used for cards and the index page)
@@ -599,7 +599,7 @@ def lesson_shell(title, active_slug, prev, nxt, inner, sims):
 def lesson_page(w, prev, nxt):
     body, snippets = render_body(w['files'])
     if not w['files']:
-        note = ('This lesson is marked <b>Coming Soon</b> on the original course site. Until it is published, use the topics, the milestone and the animations below.' if w.get('soon')
+        note = ('The full notes for this lesson are coming soon. Until then, use the topics, the milestone and the animations below.' if w.get('soon')
                 else 'Exam week. Use the animations below to revise the mechanisms covered so far.' if w.get('exam')
                 else 'Project week. The milestone and the pipeline animation are the reference for what is due.')
         body = f'<blockquote><p>{note}</p></blockquote><h2 id="topics">Topics</h2><p>{html.escape(w["topics"])}</p><h2 id="milestone">Project milestone</h2><p>{html.escape(w["milestone"])}</p>'

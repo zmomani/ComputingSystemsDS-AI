@@ -7,8 +7,6 @@ source: https://albanna-tutorials.com/transformer-step-by-step.html
 
 *Intermediate · ~30 minutes · AI Applications*
 
-*Material by Dr. Abdulkarim Albanna (Dr. Abedal-Kareem Al-Banna), Assistant Professor, Data Science & AI, University of Petra — ilmy / albanna-tutorials.com. Reproduced here for teaching use with the explanatory prose kept as close to the original; the worked-example arithmetic has been checked and recomputed where necessary.*
-
 In this guide we follow **one example sentence** through the whole Transformer, computing every stage by hand with small example numbers:
 
 > **Input (English):** I love learning
@@ -362,5 +360,3 @@ The word with the highest probability, **"التعلم"**, is selected.
 
 ---
 
-*Prepared by Dr. Abdulkarim Albanna — AI Applications Course.*
-*Related pages on the original site: [Transformer Overview](https://albanna-tutorials.com/transformer.html) · [Transformer Q&A](https://albanna-tutorials.com/transformer-qa.html) · [الشرح بالعربي](https://albanna-tutorials.com/transformer-step-by-step-ar.html)*

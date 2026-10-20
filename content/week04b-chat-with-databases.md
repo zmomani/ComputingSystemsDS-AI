@@ -5,7 +5,6 @@ source: https://albanna-tutorials.com/database.html
 ---
 # Chat with Databases
 
-> Material by Dr. Abedal-Kareem Al-Banna (ilmy / albanna-tutorials.com). Original page: "LangChain Database Chat" — Intermediate level, about 20 minutes. Code listings use 4-space indentation and current LangChain / LangGraph APIs.
 
 ## Introduction
 

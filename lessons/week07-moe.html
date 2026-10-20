@@ -30,7 +30,6 @@
 <blockquote>
 <p>"Mixture of Experts enable models to be pretrained with far less compute, which means you can dramatically scale up the model or dataset size with the same compute budget as a dense model." — Hugging Face blog</p>
 </blockquote>
-<p><em>Figure: Mixture of Experts diagram — multiple specialized expert networks with a routing mechanism that selects the best experts for each token.</em></p>
 <h2 id="how-moe-works-in-llms">How MoE Works in LLMs</h2>
 <ol>
 <li><strong>Input processing:</strong> the token embedding enters the MoE layer inside a transformer block.</li>
@@ -40,7 +39,6 @@
 <li><strong>Output aggregation:</strong> their outputs are merged as a <strong>weighted sum</strong> using the router's probabilities.</li>
 <li><strong>Forward propagation:</strong> the combined output moves on to the next transformer layer.</li>
 </ol>
-<p><em>Figure: token routing through expert networks in an MoE layer — tokens flow through the router to the selected experts.</em></p>
 <h2 id="key-components">Key Components</h2>
 <h3 id="experts">Experts</h3>
 <ul>
@@ -62,7 +60,6 @@
 - An <strong>auxiliary loss</strong> that penalizes uneven routing.
 - <strong>Expert capacity</strong> limits on how many tokens an expert can process per batch.
 - A <strong>router z-loss</strong> that prevents extreme routing logits (introduced in Google's ST-MoE).</p>
-<p><em>Figure: MoE layer detailed (Switch layer) — the router selects experts per token and combines their outputs with learned weights.</em></p>
 <h2 id="advantages-of-moe">Advantages of MoE</h2>
 <ol>
 <li><strong>Improved scalability:</strong> models can reach hundreds of billions of parameters while activating only a fraction per token.</li>
@@ -692,7 +689,6 @@ for layer_idx, logits in enumerate(router_logits):
 <li>Grok-1 open weights: https://github.com/xai-org/grok-1</li>
 <li>DeepSeek-V3 model: https://huggingface.co/deepseek-ai/DeepSeek-V3</li>
 </ul>
-<p>Images on the original page are credited to Hugging Face, Mistral AI and public research.</p>
 <h2 id="try-it-yourself">Try it yourself</h2>
 <p class="lesson-intro"><b>▶ Try it</b> runs an example in the editor panel, inside your browser — change the code and press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to run it again. Examples that use PyTorch, Transformers, LangChain or an API cannot run in a browser: press <b>⧉ Open in Codespaces</b> and run them in the course environment (this lesson's code is in <code>notebooks/</code>).</p><h3 id="run-in-your-browser">Run in your browser</h3><p class="lesson-intro">Self-contained versions of this week's mechanisms, written with NumPy, scikit-learn or plain Python so they run here.</p><div class="runnable"><div class="code-title">A Mixture-of-Experts layer with top-2 routing (NumPy)</div><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden>import numpy as np
 

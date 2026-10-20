@@ -28,18 +28,19 @@
 <blockquote>
 <p>Explore the fascinating world of Large Language Model Agents. Level: Intermediate · ~30 min.</p>
 </blockquote>
+<p>This lesson follows the tutorial <a href="https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-llm-agents"><em>A Visual Guide to LLM Agents</em></a> by Maarten Grootendorst — read it alongside this page for its many diagrams.</p>
 <h2 id="1-introduction-to-llms">1. Introduction to LLMs</h2>
 <ul>
 <li>Traditionally, a Large Language Model does nothing more than <strong>predict the next token</strong>. By sampling many tokens in a row, the model can mimic a conversation and give longer answers.</li>
 <li>Two main limitations motivate agents:</li>
-<li><strong>No memory between conversations.</strong> An LLM does not remember what was said earlier; a follow-up question cannot be connected to the previous exchange (figure: "LLM Memory Limitation").</li>
-<li><strong>Weak basic arithmetic.</strong> LLMs often fail at basic multiplication and division (figure: "LLM Math Limitation").</li>
+<li><strong>No memory between conversations.</strong> An LLM does not remember what was said earlier; a follow-up question cannot be connected to the previous exchange.</li>
+<li><strong>Weak basic arithmetic.</strong> LLMs often fail at basic multiplication and division.</li>
 <li>This does not make LLMs bad. They do not need to do everything, because <strong>external tools, memory, and retrieval systems</strong> can compensate for these gaps.</li>
 </ul>
 <h2 id="2-augmented-llms-agents">2. Augmented LLMs &amp; Agents</h2>
 <ul>
-<li>Anthropic calls an LLM extended with external systems (tools, memory, retrieval) an <strong>Augmented LLM</strong>. For example, the model can call a calculator rather than do multiplication itself (figure: "Tool Use Example").</li>
-<li>The page uses the Russell &amp; Norvig definition (<em>AI: A Modern Approach</em>, 2016): an agent is <em>anything that can be viewed as perceiving its environment through sensors and acting upon that environment through actuators</em>.</li>
+<li>Anthropic calls an LLM extended with external systems (tools, memory, retrieval) an <strong>Augmented LLM</strong>. For example, the model can call a calculator rather than do multiplication itself.</li>
+<li>This lesson uses the Russell &amp; Norvig definition (<em>AI: A Modern Approach</em>, 2016): an agent is <em>anything that can be viewed as perceiving its environment through sensors and acting upon that environment through actuators</em>.</li>
 </ul>
 <table>
 <thead>
@@ -69,7 +70,7 @@
 </table>
 <ul>
 <li>Because LLMs are textual models, an LLM agent <strong>observes the environment through textual input</strong> and <strong>acts through tools</strong> (e.g. searching the web). The Augmented LLM is a generalization of this framework: the LLM handles understanding and planning, tools handle actions, and memory tracks what has been done (figures: "Agent Framework", "Augmented LLM Framework", "Agent Components").</li>
-<li><strong>Autonomy levels.</strong> Agents vary in their degree of autonomy. The more the LLM decides how the system behaves, the more "agentic" the system is (figure: "Agent Autonomy Levels"). Tool use can follow a fixed order set by the framework, or the LLM can choose which tool to use and when.</li>
+<li><strong>Autonomy levels.</strong> Agents vary in their degree of autonomy. The more the LLM decides how the system behaves, the more "agentic" the system is. Tool use can follow a fixed order set by the framework, or the LLM can choose which tool to use and when.</li>
 </ul>
 <h2 id="3-memory-systems">3. Memory Systems</h2>
 <ul>
@@ -79,7 +80,7 @@
 <ul>
 <li>A buffer for the (near-)immediate context, including the agent's recent actions.</li>
 <li>The most straightforward implementation is the <strong>context window</strong> — the number of tokens the LLM can process. The LLM is effectively <em>told</em> what the conversation was rather than memorizing it (figures: "Context Window", "Context Window Memory").</li>
-<li><strong>Summarization:</strong> for smaller context windows or large histories, another LLM summarizes the conversation so far (figure: "Memory Summarization").</li>
+<li><strong>Summarization:</strong> for smaller context windows or large histories, another LLM summarizes the conversation so far.</li>
 </ul>
 <h3 id="long-term-memory">Long-term memory</h3>
 <ul>
@@ -87,7 +88,7 @@
 <li>Common technique: store all previous interactions, actions, and conversations in an <strong>external vector database</strong>; retrieve relevant pieces when needed. This is <strong>Retrieval-Augmented Generation (RAG)</strong> (figures: "Vector Database Creation", "Vector Database Retrieval").</li>
 </ul>
 <h3 id="memory-types-coala">Memory types (CoALA)</h3>
-<p>The paper <em>Cognitive Architectures for Language Agents</em> (CoALA) couples four psychological memory types — working, episodic, semantic and procedural — to LLM agents. Two are defined on the page:</p>
+<p>The paper <em>Cognitive Architectures for Language Agents</em> (CoALA) couples four psychological memory types — working, episodic, semantic and procedural — to LLM agents. Two of them matter most here:</p>
 <table>
 <thead>
 <tr>
@@ -106,13 +107,13 @@
 </tr>
 </tbody>
 </table>
-<p>Different information can live in different stores — e.g. semantic memory kept separate from working memory — which helps when designing agent frameworks (figure: "Memory Types").</p>
+<p>Different information can live in different stores — e.g. semantic memory kept separate from working memory — which helps when designing agent frameworks.</p>
 <h2 id="4-tools-interaction">4. Tools &amp; Interaction</h2>
 <ul>
-<li>Tools let an LLM interact with an external environment (a database) or run external applications (custom code). Two categories (figure: "Tool Types"):</li>
+<li>Tools let an LLM interact with an external environment (a database) or run external applications (custom code). Two categories:</li>
 <li><strong>Fetching data</strong> — retrieve up-to-date information.</li>
 <li><strong>Taking action</strong> — e.g. scheduling a meeting or ordering food.</li>
-<li>To use a tool, the LLM generates text matching the tool's API, usually <strong>JSON</strong>, so a code interpreter can execute it (figure: "JSON Tool Call"). Illustrative shape of such a call:</li>
+<li>To use a tool, the LLM generates text matching the tool's API, usually <strong>JSON</strong>, so a code interpreter can execute it. Illustrative shape of such a call:</li>
 </ul>
 <div class="codeblock"><button class="copy">Copy</button><pre><code class="language-json">{&quot;name&quot;: &quot;multiply&quot;, &quot;arguments&quot;: {&quot;a&quot;: 123, &quot;b&quot;: 456}}</code></pre></div>
 <ul>
@@ -122,7 +123,7 @@
 <li><strong>Toolformer</strong> — one of the first approaches to train a model to decide which APIs to call and how (three-step figure series).</li>
 <li><strong>ToolLLM</strong> — LLMs using thousands of tools.</li>
 <li><strong>Gorilla</strong> — LLMs easily retrieving the most relevant tools.</li>
-<li><strong>Model Context Protocol (MCP):</strong> Anthropic developed MCP to make tools easier to implement across agentic frameworks; it standardizes API access for services such as weather apps and GitHub (figure: "MCP Components"). See Week 11.</li>
+<li><strong>Model Context Protocol (MCP):</strong> Anthropic developed MCP to make tools easier to implement across agentic frameworks; it standardizes API access for services such as weather apps and GitHub. See Week 11.</li>
 </ul>
 <h2 id="5-planning-reasoning">5. Planning &amp; Reasoning</h2>
 <ul>
@@ -206,7 +207,7 @@
 </tr>
 </tbody>
 </table>
-<p>The growth of these frameworks has been explosive (figure: "Framework Growth").</p>
+<p>The growth of these frameworks has been explosive.</p>
 <h2 id="7-conclusion">7. Conclusion</h2>
 <p>LLM Agents combine the language understanding of LLMs with the ability to interact with an environment through tools, keep information in memory, and plan complex actions. Areas of ongoing progress:</p>
 <ul>
@@ -223,6 +224,7 @@
 <blockquote>
 <p>Standardizing communication between AI agents and data sources. Level: Intermediate · AI Agents · ~25 min.</p>
 </blockquote>
+<p>Google's Agent2Agent (A2A) protocol and Anthropic's Model Context Protocol (MCP) are two complementary protocols that are changing how AI systems interact.</p>
 <h2 id="a2a-agent2agent-protocol">A2A (Agent2Agent Protocol)</h2>
 <p>A2A is an open protocol announced by Google in April 2025. It is designed to let AI agents communicate and interoperate regardless of the framework or vendor they are built on. More than 50 technology and service partners support it, including Atlassian, Box, Cohere, Intuit, LangChain, MongoDB, PayPal, Salesforce, SAP, and ServiceNow.</p>
 <h3 id="design-principles">Design principles</h3>
