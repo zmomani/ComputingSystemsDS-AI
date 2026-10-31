@@ -26,7 +26,7 @@ WEEKS = [
        topics='Transformer architecture, encoder-decoder framework, Hugging Face ecosystem',
        milestone='Form teams, create the GitHub repo, set up the project and API keys, write a Transformer analysis',
        files=['week01-transformer.md', 'week01b-transformer-step-by-step.md', 'week01c-transformer-qa.md'],
-       sims=['attention', 'qkv', 'multihead', 'decoder', 'matrix-multiply', 'vectors', 'tokenizer', 'positional']),
+       sims=['attention', 'pronoun', 'qkv', 'multihead', 'decoder', 'matrix-multiply', 'vectors', 'tokenizer', 'positional']),
   dict(n=2, slug='week02-text-classification', title='Text Classification', ilo='K1, P1',
        topics='Text classification, sentiment analysis, feature extraction vs. fine-tuning, evaluation metrics',
        milestone='Classification Agent that labels sources by type and relevance; evaluate on 20+ sources',
@@ -96,6 +96,7 @@ SIMS = {
   'matrix-multiply': ('Matrix multiplication, step by step', 'Linear algebra', 'Row of A × column of B, one cell at a time, with the running sum.'),
   'vectors': ('Vectors, dot product & cosine similarity', 'Linear algebra', 'Drag two vectors; see u+v, u·v, θ and cos θ — the geometry behind embeddings.'),
   'attention': ('Self-attention: Q·Kᵀ → softmax → ·V', 'Transformers', 'Five stages of scaled dot-product attention on a 4-token sentence, with heatmaps.'),
+  'pronoun': ('Attention: what does “it” refer to?', 'Transformers', 'Same sentence, one word changed (tired / soft): watch “it” move its attention between cat and mat.'),
   'qkv': ('Query, key and value for one word', 'Transformers', 'Project to Q, K, V, score q·k against every key, softmax, then mix the values.'),
   'multihead': ('Multi-head attention', 'Transformers', 'One query word through three heads: project, attend, mix, concatenate, W_O.'),
   'decoder': ('Decoder: masked and cross-attention', 'Transformers', 'Causal mask, cross-attention to the encoder, next-word softmax; inference loop vs. training.'),
@@ -113,7 +114,7 @@ SIMS = {
   'lam': ('Browser agent: perceive → plan → act', 'LAMs', 'A mock browsing task with allowlist and no-payment gates.'),
   'diffusion': ('Diffusion: noising & denoising', 'Diffusion', 'Scrub t under a β schedule, read ᾱ_t and SNR, then denoise step by step.'),
 }
-SIM_FILES = ['matrix-multiply', 'vectors', 'attention', 'qkv', 'multihead', 'decoder', 'tokenizer', 'positional', 'classifier', 'bio-tagging', 'rag', 'langgraph', 'sampling', 'moe', 'react-loop', 'multi-agent', 'mcp', 'lam', 'diffusion']
+SIM_FILES = ['matrix-multiply', 'vectors', 'attention', 'pronoun', 'qkv', 'multihead', 'decoder', 'tokenizer', 'positional', 'classifier', 'bio-tagging', 'rag', 'langgraph', 'sampling', 'moe', 'react-loop', 'multi-agent', 'mcp', 'lam', 'diffusion']
 
 
 # ---------------------------------------------------------------- runnability

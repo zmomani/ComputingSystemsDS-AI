@@ -57,7 +57,7 @@ with sync_playwright() as p:
         for _ in range(3):
             nxt = pg.locator('#anim-host button', has_text='Next')
             if nxt.count() and nxt.first.is_enabled(): nxt.first.click(); pg.wait_for_timeout(100)
-        if not pg.locator('#anim-host canvas').count(): fails.append(f'animation {sid} did not render')
+        if not pg.locator('#anim-host canvas, #anim-host svg').count(): fails.append(f'animation {sid} did not render')
         pg.locator('#workbench').screenshot(path=str(SHOTS / f'panel_{sid}.png'))
     print('animations rendered in panel:', len(ids) - sum('animation' in f for f in fails), '/', len(ids))
     pg.screenshot(path=str(SHOTS / 'lesson_anim.png'))

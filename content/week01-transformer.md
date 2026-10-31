@@ -132,7 +132,7 @@ Self-attention lets every position in a sequence attend to every other position.
 
 The scaling by √d_k keeps the dot products from growing large and pushing softmax into regions with extremely small gradients.
 
-For example, in **"The cat sat on the mat because it was comfortable."** the word "it" attends strongly to "cat" and "mat" — attention is how the model resolves what "it" refers to. Open the **Self-attention** animation at the top of this lesson to follow the computation step by step.
+For example, take **"The cat sat on the mat because it was tired."** The word "it" refers to the cat: being tired fits a living thing, not a mat. Change one word, **"The cat sat on the mat because it was soft."**, and "it" now refers to the mat. A model has to use context to tell the two apart, and attention is how it does so: "it" puts most of its attention on the word it refers to. Open the **Attention: what does "it" refer to?** animation to compare the two sentences (the attention values there are illustrative), and the **Self-attention** animation to follow the computation step by step.
 
 ### Multi-head attention
 
@@ -422,7 +422,7 @@ Transformers have changed AI, enabling advances in language understanding, gener
 
 ## Key concepts worth simulating
 
-- **Scaled dot-product attention, step by step:** tokens → Q/K/V projections, Q·Kᵀ score matrix, divide by √d_k, row-wise softmax, weighted sum of V. Show the (seq × seq) heatmap for "The cat sat on the mat because it was comfortable." and let the user click a query word.
+- **Scaled dot-product attention, step by step:** tokens → Q/K/V projections, Q·Kᵀ score matrix, divide by √d_k, row-wise softmax, weighted sum of V. Show the (seq × seq) heatmap for "The cat sat on the mat because it was tired." and for the "soft" version and let the user click a query word.
 - **Why scale by √d_k:** animate how the softmax of random dot products saturates (near one-hot) as d_k grows without scaling, and stays soft with scaling.
 - **Multi-head attention:** split embed_size into h heads (reshape/permute), run h independent attention maps side by side on "The movie was great but too long.", concatenate, project with W^O. Toggle heads 1–4 and show each head's pattern.
 - **Sinusoidal positional encoding heatmap:** PE(pos, 2i)=sin, PE(pos, 2i+1)=cos; vary sequence length (5/25/50) and d_model (8/32/64); show that the dot product between PE vectors depends on relative offset.
