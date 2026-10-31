@@ -25,7 +25,7 @@ Sims.register('heads', {
       { label: 'Step 4 · Mix' },
       { label: 'Step 5 · Concatenate' }
     ];
-    let h = 0, q = 8, stage = 0, showNums = false, tips = [], St;
+    let h = 0, q = 8, stage = 0, showNums = true, tips = [], St;
 
     const stops = [[59, 76, 192], [141, 176, 254], [221, 221, 221], [244, 154, 123], [180, 4, 38]];
     const rgb = t => { t = Math.max(0, Math.min(1, t)); const i = Math.min(3, Math.floor(t * 4)), f = t * 4 - i, a = stops[i], b = stops[i + 1]; return [0, 1, 2].map(k => Math.round(a[k] + (b[k] - a[k]) * f)); };
@@ -70,7 +70,7 @@ Sims.register('heads', {
     const wrap = L.stage.querySelector('.hd-wrap'), tip = wrap.querySelector('.pr-tip'), svg = wrap.querySelector('.pr-svg');
     const pipe = wrap.querySelector('.hd-pipe'), out = wrap.querySelector('.hd-out'), right = wrap.querySelector('.hd-right');
     const rl = wrap.querySelector('.pr-rl'), cells = wrap.querySelector('.pr-cells'), colnums = wrap.querySelector('.pr-colnums'), mtitle = wrap.querySelector('.pr-mtitle');
-    const numBox = wrap.querySelector('.pr-num input');
+    const numBox = wrap.querySelector('.pr-num input'); numBox.checked = true;
     colnums.style.gridTemplateColumns = cells.style.gridTemplateColumns = 'repeat(' + n + ', var(--c))';
     wrap.querySelector('.pr-scale').innerHTML = [0, 0.25, 0.5, 0.75, 1].map(t => `<i style="background:${heat(t)}"></i>`).join('');
 
@@ -129,12 +129,13 @@ Sims.register('heads', {
       let x0 = (560 - total) / 2; const xs = wd.map(v => { const c = x0 + v / 2; x0 += v + gap; return c; });
       const y0 = 130, mxo = Math.max(...row.filter((v, i) => i !== q));
       let s = '';
-      if (stage >= 2) {
+      {
+        const fade = stage < 2 ? 0.55 : 1;
         toks.forEach((t, j) => {
           if (j === q) return;
           const wt = row[j], nm = wt / mxo, id = T('<b>' + hd.n + ': “' + toks[q] + '” → “' + t + '”</b><br>attention ' + wt.toFixed(2) + ' (' + Math.round(wt * 100) + '% of its total)');
           const d = arcPath(xs[q], xs[j], y0);
-          s += `<path d="${d}" fill="none" stroke="${heat(nm)}" stroke-width="${(1 + wt * 16).toFixed(1)}" stroke-linecap="round" opacity="${(0.3 + 0.7 * nm).toFixed(2)}"/>`;
+          s += `<path d="${d}" fill="none" stroke="${heat(nm)}" stroke-width="${(1 + wt * 16).toFixed(1)}" stroke-linecap="round" opacity="${((0.3 + 0.7 * nm) * fade).toFixed(2)}"/>`;
           s += `<path d="${d}" fill="none" stroke="transparent" stroke-width="14" data-t="${id}" style="cursor:pointer"/>`;
         });
         const sid = T('<b>' + hd.n + ': “' + toks[q] + '” → itself</b><br>attention ' + row[q].toFixed(2) + '. Words usually keep some attention for themselves; the short tick shows it.');
@@ -168,10 +169,10 @@ Sims.register('heads', {
         let note = '<b>' + hd.n + ': “' + toks[i] + '” → “' + toks[j] + '”</b><br>attention ' + v.toFixed(2) + ' (' + Math.round(v * 100) + '%)';
         if (vital) note = vitalNote[h](v.toFixed(2));
         el.setAttribute('data-t', T(note));
-        if (stage >= 2) { el.style.background = heat(a); el.style.color = isDark(a) ? '#fff' : '#222'; }
-        else { el.style.background = '#eef0f3'; }
+        el.style.background = heat(a); el.style.color = isDark(a) ? '#fff' : '#222';
+        if (stage < 2) el.style.opacity = 0.55;
         if (i === q) el.className = 'pr-qrow';
-        el.textContent = stage >= 2 ? ((showNums ? v.toFixed(2).slice(1) : '') + (vital ? '★' : '')) : '';
+        el.textContent = (showNums ? v.toFixed(2).slice(1) : '') + (vital ? '★' : '');
         if (vital) el.classList.add('pr-vital');
         cells.appendChild(el);
       }));
@@ -185,7 +186,7 @@ Sims.register('heads', {
     function explain() {
       const w = toks[q], hd = heads[h], row = Ms[h][q], to = topOther(row, q);
       const txt = [
-        `The sentence enters all at once (the first clause of the sentence in Figure 4 of the original Transformer paper). Choose the <b>query word</b>; “its” is the interesting one. Press Next.`,
+        `The sentence enters all at once (the first clause of the sentence in Figure 4 of the original Transformer paper). Choose the <b>query word</b>; “its” is the interesting one. The arcs and matrix are shown faded here: they are the result of step 3, shown early so you can see where we are heading. Press Next.`,
         `Every head has its <b>own</b> W<sub>Q</sub>, W<sub>K</sub>, W<sub>V</sub>. The same word “<b>${w}</b>” becomes a different query in each head, and every word gets a different key and value per head.`,
         `Each head scores the words differently, then softmax. <b>${hd.n} (${hd.rel})</b>: “${w}” puts most of its attention on “${toks[to[1]]}” (${to[0].toFixed(2)})` + (to[0] > 0.3 ? '. Switch to another head and watch where “its” looks.' : '. This head has no special relation for this word, so it stays near itself and its neighbours. Try “its”.'),
         `Each head returns a weighted sum of <i>its own</i> value vectors: <b>z<sub>h</sub> = Σ attention · V<sub>h</sub></b>. That gives one vector per head for “<b>${w}</b>”.`,
@@ -200,12 +201,16 @@ Sims.register('heads', {
     L.setLegend([['#6a3fa0', 'Head 1 · coreference'], ['#1e7f4f', 'Head 2 · determiner'], ['#c8862b', 'Head 3 · possessive']]);
     L.setNotes(`<p><b>Where the sentence comes from.</b> “The Law will never be perfect, but its application should be just” is the start of the sentence used in Figures 4 and 5 of Vaswani et al. (2017), <i>Attention Is All You Need</i>, which show heads in layer 5 that attend sharply from “its” to “Law”.</p><p><b>Where the head types come from.</b> Clark et al. (2019), <i>What Does BERT Look At?</i>, found BERT heads that attend from determiners to nouns (head 8-11, 94.3%), from possessive pronouns to the noun they modify (7-6, 80.5%), and that resolve coreference (5-4, about 65%).</p><p><b>What is simplified.</b> Those findings come from different models and layers. Here they are shown together as three heads of one layer, with hand-set attention values, to teach the idea. Real heads are rarely this clean, and many are redundant or hard to interpret.</p><p><b>Two meanings of “weight”.</b> W<sub>Q</sub>, W<sub>K</sub>, W<sub>V</sub> and W<sub>O</sub> are learned weight matrices. The numbers in the matrix are <i>attention</i>, computed per sentence from Q and K.</p>`);
 
+    let autoOff = false;
     function fit() {
       const W = right.clientWidth; if (!W) return;
       const c = Math.max(14, Math.min(30, Math.floor((W - 108) / n - 2)));
       wrap.style.setProperty('--c', c + 'px');
-      numBox.disabled = c < 22; numBox.parentElement.style.opacity = c < 22 ? 0.5 : 1;
-      numBox.parentElement.title = c < 22 ? 'Not enough room for numbers at this width; hover a cell instead' : '';
+      const tight = c < 18;
+      if (tight && !numBox.disabled) { numBox.checked = false; showNums = false; autoOff = true; paint(); }
+      else if (!tight && numBox.disabled && autoOff) { numBox.checked = true; showNums = true; autoOff = false; paint(); }
+      numBox.disabled = tight; numBox.parentElement.style.opacity = c < 18 ? 0.5 : 1;
+      numBox.parentElement.title = c < 18 ? 'Not enough room for numbers at this width; hover a cell instead' : '';
     }
     const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(fit) : null;
     if (ro) ro.observe(right);
