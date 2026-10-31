@@ -62,7 +62,7 @@ Sims.register('heads', {
         </div>
         <div class="hd-right">
           <div class="pr-mtitle"></div>
-          <div class="pr-hint">Row = the word looking (its query). Column = the word looked at (its key). Each row sums to 1.</div>
+          <div class="pr-hint">Row = the word looking (its query). Column = the word looked at (its key). Each row sums to 1. <i>Illustrative values, set by hand to show the pattern; not measured from a real model.</i></div>
           <div class="pr-cols"><span class="pr-gap" style="flex-basis:76px"></span><div class="pr-colnums"></div></div>
           <div class="pr-mxbody"><div class="pr-rl" style="flex-basis:76px"></div><div class="pr-brk l"></div><div class="pr-cells"></div><div class="pr-brk r"></div></div>
           <label class="pr-num"><input type="checkbox"> Show the numbers in the cells</label>
