@@ -15,13 +15,16 @@ Each lesson page works like the Programming for Data Science tutorial: the lesso
 
 Every week also has a **Try it yourself** section with browser-runnable examples of that week's mechanisms (`content/browser-examples.py`).
 
-## Simulations (16)
+## Simulations (19)
 
 | Week | Simulation | What it shows |
 |---|---|---|
 | 1 | Matrix multiplication | Row × column, one cell at a time, running sum, dimension rule |
 | 1, 2, 4 | Vectors in the plane | Drag u and v: u+v, u·v, θ, cos θ, projection |
 | 1, 6 | Self-attention | Q·Kᵀ → /√d_k → softmax → ·V on a 4-token sentence, heatmaps |
+| 1 | Query, key and value | One word: project to Q, K, V, score against every key, softmax, mix the values |
+| 1 | Multi-head attention | One query word through three heads: project, attend, mix, concatenate, W_O |
+| 1 | Decoder | Causal mask, cross-attention to the encoder, next-word softmax; inference loop vs. training |
 | 1, 2, 6 | Subword tokenisation | Text → WordPiece-style tokens → IDs → embedding rows |
 | 1 | Positional encoding | Sinusoid heatmap and per-dimension waves |
 | 2, 3 | Classification head | Linear boundary trained live; threshold vs precision/recall/F1 |
