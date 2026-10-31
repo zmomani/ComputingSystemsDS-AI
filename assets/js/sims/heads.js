@@ -14,15 +14,15 @@ Sims.register('heads', {
     ];
     const sub = ['₁', '₂', '₃'];
     const vitalNote = [
-      v => `<b>★ Coreference: “its” → “Law” ${v}</b><br>The pronoun looks back at the noun it refers to. Vaswani et al. (2017, Fig. 4) show heads in layer 5 that attend sharply from “its” to “Law”. Clark et al. (2019) report a BERT head (5-4) that finds antecedents with about 65% accuracy.`,
-      v => `<b>★ Determiner → noun: “The” → “Law” ${v}</b><br>Clark et al. (2019): BERT head 8-11 attends from determiners to the noun they belong to, with 94.3% accuracy on a dependency test.`,
-      v => `<b>★ Possessive → noun: “its” → “application” ${v}</b><br>Clark et al. (2019): BERT head 7-6 attends from possessive pronouns to the noun they modify, with 80.5% accuracy.`
+      v => `<b>★ Coreference: “its” → “Law” ${v}</b><br>The pronoun looks back at the noun it refers to. Vaswani et al. (2017, Fig. 4) show heads in layer 5 that attend sharply from “its” to “Law”. Source for the head type: the Transformer paper. Supporting evidence from a different model: Clark et al. (2019) report a BERT head (layer 5, head 4) that finds antecedents with about 65% accuracy.`,
+      v => `<b>★ Determiner → noun: “The” → “Law” ${v}</b><br>Source: a study of BERT, not the Transformer paper. Clark et al. (2019): BERT head 8-11 (layer 8, head 11) attends from determiners to the noun they modify. The 94.3% is how often that head’s top choice was the right noun across a text collection, not an attention weight.`,
+      v => `<b>★ Possessive → noun: “its” → “application” ${v}</b><br>Source: a study of BERT, not the Transformer paper. Clark et al. (2019): BERT head 7-6 (layer 7, head 6) attends from possessive pronouns to the noun they modify. The 80.5% is accuracy across a text collection, not an attention weight.`
     ];
     const steps = [
       { label: 'Step 1 · Input' },
       { label: 'Step 2 · Project' },
-      { label: 'Step 3 · Attend' },
-      { label: 'Step 4 · Mix' },
+      { label: 'Step 3 · Attend (Score and normalise)' },
+      { label: 'Step 4 · Mix (Weighted sum of V)' },
       { label: 'Step 5 · Concatenate' }
     ];
     let h = 0, q = 8, stage = 0, showNums = true, tips = [], St;
@@ -32,7 +32,7 @@ Sims.register('heads', {
     const heat = t => 'rgb(' + rgb(t).join(',') + ')';
     const isDark = t => { const c = rgb(t); return (0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2]) < 150; };
     function matrix(k) {
-      const [qi, ki] = heads[k].pair, M = [];
+      const [qi, ki] = heads[k].pair, M = [], target = 0.5;
       for (let i = 0; i < n; i++) {
         const r = new Array(n).fill(0.2);
         r[i] += 3;
@@ -40,7 +40,11 @@ Sims.register('heads', {
         if (i < n - 1) r[i + 1] += 1.5;
         if (i > 1) r[i - 2] += 0.6;
         if (i < n - 2) r[i + 2] += 0.6;
-        if (i === qi) r[ki] += 9;
+        if (i === qi) {
+          // bonus chosen so the highlighted pair gets the same share (0.5) in every head, whatever the row's neighbours
+          const S = r.reduce((a, b) => a + b, 0);
+          r[ki] += (target * S - r[ki]) / (1 - target);
+        }
         const t = r.reduce((a, b) => a + b, 0);
         M.push(r.map(v => v / t));
       }
@@ -58,7 +62,7 @@ Sims.register('heads', {
         </div>
         <div class="hd-right">
           <div class="pr-mtitle"></div>
-          <div class="pr-hint">Row = the word looking (its query). Column = the word looked at (its key). Each row sums to 1.</div>
+          <div class="pr-hint">Row = the word looking (its query). Column = the word looked at (its key). Each row sums to 1. <i>Illustrative values, set by hand to show the pattern; not measured from a real model.</i></div>
           <div class="pr-cols"><span class="pr-gap" style="flex-basis:76px"></span><div class="pr-colnums"></div></div>
           <div class="pr-mxbody"><div class="pr-rl" style="flex-basis:76px"></div><div class="pr-brk l"></div><div class="pr-cells"></div><div class="pr-brk r"></div></div>
           <label class="pr-num"><input type="checkbox"> Show the numbers in the cells</label>
@@ -148,7 +152,7 @@ Sims.register('heads', {
         s += `<text x="${xs[i]}" y="${y0 + 40}" text-anchor="middle" font-size="11" fill="#7a8291">${i + 1}</text>`;
         s += `<rect x="${xs[i] - wd[i] / 2 - 5}" y="${y0 + 8}" width="${wd[i] + 10}" height="38" fill="transparent" data-sel="${i}" style="cursor:pointer"/>`;
       });
-      const sid2 = T('<b>★ One word, two heads</b><br>“its” is handled by Head 1 (it points back to “Law”, the noun it refers to) and by Head 3 (it points forward to “application”, the noun it belongs to). Switch heads and keep “its” selected.');
+      const sid2 = T('<b>★ One word, two heads</b><br>“its” is handled by Head 1 (it points back to “Law”, the noun it refers to) and by Head 3 (it points forward to “application”, the noun it modifies). Switch heads and keep “its” selected.');
       s += `<text x="${xs[8]}" y="${y0 + 57}" text-anchor="middle" font-size="14" data-t="${sid2}" fill="#BA7517" style="cursor:pointer">★</text>`;
       svg.innerHTML = s;
 
@@ -188,7 +192,7 @@ Sims.register('heads', {
       const txt = [
         `The sentence enters all at once (the first clause of the sentence in Figure 4 of the original Transformer paper). Choose the <b>query word</b>; “its” is the interesting one. The arcs and matrix are shown faded here: they are the result of step 3, shown early so you can see where we are heading. Press Next.`,
         `Every head has its <b>own</b> W<sub>Q</sub>, W<sub>K</sub>, W<sub>V</sub>. The same word “<b>${w}</b>” becomes a different query in each head, and every word gets a different key and value per head.`,
-        `Each head scores the words differently, then softmax. <b>${hd.n} (${hd.rel})</b>: “${w}” puts most of its attention on “${toks[to[1]]}” (${to[0].toFixed(2)})` + (to[0] > 0.3 ? '. Switch to another head and watch where “its” looks.' : '. This head has no special relation for this word, so it stays near itself and its neighbours. Try “its”.'),
+        `Each head scores the words differently, in three moves: the dot product q·k of the query with every key gives the raw scores, dividing by √d<sub>k</sub> scales them, and softmax turns each row into weights that sum to 1. <b>${hd.n} (${hd.rel})</b>: “${w}” puts most of its attention on “${toks[to[1]]}” (${to[0].toFixed(2)})` + (to[0] > 0.3 ? '. Switch to another head and watch where “its” looks.' : '. This head has no special relation for this word, so it stays near itself and its neighbours. Try “its”.'),
         `Each head returns a weighted sum of <i>its own</i> value vectors: <b>z<sub>h</sub> = Σ attention · V<sub>h</sub></b>. That gives one vector per head for “<b>${w}</b>”.`,
         `The head outputs are joined, <b>[z₁ z₂ z₃]</b>, and multiplied by <b>W<sub>O</sub></b>. The result is one new vector for “<b>${w}</b>”, the same size as its input. In the original paper: 8 heads of 64 dimensions, 8 × 64 = 512.`
       ][stage];
@@ -199,7 +203,7 @@ Sims.register('heads', {
     numBox.addEventListener('change', e => { showNums = e.target.checked; paint(); });
     St = H.stepper(L, () => steps, (st, i) => { stage = i; paint(); }, { interval: 2000 });
     L.setLegend([['#6a3fa0', 'Head 1 · coreference'], ['#1e7f4f', 'Head 2 · determiner'], ['#c8862b', 'Head 3 · possessive']]);
-    L.setNotes(`<p><b>Where the sentence comes from.</b> “The Law will never be perfect, but its application should be just” is the start of the sentence used in Figures 4 and 5 of Vaswani et al. (2017), <i>Attention Is All You Need</i>, which show heads in layer 5 that attend sharply from “its” to “Law”.</p><p><b>Where the head types come from.</b> Clark et al. (2019), <i>What Does BERT Look At?</i>, found BERT heads that attend from determiners to nouns (head 8-11, 94.3%), from possessive pronouns to the noun they modify (7-6, 80.5%), and that resolve coreference (5-4, about 65%).</p><p><b>What is simplified.</b> Those findings come from different models and layers. Here they are shown together as three heads of one layer, with hand-set attention values, to teach the idea. Real heads are rarely this clean, and many are redundant or hard to interpret.</p><p><b>Two meanings of “weight”.</b> W<sub>Q</sub>, W<sub>K</sub>, W<sub>V</sub> and W<sub>O</sub> are learned weight matrices. The numbers in the matrix are <i>attention</i>, computed per sentence from Q and K.</p>`);
+    L.setNotes(`<p><b>Where the sentence comes from.</b> “The Law will never be perfect, but its application should be just” is the start of the sentence used in Figures 4 and 5 of Vaswani et al. (2017), <i>Attention Is All You Need</i>, which show heads in layer 5 that attend sharply from “its” to “Law”.</p><p><b>Where the head types come from.</b> Heads 2 and 3 come from a study of BERT, not from the Transformer paper. BERT is an encoder-only Transformer (12 layers of 12 heads in the base model) covered later in this lesson; “8-11” means layer 8, head 11. Clark et al. (2019), <i>What Does BERT Look At?</i>, found BERT heads that attend from determiners to nouns (head 8-11, 94.3%), from possessive pronouns to the noun they modify (7-6, 80.5%), and that resolve coreference (5-4, about 65%).</p><p><b>What is simplified.</b> Those findings come from different models and layers. The percentages are accuracy across a text collection (how often the head’s top choice is the correct word), not attention weights. Here the head types are shown together as three heads of one layer, with hand-set attention values (the highlighted pair is set to 0.50 in each head), to teach the idea. Real heads are rarely this clean, and many are redundant or hard to interpret.</p><p><b>Two meanings of “weight”.</b> W<sub>Q</sub>, W<sub>K</sub>, W<sub>V</sub> and W<sub>O</sub> are learned weight matrices. The numbers in the matrix are <i>attention</i>, computed per sentence from Q and K.</p>`);
 
     let autoOff = false;
     function fit() {
