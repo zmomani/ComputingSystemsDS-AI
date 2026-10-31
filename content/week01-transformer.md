@@ -157,7 +157,7 @@ For example, take the start of the sentence used in Figure 4 of the original Tra
 
 Notice that "its" appears twice: one head looks back at the noun it refers to, another looks forward at the noun it belongs to. The multi-head output combines both views. These findings come from different models and layers, so the table groups them for teaching; real heads are rarely this clean, and many cannot be given a simple label. Open the **Multi-head attention: one sentence, three heads** animation to follow "its" through project, attend, mix and concatenate.
 
-{{display: heads multihead}}
+{{display: multihead heads}}
 
 ### Positional encoding
 

@@ -26,7 +26,7 @@ WEEKS = [
        topics='Transformer architecture, encoder-decoder framework, Hugging Face ecosystem',
        milestone='Form teams, create the GitHub repo, set up the project and API keys, write a Transformer analysis',
        files=['week01-transformer.md', 'week01b-transformer-step-by-step.md', 'week01c-transformer-qa.md'],
-       sims=['attention', 'pronoun', 'qkv', 'heads', 'multihead', 'decoder', 'matrix-multiply', 'vectors', 'tokenizer', 'positional']),
+       sims=['attention', 'pronoun', 'qkv', 'multihead', 'heads', 'decoder', 'matrix-multiply', 'vectors', 'tokenizer', 'positional']),
   dict(n=2, slug='week02-text-classification', title='Text Classification', ilo='K1, P1',
        topics='Text classification, sentiment analysis, feature extraction vs. fine-tuning, evaluation metrics',
        milestone='Classification Agent that labels sources by type and relevance; evaluate on 20+ sources',

@@ -302,7 +302,7 @@ kbd { font-family: var(--mono); font-size: .8em; background: #eef1f5; border: 1p
 .pr-brk.l { border-right: none; border-radius: 3px 0 0 3px; }
 .pr-brk.r { border-left: none; border-radius: 0 3px 3px 0; }
 .pr-cells { display: grid; grid-template-columns: repeat(10, var(--c)); grid-auto-rows: var(--c); gap: 2px; padding: 2px 3px; }
-.pr-cells div { text-align: center; font-size: .7rem; line-height: var(--c); border-radius: 3px; cursor: default; overflow: hidden; }
+.pr-cells div { text-align: center; font-size: min(.7rem, calc(var(--c) * .42)); line-height: var(--c); border-radius: 3px; cursor: default; overflow: hidden; }
 .pr-cells .pr-qrow { box-shadow: 0 0 0 2px var(--ink); position: relative; }
 .pr-cells .pr-vital { font-weight: 700; }
 .pr-num { display: flex; gap: 8px; align-items: center; font-size: .82rem; color: var(--ink-2); margin: 12px 0 0; }
