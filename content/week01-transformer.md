@@ -97,6 +97,8 @@ The Transformer consists of an **encoder** and a **decoder**, each built from a 
 - Masking preserves the autoregressive property (a position may not attend to future positions)
 - Outputs probabilities for predicting the next token
 
+{{display: decoder}}
+
 Positional encodings are added to the input embeddings before the first layer. The feed-forward inner dimension is typically 4× the model dimension.
 
 ### Mathematical formulation
@@ -134,6 +136,8 @@ The scaling by √d_k keeps the dot products from growing large and pushing soft
 
 For example, take **"The cat sat on the mat because it was tired."** The word "it" refers to the cat: being tired fits a living thing, not a mat. Change one word, **"The cat sat on the mat because it was soft."**, and "it" now refers to the mat. A model has to use context to tell the two apart, and attention is how it does so: "it" puts most of its attention on the word it refers to. Open the **Attention: what does "it" refer to?** animation to compare the two sentences (the attention values there are illustrative), and the **Self-attention** animation to follow the computation step by step.
 
+{{display: pronoun attention qkv}}
+
 ### Multi-head attention
 
 Instead of a single attention function, the model runs **h** attention heads in parallel, each with its own projection matrices, so it can attend to information from different representation subspaces at once. Benefits:
@@ -152,6 +156,8 @@ For example, in **"The movie was great but too long."** four heads can specialis
 | Head 3 | Entity recognition |
 | Head 4 | Conjunction relationships |
 
+{{display: multihead}}
+
 ### Positional encoding
 
 Because the Transformer has no recurrence or convolution, it needs explicit information about token order. Sinusoidal positional encodings are added to the input embeddings:
@@ -163,6 +169,8 @@ $$PE_{(pos, 2i+1)} = \cos\left(pos / 10000^{2i/d_{model}}\right)$$
 where *pos* is the token position and *i* is the dimension index. Sinusoids at different frequencies let the model learn to attend by relative position.
 
 Viewed as a heatmap (positions as rows, dimensions as columns), low dimensions oscillate quickly and high dimensions slowly. Open the **Positional encoding** animation at the top of this lesson to explore it.
+
+{{display: positional}}
 
 ### Feed-forward networks
 

@@ -262,6 +262,8 @@ kbd { font-family: var(--mono); font-size: .8em; background: #eef1f5; border: 1p
 
 /* ---------- responsive ---------- */
 
+.sim-inline { display: flex; flex-wrap: wrap; gap: 8px; margin: .9rem 0 1.3rem; }
+
 /* ---------- pronoun simulation ---------- */
 .pr-wrap { --c: 26px; position: relative; width: 100%; font-size: .85rem; color: var(--ink); }
 .pr-two { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; align-items: start; }
