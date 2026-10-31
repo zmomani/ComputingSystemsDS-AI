@@ -151,11 +151,11 @@ For example, take the start of the sentence used in Figure 4 of the original Tra
 
 | Head | What it links in this sentence | Evidence |
 |---|---|---|
-| Head 1: coreference | "its" → "Law" (the noun the pronoun refers to) | Vaswani et al. (2017), Fig. 4: heads in layer 5 attend sharply from "its" to "Law". Clark et al. (2019): BERT head 5-4 finds the antecedent of a mention with about 65% accuracy |
-| Head 2: determiner → noun | "The" → "Law" | Clark et al. (2019): BERT head 8-11 attends from determiners to their nouns, 94.3% accuracy |
-| Head 3: possessive → noun | "its" → "application" (the noun it belongs to) | Clark et al. (2019): BERT head 7-6 attends from possessive pronouns to the noun they modify, 80.5% accuracy |
+| Head 1: coreference | "its" → "Law" (the noun the pronoun refers to) | Transformer paper: Vaswani et al. (2017), Fig. 4: heads in layer 5 attend sharply from "its" to "Law". Also, in BERT, Clark et al. (2019): BERT head 5-4 finds the antecedent of a mention with about 65% accuracy |
+| Head 2: determiner → noun | "The" → "Law" | BERT study: Clark et al. (2019), head 8-11 (layer 8, head 11) attends from determiners to their nouns; the head's top choice is the right noun 94.3% of the time |
+| Head 3: possessive → noun | "its" → "application" (the noun it modifies) | BERT study: Clark et al. (2019), head 7-6 attends from possessive pronouns to the noun they modify; the head's top choice is right 80.5% of the time |
 
-Notice that "its" appears twice: one head looks back at the noun it refers to, another looks forward at the noun it belongs to. The multi-head output combines both views. These findings come from different models and layers, so the table groups them for teaching; real heads are rarely this clean, and many cannot be given a simple label. Open the **Multi-head attention: one sentence, three heads** animation to follow "its" through project, attend, mix and concatenate.
+Notice that "its" appears twice: one head looks back at the noun it refers to, another looks forward at the noun it modifies. The multi-head output combines both views. Only the first head type comes from the Transformer paper; the other two come from a study of BERT (an encoder-only model introduced later in this lesson), and the percentages are accuracy figures over a text collection, not attention weights. The table groups them for teaching; real heads are rarely this clean, and many cannot be given a simple label. Open the **Multi-head attention: one sentence, three heads** animation to follow "its" through project, attend, mix and concatenate.
 
 {{display: multihead heads}}
 
