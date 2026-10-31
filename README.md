@@ -15,7 +15,7 @@ Each lesson page works like the Programming for Data Science tutorial: the lesso
 
 Every week also has a **Try it yourself** section with browser-runnable examples of that week's mechanisms (`content/browser-examples.py`).
 
-## Simulations (20)
+## Simulations (21)
 
 | Week | Simulation | What it shows |
 |---|---|---|
@@ -24,6 +24,7 @@ Every week also has a **Try it yourself** section with browser-runnable examples
 | 1, 6 | Self-attention | Q·Kᵀ → /√d_k → softmax → ·V on a 4-token sentence, heatmaps |
 | 1 | Attention: what does “it” refer to? | Two sentences differing by one word (tired / soft); arcs and a heat-map matrix show “it” moving between cat and mat |
 | 1 | Query, key and value | One word: project to Q, K, V, score against every key, softmax, mix the values |
+| 1 | Multi-head attention: one sentence, three heads | Follow “its” through three heads (coreference, determiner, possessive) with arcs, a heat-map matrix and the project → attend → mix → concatenate steps |
 | 1 | Multi-head attention | One query word through three heads: project, attend, mix, concatenate, W_O |
 | 1 | Decoder | Causal mask, cross-attention to the encoder, next-word softmax; inference loop vs. training |
 | 1, 2, 6 | Subword tokenisation | Text → WordPiece-style tokens → IDs → embedding rows |
