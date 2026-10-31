@@ -147,16 +147,17 @@ Instead of a single attention function, the model runs **h** attention heads in 
 - Greater representational power
 - An ensemble-like effect within a single layer
 
-For example, in **"The movie was great but too long."** four heads can specialise in different relationships:
+For example, take the start of the sentence used in Figure 4 of the original Transformer paper (Vaswani et al., 2017): **"The Law will never be perfect, but its application should be just."** The same word can be handled by different heads, each following a different relation. Published analyses found heads of these kinds:
 
-| Head | Focus |
-|---|---|
-| Head 1 | Subject–object relationships |
-| Head 2 | Adjective–noun relationships |
-| Head 3 | Entity recognition |
-| Head 4 | Conjunction relationships |
+| Head | What it links in this sentence | Evidence |
+|---|---|---|
+| Head 1: coreference | "its" → "Law" (the noun the pronoun refers to) | Vaswani et al. (2017), Fig. 4: heads in layer 5 attend sharply from "its" to "Law". Clark et al. (2019): BERT head 5-4 finds the antecedent of a mention with about 65% accuracy |
+| Head 2: determiner → noun | "The" → "Law" | Clark et al. (2019): BERT head 8-11 attends from determiners to their nouns, 94.3% accuracy |
+| Head 3: possessive → noun | "its" → "application" (the noun it belongs to) | Clark et al. (2019): BERT head 7-6 attends from possessive pronouns to the noun they modify, 80.5% accuracy |
 
-{{display: multihead}}
+Notice that "its" appears twice: one head looks back at the noun it refers to, another looks forward at the noun it belongs to. The multi-head output combines both views. These findings come from different models and layers, so the table groups them for teaching; real heads are rarely this clean, and many cannot be given a simple label. Open the **Multi-head attention: one sentence, three heads** animation to follow "its" through project, attend, mix and concatenate.
+
+{{display: heads multihead}}
 
 ### Positional encoding
 
@@ -432,7 +433,7 @@ Transformers have changed AI, enabling advances in language understanding, gener
 
 - **Scaled dot-product attention, step by step:** tokens → Q/K/V projections, Q·Kᵀ score matrix, divide by √d_k, row-wise softmax, weighted sum of V. Show the (seq × seq) heatmap for "The cat sat on the mat because it was tired." and for the "soft" version and let the user click a query word.
 - **Why scale by √d_k:** animate how the softmax of random dot products saturates (near one-hot) as d_k grows without scaling, and stays soft with scaling.
-- **Multi-head attention:** split embed_size into h heads (reshape/permute), run h independent attention maps side by side on "The movie was great but too long.", concatenate, project with W^O. Toggle heads 1–4 and show each head's pattern.
+- **Multi-head attention:** split embed_size into h heads (reshape/permute), run h independent attention maps side by side on "The Law will never be perfect, but its application should be just.", concatenate, project with W^O. Toggle heads 1–4 and show each head's pattern.
 - **Sinusoidal positional encoding heatmap:** PE(pos, 2i)=sin, PE(pos, 2i+1)=cos; vary sequence length (5/25/50) and d_model (8/32/64); show that the dot product between PE vectors depends on relative offset.
 - **Token → embedding + positional encoding in a 2D plane:** plot a few token embeddings, add PE vectors, show how the same word at different positions lands at different points.
 - **Position-wise FFN:** input slider (−3..3) → xW₁+b₁ → ReLU → W₂; show the hidden layer at 1×/4×/8× width and the piecewise-linear output.
