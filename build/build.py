@@ -390,6 +390,11 @@ def parse(path: Path):
             if ':' in line:
                 k, v = line.split(':', 1); meta[k.strip()] = v.strip()
         text = text[m.end():]
+    def display_buttons(mo):
+        ids = [i for i in mo.group(1).split() if i in SIMS]
+        chips = ''.join(f'<button class="sim-chip" data-display="{i}"><span class="sim-chip-kind">{html.escape(SIMS[i][1])}</span>▶ Display: {html.escape(SIMS[i][0])}</button>' for i in ids)
+        return f'<div class="sim-inline">{chips}</div>'
+    text = re.sub(r'^\{\{display:\s*([\w\- ]+?)\s*\}\}[ \t]*$', display_buttons, text, flags=re.M)
     def cut(section):
         nonlocal text
         mm = re.search(r'\n## ' + section + r'[^\n]*\n', text)

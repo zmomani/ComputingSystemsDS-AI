@@ -138,6 +138,8 @@
 <li>Masking preserves the autoregressive property (a position may not attend to future positions)</li>
 <li>Outputs probabilities for predicting the next token</li>
 </ul>
+<div class="sim-inline"><button class="sim-chip" data-display="decoder"><span class="sim-chip-kind">Transformers</span>▶ Display: Decoder: masked and cross-attention</button></div>
+
 <p>Positional encodings are added to the input embeddings before the first layer. The feed-forward inner dimension is typically 4× the model dimension.</p>
 <h3 id="mathematical-formulation">Mathematical formulation</h3>
 <p>Scaled dot-product attention:</p>
@@ -160,6 +162,8 @@
 </ol>
 <p>The scaling by √d_k keeps the dot products from growing large and pushing softmax into regions with extremely small gradients.</p>
 <p>For example, take <strong>"The cat sat on the mat because it was tired."</strong> The word "it" refers to the cat: being tired fits a living thing, not a mat. Change one word, <strong>"The cat sat on the mat because it was soft."</strong>, and "it" now refers to the mat. A model has to use context to tell the two apart, and attention is how it does so: "it" puts most of its attention on the word it refers to. Open the <strong>Attention: what does "it" refer to?</strong> animation to compare the two sentences (the attention values there are illustrative), and the <strong>Self-attention</strong> animation to follow the computation step by step.</p>
+<div class="sim-inline"><button class="sim-chip" data-display="pronoun"><span class="sim-chip-kind">Transformers</span>▶ Display: Attention: what does “it” refer to?</button><button class="sim-chip" data-display="attention"><span class="sim-chip-kind">Transformers</span>▶ Display: Self-attention: Q·Kᵀ → softmax → ·V</button><button class="sim-chip" data-display="qkv"><span class="sim-chip-kind">Transformers</span>▶ Display: Query, key and value for one word</button></div>
+
 <h3 id="multi-head-attention">Multi-head attention</h3>
 <p>Instead of a single attention function, the model runs <strong>h</strong> attention heads in parallel, each with its own projection matrices, so it can attend to information from different representation subspaces at once. Benefits:</p>
 <ul>
@@ -195,12 +199,16 @@
 </tr>
 </tbody>
 </table>
+<div class="sim-inline"><button class="sim-chip" data-display="multihead"><span class="sim-chip-kind">Transformers</span>▶ Display: Multi-head attention</button></div>
+
 <h3 id="positional-encoding">Positional encoding</h3>
 <p>Because the Transformer has no recurrence or convolution, it needs explicit information about token order. Sinusoidal positional encodings are added to the input embeddings:</p>
 <div class="arithmatex">\[PE_{(pos, 2i)} = \sin\left(pos / 10000^{2i/d_{model}}\right)\]</div>
 <div class="arithmatex">\[PE_{(pos, 2i+1)} = \cos\left(pos / 10000^{2i/d_{model}}\right)\]</div>
 <p>where <em>pos</em> is the token position and <em>i</em> is the dimension index. Sinusoids at different frequencies let the model learn to attend by relative position.</p>
 <p>Viewed as a heatmap (positions as rows, dimensions as columns), low dimensions oscillate quickly and high dimensions slowly. Open the <strong>Positional encoding</strong> animation at the top of this lesson to explore it.</p>
+<div class="sim-inline"><button class="sim-chip" data-display="positional"><span class="sim-chip-kind">Transformers</span>▶ Display: Positional encoding</button></div>
+
 <h3 id="feed-forward-networks">Feed-forward networks</h3>
 <p>Each encoder and decoder layer contains a fully connected network applied independently and identically at each position: two linear transformations with a ReLU between them.</p>
 <div class="arithmatex">\[\text{FFN}(x) = \max(0, xW_1 + b_1)W_2 + b_2\]</div>
