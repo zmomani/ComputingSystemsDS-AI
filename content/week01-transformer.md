@@ -42,12 +42,16 @@ The Transformer architecture was introduced in the 2017 paper **"Attention Is Al
 
 ### Recurrent Neural Networks (RNNs)
 
+<figure class="fig"><img src="../assets/img/rnn-unfolded.jpg" alt="A recurrent neural network folded on the left and unfolded through time on the right"><figcaption>A recurrent network folded (left) and unfolded through time (right). The same weights U, V and W are reused at every time step, and each hidden state h<sub>t</sub> depends on h<sub>t-1</sub>, so the steps must run one after another.</figcaption></figure>
+
 - Slow, because they process sequences step by step
 - Suffer from vanishing or exploding gradients
 - Have a limited context window
 - Struggle with long-range dependencies
 
 ### Long Short-Term Memory (LSTM)
+
+<figure class="fig"><img src="../assets/img/lstm-cell.png" alt="An LSTM cell with forget, input and output gates acting on the cell state"><figcaption>An LSTM cell. The forget gate decides what to erase from the cell state c(t-1), the input gate decides what new information to add, and the output gate decides what part of the cell state becomes the hidden state h(t).</figcaption></figure>
 
 - Handle long-term dependencies better than vanilla RNNs
 - Use gates to regulate information flow
@@ -76,6 +80,8 @@ The table compares the three model families across sequence lengths and tasks su
 ## Transformer Architecture
 
 The Transformer consists of an **encoder** and a **decoder**, each built from a stack of identical layers. Every layer contains **multi-head self-attention** and a **position-wise feed-forward network**, wrapped with residual connections and layer normalization. (The original diagram has buttons to highlight the encoder, decoder and attention paths.)
+
+<figure class="fig"><img src="../assets/img/transformer-architecture.jpg" alt="The Transformer model architecture with the encoder on the left and the decoder on the right"><figcaption>The Transformer model architecture (Figure 1 in Vaswani et al., 2017): encoder on the left, decoder on the right.</figcaption></figure>
 
 ### Encoder
 
