@@ -52,6 +52,8 @@
 </ul>
 <h2 id="evolution-of-sequence-models">Evolution of Sequence Models</h2>
 <h3 id="recurrent-neural-networks-rnns">Recurrent Neural Networks (RNNs)</h3>
+<figure class="fig"><img src="../assets/img/rnn-unfolded.jpg" alt="A recurrent neural network folded on the left and unfolded through time on the right"><figcaption>A recurrent network folded (left) and unfolded through time (right). The same weights U, V and W are reused at every time step, and each hidden state h<sub>t</sub> depends on h<sub>t-1</sub>, so the steps must run one after another.</figcaption></figure>
+
 <ul>
 <li>Slow, because they process sequences step by step</li>
 <li>Suffer from vanishing or exploding gradients</li>
@@ -59,6 +61,8 @@
 <li>Struggle with long-range dependencies</li>
 </ul>
 <h3 id="long-short-term-memory-lstm">Long Short-Term Memory (LSTM)</h3>
+<figure class="fig"><img src="../assets/img/lstm-cell.png" alt="An LSTM cell with forget, input and output gates acting on the cell state"><figcaption>An LSTM cell. The forget gate decides what to erase from the cell state c(t-1), the input gate decides what new information to add, and the output gate decides what part of the cell state becomes the hidden state h(t).</figcaption></figure>
+
 <ul>
 <li>Handle long-term dependencies better than vanilla RNNs</li>
 <li>Use gates to regulate information flow</li>
@@ -118,6 +122,8 @@
 </table>
 <h2 id="transformer-architecture">Transformer Architecture</h2>
 <p>The Transformer consists of an <strong>encoder</strong> and a <strong>decoder</strong>, each built from a stack of identical layers. Every layer contains <strong>multi-head self-attention</strong> and a <strong>position-wise feed-forward network</strong>, wrapped with residual connections and layer normalization. (The original diagram has buttons to highlight the encoder, decoder and attention paths.)</p>
+<figure class="fig"><img src="../assets/img/transformer-architecture.jpg" alt="The Transformer model architecture with the encoder on the left and the decoder on the right"><figcaption>The Transformer model architecture (Figure 1 in Vaswani et al., 2017): encoder on the left, decoder on the right.</figcaption></figure>
+
 <h3 id="encoder">Encoder</h3>
 <ul>
 <li>Stacks N identical layers (N = 6 in the original paper)</li>
