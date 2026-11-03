@@ -323,3 +323,12 @@ kbd { font-family: var(--mono); font-size: .8em; background: #eef1f5; border: 1p
   .lesson-card { grid-template-columns: 40px 1fr; }
   .lesson-meta { display: none; }
 }
+
+/* positional-encoding walkthrough */
+.pe-wrap .pr-tip { width: 260px; }
+.pe-cells div.pe-pair { outline: 2px solid var(--navy); outline-offset: -2px; }
+.pe-add { transition: opacity .2s; }
+.pe-addrow { display: flex; align-items: center; gap: 8px; margin: 4px 0; }
+.pe-addrow > span { flex: 0 0 76px; text-align: right; font-size: .72rem; color: var(--ink-2); }
+.pe-addrow .pr-cells { padding: 2px 3px; }
+.pe-sum .pr-cells { border-top: 2px solid var(--ink); }
