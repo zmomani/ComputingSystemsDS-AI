@@ -253,12 +253,26 @@ Scores before mask            After mask                    After softmax
 
 Each word attends only to itself and the words before it.
 
+The mask is a matrix **M** that is added to the scaled scores before the softmax:
+
+$$\text{MaskedAttention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}} + M\right)V$$
+
+$$M_{ij} = \begin{cases} 0 & j \le i \quad \text{(the word itself and earlier words: allowed)} \\ -\infty & j > i \quad \text{(later words: blocked)} \end{cases}$$
+
+Because e^(−∞) = 0, every blocked position gets a weight of exactly 0, and each row of the result still sums to 1. During training the whole target sentence is fed in at once and this mask makes every position behave as if it were generating step by step, so training stays parallel. At inference the loop is sequential, because each new word depends on the ones already generated. A second, separate **padding mask** sets the scores of empty padding tokens to −∞ in the same way; the encoder uses only that one, because every encoder word may look at every other word.
+
 ### 7.2 Cross-Attention (Encoder–Decoder Attention)
 
 Here the decoder looks at the **input sentence**:
 
 - **Q** comes from the decoder (the Arabic words so far)
 - **K** and **V** come from the **encoder output** (the English words)
+
+$$Q = X_{dec}W^Q, \qquad K = H_{enc}W^K, \qquad V = H_{enc}W^V$$
+
+$$\text{CrossAttention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
+
+Here X<sub>dec</sub> is the decoder's own vectors and H<sub>enc</sub> is the final encoder output. No mask is needed, because the whole input sentence is already known.
 
 ```text
 Q for "???"              = [0.5, 0.8, 0.3]

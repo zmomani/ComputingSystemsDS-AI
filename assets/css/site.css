@@ -332,3 +332,7 @@ kbd { font-family: var(--mono); font-size: .8em; background: #eef1f5; border: 1p
 .pe-addrow > span { flex: 0 0 76px; text-align: right; font-size: .72rem; color: var(--ink-2); }
 .pe-addrow .pr-cells { padding: 2px 3px; }
 .pe-sum .pr-cells { border-top: 2px solid var(--ink); }
+
+/* code blocks stay left-to-right; Arabic runs inside them are isolated right-to-left islands */
+.lesson-content pre, .lesson-content pre code { direction: ltr; unicode-bidi: isolate; text-align: left; }
+.lesson-content pre .ar { unicode-bidi: isolate; direction: rtl; }
