@@ -760,12 +760,19 @@ After W₂ + b₂      = [0.8,  0.5, 0.3]</code></pre></div>
 &quot;أحب&quot;   [0.6, 0.9, 0.4]      &quot;أحب&quot;  [0.6,  0.9,  -∞ ]      &quot;أحب&quot;  [0.43, 0.57, 0.00]
 &quot;???&quot;   [0.3, 0.7, 0.8]      &quot;???&quot;  [0.3,  0.7,  0.8]      &quot;???&quot;  [0.24, 0.36, 0.40]</code></pre></div>
 <p>Each word attends only to itself and the words before it.</p>
+<p>The mask is a matrix <strong>M</strong> that is added to the scaled scores before the softmax:</p>
+<div class="arithmatex">\[\text{MaskedAttention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}} + M\right)V\]</div>
+<div class="arithmatex">\[M_{ij} = \begin{cases} 0 &amp; j \le i \quad \text{(the word itself and earlier words: allowed)} \\ -\infty &amp; j &gt; i \quad \text{(later words: blocked)} \end{cases}\]</div>
+<p>Because e^(−∞) = 0, every blocked position gets a weight of exactly 0, and each row of the result still sums to 1. During training the whole target sentence is fed in at once and this mask makes every position behave as if it were generating step by step, so training stays parallel. At inference the loop is sequential, because each new word depends on the ones already generated. A second, separate <strong>padding mask</strong> sets the scores of empty padding tokens to −∞ in the same way; the encoder uses only that one, because every encoder word may look at every other word.</p>
 <h3 id="72-cross-attention-encoderdecoder-attention">7.2 Cross-Attention (Encoder–Decoder Attention)</h3>
 <p>Here the decoder looks at the <strong>input sentence</strong>:</p>
 <ul>
 <li><strong>Q</strong> comes from the decoder (the Arabic words so far)</li>
 <li><strong>K</strong> and <strong>V</strong> come from the <strong>encoder output</strong> (the English words)</li>
 </ul>
+<div class="arithmatex">\[Q = X_{dec}W^Q, \qquad K = H_{enc}W^K, \qquad V = H_{enc}W^V\]</div>
+<div class="arithmatex">\[\text{CrossAttention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V\]</div>
+<p>Here X<sub>dec</sub> is the decoder's own vectors and H<sub>enc</sub> is the final encoder output. No mask is needed, because the whole input sentence is already known.</p>
 <div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">Q for &quot;???&quot;              = [0.5, 0.8, 0.3]
 
 Scores against encoder keys:
