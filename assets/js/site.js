@@ -12,6 +12,25 @@
   /* ------------------------------------------------ common: highlight, maths, nav, quiz */
   document.addEventListener("DOMContentLoaded", () => {
     if (window.hljs) $$("pre code[class*=language-]").forEach((c) => { if (!c.classList.contains("language-plaintext")) hljs.highlightElement(c); });
+    /* Arabic inside code blocks: keep each Arabic phrase as its own right-to-left island so the surrounding
+       left-to-right text (brackets, commas, numbers, column order) is not reordered by the bidi algorithm. */
+    const AR = /[\u0600-\u06FF\u0750-\u077F]+(?: [\u0600-\u06FF\u0750-\u077F]+)*/g;
+    $$("pre code").forEach((c) => {
+      if (!/[\u0600-\u06FF]/.test(c.textContent)) return;
+      const walker = document.createTreeWalker(c, NodeFilter.SHOW_TEXT), nodes = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode);
+      nodes.forEach((n) => {
+        if (!AR.test(n.nodeValue)) return; AR.lastIndex = 0;
+        const frag = document.createDocumentFragment(); let last = 0, m;
+        while ((m = AR.exec(n.nodeValue))) {
+          if (m.index > last) frag.appendChild(document.createTextNode(n.nodeValue.slice(last, m.index)));
+          const sp = document.createElement("span"); sp.className = "ar"; sp.dir = "rtl"; sp.textContent = m[0]; frag.appendChild(sp);
+          last = m.index + m[0].length;
+        }
+        if (last < n.nodeValue.length) frag.appendChild(document.createTextNode(n.nodeValue.slice(last)));
+        n.parentNode.replaceChild(frag, n);
+      });
+    });
     if (window.renderMathInElement) renderMathInElement(document.body, {
       delimiters: [{ left: "\\[", right: "\\]", display: true }, { left: "\\(", right: "\\)", display: false }], throwOnError: false });
   });
