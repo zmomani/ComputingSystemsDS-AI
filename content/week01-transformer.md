@@ -171,7 +171,7 @@ where *pos* is the token position and *i* is the dimension index. Sinusoids at d
 
 Viewed as a heatmap (positions as rows, dimensions as columns), low dimensions oscillate quickly and high dimensions slowly. Open the **Positional encoding** animation at the top of this lesson to explore it.
 
-{{display: positional}}
+{{display: posenc positional}}
 
 ### Feed-forward networks
 
