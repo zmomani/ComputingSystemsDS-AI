@@ -385,6 +385,62 @@ def compute_metrics(pred):
     return {"accuracy": acc, "f1": f1}
 ```
 
+### Before you train: moving to Google Colab
+
+<div class="where-note" markdown="1">
+<div class="where-head">Optional notes. The lesson code below stays exactly as it is.</div>
+
+The three training examples that follow (*Setting up the Trainer*, *Training the model* and the tuning mini-challenge) need a GPU, so they run in Google Colab instead of the codespace. Nothing here replaces the lesson code. Each note is an **extra cell** that you add to the Colab notebook, either as a setup step before training or as a fix when a particular message appears.
+
+**How to add a cell in Colab.** Move the mouse between two cells and click **+ Code**, paste the snippet, and run it with `Shift`+`Enter`. *At the top* means above the first code cell of the notebook. *Above the Trainer cell* means directly above the cell that starts with `from transformers import Trainer, TrainingArguments`.
+
+**Setup steps, in this order**
+
+**1. Open the notebook.** Press **▶ Train in Colab** on the example below. It opens this week's notebook, which contains every example of the lesson in order.
+
+**2. Turn on the GPU.** In the Colab menu choose **Runtime → Change runtime type → T4 GPU → Save**. This is a menu setting, not code. Changing it restarts the session, so do it before you run anything.
+
+**3. Check that the GPU is visible.** Add this cell at the top and run it:
+
+```python-note
+import torch
+
+if torch.cuda.is_available():
+    print("GPU ready:", torch.cuda.get_device_name(0))
+else:
+    print("No GPU found. Runtime → Change runtime type → T4 GPU, then run this cell again.")
+```
+
+*What it does:* it asks PyTorch whether a GPU is attached to the session. No separate command is needed to make the code use the GPU. The lesson already selects it with `device = torch.device("cuda" if torch.cuda.is_available() else "cpu")`, and the `Trainer` picks it up automatically. This cell only confirms that step 2 worked. Without a GPU the code still runs, without any error, but training takes hours.
+
+**4. Run the notebook from the top down to the Trainer cell.** Click the Trainer cell, then choose **Runtime → Run before**. The Trainer reuses `model`, `tokenizer`, `emotion_encoded` and `compute_metrics` from the earlier sections, so they must exist in the Colab session. The first code cell of the notebook installs the libraries that Colab does not include (`datasets`, `gradio`).
+
+**5. Log in to Hugging Face.** Add this cell above the Trainer cell and run it:
+
+```python-note
+from huggingface_hub import notebook_login
+notebook_login()
+```
+
+*What it does:* it stores your access token in the session so that the Trainer can upload the model. It is required here because `TrainingArguments` sets `push_to_hub=True`, and the Trainer creates your model repository as soon as it is built. In the notebook the login cell appears later, in Section 8, so in Colab you run it early. Create a token with **write** access at https://huggingface.co/settings/tokens.
+
+**If you see one of these messages**
+
+- **`ModuleNotFoundError: No module named 'datasets'`**: the install cell at the top of the notebook was not run. Run it, or add `%pip install -q datasets` in a cell at the top.
+- **`TypeError: ... got an unexpected keyword argument 'eval_strategy'`** (or `'processing_class'`): the Transformers version in Colab is older than 4.46. Add `%pip install -q -U "transformers[torch]"` in a cell at the top and run it, choose **Runtime → Restart session**, then run the notebook from the top again.
+- **`NameError: name 'emotion_encoded' is not defined`** (or `model`, `tokenizer`, `compute_metrics`): the earlier cells were not run in this session. Colab forgets all variables after a restart or a disconnect. Repeat step 4.
+- **An error that mentions a token, a login or `401 Unauthorized`** when the Trainer cell runs: you are not logged in. Do step 5, then run the Trainer cell again.
+- **Colab asks for a `wandb` API key** when training starts: older Transformers versions try to log to Weights & Biases, which this course does not use. Type `3` (do not visualize my results) and press Enter.
+- **`CUDA out of memory`**: the GPU ran out of memory. This is the one case where you change the lesson code: set `batch_size = 32` in the Trainer cell, choose **Runtime → Restart session**, and run from the top again.
+- **Training shows an estimated time of hours**: the GPU is off. Repeat steps 2 and 3.
+
+**Optional**
+
+- **See the GPU and its memory.** Run `!nvidia-smi` in a new cell anywhere in the notebook.
+- **Bring the trained model back to your codespace.** Colab deletes its files when the session ends, so finish Section 8 (`trainer.push_to_hub(...)`) in Colab before you close the tab. Then, in the codespace, run the *Using your model* cell with your own username. It downloads the model from the Hub, and prediction does not need a GPU.
+
+</div>
+
 ### Setting up the Trainer
 
 ```python
