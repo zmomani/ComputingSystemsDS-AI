@@ -15,7 +15,7 @@ Each lesson page works like the Programming for Data Science tutorial: the lesso
 
 Every week also has a **Try it yourself** section with browser-runnable examples of that week's mechanisms (`content/browser-examples.py`).
 
-## Simulations (21)
+## Simulations (23)
 
 | Week | Simulation | What it shows |
 |---|---|---|
@@ -29,6 +29,8 @@ Every week also has a **Try it yourself** section with browser-runnable examples
 | 1 | Decoder | Causal mask, cross-attention to the encoder, next-word softmax; inference loop vs. training |
 | 1, 2, 6 | Subword tokenisation | Text → WordPiece-style tokens → IDs → embedding rows |
 | 1 | Positional encoding | Sinusoid heatmap and per-dimension waves |
+| 2 | Frozen vs fine-tuned weights | Feature extraction, fine-tuning and training from scratch: which weights are trainable and how far each block moves |
+| 2 | Knowledge distillation | A student learns a masked word from the hard label or from the teacher's soft targets; temperature slider |
 | 2, 3 | Classification head | Linear boundary trained live; threshold vs precision/recall/F1 |
 | 3 | NER / BIO tagging | Token-by-token tags; entity-level vs token-level scoring |
 | 4, 9 | RAG pipeline | Load → split → embed → store → query → top-k → prompt |
