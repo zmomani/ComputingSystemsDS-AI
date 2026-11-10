@@ -41,6 +41,150 @@ Transformers are neural network architectures that changed NLP by using **attent
 - **RoBERTa** — a BERT variant with an optimized training recipe
 - **GPT models** — Generative Pre-trained Transformers
 
+### The ideas behind this lesson
+
+The key features above are stated in one line each. This part explains the theory the rest of the lesson relies on, before any code. Attention itself is the subject of [Week 1](week01-transformers.html).
+
+**Parallelization.** An RNN reads a sentence one word at a time, and each step needs the result of the previous one, so the work is sequential however much hardware is available. A transformer has no such dependency: attention relates every token to every other token in one set of matrix operations, and the whole sequence is processed at once. Matrix operations are what GPUs do well. That is why training became fast enough to learn from enormous amounts of text, and why the training step of this lesson runs on a GPU.
+
+### Theory 1: encoder-only, decoder-only, and encoder–decoder
+
+The original Transformer (2017) was built for translation and has two parts, an encoder and a decoder. Later models kept one part or both. Which parts a model keeps decides what it is good at.
+
+**What each part does**
+
+- **The encoder reads.** Its self-attention is *bidirectional*: every token attends to all the other tokens, to its left and to its right. Its output is one contextual vector per input token. An encoder produces no text. It produces a representation of the text it was given.
+- **The decoder writes.** It produces the output one token at a time. Its self-attention is *masked* (also called causal): each position can attend only to the positions before it, because when text is being generated the later words do not exist yet. Its output is a probability distribution over the next token.
+- **Cross-attention connects them.** In a model that has both parts, every decoder step also attends to the encoder's vectors. Each word the decoder writes can therefore consult the whole input.
+
+| Family and examples | Parts | Pre-trained by |
+|---|---|---|
+| **Encoder-only**: BERT, DistilBERT, RoBERTa | Encoder | Predicting hidden (masked) words |
+| **Decoder-only**: GPT family | Decoder | Predicting the next word |
+| **Encoder–decoder**: the original Transformer, T5, BART | Both, joined by cross-attention | Producing an output text from an input text |
+
+**Why each application needs its part, and what it gets from it**
+
+*Understanding a text: classification, named entity recognition.* The answer is a label, not a text. What the task needs is the meaning of the whole input, and the meaning of a word often depends on what comes after it. In "He went to the bank to fish" and "He went to the bank to deposit money", the word *bank* is settled only by the words that follow. The encoder supplies exactly this: every token's vector is informed by both sides. No decoder is needed, because nothing is written. A small classification layer on top of the encoder is enough. What the task gets is the best representation for the least computation. What it gives up is the ability to generate text.
+
+*Generating a text: chat, completion, code.* The output is open-ended text, written from left to right. The task needs a model that predicts the next word from the words so far, and the causal mask makes training match this situation: the model is never shown the word it is asked to predict. No separate encoder is needed, because the prompt and its continuation form one sequence, and the prompt is simply the beginning of the text. What the task gets is fluent generation, and efficient training, since every position in every sentence is a prediction exercise. What it gives up is the two-sided view: each token is represented using only what precedes it.
+
+*Turning one text into another: translation, summarization.* The output is a new text whose words depend on the whole input, often in a different order. English says "the red car"; Arabic says "السيارة الحمراء", with the noun first. To write the first Arabic word, the model must already have read the last English word. The task needs both abilities. The encoder gives a complete, two-sided reading of the source. The decoder gives left-to-right writing of the target. Cross-attention lets each written word look back at the relevant source words. The price is two stacks of layers instead of one.
+
+| Application | What it needs | Family that fits, and what it provides |
+|---|---|---|
+| Classification, NER | The meaning of the whole input | **Encoder-only**: two-sided context for every token |
+| Text generation | The next word, given the words so far | **Decoder-only**: left-to-right prediction that matches how text is written |
+| Translation, summarization | A full reading of the input, and a new text as output | **Encoder–decoder**: both, plus cross-attention between them |
+
+Two remarks keep this picture honest. Large decoder-only models now also translate, summarize and classify, by treating every task as the continuation of a prompt. Encoder-only models remain the common choice for classification when the model must be small, fast and cheap to run.
+
+**In this lesson.** Emotion classification means reading a complete tweet and assigning one label, so the lesson uses an encoder, DistilBERT. This is also why the vector of the first token, `[CLS]`, can serve as a summary of the sentence: in an encoder that token has attended to every word.
+
+{{display: decoder attention}}
+
+### Theory 2: transfer learning
+
+**The principle.** Transfer learning means that knowledge gained on one task is reused on another, so that training does not start from randomly initialized weights. With transformers it is carried out in two stages.
+
+**Stage 1: pre-training.** Pre-training is done once, by the model's creators, on a very large body of **unlabeled** text. BERT learns by masked-word prediction: some words of a sentence are hidden and the model must predict them. No human labels are needed, because the text supplies its own answers. The result is a model that represents general English well but performs no particular task.
+
+**Stage 2: adapting to a task.** The pre-trained model is then trained on a small **labeled** dataset for one task. In this lesson that is 16,000 tweets labeled with six emotions.
+
+**Why it works.** To predict hidden words well, a model has to learn grammar, word meanings and how context changes meaning. That knowledge is useful for almost any language task. Only the last step, deciding which emotion a sentence expresses, is specific to the task. The practical value is that a small dataset becomes sufficient: sixteen thousand tweets cannot teach a model English, but they can teach a model that already knows English what anger looks like.
+
+**The body and the head.** A classifier built this way has two parts.
+
+- The **body** is the pre-trained transformer. It comes first and turns text into vectors.
+- The **classification head** is a small layer that comes last and turns those vectors into one score per class. It is specific to the task: its size is the number of classes (`num_labels=6` here; a three-class task would need a different head). It did not exist during pre-training, so it always starts from random weights.
+
+**Two ways to adapt.** The lesson uses both, in this order.
+
+| | Feature extraction | Fine-tuning |
+|---|---|---|
+| Body weights | Frozen: not updated | Updated, slightly |
+| Head | Trained | Trained |
+| Cost | Low, no GPU needed | Higher, a GPU is needed in practice |
+| Typical result | A reasonable baseline | Usually better |
+| In this lesson | Sections 4 and 5 (logistic regression on the body's vectors) | Section 6 (the `Trainer`) |
+
+In fine-tuning, all the weights are adjusted, but the body only slightly. This is why the learning rate is so small (`2e-5`): large steps would destroy what pre-training learned. In research papers, feature extraction with a linear classifier on top is also called *linear probing*.
+
+**When transfer works less well.** Transfer depends on the pre-training text resembling the task text. A model pre-trained on English will do poorly on Arabic tweets; for those, start from a model pre-trained on Arabic or on many languages. The same applies to specialized fields such as medicine or law.
+
+{{display: finetune}}
+
+### Theory 3: knowledge distillation
+
+**The problem it solves.** Large models are accurate but slow and expensive to run, which matters on a phone, on a free codespace, or when serving many users. Distillation produces a smaller model that keeps most of the large model's ability.
+
+**Teacher and student.** A large trained model, the *teacher*, is used to train a smaller model, the *student*. The student does not learn only from the data. It learns to imitate the teacher's outputs.
+
+**Hard labels and soft targets.** In ordinary training, a model that predicts a hidden word is told only the one correct answer. For "I drank a cup of [MASK]" the target is *coffee*, and every other word is equally wrong. This is a *hard label*. The teacher knows more than that. It might give *coffee* a high probability, *tea* a lower one, *water* less, and *car* almost none. These probabilities are *soft targets*. They tell the student that *tea* is a sensible answer and *car* is not, which the hard label cannot express. Each training example therefore teaches the student something about many words at once.
+
+**Temperature.** The teacher's probabilities for wrong answers are often very small. Dividing the scores by a *temperature* T greater than 1 before the softmax flattens the distribution, so that these small differences become large enough for the student to learn from.
+
+**What the student is trained on.** The student's loss combines two terms: how far its distribution is from the teacher's soft targets, and how far it is from the hard label.
+
+**DistilBERT.** DistilBERT is BERT distilled during pre-training. It has half of BERT's layers and started from BERT's own weights, taking every second layer. It was trained on three terms: matching the teacher's distribution, the usual masked-word loss, and keeping its hidden vectors aligned with the teacher's.
+
+| | BERT-base | DistilBERT |
+|---|---|---|
+| Transformer layers | 12 | 6 |
+| Parameters | about 110 million | about 66 million |
+| Speed | baseline | about 60% faster |
+| Language-understanding score | baseline | about 97% of BERT's (reported by its authors) |
+
+The size of each vector is the same, 768, which is the feature size you will see in Section 4.
+
+**Distillation is not fine-tuning.** The two answer different questions and are often used together, as in this lesson.
+
+| | Distillation | Fine-tuning |
+|---|---|---|
+| Purpose | Make a model smaller and faster | Adapt a model to a task |
+| Learns from | A teacher model's outputs | Labeled examples of the task |
+| In this lesson | Already done for you: BERT was distilled into DistilBERT | You do it in Section 6 |
+
+{{display: distill}}
+
+### Check your understanding
+
+<details markdown="1">
+<summary>1. Why is an encoder, and not a decoder, the natural choice for emotion classification?</summary>
+
+Classification needs the meaning of the whole sentence, and an encoder gives every token a view of the full input, left and right. Nothing has to be generated, so a decoder is not needed.
+</details>
+
+<details markdown="1">
+<summary>2. Why does a decoder mask the words that come later?</summary>
+
+When text is generated, later words do not exist yet. The mask makes training match that situation: the model is never shown the word it is asked to predict.
+</details>
+
+<details markdown="1">
+<summary>3. What does cross-attention give a translation model?</summary>
+
+It lets each word the decoder writes consult the encoder's reading of the whole source sentence.
+</details>
+
+<details markdown="1">
+<summary>4. In fine-tuning, which weights start from random values, and which are updated?</summary>
+
+Only the classification head starts from random values. All the weights are updated, the body as well as the head.
+</details>
+
+<details markdown="1">
+<summary>5. You change the task from six emotions to three sentiment classes. What can be reused?</summary>
+
+The pre-trained body can be reused as it is. The head must be replaced by one with three outputs and trained again, because its size depends on the number of classes.
+</details>
+
+<details markdown="1">
+<summary>6. What does a student learn from soft targets that it cannot learn from a hard label?</summary>
+
+Which wrong answers are nearly right. The hard label treats *tea* and *car* as equally wrong; the teacher's distribution shows that *tea* is plausible and *car* is not.
+</details>
+
 ### Setting up your environment
 
 Required tools: Python 3.10+, PyTorch, the Hugging Face libraries, and scikit-learn for evaluation.

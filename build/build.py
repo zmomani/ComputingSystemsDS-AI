@@ -30,7 +30,7 @@ WEEKS = [
   dict(n=2, slug='week02-text-classification', title='Text Classification', ilo='K1, P1',
        topics='Text classification, sentiment analysis, feature extraction vs. fine-tuning, evaluation metrics',
        milestone='Classification Agent that labels sources by type and relevance; evaluate on 20+ sources',
-       files=['week02-text-classification.md'], sims=['classifier', 'tokenizer', 'vectors']),
+       files=['week02-text-classification.md'], sims=['finetune', 'distill', 'classifier', 'tokenizer', 'vectors']),
   dict(n=3, slug='week03-ner', title='Named Entity Recognition (NER)', ilo='P1, T1', soon=True,
        topics='Token classification, BIO tagging, multilingual NER, per-entity evaluation',
        milestone='NER Agent extracting people, organisations, technologies, dates and locations; test on 5+ articles',
@@ -104,6 +104,8 @@ SIMS = {
   'decoder': ('Decoder: masked and cross-attention', 'Transformers', 'Causal mask, cross-attention to the encoder, next-word softmax; inference loop vs. training.'),
   'tokenizer': ('Subword tokenisation', 'Transformers', 'Type text, see WordPiece-style tokens, IDs and the embedding lookup.'),
   'positional': ('Positional encoding', 'Transformers', 'Sinusoid heatmap and per-dimension waves; why attention needs position.'),
+  'finetune': ('Frozen vs fine-tuned weights', 'Transfer learning', 'Feature extraction, fine-tuning and training from scratch: which weights are trainable and how far they move.'),
+  'distill': ('Distillation: hard label vs soft targets', 'Distillation', 'A student learns a masked word from the one correct answer or from the teacher\'s full distribution; change the temperature.'),
   'classifier': ('Decision boundary, threshold & F1', 'Classification', 'Train a linear classifier live over 2-D embeddings; slide the threshold.'),
   'bio-tagging': ('NER: BIO tags & entity-level F1', 'NER', 'Tag a sentence token by token; see why NER is scored per entity.'),
   'rag': ('RAG pipeline', 'LangChain', 'Load → split → embed → store → query → top-k → grounded prompt, in 2-D embedding space.'),
@@ -116,7 +118,7 @@ SIMS = {
   'lam': ('Browser agent: perceive → plan → act', 'LAMs', 'A mock browsing task with allowlist and no-payment gates.'),
   'diffusion': ('Diffusion: noising & denoising', 'Diffusion', 'Scrub t under a β schedule, read ᾱ_t and SNR, then denoise step by step.'),
 }
-SIM_FILES = ['matrix-multiply', 'vectors', 'attention', 'pronoun', 'qkv', 'heads', 'multihead', 'decoder', 'tokenizer', 'posenc', 'positional', 'classifier', 'bio-tagging', 'rag', 'langgraph', 'sampling', 'moe', 'react-loop', 'multi-agent', 'mcp', 'lam', 'diffusion']
+SIM_FILES = ['matrix-multiply', 'vectors', 'attention', 'pronoun', 'qkv', 'heads', 'multihead', 'decoder', 'tokenizer', 'posenc', 'positional', 'finetune', 'distill', 'classifier', 'bio-tagging', 'rag', 'langgraph', 'sampling', 'moe', 'react-loop', 'multi-agent', 'mcp', 'lam', 'diffusion']
 
 
 # ---------------------------------------------------------------- runnability
