@@ -421,6 +421,43 @@ def compute_metrics(pred):
     f1 = f1_score(labels, preds, average=&quot;weighted&quot;)
     acc = accuracy_score(labels, preds)
     return {&quot;accuracy&quot;: acc, &quot;f1&quot;: f1}</code></pre></div>
+<h3 id="before-you-train-moving-to-google-colab">Before you train: moving to Google Colab</h3>
+<div class="where-note">
+<div class="where-head">Optional notes. The lesson code below stays exactly as it is.</div>
+<p>The three training examples that follow (<em>Setting up the Trainer</em>, <em>Training the model</em> and the tuning mini-challenge) need a GPU, so they run in Google Colab instead of the codespace. Nothing here replaces the lesson code. Each note is an <strong>extra cell</strong> that you add to the Colab notebook, either as a setup step before training or as a fix when a particular message appears.</p>
+<p><strong>How to add a cell in Colab.</strong> Move the mouse between two cells and click <strong>+ Code</strong>, paste the snippet, and run it with <code>Shift</code>+<code>Enter</code>. <em>At the top</em> means above the first code cell of the notebook. <em>Above the Trainer cell</em> means directly above the cell that starts with <code>from transformers import Trainer, TrainingArguments</code>.</p>
+<p><strong>Setup steps, in this order</strong></p>
+<p><strong>1. Open the notebook.</strong> Press <strong>▶ Train in Colab</strong> on the example below. It opens this week's notebook, which contains every example of the lesson in order.</p>
+<p><strong>2. Turn on the GPU.</strong> In the Colab menu choose <strong>Runtime → Change runtime type → T4 GPU → Save</strong>. This is a menu setting, not code. Changing it restarts the session, so do it before you run anything.</p>
+<p><strong>3. Check that the GPU is visible.</strong> Add this cell at the top and run it:</p>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-python">import torch
+
+if torch.cuda.is_available():
+    print(&quot;GPU ready:&quot;, torch.cuda.get_device_name(0))
+else:
+    print(&quot;No GPU found. Runtime → Change runtime type → T4 GPU, then run this cell again.&quot;)</code></pre></div>
+<p><em>What it does:</em> it asks PyTorch whether a GPU is attached to the session. No separate command is needed to make the code use the GPU. The lesson already selects it with <code>device = torch.device("cuda" if torch.cuda.is_available() else "cpu")</code>, and the <code>Trainer</code> picks it up automatically. This cell only confirms that step 2 worked. Without a GPU the code still runs, without any error, but training takes hours.</p>
+<p><strong>4. Run the notebook from the top down to the Trainer cell.</strong> Click the Trainer cell, then choose <strong>Runtime → Run before</strong>. The Trainer reuses <code>model</code>, <code>tokenizer</code>, <code>emotion_encoded</code> and <code>compute_metrics</code> from the earlier sections, so they must exist in the Colab session. The first code cell of the notebook installs the libraries that Colab does not include (<code>datasets</code>, <code>gradio</code>).</p>
+<p><strong>5. Log in to Hugging Face.</strong> Add this cell above the Trainer cell and run it:</p>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-python">from huggingface_hub import notebook_login
+notebook_login()</code></pre></div>
+<p><em>What it does:</em> it stores your access token in the session so that the Trainer can upload the model. It is required here because <code>TrainingArguments</code> sets <code>push_to_hub=True</code>, and the Trainer creates your model repository as soon as it is built. In the notebook the login cell appears later, in Section 8, so in Colab you run it early. Create a token with <strong>write</strong> access at https://huggingface.co/settings/tokens.</p>
+<p><strong>If you see one of these messages</strong></p>
+<ul>
+<li><strong><code>ModuleNotFoundError: No module named 'datasets'</code></strong>: the install cell at the top of the notebook was not run. Run it, or add <code>%pip install -q datasets</code> in a cell at the top.</li>
+<li><strong><code>TypeError: ... got an unexpected keyword argument 'eval_strategy'</code></strong> (or <code>'processing_class'</code>): the Transformers version in Colab is older than 4.46. Add <code>%pip install -q -U "transformers[torch]"</code> in a cell at the top and run it, choose <strong>Runtime → Restart session</strong>, then run the notebook from the top again.</li>
+<li><strong><code>NameError: name 'emotion_encoded' is not defined</code></strong> (or <code>model</code>, <code>tokenizer</code>, <code>compute_metrics</code>): the earlier cells were not run in this session. Colab forgets all variables after a restart or a disconnect. Repeat step 4.</li>
+<li><strong>An error that mentions a token, a login or <code>401 Unauthorized</code></strong> when the Trainer cell runs: you are not logged in. Do step 5, then run the Trainer cell again.</li>
+<li><strong>Colab asks for a <code>wandb</code> API key</strong> when training starts: older Transformers versions try to log to Weights &amp; Biases, which this course does not use. Type <code>3</code> (do not visualize my results) and press Enter.</li>
+<li><strong><code>CUDA out of memory</code></strong>: the GPU ran out of memory. This is the one case where you change the lesson code: set <code>batch_size = 32</code> in the Trainer cell, choose <strong>Runtime → Restart session</strong>, and run from the top again.</li>
+<li><strong>Training shows an estimated time of hours</strong>: the GPU is off. Repeat steps 2 and 3.</li>
+</ul>
+<p><strong>Optional</strong></p>
+<ul>
+<li><strong>See the GPU and its memory.</strong> Run <code>!nvidia-smi</code> in a new cell anywhere in the notebook.</li>
+<li><strong>Bring the trained model back to your codespace.</strong> Colab deletes its files when the session ends, so finish Section 8 (<code>trainer.push_to_hub(...)</code>) in Colab before you close the tab. Then, in the codespace, run the <em>Using your model</em> cell with your own username. It downloads the model from the Hub, and prediction does not need a GPU.</li>
+</ul>
+</div>
 <h3 id="setting-up-the-trainer">Setting up the Trainer</h3>
 <div class="runnable local"><span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Training needs a GPU — opens this code in Google Colab">▶ Train in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="a GPU for training" title="Opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from transformers import Trainer, TrainingArguments
 

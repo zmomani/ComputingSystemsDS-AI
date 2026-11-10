@@ -167,10 +167,14 @@ PAGE_BLOCKS = []   # python blocks of the page being built: (code, title)
 
 def code_block_html(code, lang, title=None):
     lang = LANG_ALIAS.get(lang.lower(), lang.lower())
+    # ```python-note: an optional side snippet. Shown and highlighted as Python with a Copy button,
+    # but it is not a lesson example: no Try it / Codespaces button and it is left out of the notebook.
+    note_only = lang == 'python-note'
+    if note_only: lang = 'python'
     esc = html.escape(code)
     pre = f'<pre><code class="language-{lang}">{esc}</code></pre>'
     head = f'<div class="code-title">{html.escape(title)}</div>' if title else ''
-    shell_only = all(l.strip().startswith(('!', '%', '#')) for l in code.splitlines() if l.strip())
+    shell_only = note_only or all(l.strip().startswith(('!', '%', '#')) for l in code.splitlines() if l.strip())
     if lang == 'javascript' and not re.search(r'\b(document|window|fetch|require|localStorage|XMLHttpRequest)\b|^\s*import\s', code, re.M):
         btn = '<button class="try" data-run="1" data-lang="javascript">▶ Try it</button>'
         return f'<div class="runnable" data-lang="javascript">{head}{btn}<button class="copy">Copy</button><textarea class="src" hidden>{esc}</textarea>{pre}</div>'
