@@ -35,6 +35,21 @@ Better still: put functions in `.py` files and `import` them from the notebook, 
 2. Open the folder **`notebooks/`** — one notebook per lesson with all of that lesson's code, in the same order as the site.
 3. Click inside a code cell and press **Shift + Enter**. If VS Code asks for a kernel, choose **Python 3.12** (`/usr/local/bin/python`).
 
+## Lesson and notebook side by side (trial, Week 2)
+
+You can read the lesson and run its notebook in **one browser window**: the lesson on the left and the real notebook
+on the right, running on this codespace with PyTorch and Transformers.
+
+1. Open a terminal (**Ctrl + `**) and run `bash scripts/start-lesson-lab.sh`.
+2. Open the link it prints (Ctrl+click). The Week 2 lesson opens.
+3. Press the button on any Python example (**▶ Try it** or **📓 To notebook**). The side panel opens the Week 2 notebook
+   and selects the cell that holds that example. If the example is not in your notebook any more, a new cell is filled with it.
+4. Press **▶ Run cell**. If the example needs earlier ones, press **⏫ Run all above, then this**
+   (not for the training cells: those belong in Colab).
+
+The notebook is the same file as `notebooks/week02-text-classification.ipynb`, so your work is saved there.
+Leave the terminal open while you work, and press **Ctrl + C** in it to stop.
+
 ## API keys (OpenAI, Tavily)
 
 The LangChain, LangGraph and agent examples need your own keys. Either:

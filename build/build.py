@@ -604,14 +604,19 @@ def try_section(snippets, week=None):
     return out
 
 # ---------------------------------------------------------------- pages
+NOTEBOOK_PANEL_PAGES = {'week02-text-classification'}   # pages that load assets/js/jupyter-panel.js
+
 def lesson_shell(title, active_slug, prev, nxt, inner, sims):
     has_nb = bool(PAGE_BLOCKS)
     inner = finalize(inner, active_slug, title)
     data = f' data-colab="{colab_url(active_slug)}"' if has_nb else ''
-    return (head(title, 1) + topbar(1, active_slug, prev, nxt, workbench=True) +
+    page = (head(title, 1) + topbar(1, active_slug, prev, nxt, workbench=True) +
             f'<main class="lesson panel-closed" id="lesson"{data} data-codespaces="{CODESPACES_URL}" data-guide="{GUIDE_URL}"><article class="lesson-content" id="lesson-content">{inner}</article>'
             f'<div id="splitter" class="splitter" role="separator" aria-orientation="vertical" title="Drag to resize"></div>{workbench(sims)}</main>' +
             scripts(1, workbench=True))
+    if active_slug in NOTEBOOK_PANEL_PAGES:   # prototype: lesson and notebook side by side (see scripts/start-lesson-lab.sh)
+        page = page.replace('</body>', '<script src="../assets/js/jupyter-panel.js"></script>\n</body>')
+    return page
 
 def lesson_page(w, prev, nxt):
     body, snippets = render_body(w['files'])

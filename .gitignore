@@ -3,3 +3,4 @@ build/shots/
 .env
 .ipynb_checkpoints/
 db.sqlite3
+.lesson-site/
