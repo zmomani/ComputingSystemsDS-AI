@@ -33,6 +33,20 @@ Good to know:
 * You can close this VS Code tab's panels and work only in the lesson tab. Keep the codespace itself running.
 * Stop the notebook server with `bash scripts/start-lesson-lab.sh stop`. Show the link again by running the script again.
 
+## If the lesson tab stops working
+
+A codespace **goes to sleep after 30 minutes without activity** (GitHub's rule; it protects your free hours).
+The lesson tab then shows a red bar, a "Kernel died" or "401" message, or a "404 Not Found" page.
+
+* **To wake it:** open <https://github.com/codespaces>, start your codespace again, wait for the link in its terminal,
+  and open the link. Your notebook file is saved; run the cells you need again, because the variables are gone.
+* **To avoid it while you work:** leave the terminal named for the course notebook open in the codespace tab. It prints
+  a line every few minutes while you are using a lesson tab, and that is what keeps the codespace awake. If you closed
+  that terminal, run `bash scripts/start-lesson-lab.sh watch` in a new one.
+* **If lessons do not open from the home page:** run `bash scripts/start-lesson-lab.sh` once more and reload the page.
+* You can also raise the limit for codespaces you create later: GitHub → Settings → Codespaces → *Default idle timeout*
+  (up to 240 minutes).
+
 ## Where does each kind of code run?
 
 **Use the course notebook for all your coursework.** One environment means the same Python and the same libraries

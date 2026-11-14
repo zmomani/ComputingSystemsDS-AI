@@ -4,3 +4,4 @@ build/shots/
 .ipynb_checkpoints/
 db.sqlite3
 .lesson-site/
+.lesson-site.*/

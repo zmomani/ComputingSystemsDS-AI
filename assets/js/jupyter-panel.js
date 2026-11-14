@@ -12,6 +12,37 @@
   const base = where[1], slug = where[2];
   const lesson = document.getElementById("lesson"), wb = document.getElementById("workbench");
 
+  /* ---- staying awake, and saying so when the codespace has gone to sleep
+   * GitHub stops a codespace after 30 minutes without activity and counts only its own tab and terminals.
+   * While the student is really using this tab (mouse, keyboard, scrolling in the last few minutes), the page reports
+   * to the notebook server every few minutes. The server logs that request, and "start-lesson-lab.sh watch" prints
+   * it in a codespace terminal, which GitHub counts as activity. No interaction here means no reports, and the
+   * codespace sleeps as usual. */
+  const BEAT_MS = Number(new URLSearchParams(location.search).get("heartbeat")) * 1000 || 4 * 60 * 1000;
+  let lastUse = Date.now();
+  const used = () => { lastUse = Date.now(); };
+  const watchUse = (doc) => ["pointerdown", "keydown", "wheel", "scroll"].forEach((ev) => doc.addEventListener(ev, used, { capture: true, passive: true }));
+  watchUse(document);
+  let asleep = null;
+  function showAsleep(why) {
+    if (asleep) return;
+    asleep = document.createElement("div");
+    asleep.setAttribute("role", "alert");
+    asleep.style.cssText = "position:fixed;left:0;right:0;top:0;z-index:2000;padding:.6rem 1rem;background:#7a1f1f;color:#fff;font-size:.92rem;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.3)";
+    asleep.innerHTML = why + ' Open <a style="color:#fff;font-weight:700" href="https://github.com/codespaces" target="_blank" rel="noopener">github.com/codespaces</a>, start your codespace again, and use the new link shown in its terminal. Your notebook file is saved.';
+    document.body.appendChild(asleep);
+  }
+  async function beat() {
+    if (asleep) return;
+    try {
+      const r = await fetch(`${base}/api/status`, { cache: "no-store" });
+      if (r.status === 401 || r.status === 403) return showAsleep("Your login to the course notebook has expired.");
+      if (!r.ok) return showAsleep("The course notebook has stopped. A codespace sleeps after 30 minutes without activity.");
+    } catch (_) { return showAsleep("The course notebook has stopped. A codespace sleeps after 30 minutes without activity."); }
+    if (Date.now() - lastUse < BEAT_MS * 1.5) fetch(`${base}/?lesson-active`, { redirect: "manual", cache: "no-store" }).catch(() => {});
+  }
+  setInterval(beat, BEAT_MS);
+
   if (!slug || !lesson || !wb) {                   // home page inside the codespace: the notebook is already running
     document.querySelectorAll("a.btn.codespaces").forEach((a) => {
       const note = document.createElement("p");
@@ -62,6 +93,7 @@
     if (!iframe) {
       iframe = document.createElement("iframe");
       iframe.title = "Notebook"; iframe.src = `${base}/doc/tree/${nbPath}`;
+      iframe.addEventListener("load", () => { try { watchUse(iframe.contentDocument); } catch (_) { /* not ready */ } });
       pane.querySelector(".nb-frame").replaceWith(iframe);
     }
     return iframe;

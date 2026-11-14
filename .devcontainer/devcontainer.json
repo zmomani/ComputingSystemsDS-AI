@@ -6,7 +6,7 @@
   },
   "hostRequirements": { "cpus": 2, "memory": "8gb", "storage": "32gb" },
   "postCreateCommand": "bash .devcontainer/setup.sh",
-  "postAttachCommand": "bash scripts/start-lesson-lab.sh || true",
+  "postAttachCommand": "bash scripts/start-lesson-lab.sh watch || true",
   "forwardPorts": [8000, 8501, 7860, 8888, 11434],
   "portsAttributes": {
     "8000": { "label": "Django / FastAPI app", "onAutoForward": "openBrowser" },

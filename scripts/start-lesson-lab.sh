@@ -6,9 +6,15 @@
 # in the side panel. The button on each code example then takes you to the notebook cell that holds it.
 #
 #   bash scripts/start-lesson-lab.sh          start it (or, if it is already running, show the link again)
+#   bash scripts/start-lesson-lab.sh watch    the same, then stay in this terminal and report activity (see below)
 #   bash scripts/start-lesson-lab.sh stop     stop it
 #
-# The codespace runs this by itself every time you open it.
+# The codespace runs the "watch" form by itself every time you open it.
+#
+# Why "watch": GitHub stops a codespace after 30 minutes without activity, and it counts only what happens in the
+# codespace's own tab and terminals. While you work in a lesson tab, the lesson page reports to the notebook server
+# every few minutes, and "watch" prints one line in the terminal for each report. That terminal output is what tells
+# GitHub you are still working. When you stop using the lesson tab, the reports stop and the codespace sleeps as usual.
 cd "$(dirname "$0")/.." || exit 1
 PORT="${LESSON_LAB_PORT:-8888}"
 STATE="$HOME/.lesson-lab"
@@ -29,10 +35,23 @@ TOKEN="$(cat "$STATE/token")"
 
 # Only the lesson pages and their assets are served as web pages, never the whole repository (it may hold your .env file).
 # They are copied fresh on every run, so after a "git pull" just run this script again.
+# The copy is prepared aside and swapped in, and only one run does it at a time: two browser tabs attaching to the
+# codespace at once must never leave the pages half copied.
 SITE=".lesson-site"
-rm -rf "$SITE"
-mkdir -p "$SITE"
-cp -r index.html lessons assets "$SITE/"
+exec 9>"$STATE/lock"
+command -v flock >/dev/null 2>&1 && flock 9
+NEW="$SITE.new.$$"
+rm -rf "$NEW"
+mkdir -p "$NEW"
+if cp -r index.html lessons assets "$NEW/"; then
+  rm -rf "$SITE.old"
+  [ -e "$SITE" ] && mv "$SITE" "$SITE.old"
+  mv "$NEW" "$SITE"
+  rm -rf "$SITE.old"
+else
+  rm -rf "$NEW"
+  echo "Could not copy the lesson pages; keeping the previous copy."
+fi
 
 if ! listening; then
   # No "Jupyter news" pop-up over the notebook.
@@ -45,7 +64,8 @@ cfg.setdefault("disabledExtensions", {})["@jupyterlab/apputils-extension:announc
 p.write_text(json.dumps(cfg, indent=2))
 PY
   ROOT_FLAG=""; [ "$(id -u)" = "0" ] && ROOT_FLAG="--allow-root"
-  nohup python -m jupyterlab --no-browser --port "$PORT" --ServerApp.port_retries=0 $ROOT_FLAG \
+  DETACH=""; command -v setsid >/dev/null 2>&1 && DETACH="setsid"     # so that closing a terminal cannot stop the server
+  $DETACH nohup python -m jupyterlab --no-browser --port "$PORT" --ServerApp.port_retries=0 $ROOT_FLAG \
     --IdentityProvider.token="$TOKEN" \
     --ServerApp.root_dir="$PWD" \
     --ServerApp.extra_static_paths="$PWD/$SITE" \
@@ -56,6 +76,8 @@ PY
   echo $! > "$STATE/pid"
   for _ in $(seq 1 60); do listening && break; sleep 1; done
 fi
+
+flock -u 9 2>/dev/null; exec 9>&-
 
 if ! listening; then
   echo "The course notebook did not start. The last lines of its log ($STATE/jupyter.log):"
@@ -84,4 +106,17 @@ echo
 
 # In a codespace, also open the link in a new browser tab (the browser may ask for permission first).
 if [ -n "${CODESPACE_NAME:-}" ] && [ -n "${BROWSER:-}" ]; then "$BROWSER" "$LINK" >/dev/null 2>&1 || true; fi
+
+if [ "${1:-start}" = "watch" ]; then
+  echo " Leave this terminal open. It shows a line whenever you are working in a lesson tab,"
+  echo " which keeps the codespace awake. After 30 minutes with no line here, the codespace sleeps."
+  echo
+  tail -n 0 -F "$STATE/jupyter.log" 2>/dev/null | while IFS= read -r line; do
+    case "$line" in
+      *"302 GET /?lesson-active"*) echo "$(date +%H:%M)  working in a lesson tab" ;;
+      *"Saving file at"*)          echo "$(date +%H:%M)  notebook saved" ;;
+      *"Kernel started"*)          echo "$(date +%H:%M)  notebook kernel started" ;;
+    esac
+  done
+fi
 exit 0
