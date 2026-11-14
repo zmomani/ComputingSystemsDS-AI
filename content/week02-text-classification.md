@@ -116,7 +116,7 @@ In fine-tuning, all the weights are adjusted, but the body only slightly. This i
 
 ### Theory 3: knowledge distillation
 
-**The problem it solves.** Large models are accurate but slow and expensive to run, which matters on a phone, on a free codespace, or when serving many users. Distillation produces a smaller model that keeps most of the large model's ability.
+**The problem it solves.** Large models are accurate but slow and expensive to run, which matters on a phone, on a free cloud machine, or when serving many users. Distillation produces a smaller model that keeps most of the large model's ability.
 
 **Teacher and student.** A large trained model, the *teacher*, is used to train a smaller model, the *student*. The student does not learn only from the data. It learns to imitate the teacher's outputs.
 
@@ -534,7 +534,7 @@ def compute_metrics(pred):
 <div class="where-note" markdown="1">
 <div class="where-head">Optional notes. The lesson code below stays exactly as it is.</div>
 
-The three training examples that follow (*Setting up the Trainer*, *Training the model* and the tuning mini-challenge) need a GPU, so they run in Google Colab instead of the codespace. Nothing here replaces the lesson code. Each note is an **extra cell** that you add to the Colab notebook, either as a setup step before training or as a fix when a particular message appears.
+The three training examples that follow (*Setting up the Trainer*, *Training the model* and the tuning mini-challenge) need a GPU, so they run in Google Colab instead of the course notebook. Nothing here replaces the lesson code. Each note is an **extra cell** that you add to the Colab notebook, either as a setup step before training or as a fix when a particular message appears.
 
 **How to add a cell in Colab.** Move the mouse between two cells and click **+ Code**, paste the snippet, and run it with `Shift`+`Enter`. *At the top* means above the first code cell of the notebook. *Above the Trainer cell* means directly above the cell that starts with `from transformers import Trainer, TrainingArguments`.
 
@@ -581,7 +581,7 @@ notebook_login()
 **Optional**
 
 - **See the GPU and its memory.** Run `!nvidia-smi` in a new cell anywhere in the notebook.
-- **Bring the trained model back to your codespace.** Colab deletes its files when the session ends, so finish Section 8 (`trainer.push_to_hub(...)`) in Colab before you close the tab. Then, in the codespace, run the *Using your model* cell with your own username. It downloads the model from the Hub, and prediction does not need a GPU.
+- **Bring the trained model back to the course notebook.** Colab deletes its files when the session ends, so finish Section 8 (`trainer.push_to_hub(...)`) in Colab before you close the tab. Then, in the course notebook, run the *Using your model* cell with your own username. It downloads the model from the Hub, and prediction does not need a GPU.
 
 </div>
 

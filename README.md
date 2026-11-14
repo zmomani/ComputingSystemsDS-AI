@@ -9,8 +9,8 @@ Each lesson page works like the Programming for Data Science tutorial: the lesso
 | Button | What happens |
 |---|---|
 | **▶ Try it** | Opens the panel's **Code** tab, loads the example into a live Python editor (CodeMirror) and runs it in the browser with Pyodide. Students edit and re-run with `Ctrl+Enter`. NumPy, pandas, scikit-learn and matplotlib load automatically; figures and DataFrames render in the output. |
-| **⧉ Open in Codespaces** | For all code a browser cannot run (PyTorch, Transformers, LangChain, MCP, Ollama, Django, Playwright…). Opens the course codespace (VS Code in the browser, configured by `.devcontainer/`); each lesson's code is in `notebooks/`. See `CODESPACES.md`. |
-| **▶ Train in Colab** | Only for the GPU training exercises in Weeks 2 and 13 (free codespaces have no GPU). |
+| **📓 Open in notebook** | For all code a browser cannot run (PyTorch, Transformers, LangChain, MCP, Ollama, Django, Playwright…). Starts the course codespace (configured by `.devcontainer/`), which runs `scripts/start-lesson-lab.sh` and shows a link to the lessons with their Jupyter notebooks beside them; on those pages each example's button takes you to its notebook cell (`assets/js/jupyter-panel.js`). See `CODESPACES.md`. |
+| **▶ Train in Colab** | Only for the GPU training exercises in Weeks 2 and 13 (the codespace has no GPU). |
 | **▶ Display** | Opens the panel's **Animation** tab on the chosen animation; **⤢ Full screen** enlarges it. |
 
 Every week also has a **Try it yourself** section with browser-runnable examples of that week's mechanisms (`content/browser-examples.py`).

@@ -6,12 +6,13 @@
   },
   "hostRequirements": { "cpus": 2, "memory": "8gb", "storage": "32gb" },
   "postCreateCommand": "bash .devcontainer/setup.sh",
+  "postAttachCommand": "bash scripts/start-lesson-lab.sh || true",
   "forwardPorts": [8000, 8501, 7860, 8888, 11434],
   "portsAttributes": {
     "8000": { "label": "Django / FastAPI app", "onAutoForward": "openBrowser" },
     "8501": { "label": "Streamlit app", "onAutoForward": "openBrowser" },
     "7860": { "label": "Gradio app", "onAutoForward": "openBrowser" },
-    "8888": { "label": "Lesson + notebook (scripts/start-lesson-lab.sh)", "onAutoForward": "silent" },
+    "8888": { "label": "Course notebook (lessons + notebooks)", "onAutoForward": "silent" },
     "11434": { "label": "Ollama", "onAutoForward": "silent" }
   },
   "secrets": {

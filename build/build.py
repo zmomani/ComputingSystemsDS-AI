@@ -295,8 +295,8 @@ def finalize(page_html, slug=None, title=None):
     gpu_btn = (f'<a class="btn colab" href="{colab}" target="_blank" rel="noopener"><span class="colab-logo">CO</span> Train on a GPU in Colab</a>'
                if slug in GPU_WEEKS else '')
     page_html = page_html.replace('COLABLINKX', (f'<div class="colab-bar"><a class="btn codespaces" href="{CODESPACES_URL}" target="_blank" rel="noopener">'
-        '⧉ Open this week\'s code in Codespaces</a>' + gpu_btn +
-        f'<a class="muted small" href="{GUIDE_URL}" target="_blank" rel="noopener">How to use Codespaces</a></div>') if has_nb else '')
+        '📓 Open this week\'s notebook</a>' + gpu_btn +
+        f'<a class="muted small" href="{GUIDE_URL}" target="_blank" rel="noopener">How the notebook works</a></div>') if has_nb else '')
     def block(i):
         code, title = PAGE_BLOCKS[i]; r = res[i]
         return python_block_html(code, title, r['run'], r.get('setup', ''), r.get('reason', ''))
@@ -334,18 +334,19 @@ def where_note(blocks):
     mods = set(); gpu = False
     for c, _ in blocks:
         mods |= imported_modules(c) | set(missing_modules(c)); gpu = gpu or needs_gpu(c)
-    items = ['<li><b>Everything else → GitHub Codespaces.</b> PyTorch, Transformers, LangChain, LangGraph, MCP servers, Ollama, Django, '
+    items = ['<li><b>Everything else → the course notebook.</b> PyTorch, Transformers, LangChain, LangGraph, MCP servers, Ollama, Django, '
              'Playwright and Streamlit need a full Python installation, large libraries, or programs that keep running — a web page has none '
-             'of these. <b>⧉ Open in Codespaces</b> gives you VS Code in your browser on a cloud machine already set up for this course, '
-             'with this lesson\'s code in <code>notebooks/</code>. Use it for all your coursework and your project, so everything runs in '
-             f'<b>one</b> environment (<a href="{GUIDE_URL}" target="_blank" rel="noopener">how to use it</a>).</li>']
+             'of these. <b>📓 Open in notebook</b> starts a free cloud machine already set up for this course (a GitHub codespace) and shows '
+             'a link that opens this lesson with its Jupyter notebook beside it. There, the button on each example takes you to the notebook '
+             'cell that holds it. Use the notebook for all your coursework, so everything runs in '
+             f'<b>one</b> environment (<a href="{GUIDE_URL}" target="_blank" rel="noopener">how it works</a>).</li>']
     if mods & API_MODS:
         items.append('<li><b>API keys.</b> LangChain, OpenAI and agent examples call services on the internet with your own key. Add it once as a '
                      'Codespaces secret (GitHub → Settings → Codespaces → Secrets) or in the <code>.env</code> file — never in your code.</li>')
     if gpu:
-        items.append('<li><b>Exception — model training → Google Colab.</b> Training a model needs a GPU, which free codespaces do not have '
+        items.append('<li><b>Exception — model training → Google Colab.</b> Training a model needs a GPU, which the notebook\'s free cloud machine does not have '
                      '(it would take hours on the CPU). The training examples below have <b>▶ Train in Colab</b>, which opens the same code '
-                     'with a free GPU. Save the trained model and bring it back to your codespace.</li>')
+                     'with a free GPU. Save the trained model and bring it back to the course notebook.</li>')
     return ('<div class="where-note"><div class="where-head">Where does this code run — and why?</div>'
             '<p><b>▶ Try it</b> examples run inside this page, in your web browser — good for quick experiments with plain Python, '
             'NumPy, pandas, scikit-learn and matplotlib. From here on the examples need more:</p><ul>' + ''.join(items) + '</ul></div>')
@@ -368,7 +369,7 @@ def python_block_html(code, title, run, setup, reason):
         miss = (', '.join({'django': 'Django', 'playwright': 'Playwright', 'ollama': 'Ollama', 'langchain_ollama': 'Ollama', 'streamlit': 'Streamlit'}.get(m, m) for m in vm)
                 or ('Django' if re.search(r'django|INSTALLED_APPS|urlpatterns', code) else 'an MCP server' if 'mcp.run(' in code else miss))
         btn = (f'<span class="local-btns"><a class="try vscode-try" href="{CODESPACES_URL}" target="_blank" rel="noopener" '
-               f'title="Opens VS Code in your browser, set up for this course">⧉ Open in Codespaces</a>'
+               f'title="Starts the course environment. The link it shows opens this lesson with its notebook beside it.">📓 Open in notebook</a>'
                f'<button class="try local" data-run="0" data-target="vscode" data-needs="{html.escape(miss)}" title="Needs {html.escape(miss)} — opens in the editor">✎ Editor</button></span>')
     else:
         btn = (f'<span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week\'s notebook)">▶ Run in Colab</a>'
@@ -594,7 +595,7 @@ def try_section(snippets, week=None):
     browser = BROWSER_EXAMPLES.get(week, [])
     if not snippets and not browser: return ''
     out = '''<h2 id="try-it-yourself">Try it yourself</h2>
-<p class="lesson-intro"><b>▶ Try it</b> runs an example in the editor panel, inside your browser — change the code and press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to run it again. Examples that use PyTorch, Transformers, LangChain or an API cannot run in a browser: press <b>⧉ Open in Codespaces</b> and run them in the course environment (this lesson's code is in <code>notebooks/</code>).</p>'''
+<p class="lesson-intro"><b>▶ Try it</b> runs an example in the editor panel, inside your browser — change the code and press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to run it again. Examples that use PyTorch, Transformers, LangChain or an API cannot run in a browser: press <b>📓 Open in notebook</b> and run them in the course notebook, which opens beside the lesson.</p>'''
     if browser:
         out += '<h3 id="run-in-your-browser">Run in your browser</h3><p class="lesson-intro">Self-contained versions of this week\'s mechanisms, written with NumPy, scikit-learn or plain Python so they run here.</p>'
         out += ''.join(code_block_html(code, 'python', title) for title, code in browser)
@@ -604,8 +605,6 @@ def try_section(snippets, week=None):
     return out
 
 # ---------------------------------------------------------------- pages
-NOTEBOOK_PANEL_PAGES = {'week02-text-classification'}   # pages that load assets/js/jupyter-panel.js
-
 def lesson_shell(title, active_slug, prev, nxt, inner, sims):
     has_nb = bool(PAGE_BLOCKS)
     inner = finalize(inner, active_slug, title)
@@ -614,7 +613,7 @@ def lesson_shell(title, active_slug, prev, nxt, inner, sims):
             f'<main class="lesson panel-closed" id="lesson"{data} data-codespaces="{CODESPACES_URL}" data-guide="{GUIDE_URL}"><article class="lesson-content" id="lesson-content">{inner}</article>'
             f'<div id="splitter" class="splitter" role="separator" aria-orientation="vertical" title="Drag to resize"></div>{workbench(sims)}</main>' +
             scripts(1, workbench=True))
-    if active_slug in NOTEBOOK_PANEL_PAGES:   # prototype: lesson and notebook side by side (see scripts/start-lesson-lab.sh)
+    if has_nb:   # lesson and notebook side by side when the page is opened from the course codespace (scripts/start-lesson-lab.sh)
         page = page.replace('</body>', '<script src="../assets/js/jupyter-panel.js"></script>\n</body>')
     return page
 
@@ -665,14 +664,14 @@ def index_page():
   <div class="eyebrow">{COURSE_CODE} · Faculty of Information Technology · University of Petra</div>
   <h1>Computing Systems for Data Science and Artificial Intelligence</h1>
   <p class="lead">A 16-week, project-driven course from transformers to agents: LLMs, Mixture of Experts, ReAct, multi-agent systems, MCP, Large Action Models and diffusion — built around a multi-agent research assistant that competes live in Week 15.</p>
-  <p class="lead small-lead">Each lesson has the explanation on the left and a panel on the right. <b>▶ Try it</b> runs an example in a live Python editor inside your browser — nothing to install. <b>▶ Display</b> opens an animation of the concept you are reading about. <b>⧉ Open in Codespaces</b> opens the course environment for everything else. Section taught by <b>{INSTRUCTOR}</b>.</p>
+  <p class="lead small-lead">Each lesson has the explanation on the left and a panel on the right. <b>▶ Try it</b> runs an example in a live Python editor inside your browser — nothing to install. <b>▶ Display</b> opens an animation of the concept you are reading about. <b>📓 Open in notebook</b> opens the course notebook for everything else. Section taught by <b>{INSTRUCTOR}</b>.</p>
   <p><a class="btn primary" href="lessons/week01-transformers.html">Start with Week 1 ›</a> <a class="btn ghost" href="lessons/syllabus.html">Syllabus</a> <a class="btn ghost" href="lessons/project.html">Final project</a></p>
 
   <h2 id="where-code-runs">Where the code runs</h2>
   <div class="grid">
     <div class="card"><h3>▶ Try it — in your browser</h3><p>Plain Python, NumPy, pandas, scikit-learn and matplotlib run inside the lesson page itself. Instant, nothing to install — for experimenting while you read.</p></div>
-    <div class="card"><h3>⧉ Codespaces — for everything else</h3><p>VS Code in your browser on a cloud machine already set up for this course: PyTorch, Transformers, LangChain, LangGraph, MCP, Ollama, Django, Playwright, Streamlit — every lesson's code in <code>notebooks/</code>, and your project. One environment, so code that runs in a notebook also runs as a script. <a href="{GUIDE_URL}" target="_blank" rel="noopener">Guide</a></p><a class="btn codespaces" href="{CODESPACES_URL}" target="_blank" rel="noopener">⧉ Open in Codespaces</a></div>
-    <div class="card"><h3><span class="colab-logo">CO</span> Colab — only for GPU training</h3><p>Codespaces has no GPU. The two model-training exercises (Week 2 fine-tuning, Week 13 diffusion) have a <b>▶ Train in Colab</b> button that opens the same code with a free GPU.</p></div>
+    <div class="card"><h3>📓 Notebook — for everything else</h3><p>A Jupyter notebook beside the lesson, running on a free cloud machine already set up for this course (a GitHub codespace): PyTorch, Transformers, LangChain, LangGraph, MCP, Ollama, Django, Playwright, Streamlit. Every lesson has its own notebook with all of its code in order, and the button on each example takes you to its cell. One environment for all your coursework. <a href="{GUIDE_URL}" target="_blank" rel="noopener">Guide</a></p><a class="btn codespaces" href="{CODESPACES_URL}" target="_blank" rel="noopener">📓 Open in notebook</a></div>
+    <div class="card"><h3><span class="colab-logo">CO</span> Colab — only for GPU training</h3><p>The notebook's cloud machine has no GPU. The two model-training exercises (Week 2 fine-tuning, Week 13 diffusion) have a <b>▶ Train in Colab</b> button that opens the same code with a free GPU.</p></div>
   </div>
 
   <h2 id="curriculum">16-week curriculum</h2>
@@ -686,7 +685,7 @@ def index_page():
   <div class="grid">
     <div class="card"><h3>What you'll learn</h3><p>Transformers, LLMs, Mixture of Experts, AI agents and ReAct, multi-agent systems, Model Context Protocol (MCP), Large Action Models (LAMs) and diffusion models.</p></div>
     <div class="card"><h3>What you'll build</h3><p>NER systems, RAG pipelines, LangGraph agents, multi-agent workflows, LAM applications and generative-AI projects, culminating in a multi-agent research assistant.</p></div>
-    <div class="card"><h3>Technologies</h3><p>Python 3.12+, PyTorch, Hugging Face, LangChain &amp; LangGraph, OpenAI API, Ollama, Playwright, VS Code.</p></div>
+    <div class="card"><h3>Technologies</h3><p>Python 3.12+, PyTorch, Hugging Face, LangChain &amp; LangGraph, OpenAI API, Ollama, Playwright, Jupyter notebooks.</p></div>
     <div class="card"><h3>Who should take it</h3><p>University of Petra students in Data Science and AI degrees interested in LLMs and agents. Basic Python is recommended.</p></div>
   </div>
 
@@ -711,7 +710,7 @@ def index_page():
 
   <h2 id="resources">Resources</h2>
   <div class="grid">
-    <div class="card"><h3>Required software</h3><p>Python 3.12+, PyTorch, Hugging Face Transformers, LangChain &amp; LangGraph, Ollama, VS Code. Keep API keys in a <code>.env</code> file and never commit them.</p></div>
+    <div class="card"><h3>Required software</h3><p>Python 3.12+, PyTorch, Hugging Face Transformers, LangChain &amp; LangGraph, Ollama, Jupyter notebooks. Keep API keys in a <code>.env</code> file and never commit them.</p></div>
     <div class="card"><h3>Hardware</h3><p><b>Minimum:</b> 8 GB RAM, i5, 50 GB storage, webcam.<br><b>Recommended:</b> 16 GB RAM, i7/Ryzen 7, dedicated GPU, 100 GB SSD.</p></div>
   </div>
   <div class="card" style="margin-top:.75rem"><h3>References &amp; reading</h3><ol>
@@ -725,7 +724,8 @@ def index_page():
       <li>Calvin Luo, <i>Understanding Diffusion Models: A Unified Perspective</i>, 2022.</li></ol></div>
   {footer()}
 </div>'''
-    return head('Home') + topbar(0) + f'<main class="home">{inner}</main>' + scripts(0)
+    return (head('Home') + topbar(0) + f'<main class="home">{inner}</main>' +
+            scripts(0).replace('</body>', '<script src="assets/js/jupyter-panel.js"></script>\n</body>'))
 
 def main():
     nav = [(f'{w["slug"]}.html', w['title'], w['n']) for w in WEEKS]
