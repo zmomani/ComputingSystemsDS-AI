@@ -87,9 +87,15 @@ Two remarks keep this picture honest. Large decoder-only models now also transla
 
 **The principle.** Transfer learning means that knowledge gained on one task is reused on another, so that training does not start from randomly initialized weights. With transformers it is carried out in two stages.
 
+<figure class="fig"><img src="../assets/img/transfer-learning.png" alt="On the left, supervised learning: model A is trained on domain A and model B on domain B, separately. On the right, transfer learning: the body trained on domain A is reused, with a new head B, for domain B"><figcaption>Ordinary supervised learning (left) trains a separate model for every task. Transfer learning (right) reuses the body trained on the first task and gives it a new head for the second. Figure from the companion repository of Tunstall et al., <em>Natural Language Processing with Transformers</em> (2022), Apache 2.0 licence.</figcaption></figure>
+
 **Stage 1: pre-training.** Pre-training is done once, by the model's creators, on a very large body of **unlabeled** text. BERT learns by masked-word prediction: some words of a sentence are hidden and the model must predict them. No human labels are needed, because the text supplies its own answers. The result is a model that represents general English well but performs no particular task.
 
 **Stage 2: adapting to a task.** The pre-trained model is then trained on a small **labeled** dataset for one task. In this lesson that is 16,000 tweets labeled with six emotions.
+
+This recipe became standard in NLP with ULMFiT (2018), which used three steps: pre-train a language model on general text, continue training it on text from the target domain, and then train the classifier. With BERT-style models the middle step is usually skipped, which leaves the two stages above.
+
+<figure class="fig"><img src="../assets/img/ulmfit-stages.png" alt="Three arrows in sequence: a language model trained on Wikitext 103, the language model trained further on IMDb, and a classifier trained on IMDb"><figcaption>The three steps of ULMFiT: pre-training on general text (Wikitext-103), domain adaptation on movie reviews (IMDb), and fine-tuning a classifier on the labeled reviews. Figure from the companion repository of Tunstall et al., <em>Natural Language Processing with Transformers</em> (2022), Apache 2.0 licence.</figcaption></figure>
 
 **Why it works.** To predict hidden words well, a model has to learn grammar, word meanings and how context changes meaning. That knowledge is useful for almost any language task. Only the last step, deciding which emotion a sentence expresses, is specific to the task. The practical value is that a small dataset becomes sufficient: sixteen thousand tweets cannot teach a model English, but they can teach a model that already knows English what anger looks like.
 
@@ -97,6 +103,8 @@ Two remarks keep this picture honest. Large decoder-only models now also transla
 
 - The **body** is the pre-trained transformer. It comes first and turns text into vectors.
 - The **classification head** is a small layer that comes last and turns those vectors into one score per class. It is specific to the task: its size is the number of classes (`num_labels=6` here; a three-class task would need a different head). It did not exist during pre-training, so it always starts from random weights.
+
+<figure class="fig"><img src="../assets/img/encoder-classifier.png" alt="Token encodings become token embeddings, pass through the encoder stack to give hidden states, and a classification head turns them into predictions"><figcaption>The architecture used for sequence classification with an encoder. The blue parts are the pre-trained body; the orange classification head is new. Figure from the companion repository of Tunstall et al., <em>Natural Language Processing with Transformers</em> (2022), Apache 2.0 licence.</figcaption></figure>
 
 **Two ways to adapt.** The lesson uses both, in this order.
 
@@ -218,6 +226,10 @@ print(f"Datasets version: {datasets.__version__}")
 ## 2. Loading and Exploring the Dataset
 
 The Hugging Face **Datasets** library gives easy access to many public datasets. This tutorial uses the **emotion** dataset (`dair-ai/emotion`): English tweets labeled with one of six emotions.
+
+The rest of the lesson follows the four stages below: load the data (Section 2), tokenize it (Section 3), load and train a model (Sections 4 to 6), and evaluate it (Section 7).
+
+<figure class="fig"><img src="../assets/img/hf-libraries-pipeline.png" alt="Four stages: Datasets loads and processes data, Tokenizers tokenizes input texts, Transformers loads models, trains and infers, Datasets loads metrics and evaluates models"><figcaption>A typical pipeline for training a transformer model with the Hugging Face libraries. Figure from the companion repository of Tunstall et al., <em>Natural Language Processing with Transformers</em> (2022), Apache 2.0 licence.</figcaption></figure>
 
 ### Loading the dataset
 
@@ -342,6 +354,11 @@ print(emotion_encoded.column_names)
 - `batched=True` processes the data in batches; `batch_size=None` treats the whole split as one batch.
 - New columns `input_ids` and `attention_mask` are added alongside the originals.
 
+
+The attention mask tells the model which positions are real tokens (1) and which are padding (0), so that padding does not influence the result:
+
+<figure class="fig"><img src="../assets/img/attention-mask-padding.png" alt="Three texts of different lengths are padded with zeros to the same length; each has an attention mask with 1 for real tokens and 0 for padding, and the vectors are stacked into input matrices"><figcaption>For each batch, the input sequences are padded to the length of the longest one, and the attention mask marks the padded positions to be ignored. Figure from the companion repository of Tunstall et al., <em>Natural Language Processing with Transformers</em> (2022), Apache 2.0 licence.</figcaption></figure>
+
 ### Mini-challenge: tokenize a custom sentence
 
 Tokenize *"I am feeling both happy and sad at the same time."*, print the IDs and tokens, and identify which words split into subword pieces. This is a useful debugging skill.
@@ -356,6 +373,8 @@ print(tokenizer.convert_ids_to_tokens(encoded.input_ids))
 ## 4. Feature Extraction from Pre-trained Models
 
 Instead of fine-tuning, you can use a pre-trained model as a **frozen feature extractor** and train a simpler classifier on its outputs. This is faster and less resource-intensive.
+
+<figure class="fig"><img src="../assets/img/encoder-feature-extraction.png" alt="The same architecture with the body shown in grey and marked as frozen; gradients flow only into the classification head, which is the trainable part"><figcaption>Feature extraction: the body is frozen and only the classifier on top of its hidden states is trained. Compare with the figure at the start of Section 6. Figure from the companion repository of Tunstall et al., <em>Natural Language Processing with Transformers</em> (2022), Apache 2.0 licence.</figcaption></figure>
 
 ### Loading the pre-trained model
 
@@ -499,6 +518,8 @@ Which emotions does the random forest predict better?
 ## 6. Fine-tuning a Transformer Model
 
 Fine-tuning updates **all** of the model's weights on the task, usually giving better results than frozen features.
+
+<figure class="fig"><img src="../assets/img/encoder-fine-tuning.png" alt="The same architecture with every part in colour; gradients flow back through the classification head and the whole body, and all model parameters are trainable"><figcaption>Fine-tuning: the gradients flow through the whole model, so the body is updated together with the head. Compare with the frozen body in Section 4. Figure from the companion repository of Tunstall et al., <em>Natural Language Processing with Transformers</em> (2022), Apache 2.0 licence.</figcaption></figure>
 
 ### Loading a classification model
 
