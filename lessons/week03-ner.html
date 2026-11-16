@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="../assets/vendor/codemirror/material-darker.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
-<link rel="stylesheet" href="../assets/css/site.css">
+<link rel="stylesheet" href="../assets/css/site.css?v=c4edf52d">
 </head>
 <body><header class="topbar">
   <a class="brand" href="../index.html">
@@ -158,7 +158,7 @@
 </table>
 <h2 id="1-what-is-named-entity-recognition">1. What is Named Entity Recognition?</h2>
 <p><strong>Named entity recognition (<abbr data-tip="Named Entity Recognition: finding names in text and labelling each with a type" tabindex="0">NER</abbr>)</strong> finds the pieces of text that name real-world things and assigns each one a type. Such a piece is called a <strong>span</strong>: one word, or several words in a row, with a definite start and end. <em>Amman</em> is a span of one word and <em>University of Petra</em> is a span of three. The three types used throughout this lesson are <strong><abbr data-tip="Person" tabindex="0">PER</abbr></strong> (person), <strong><abbr data-tip="Organisation" tabindex="0">ORG</abbr></strong> (organisation) and <strong><abbr data-tip="Location" tabindex="0">LOC</abbr></strong> (location).</p>
-<p class="ner-example"><mark class="ent ent-per">Dr. Albanna<span class="ent-label">PER</span></mark> teaches at the <mark class="ent ent-org">University of Petra<span class="ent-label">ORG</span></mark> in <mark class="ent ent-loc">Amman<span class="ent-label">LOC</span></mark>.</p>
+<p class="ner-example" style="line-height:2.4;padding:.6rem 1rem;border:1px solid #e3e6ea;border-radius:8px;background:#fff;color:#1b1f24"><mark class="ent" style="padding:.2em .5em;border-radius:.4em;color:#1b1f24;white-space:nowrap;background:#cfe5ff">Dr. Albanna<span class="ent-label" style="margin-left:.5em;font-size:.68em;font-weight:700;letter-spacing:.05em;vertical-align:middle;color:#3d4654">PER</span></mark> teaches at the <mark class="ent" style="padding:.2em .5em;border-radius:.4em;color:#1b1f24;white-space:nowrap;background:#ffe2b8">University of Petra<span class="ent-label" style="margin-left:.5em;font-size:.68em;font-weight:700;letter-spacing:.05em;vertical-align:middle;color:#3d4654">ORG</span></mark> in <mark class="ent" style="padding:.2em .5em;border-radius:.4em;color:#1b1f24;white-space:nowrap;background:#cfeccf">Amman<span class="ent-label" style="margin-left:.5em;font-size:.68em;font-weight:700;letter-spacing:.05em;vertical-align:middle;color:#3d4654">LOC</span></mark>.</p>
 
 <p>Each highlighted span is one entity, and the small label after it is its type. This sentence has three entities, although it has ten words.</p>
 <p>Two things make this harder than it looks. An entity can span several words, so the model must find where it starts and where it ends. And the same word can belong to different types depending on its context: <em>Petra</em> is a location when it means the ancient city and part of an organisation in <em>University of Petra</em>.</p>
@@ -1053,6 +1053,6 @@ print(np.round(np.linspace(0, 1, 5), 2))</textarea></div>
 <script>window.CS_PYODIDE_URL = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";</script>
 <script src="../assets/js/sims/core.js"></script>
 <script src="../assets/js/sims/matrix-multiply.js"></script><script src="../assets/js/sims/vectors.js"></script><script src="../assets/js/sims/attention.js"></script><script src="../assets/js/sims/pronoun.js"></script><script src="../assets/js/sims/qkv.js"></script><script src="../assets/js/sims/heads.js"></script><script src="../assets/js/sims/multihead.js"></script><script src="../assets/js/sims/decoder.js"></script><script src="../assets/js/sims/tokenizer.js"></script><script src="../assets/js/sims/posenc.js"></script><script src="../assets/js/sims/positional.js"></script><script src="../assets/js/sims/finetune.js"></script><script src="../assets/js/sims/distill.js"></script><script src="../assets/js/sims/classifier.js"></script><script src="../assets/js/sims/bio-tagging.js"></script><script src="../assets/js/sims/rag.js"></script><script src="../assets/js/sims/langgraph.js"></script><script src="../assets/js/sims/sampling.js"></script><script src="../assets/js/sims/moe.js"></script><script src="../assets/js/sims/react-loop.js"></script><script src="../assets/js/sims/multi-agent.js"></script><script src="../assets/js/sims/mcp.js"></script><script src="../assets/js/sims/lam.js"></script><script src="../assets/js/sims/diffusion.js"></script>
-<script src="../assets/js/site.js"></script>
-<script src="../assets/js/jupyter-panel.js"></script>
+<script src="../assets/js/site.js?v=21e131df"></script>
+<script src="../assets/js/jupyter-panel.js?v=1c057204"></script>
 </body></html>

@@ -9,6 +9,12 @@ from pathlib import Path
 import markdown
 
 ROOT = Path(__file__).resolve().parent.parent
+
+def asset_v(rel):
+    """A short fingerprint of a site asset, added to its link as ?v=…, so that browsers fetch the new file
+    as soon as it changes instead of showing a page with last week's stylesheet or script."""
+    import hashlib
+    return hashlib.md5((ROOT / rel).read_bytes()).hexdigest()[:8]
 CONTENT = ROOT / 'content'
 OUT_LESSONS = ROOT / 'lessons'
 OUT_LESSONS.mkdir(exist_ok=True)
@@ -477,7 +483,7 @@ def head(title, depth=0):
 <link rel="stylesheet" href="{base}assets/vendor/codemirror/material-darker.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
-<link rel="stylesheet" href="{base}assets/css/site.css">
+<link rel="stylesheet" href="{base}assets/css/site.css?v={asset_v("assets/css/site.css")}">
 </head>
 <body>'''
 
@@ -568,7 +574,7 @@ def scripts(depth, workbench=False):
 {cm}
 <script src="{base}assets/js/sims/core.js"></script>
 {sims}
-<script src="{base}assets/js/site.js"></script>
+<script src="{base}assets/js/site.js?v={asset_v("assets/js/site.js")}"></script>
 </body></html>'''
 
 def footer():
@@ -614,7 +620,7 @@ def lesson_shell(title, active_slug, prev, nxt, inner, sims):
             f'<div id="splitter" class="splitter" role="separator" aria-orientation="vertical" title="Drag to resize"></div>{workbench(sims)}</main>' +
             scripts(1, workbench=True))
     if has_nb:   # lesson and notebook side by side when the page is opened from the course codespace (scripts/start-lesson-lab.sh)
-        page = page.replace('</body>', '<script src="../assets/js/jupyter-panel.js"></script>\n</body>')
+        page = page.replace('</body>', f'<script src="../assets/js/jupyter-panel.js?v={asset_v("assets/js/jupyter-panel.js")}"></script>\n</body>')
     return page
 
 def lesson_page(w, prev, nxt):
@@ -725,7 +731,7 @@ def index_page():
   {footer()}
 </div>'''
     return (head('Home') + topbar(0) + f'<main class="home">{inner}</main>' +
-            scripts(0).replace('</body>', '<script src="assets/js/jupyter-panel.js"></script>\n</body>'))
+            scripts(0).replace('</body>', f'<script src="assets/js/jupyter-panel.js?v={asset_v("assets/js/jupyter-panel.js")}"></script>\n</body>'))
 
 def main():
     nav = [(f'{w["slug"]}.html', w['title'], w['n']) for w in WEEKS]
