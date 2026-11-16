@@ -336,3 +336,28 @@ builtins.input = input
   // first animation of the week is ready in the selector; open the panel on wide screens only when asked
   if (location.hash.startsWith("#display=")) { openPanel("anim"); showAnim(location.hash.slice(9)); }
 })();
+
+/* Helper notes for abbreviations: <abbr data-tip="…"> shows a small bubble on hover, keyboard focus or tap. */
+(function () {
+  let tip = null, owner = null;
+  function hide() { if (tip) tip.hidden = true; owner = null; }
+  function show(el) {
+    if (!tip) { tip = document.createElement("div"); tip.className = "abbr-tip"; tip.setAttribute("role", "tooltip"); document.body.appendChild(tip); }
+    tip.textContent = el.dataset.tip; tip.hidden = false; owner = el;
+    const r = el.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
+    const left = Math.min(Math.max(8, r.left), window.innerWidth - w - 8);
+    let top = r.bottom + 6; if (top + h > window.innerHeight - 8) top = r.top - h - 6;
+    tip.style.left = left + "px"; tip.style.top = top + "px";
+  }
+  const find = e => (e.target && e.target.closest) ? e.target.closest("abbr[data-tip]") : null;
+  document.addEventListener("mouseover", e => { const a = find(e); if (a) show(a); else if (owner) hide(); });
+  document.addEventListener("focusin", e => { const a = find(e); if (a) show(a); });
+  document.addEventListener("focusout", hide);
+  document.addEventListener("click", e => { const a = find(e); if (a) show(a); else hide(); });
+  document.addEventListener("scroll", () => {          // keep the note attached while the page scrolls; drop it once the word leaves the screen
+    if (!owner) return;
+    const r = owner.getBoundingClientRect();
+    if (r.bottom < 0 || r.top > window.innerHeight) hide(); else show(owner);
+  }, true);
+  document.addEventListener("keydown", e => { if (e.key === "Escape") hide(); });
+})();

@@ -128,6 +128,48 @@ f1 = 2 * precision * recall / (precision + recall)
 token_acc = sum(g == p for g, p in zip(gold, pred)) / len(gold)
 print(f"\ntoken accuracy = {token_acc:.2f}, entity P={precision:.2f} R={recall:.2f} F1={f1:.2f}")
 
+#@ week 3 | Aligning word labels with subword tokens: where the -100 labels come from
+# A toy subword tokenizer (greedy longest match) stands in for SentencePiece, so this runs in the browser.
+VOCAB = {"Dr", ".", "Al", "ban", "na", "teach", "es", "at", "the", "Univers", "ity", "of", "Petra", "in", "Am", "man"}
+
+def split_word(word):
+    pieces, start = [], 0
+    while start < len(word):
+        end = len(word)
+        while end > start and word[start:end] not in VOCAB:
+            end -= 1
+        if end == start:                       # no piece matches: emit one unknown character
+            end = start + 1
+        pieces.append(word[start:end])
+        start = end
+    return pieces
+
+words = ["Dr.", "Albanna", "teaches", "at", "the", "University", "of", "Petra", "in", "Amman"]
+tags  = ["B-PER", "I-PER", "O", "O", "O", "B-ORG", "I-ORG", "I-ORG", "O", "B-LOC"]
+tag2id = {"O": 0, "B-PER": 1, "I-PER": 2, "B-ORG": 3, "I-ORG": 4, "B-LOC": 5, "I-LOC": 6}
+
+tokens, word_ids = ["<s>"], [None]
+for i, w in enumerate(words):
+    for piece in split_word(w):
+        tokens.append(piece); word_ids.append(i)
+tokens.append("</s>"); word_ids.append(None)
+
+label_ids, previous = [], None
+for word_id in word_ids:
+    if word_id is None or word_id == previous:
+        label_ids.append(-100)                 # special token, or a later subword: ignored by the loss
+    else:
+        label_ids.append(tag2id[tags[word_id]])
+    previous = word_id
+
+print(f"{'token':10} {'word_id':>7} {'label_id':>8}  label")
+for t, w, l in zip(tokens, word_ids, label_ids):
+    name = "IGN" if l == -100 else tags[w]
+    print(f"{t:10} {str(w):>7} {l:>8}  {name}")
+
+counted = sum(l != -100 for l in label_ids)
+print(f"\n{len(tokens)} tokens, {len(words)} words, {counted} positions counted in the loss (one per word)")
+
 #@ week 4 | Retrieval for RAG: embed chunks, rank by cosine similarity, build the prompt
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity

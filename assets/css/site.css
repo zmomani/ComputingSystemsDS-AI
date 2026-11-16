@@ -336,3 +336,9 @@ kbd { font-family: var(--mono); font-size: .8em; background: #eef1f5; border: 1p
 /* code blocks stay left-to-right; Arabic runs inside them are isolated right-to-left islands */
 .lesson-content pre, .lesson-content pre code { direction: ltr; unicode-bidi: isolate; text-align: left; }
 .lesson-content pre .ar { unicode-bidi: isolate; direction: rtl; }
+
+/* Helper notes for abbreviations: <abbr data-tip="…"> shows a bubble on hover, keyboard focus or tap (see site.js) */
+abbr[data-tip] { text-decoration: underline dotted; text-underline-offset: 3px; cursor: help; }
+abbr[data-tip]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+.abbr-tip { position: fixed; z-index: 1000; max-width: min(340px, calc(100vw - 16px)); padding: .45rem .65rem; background: #1b1f24; color: #fff; border-radius: 6px; font-size: .84rem; line-height: 1.4; box-shadow: 0 6px 20px rgba(0,0,0,.28); pointer-events: none; }
+.abbr-tip[hidden] { display: none; }

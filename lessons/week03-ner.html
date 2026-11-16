@@ -22,9 +22,835 @@
 </header><main class="lesson panel-closed" id="lesson" data-colab="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week03-ner.ipynb" data-codespaces="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" data-guide="https://github.com/zmomani/ComputingSystemsDS-AI/blob/main/CODESPACES.md"><article class="lesson-content" id="lesson-content"><div class="lesson-head"><div class="eyebrow">Week 3 · ILO P1, T1</div><h1>Named Entity Recognition (NER)</h1>
 <p class="lesson-intro"><b>Topics:</b> Token classification, BIO tagging, multilingual NER, per-entity evaluation<br><b>Project milestone:</b> NER Agent extracting people, organisations, technologies, dates and locations; test on 5+ articles</p></div>
 <div class="colab-bar"><a class="btn codespaces" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener">📓 Open this week's notebook</a><a class="muted small" href="https://github.com/zmomani/ComputingSystemsDS-AI/blob/main/CODESPACES.md" target="_blank" rel="noopener">How the notebook works</a></div>
-<div class="sim-strip"><div class="sim-strip-head">Animations for this week — open them in the panel</div><div class="sim-strip-items"><button class="sim-chip" data-display="bio-tagging"><span class="sim-chip-kind">NER</span>▶ Display: NER: BIO tags &amp; entity-level F1</button><button class="sim-chip" data-display="classifier"><span class="sim-chip-kind">Classification</span>▶ Display: Decision boundary, threshold &amp; F1</button></div></div>
+<div class="sim-strip"><div class="sim-strip-head">Animations for this week — open them in the panel</div><div class="sim-strip-items"><button class="sim-chip" data-display="bio-tagging"><span class="sim-chip-kind">NER</span>▶ Display: NER: BIO tags &amp; entity-level F1</button><button class="sim-chip" data-display="classifier"><span class="sim-chip-kind">Classification</span>▶ Display: Decision boundary, threshold &amp; F1</button><button class="sim-chip" data-display="tokenizer"><span class="sim-chip-kind">Transformers</span>▶ Display: Subword tokenisation</button><button class="sim-chip" data-display="finetune"><span class="sim-chip-kind">Transfer learning</span>▶ Display: Frozen vs fine-tuned weights</button></div></div>
+<details class="contents"><summary>Contents (14 sections)</summary><ol><li><a href="#what-youll-learn">What You'll Learn</a></li><li><a href="#1-what-is-named-entity-recognition">1. What is Named Entity Recognition?</a></li><li><a href="#2-the-iob2-tagging-scheme">2. The IOB2 Tagging Scheme</a></li><li><a href="#3-from-sequence-classification-to-token-classification">3. From Sequence Classification to Token Classification</a></li><li><a href="#4-a-first-ner-system">4. A First NER System</a></li><li><a href="#5-multilingual-transformers">5. Multilingual Transformers</a></li><li><a href="#6-the-subword-alignment-problem">6. The Subword Alignment Problem</a></li><li><a href="#7-evaluating-an-ner-model">7. Evaluating an NER Model</a></li><li><a href="#8-how-the-model-was-fine-tuned">8. How the Model Was Fine-Tuned</a></li><li><a href="#9-cross-lingual-transfer">9. Cross-Lingual Transfer</a></li><li><a href="#10-error-analysis">10. Error Analysis</a></li><li><a href="#11-from-the-lesson-to-your-ner-agent">11. From the Lesson to Your NER Agent</a></li><li><a href="#12-check-your-understanding">12. Check Your Understanding</a></li><li><a href="#13-summary-and-further-reading">13. Summary and Further Reading</a></li></ol></details>
+<p><em>From one label per sentence to one label per word.</em> Level: intermediate · about 75 minutes · Hugging Face Transformers, Datasets, seqeval. The lesson follows Tunstall, von Werra &amp; Wolf, <em>Natural Language Processing with Transformers</em> (Revised Edition, 2022), Chapter 4, "Multilingual Named Entity Recognition".</p>
+<h2 id="what-youll-learn">What You'll Learn</h2>
+<p>By the end of this lesson you will be able to:</p>
+<ul>
+<li>Explain what named entity recognition is and where it is used</li>
+<li>Read and write entity annotations in the <abbr data-tip="Inside, Outside, Beginning, version 2: B- starts an entity, I- continues it, O is outside any entity" tabindex="0">IOB2</abbr> (<abbr data-tip="Beginning, Inside, Outside: another name for the IOB2 tagging scheme" tabindex="0">BIO</abbr>) scheme</li>
+<li>Describe how a transformer encoder is turned into a token classifier</li>
+<li>Align word-level labels with subword tokens, and explain the label <code>-100</code></li>
+<li>Evaluate an <abbr data-tip="Named Entity Recognition: finding names in text and labelling each with a type" tabindex="0">NER</abbr> model at the entity level with <abbr data-tip="Sequence labelling evaluation: the Python library that scores NER at the entity level" tabindex="0"><code>seqeval</code></abbr></li>
+<li>Explain zero-shot cross-lingual transfer and decide when it is good enough</li>
+<li>Analyse the errors of an NER model and of its training data</li>
+</ul>
+<p><strong>Goal:</strong> a working multilingual NER pipeline that you can evaluate yourself, and a plan for the <strong>NER Agent</strong> of your project.</p>
+<p><strong>Prerequisites:</strong> <a href="week02-text-classification.html">Week 2</a>. You should be comfortable with tokenisation, the idea of a pre-trained body with a task head, and precision, recall and <abbr data-tip="F1-score: the harmonic mean of precision and recall" tabindex="0">F1</abbr>.</p>
+<h3 id="abbreviations-used-in-this-lesson">Abbreviations used in this lesson</h3>
+<p>Each abbreviation is also explained where it first appears. In the text, an abbreviation with a dotted underline shows its meaning when you point at it, tap it, or reach it with the Tab key. Each one is marked at its first use in every section.</p>
+<table>
+<thead>
+<tr>
+<th>Abbreviation</th>
+<th>Stands for</th>
+<th>In one line</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NER</td>
+<td>Named Entity Recognition</td>
+<td>Finding names in text and labelling each with a type</td>
+</tr>
+<tr>
+<td>PER, ORG, LOC</td>
+<td>Person, Organisation, Location</td>
+<td>The three entity types used in this lesson</td>
+</tr>
+<tr>
+<td>IOB2</td>
+<td>Inside, Outside, Beginning, version 2</td>
+<td>The tagging scheme: <code>B-</code> starts an entity, <code>I-</code> continues it, <code>O</code> is outside any entity</td>
+</tr>
+<tr>
+<td>BIO</td>
+<td>Beginning, Inside, Outside</td>
+<td>Another name for the same scheme, with the letters in a different order</td>
+</tr>
+<tr>
+<td>IGN</td>
+<td>Ignored</td>
+<td>A token position that the loss skips; stored as the label ID <code>-100</code></td>
+</tr>
+<tr>
+<td>BERT</td>
+<td>Bidirectional Encoder Representations from Transformers</td>
+<td>The encoder-only model family from Week 2</td>
+</tr>
+<tr>
+<td>DistilBERT</td>
+<td>Distilled BERT</td>
+<td>The smaller, faster BERT used in Week 2</td>
+</tr>
+<tr>
+<td>mBERT</td>
+<td>Multilingual BERT</td>
+<td>BERT pre-trained on Wikipedia in many languages</td>
+</tr>
+<tr>
+<td>RoBERTa</td>
+<td>Robustly Optimized BERT Pretraining Approach</td>
+<td>BERT with an improved pre-training recipe</td>
+</tr>
+<tr>
+<td>XLM</td>
+<td>Cross-lingual Language Model</td>
+<td>An earlier family of multilingual models</td>
+</tr>
+<tr>
+<td>XLM-R</td>
+<td>XLM-RoBERTa</td>
+<td>RoBERTa pre-trained on 100 languages; the model used in this lesson</td>
+</tr>
+<tr>
+<td>MLM</td>
+<td>Masked Language Modelling</td>
+<td>Pre-training by hiding words and predicting them</td>
+</tr>
+<tr>
+<td>BPE</td>
+<td>Byte-Pair Encoding</td>
+<td>A subword algorithm that repeatedly merges the most frequent pair of symbols</td>
+</tr>
+<tr>
+<td><code>[CLS]</code>, <code>[SEP]</code></td>
+<td>Classification, Separator</td>
+<td>BERT's special tokens at the start and the end of a sequence</td>
+</tr>
+<tr>
+<td><code>&lt;s&gt;</code>, <code>&lt;/s&gt;</code></td>
+<td>Start and end of sequence</td>
+<td>XLM-R's special tokens, with the same role</td>
+</tr>
+<tr>
+<td>WikiANN, PAN-X</td>
+<td>Wikipedia annotated for NER; its name in XTREME</td>
+<td>The multilingual NER dataset used in this lesson</td>
+</tr>
+<tr>
+<td>XTREME</td>
+<td>Cross-lingual TRansfer Evaluation of Multilingual Encoders</td>
+<td>A benchmark of multilingual tasks; PAN-X is one of them</td>
+</tr>
+<tr>
+<td>F1</td>
+<td>F1-score</td>
+<td>The harmonic mean of precision and recall</td>
+</tr>
+<tr>
+<td>seqeval</td>
+<td>Sequence labelling evaluation</td>
+<td>The Python library that scores NER at the entity level</td>
+</tr>
+<tr>
+<td>LLM</td>
+<td>Large Language Model</td>
+<td>A generative model such as those studied from Week 4 on</td>
+</tr>
+<tr>
+<td>GPU, CPU</td>
+<td>Graphics / Central Processing Unit</td>
+<td>Training needs a GPU; running a trained model also works on a CPU</td>
+</tr>
+</tbody>
+</table>
+<h2 id="1-what-is-named-entity-recognition">1. What is Named Entity Recognition?</h2>
+<p><strong>Named entity recognition (<abbr data-tip="Named Entity Recognition: finding names in text and labelling each with a type" tabindex="0">NER</abbr>)</strong> finds the spans of text that name real-world things and assigns each span a type. The three types used throughout this lesson are <strong><abbr data-tip="Person" tabindex="0">PER</abbr></strong> (person), <strong><abbr data-tip="Organisation" tabindex="0">ORG</abbr></strong> (organisation) and <strong><abbr data-tip="Location" tabindex="0">LOC</abbr></strong> (location).</p>
+<blockquote>
+<p><strong>Dr. Albanna</strong><sub>PER</sub> teaches at the <strong>University of Petra</strong><sub>ORG</sub> in <strong>Amman</strong><sub>LOC</sub>.</p>
+</blockquote>
+<p>Two things make this harder than it looks. An entity can span several words, so the model must find where it starts and where it ends. And the same word can belong to different types depending on its context: <em>Petra</em> is a location when it means the ancient city and part of an organisation in <em>University of Petra</em>.</p>
+<p><strong>Where NER is used</strong></p>
+<ul>
+<li><strong>Structured data from text:</strong> turn a collection of documents into a table of who, where and which organisation.</li>
+<li><strong>Search:</strong> let a search engine index and filter by the entities a document mentions.</li>
+<li><strong>Insight from company documents:</strong> find the people, suppliers and places named in contracts, reports or support tickets.</li>
+</ul>
+<p>In the course project, the NER Agent does the first of these. It reads the sources that the Research Agent collected and gives the Analyzer a structured list of the entities they mention.</p>
+<p><strong>The workflow</strong> is the same four-stage pipeline as in Week 2. Only the model head and the way labels are prepared change.</p>
+<figure class="fig"><img src="../assets/img/hf-libraries-pipeline.png" alt="Four stages: Datasets loads and processes data, Tokenizers tokenizes input texts, Transformers loads models, trains and infers, Datasets loads metrics and evaluates models"><figcaption>The pipeline for training and using a transformer with the Hugging Face libraries. Figure from the companion repository of Tunstall et al. (2022), Apache 2.0 licence.</figcaption></figure>
 
-<blockquote><p>The full notes for this lesson are coming soon. Until then, use the topics, the milestone and the animations below.</p></blockquote><h2 id="topics">Topics</h2><p>Token classification, BIO tagging, multilingual NER, per-entity evaluation</p><h2 id="milestone">Project milestone</h2><p>NER Agent extracting people, organisations, technologies, dates and locations; test on 5+ articles</p>
+<h2 id="2-the-iob2-tagging-scheme">2. The IOB2 Tagging Scheme</h2>
+<p>A classifier outputs one label per item, but an entity is a <em>span</em> of several items. The <abbr data-tip="Inside, Outside, Beginning, version 2: B- starts an entity, I- continues it, O is outside any entity" tabindex="0">IOB2</abbr> scheme solves this by giving every word a tag that says both the entity type and the position of the word inside the entity.</p>
+<blockquote>
+<p><strong>What the name means.</strong> IOB stands for <strong>I</strong>nside, <strong>O</strong>utside, <strong>B</strong>eginning, the three kinds of tag. The scheme is often called <abbr data-tip="Beginning, Inside, Outside: another name for the IOB2 tagging scheme" tabindex="0">BIO</abbr>, which is the same three letters in a different order. The <strong>2</strong> marks the second version of the scheme, in which <em>every</em> entity starts with a <code>B-</code> tag. In the original version, <code>B-</code> was used only when an entity came directly after another entity of the same type.</p>
+</blockquote>
+<p>The three kinds of tag are:</p>
+<ul>
+<li><strong><code>B-XXX</code></strong>: the word <strong>b</strong>egins an entity of type XXX.</li>
+<li><strong><code>I-XXX</code></strong>: the word is <strong>i</strong>nside an entity of type XXX, continuing the one that started earlier.</li>
+<li><strong><code>O</code></strong>: the word is <strong>o</strong>utside any entity.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Word</th>
+<th>Dr.</th>
+<th>Albanna</th>
+<th>teaches</th>
+<th>at</th>
+<th>the</th>
+<th>University</th>
+<th>of</th>
+<th>Petra</th>
+<th>in</th>
+<th>Amman</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tag</td>
+<td>B-PER</td>
+<td>I-PER</td>
+<td>O</td>
+<td>O</td>
+<td>O</td>
+<td>B-ORG</td>
+<td>I-ORG</td>
+<td>I-ORG</td>
+<td>O</td>
+<td>B-LOC</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Why a separate B- tag is needed.</strong> Without it, two entities of the same type that stand next to each other would merge into one. In <em>"He visited Amman Irbid and Aqaba"</em>, the tags <code>B-LOC B-LOC O B-LOC</code> keep Amman and Irbid apart; with only <code>LOC LOC O LOC</code> they would read as a single place called "Amman Irbid".</p>
+<p><strong>How many classes?</strong> With <em>k</em> entity types there are <span class="arithmatex">\(2k + 1\)</span> tags: a B- and an I- tag for each type, plus <code>O</code>. For <abbr data-tip="Person" tabindex="0">PER</abbr>, <abbr data-tip="Organisation" tabindex="0">ORG</abbr> and <abbr data-tip="Location" tabindex="0">LOC</abbr> that gives seven classes: <code>O, B-PER, I-PER, B-ORG, I-ORG, B-LOC, I-LOC</code>.</p>
+<p><strong>Valid sequences.</strong> An <code>I-XXX</code> tag must follow a <code>B-XXX</code> or <code>I-XXX</code> tag of the same type. A sequence such as <code>O I-ORG</code> is not valid IOB2, although a model can still produce it, because each word is classified separately.</p>
+<p><strong>Animation: tagging a sentence.</strong> Step through the sentence one token at a time and watch each word receive its <code>B-</code>, <code>I-</code> or <code>O</code> tag. Stop when the whole sentence is tagged; the last two steps of the animation, spans and scoring, belong to Section 7.</p>
+<div class="sim-inline"><button class="sim-chip" data-display="bio-tagging"><span class="sim-chip-kind">NER</span>▶ Display: NER: BIO tags &amp; entity-level F1</button></div>
+
+<h3 id="mini-challenge-tag-by-hand">Mini-challenge: tag by hand</h3>
+<p>Write the IOB2 tags for this sentence, then check your answer.</p>
+<blockquote>
+<p>Lina Haddad works for Orange Jordan in Irbid.</p>
+</blockquote>
+<details>
+<summary>Show the answer</summary>
+<p><code>B-PER I-PER O O B-ORG I-ORG O B-LOC O</code> — nine tags, because the final full stop is a token as well and it is tagged <code>O</code>.</p>
+</details>
+<h2 id="3-from-sequence-classification-to-token-classification">3. From Sequence Classification to Token Classification</h2>
+<p>In Week 2 the model read a whole tweet and produced <strong>one</strong> label. The hidden state of the special <abbr data-tip="Classification token: BERT&#x27;s special token at the start of every input" tabindex="0"><code>[CLS]</code></abbr> token (short for <em>classification</em>; it is placed at the start of every input) stood for the whole sequence, and a single linear layer turned it into class scores.</p>
+<figure class="fig"><img src="../assets/img/ner-sequence-classification.png" alt="A transformer encoder produces one hidden state per token; only the hidden state of the CLS token goes through a linear layer to give one label, Positive"><figcaption>Sequence classification (Week 2): one label for the whole input, taken from the <code>[CLS]</code> position. Figure from the companion repository of Tunstall et al. (2022), Apache 2.0 licence.</figcaption></figure>
+
+<p><abbr data-tip="Named Entity Recognition: finding names in text and labelling each with a type" tabindex="0">NER</abbr> uses the same encoder and almost the same head. The difference is that <strong>every</strong> hidden state goes through the linear layer, so the model produces one tag per token. This is why NER is called a <strong>token classification</strong> task.</p>
+<figure class="fig"><img src="../assets/img/ner-token-classification.png" alt="The same encoder, but the hidden state of every token goes through the linear layer, giving the tags B-PER, IGN, I-PER, O, B-LOC, I-LOC"><figcaption>Token classification: the same linear layer is applied to every token's hidden state. <code>IGN</code> marks a subword that is ignored, explained in Section 6. Figure from the companion repository of Tunstall et al. (2022), Apache 2.0 licence.</figcaption></figure>
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Sequence classification (Week 2)</th>
+<th>Token classification (Week 3)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Input to the head</td>
+<td>hidden state of <code>[CLS]</code> only</td>
+<td>hidden state of every token</td>
+</tr>
+<tr>
+<td>Output shape</td>
+<td><code>[batch, classes]</code></td>
+<td><code>[batch, tokens, classes]</code></td>
+</tr>
+<tr>
+<td>Labels per example</td>
+<td>one</td>
+<td>one per word</td>
+</tr>
+<tr>
+<td>Typical metric</td>
+<td>accuracy, <abbr data-tip="F1-score: the harmonic mean of precision and recall" tabindex="0">F1</abbr> per class</td>
+<td>precision, recall, F1 per <strong>entity</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="body-and-head">Body and head</h3>
+<p>A pre-trained transformer is split into two parts. The <strong>body</strong> contains the embeddings and the transformer layers; it is independent of the task. The <strong>head</strong> is the last, task-specific layer. Changing the task means keeping the body and replacing the head.</p>
+<figure class="fig"><img src="../assets/img/model-body-head.png" alt="A model class such as BertModel contains only the body; a class such as BertForTask contains the body and a head"><figcaption>A class such as <code>BertModel</code> is the body alone. A class named <code>…For&lt;Task&gt;</code> adds a head for that task. Figure from the companion repository of Tunstall et al. (2022), Apache 2.0 licence.</figcaption></figure>
+
+<p>In the Transformers library the class name tells you the head: <code>AutoModelForSequenceClassification</code> in Week 2, <code>AutoModelForTokenClassification</code> this week. The token classification head is small. It is a dropout layer followed by one linear layer that maps each hidden state (768 values in a base-size model) to the seven tag scores:</p>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-python"># The whole token-classification head, as PyTorch code (for reading, not for running)
+import torch.nn as nn
+
+class TokenClassificationHead(nn.Module):
+    def __init__(self, hidden_size=768, num_labels=7, dropout=0.1):
+        super().__init__()
+        self.dropout = nn.Dropout(dropout)
+        self.classifier = nn.Linear(hidden_size, num_labels)
+
+    def forward(self, hidden_states):            # [batch, tokens, hidden_size]
+        return self.classifier(self.dropout(hidden_states))   # [batch, tokens, num_labels]</code></pre></div>
+<p>When a body is loaded with a new head, the body starts from its pre-trained weights and the head starts from random values. Before fine-tuning, such a model outputs meaningless tags. Fine-tuning on labelled sentences is what makes the head useful, exactly as in Week 2.</p>
+<h2 id="4-a-first-ner-system">4. A First NER System</h2>
+<p>Fine-tuning a model of this size needs a <abbr data-tip="Graphics Processing Unit: the hardware that makes training fast" tabindex="0">GPU</abbr>, so in this lesson you start from a model that is already fine-tuned: the checkpoint the textbook authors trained in Chapter 4 and published on the Hugging Face Hub. Section 8 shows how it was made.</p>
+<p>The <code>pipeline</code> function wraps the three steps (tokenise, run the model, turn tag scores back into entities) into one call:</p>
+<div class="where-note"><div class="where-head">Where does this code run — and why?</div><p><b>▶ Try it</b> examples run inside this page, in your web browser — good for quick experiments with plain Python, NumPy, pandas, scikit-learn and matplotlib. From here on the examples need more:</p><ul><li><b>Everything else → the course notebook.</b> PyTorch, Transformers, LangChain, LangGraph, MCP servers, Ollama, Django, Playwright and Streamlit need a full Python installation, large libraries, or programs that keep running — a web page has none of these. <b>📓 Open in notebook</b> starts a free cloud machine already set up for this course (a GitHub codespace) and shows a link that opens this lesson with its Jupyter notebook beside it. There, the button on each example takes you to the notebook cell that holds it. Use the notebook for all your coursework, so everything runs in <b>one</b> environment (<a href="https://github.com/zmomani/ComputingSystemsDS-AI/blob/main/CODESPACES.md" target="_blank" rel="noopener">how it works</a>).</li></ul></div><div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Starts the course environment. The link it shows opens this lesson with its notebook beside it.">📓 Open in notebook</a><button class="try local" data-run="0" data-target="vscode" data-needs="transformers" title="Needs transformers — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from transformers import pipeline
+
+checkpoint = &quot;transformersbook/xlm-roberta-base-finetuned-panx-all&quot;
+ner = pipeline(&quot;token-classification&quot;, model=checkpoint, aggregation_strategy=&quot;simple&quot;)
+
+sentences = [
+    &quot;Dr. Albanna teaches at the University of Petra in Amman.&quot;,
+    &quot;Angela Merkel wurde in Hamburg geboren.&quot;,
+    &quot;تقع جامعة البترا في مدينة عمّان.&quot;,
+]
+for s in sentences:
+    print(s)
+    for e in ner(s):
+        print(f&quot;   {e[&#x27;entity_group&#x27;]:4} {e[&#x27;word&#x27;]!r:32} score={e[&#x27;score&#x27;]:.2f}&quot;)</textarea><pre><code class="language-python">from transformers import pipeline
+
+checkpoint = &quot;transformersbook/xlm-roberta-base-finetuned-panx-all&quot;
+ner = pipeline(&quot;token-classification&quot;, model=checkpoint, aggregation_strategy=&quot;simple&quot;)
+
+sentences = [
+    &quot;Dr. Albanna teaches at the University of Petra in Amman.&quot;,
+    &quot;Angela Merkel wurde in Hamburg geboren.&quot;,
+    &quot;تقع جامعة البترا في مدينة عمّان.&quot;,
+]
+for s in sentences:
+    print(s)
+    for e in ner(s):
+        print(f&quot;   {e[&#x27;entity_group&#x27;]:4} {e[&#x27;word&#x27;]!r:32} score={e[&#x27;score&#x27;]:.2f}&quot;)</code></pre></div>
+<p>The first run downloads the model (about 1 GB), so allow a minute or two.</p>
+<p><strong>What <code>aggregation_strategy="simple"</code> does.</strong> The model predicts a tag for every subword token. Without aggregation, the pipeline returns those raw pieces one by one. With <code>"simple"</code>, it merges neighbouring tokens that belong to the same entity and returns whole spans with their type, their text, a confidence score, and their character positions (<code>start</code>, <code>end</code>) in the original string.</p>
+<p><strong>One model, three languages.</strong> The same model handled English, German and Arabic. It was fine-tuned on German, French, Italian and English only, so the Arabic sentence is a first look at <em>cross-lingual transfer</em>, the subject of Section 9. Check its Arabic answer carefully; you will measure how reliable it is later in the lesson.</p>
+<h3 id="mini-challenge-break-it">Mini-challenge: break it</h3>
+<p>Try sentences that are likely to be difficult, and note what the model gets wrong:</p>
+<ol>
+<li>An entity written without capital letters: <code>"i met sara at petra university"</code>.</li>
+<li>A word that changes type with context: <code>"Jordan scored 30 points"</code> and <code>"Jordan borders Saudi Arabia"</code>.</li>
+<li>A sentence that mixes two languages (code-switching): <code>"The meeting is in عمّان next week with Dr. Khalid"</code>.</li>
+</ol>
+<h2 id="5-multilingual-transformers">5. Multilingual Transformers</h2>
+<p>A model such as <abbr data-tip="Distilled BERT: the smaller, faster BERT used in Week 2" tabindex="0">DistilBERT</abbr> was pre-trained on English text only. For other languages there are two options: find a model pre-trained on that language, or use one model pre-trained on many languages at once. The second option is attractive when your documents are in several languages, because maintaining one model is far easier than maintaining one per language.</p>
+<ul>
+<li><strong><abbr data-tip="Multilingual BERT: BERT pre-trained on Wikipedia in many languages" tabindex="0">mBERT</abbr></strong> (multilingual <abbr data-tip="Bidirectional Encoder Representations from Transformers" tabindex="0">BERT</abbr>) was one of the first. It has the architecture and the pre-training objective of BERT, with Wikipedia articles in many languages as its pre-training corpus.</li>
+<li><strong><abbr data-tip="Cross-lingual Language Model + RoBERTa: RoBERTa pre-trained on 100 languages" tabindex="0">XLM-RoBERTa</abbr> (<abbr data-tip="XLM-RoBERTa: RoBERTa pre-trained on 100 languages; the model used in this lesson" tabindex="0">XLM-R</abbr>)</strong> replaced it as the usual choice. The name joins two earlier models: <abbr data-tip="Cross-lingual Language Model: an earlier family of multilingual models" tabindex="0">XLM</abbr>, the <em>cross-lingual language model</em>, and <abbr data-tip="Robustly Optimized BERT Pretraining Approach: BERT with an improved pre-training recipe" tabindex="0">RoBERTa</abbr>, a <em>robustly optimized BERT pretraining approach</em>, which is BERT trained with an improved recipe. XLM-R is pre-trained with masked language modelling (<abbr data-tip="Masked Language Modelling: pre-training by hiding words and predicting them" tabindex="0">MLM</abbr>) only: words are hidden and the model learns to predict them. Its text covers 100 languages. Its corpus is far larger than mBERT's: Wikipedia plus 2.5 terabytes of web text from Common Crawl. The extra data matters most for languages with little Wikipedia content.</li>
+</ul>
+<p>A multilingual model receives no signal telling it which language it is reading. Even so, the representations it learns generalise across languages: after fine-tuning on one language it can often perform the task on another. This is <strong>zero-shot cross-lingual transfer</strong>. It also makes such models suitable for <strong>code-switching</strong>, where a speaker mixes languages inside one conversation or one sentence, as many Arabic speakers do with English.</p>
+<h3 id="a-closer-look-at-tokenisation">A closer look at tokenisation</h3>
+<p>One tokeniser must serve 100 languages, including languages that do not separate words with spaces. XLM-R therefore uses <strong>SentencePiece</strong> instead of BERT's WordPiece, with a vocabulary of about 250,000 tokens, several times larger than that of a monolingual model.</p>
+<p>Tokenisation is itself a pipeline of four steps:</p>
+<figure class="fig"><img src="../assets/img/tokenizer-pipeline.png" alt="Four steps in order: normalization, pretokenization, tokenizer model, postprocessing"><figcaption>The four steps inside a tokeniser. Figure from the companion repository of Tunstall et al. (2022), Apache 2.0 licence.</figcaption></figure>
+
+<ol>
+<li><strong>Normalisation</strong> cleans the raw string: for example Unicode normalisation, removing extra spaces, and in some models lowercasing.</li>
+<li><strong>Pre-tokenisation</strong> splits the text into word-like units, usually at spaces and punctuation. This step does not suit every language, because some languages have no spaces between words.</li>
+<li><strong>The tokeniser model</strong> splits each unit into subwords from the learned vocabulary. WordPiece, <abbr data-tip="Byte-Pair Encoding: a subword algorithm that repeatedly merges the most frequent pair of symbols" tabindex="0">BPE</abbr> (Byte-Pair Encoding) and Unigram are three algorithms for this. This is the only step that is trained on data.</li>
+<li><strong>Post-processing</strong> adds the special tokens, such as <abbr data-tip="Classification token: BERT&#x27;s special token at the start of every input" tabindex="0"><code>[CLS]</code></abbr> and <abbr data-tip="Separator token: BERT&#x27;s special token at the end of a sequence" tabindex="0"><code>[SEP]</code></abbr> (<em>separator</em>) for BERT, or <abbr data-tip="Start of sequence: XLM-R&#x27;s special token, with the role of [CLS]" tabindex="0"><code>&lt;s&gt;</code></abbr> and <abbr data-tip="End of sequence: XLM-R&#x27;s special token, with the role of [SEP]" tabindex="0"><code>&lt;/s&gt;</code></abbr> (start and end of sequence) for XLM-R.</li>
+</ol>
+<p>Compare the two tokenisers on the same sentence:</p>
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Starts the course environment. The link it shows opens this lesson with its notebook beside it.">📓 Open in notebook</a><button class="try local" data-run="0" data-target="vscode" data-needs="transformers" title="Needs transformers — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from transformers import AutoTokenizer
+
+bert_tok = AutoTokenizer.from_pretrained(&quot;bert-base-cased&quot;)
+xlmr_tok = AutoTokenizer.from_pretrained(&quot;xlm-roberta-base&quot;)
+
+text = &quot;Sara teaches NER in Amman!&quot;
+bert_tokens = bert_tok(text).tokens()
+xlmr_tokens = xlmr_tok(text).tokens()
+print(&quot;BERT :&quot;, bert_tokens)
+print(&quot;XLM-R:&quot;, xlmr_tokens)
+
+# SentencePiece keeps the spaces, so the original text can be rebuilt exactly
+print(&quot;&quot;.join(xlmr_tokens).replace(&quot;▁&quot;, &quot; &quot;))</textarea><pre><code class="language-python">from transformers import AutoTokenizer
+
+bert_tok = AutoTokenizer.from_pretrained(&quot;bert-base-cased&quot;)
+xlmr_tok = AutoTokenizer.from_pretrained(&quot;xlm-roberta-base&quot;)
+
+text = &quot;Sara teaches NER in Amman!&quot;
+bert_tokens = bert_tok(text).tokens()
+xlmr_tokens = xlmr_tok(text).tokens()
+print(&quot;BERT :&quot;, bert_tokens)
+print(&quot;XLM-R:&quot;, xlmr_tokens)
+
+# SentencePiece keeps the spaces, so the original text can be rebuilt exactly
+print(&quot;&quot;.join(xlmr_tokens).replace(&quot;▁&quot;, &quot; &quot;))</code></pre></div>
+<p>Three differences are worth noticing in the output:</p>
+<ul>
+<li><strong>Special tokens.</strong> BERT wraps the sequence in <code>[CLS]</code> and <code>[SEP]</code>; XLM-R uses <code>&lt;s&gt;</code> and <code>&lt;/s&gt;</code>.</li>
+<li><strong>How a split word is marked.</strong> WordPiece marks the <em>continuation</em> of a word with <code>##</code>. SentencePiece marks the <em>start</em> of a word with the character <code>▁</code> (Unicode U+2581), which stands for the space before it.</li>
+<li><strong>Reversibility.</strong> Because SentencePiece records every space, joining the tokens and replacing <code>▁</code> with a space gives back the original text, including the fact that there is no space before <code>!</code>. WordPiece loses that information. Treating the text as a raw stream of characters, spaces included, is what lets SentencePiece work without language-specific rules.</li>
+</ul>
+<p><strong>Animation: subword tokenisation.</strong> Type a common word, then a rare name such as <em>Albanna</em> or <em>Momani</em>, and watch the name break into several pieces while the common word stays whole. The animation uses WordPiece-style tokens, so continuation pieces are marked with <code>##</code>. Keep the split name in mind: it is the starting point of the next section.</p>
+<div class="sim-inline"><button class="sim-chip" data-display="tokenizer"><span class="sim-chip-kind">Transformers</span>▶ Display: Subword tokenisation</button></div>
+
+<h2 id="6-the-subword-alignment-problem">6. The Subword Alignment Problem</h2>
+<p>Here is the central practical difficulty of <abbr data-tip="Named Entity Recognition: finding names in text and labelling each with a type" tabindex="0">NER</abbr> with transformers. <strong>The dataset has one label per word, but the model sees subword tokens.</strong> A word such as <em>Albanna</em> may be split into several tokens. Which of them carries the <code>I-PER</code> label?</p>
+<p>The convention introduced with <abbr data-tip="Bidirectional Encoder Representations from Transformers" tabindex="0">BERT</abbr>, and followed here, is:</p>
+<ul>
+<li>the <strong>first</strong> subword of each word keeps the word's label;</li>
+<li>the <strong>remaining</strong> subwords of that word are <strong>ignored</strong> when the loss is computed;</li>
+<li>the special tokens (<abbr data-tip="Start of sequence: XLM-R&#x27;s special token, with the role of [CLS]" tabindex="0"><code>&lt;s&gt;</code></abbr>, <abbr data-tip="End of sequence: XLM-R&#x27;s special token, with the role of [SEP]" tabindex="0"><code>&lt;/s&gt;</code></abbr>, padding) are ignored as well.</li>
+</ul>
+<p>"Ignored" is expressed with the label ID <strong><code>-100</code></strong>. This number is not arbitrary: PyTorch's cross-entropy loss has a parameter <code>ignore_index</code> whose default value is <code>-100</code>, so any position with that label contributes nothing to the loss.</p>
+<p>Copying the word's label to every subword would be simpler, but it breaks the scheme: if <em>Albanna</em> became three tokens all tagged <code>B-PER</code>, the tags would describe three separate people.</p>
+<p>The tokeniser provides what is needed. When it is told that the input is already split into words (<code>is_split_into_words=True</code>), its output has a <code>word_ids()</code> method that says which word each token came from:</p>
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Starts the course environment. The link it shows opens this lesson with its notebook beside it.">📓 Open in notebook</a><button class="try local" data-run="0" data-target="vscode" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>import pandas as pd
+
+words = [&quot;Dr.&quot;, &quot;Albanna&quot;, &quot;teaches&quot;, &quot;at&quot;, &quot;the&quot;, &quot;University&quot;, &quot;of&quot;, &quot;Petra&quot;, &quot;in&quot;, &quot;Amman&quot;]
+tags  = [&quot;B-PER&quot;, &quot;I-PER&quot;, &quot;O&quot;, &quot;O&quot;, &quot;O&quot;, &quot;B-ORG&quot;, &quot;I-ORG&quot;, &quot;I-ORG&quot;, &quot;O&quot;, &quot;B-LOC&quot;]
+
+encoding = xlmr_tok(words, is_split_into_words=True)
+tokens = xlmr_tok.convert_ids_to_tokens(encoding[&quot;input_ids&quot;])
+word_ids = encoding.word_ids()
+
+aligned, previous = [], None
+for word_id in word_ids:
+    if word_id is None:                 # special token: &lt;s&gt; or &lt;/s&gt;
+        aligned.append(&quot;IGN&quot;)
+    elif word_id == previous:           # a later subword of the same word
+        aligned.append(&quot;IGN&quot;)
+    else:                               # first subword of a new word
+        aligned.append(tags[word_id])
+    previous = word_id
+
+print(pd.DataFrame({&quot;token&quot;: tokens, &quot;word_id&quot;: word_ids, &quot;label&quot;: aligned}).to_string())</textarea><pre><code class="language-python">import pandas as pd
+
+words = [&quot;Dr.&quot;, &quot;Albanna&quot;, &quot;teaches&quot;, &quot;at&quot;, &quot;the&quot;, &quot;University&quot;, &quot;of&quot;, &quot;Petra&quot;, &quot;in&quot;, &quot;Amman&quot;]
+tags  = [&quot;B-PER&quot;, &quot;I-PER&quot;, &quot;O&quot;, &quot;O&quot;, &quot;O&quot;, &quot;B-ORG&quot;, &quot;I-ORG&quot;, &quot;I-ORG&quot;, &quot;O&quot;, &quot;B-LOC&quot;]
+
+encoding = xlmr_tok(words, is_split_into_words=True)
+tokens = xlmr_tok.convert_ids_to_tokens(encoding[&quot;input_ids&quot;])
+word_ids = encoding.word_ids()
+
+aligned, previous = [], None
+for word_id in word_ids:
+    if word_id is None:                 # special token: &lt;s&gt; or &lt;/s&gt;
+        aligned.append(&quot;IGN&quot;)
+    elif word_id == previous:           # a later subword of the same word
+        aligned.append(&quot;IGN&quot;)
+    else:                               # first subword of a new word
+        aligned.append(tags[word_id])
+    previous = word_id
+
+print(pd.DataFrame({&quot;token&quot;: tokens, &quot;word_id&quot;: word_ids, &quot;label&quot;: aligned}).to_string())</code></pre></div>
+<p>Every row marked <code>IGN</code> receives the label ID <code>-100</code> during training. The function below does the same for a whole batch, working with label IDs instead of tag names. It is the standard preprocessing step for any token classification dataset:</p>
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Starts the course environment. The link it shows opens this lesson with its notebook beside it.">📓 Open in notebook</a><button class="try local" data-run="0" data-target="vscode" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>def tokenize_and_align_labels(examples):
+    tokenized = xlmr_tok(examples[&quot;tokens&quot;], truncation=True, is_split_into_words=True)
+    all_labels = []
+    for i, word_labels in enumerate(examples[&quot;ner_tags&quot;]):
+        previous, label_ids = None, []
+        for word_id in tokenized.word_ids(batch_index=i):
+            if word_id is None or word_id == previous:
+                label_ids.append(-100)
+            else:
+                label_ids.append(word_labels[word_id])
+            previous = word_id
+        all_labels.append(label_ids)
+    tokenized[&quot;labels&quot;] = all_labels
+    return tokenized
+
+batch = {&quot;tokens&quot;: [words], &quot;ner_tags&quot;: [[1, 2, 0, 0, 0, 3, 4, 4, 0, 5]]}
+print(tokenize_and_align_labels(batch)[&quot;labels&quot;][0])</textarea><pre><code class="language-python">def tokenize_and_align_labels(examples):
+    tokenized = xlmr_tok(examples[&quot;tokens&quot;], truncation=True, is_split_into_words=True)
+    all_labels = []
+    for i, word_labels in enumerate(examples[&quot;ner_tags&quot;]):
+        previous, label_ids = None, []
+        for word_id in tokenized.word_ids(batch_index=i):
+            if word_id is None or word_id == previous:
+                label_ids.append(-100)
+            else:
+                label_ids.append(word_labels[word_id])
+            previous = word_id
+        all_labels.append(label_ids)
+    tokenized[&quot;labels&quot;] = all_labels
+    return tokenized
+
+batch = {&quot;tokens&quot;: [words], &quot;ner_tags&quot;: [[1, 2, 0, 0, 0, 3, 4, 4, 0, 5]]}
+print(tokenize_and_align_labels(batch)[&quot;labels&quot;][0])</code></pre></div>
+<p><strong>Padding the labels too.</strong> Sentences in a batch have different lengths, so the shorter ones are padded and an attention mask tells the model which positions are real, as in Week 2.</p>
+<figure class="fig"><img src="../assets/img/attention-mask-padding.png" alt="Three texts of different length are padded with zeros to the same length; the attention mask is 1 for real tokens and 0 for padding"><figcaption>Padding and attention masks for a batch of three texts. Figure from the companion repository of Tunstall et al. (2022), Apache 2.0 licence.</figcaption></figure>
+
+<p>In token classification the <strong>labels are sequences as well</strong>, so they must be padded to the same length. <code>DataCollatorForTokenClassification</code> does this and pads the labels with <code>-100</code>, which means padding positions are ignored by the loss in the same way as the extra subwords.</p>
+<h3 id="mini-challenge-predict-before-you-run">Mini-challenge: predict before you run</h3>
+<p>The German word <em>Einwohnern</em> is split by <abbr data-tip="XLM-RoBERTa: RoBERTa pre-trained on 100 languages; the model used in this lesson" tabindex="0">XLM-R</abbr> into two tokens. If the word is tagged <code>O</code> (ID 0), what are the label IDs of its two tokens? Then explain why the answer is not <code>[0, 0]</code>.</p>
+<details>
+<summary>Show the answer</summary>
+<p><code>[0, -100]</code>. Only the first subword keeps the label. The second one is masked so that each word contributes exactly once to the loss and to the evaluation, however many pieces the tokeniser cuts it into.</p>
+</details>
+<h2 id="7-evaluating-an-ner-model">7. Evaluating an NER Model</h2>
+<p><abbr data-tip="Named Entity Recognition: finding names in text and labelling each with a type" tabindex="0">NER</abbr> is evaluated with precision, recall and <abbr data-tip="F1-score: the harmonic mean of precision and recall" tabindex="0">F1</abbr>, as in Week 2, with one important change: <strong>the unit that is counted is the entity, not the token.</strong> A predicted entity is correct only if its type and <strong>both of its boundaries</strong> match the gold annotation exactly. Getting two of the three words of <em>University of Petra</em> right earns nothing.</p>
+<p><strong>Animation: precision, recall and F1.</strong> A reminder from Week 2 before the scores are applied to entities. Move the threshold and watch precision and recall pull in opposite directions while F1 balances them.</p>
+<div class="sim-inline"><button class="sim-chip" data-display="classifier"><span class="sim-chip-kind">Classification</span>▶ Display: Decision boundary, threshold &amp; F1</button></div>
+
+<p><strong>Why not token accuracy?</strong> In ordinary text most tokens are <code>O</code>. A model that tags every token as <code>O</code> finds no entity at all and still scores a high accuracy. Entity-level F1 gives that model zero.</p>
+<p>The <abbr data-tip="Sequence labelling evaluation: the Python library that scores NER at the entity level" tabindex="0"><code>seqeval</code></abbr> library (<em>seq</em>uence labelling <em>eval</em>uation) implements entity-level scoring. It expects lists of tag sequences, one list per sentence:</p>
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Starts the course environment. The link it shows opens this lesson with its notebook beside it.">📓 Open in notebook</a><button class="try local" data-run="0" data-target="vscode" data-needs="seqeval" title="Needs seqeval — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from seqeval.metrics import classification_report
+
+y_true = [[&quot;B-PER&quot;, &quot;I-PER&quot;, &quot;O&quot;, &quot;O&quot;, &quot;O&quot;, &quot;B-ORG&quot;, &quot;I-ORG&quot;, &quot;I-ORG&quot;, &quot;O&quot;, &quot;B-LOC&quot;],
+          [&quot;B-LOC&quot;, &quot;O&quot;, &quot;O&quot;, &quot;B-PER&quot;]]
+y_pred = [[&quot;B-PER&quot;, &quot;I-PER&quot;, &quot;O&quot;, &quot;O&quot;, &quot;O&quot;, &quot;B-ORG&quot;, &quot;I-ORG&quot;, &quot;B-LOC&quot;, &quot;O&quot;, &quot;B-LOC&quot;],
+          [&quot;B-LOC&quot;, &quot;O&quot;, &quot;O&quot;, &quot;B-PER&quot;]]
+
+print(classification_report(y_true, y_pred))</textarea><pre><code class="language-python">from seqeval.metrics import classification_report
+
+y_true = [[&quot;B-PER&quot;, &quot;I-PER&quot;, &quot;O&quot;, &quot;O&quot;, &quot;O&quot;, &quot;B-ORG&quot;, &quot;I-ORG&quot;, &quot;I-ORG&quot;, &quot;O&quot;, &quot;B-LOC&quot;],
+          [&quot;B-LOC&quot;, &quot;O&quot;, &quot;O&quot;, &quot;B-PER&quot;]]
+y_pred = [[&quot;B-PER&quot;, &quot;I-PER&quot;, &quot;O&quot;, &quot;O&quot;, &quot;O&quot;, &quot;B-ORG&quot;, &quot;I-ORG&quot;, &quot;B-LOC&quot;, &quot;O&quot;, &quot;B-LOC&quot;],
+          [&quot;B-LOC&quot;, &quot;O&quot;, &quot;O&quot;, &quot;B-PER&quot;]]
+
+print(classification_report(y_true, y_pred))</code></pre></div>
+<p>Only one tag out of fourteen is wrong (<em>Petra</em> is tagged <code>B-LOC</code> instead of <code>I-ORG</code>), yet the report shows two errors: the organisation is no longer matched, which lowers <abbr data-tip="Organisation" tabindex="0">ORG</abbr> recall, and a location has appeared that does not exist, which lowers <abbr data-tip="Location" tabindex="0">LOC</abbr> precision. The first browser example in <em>Try it yourself</em> computes the same scores by hand so that you can see where each number comes from.</p>
+<p><strong>Animation: scoring by entity.</strong> Open the tagging animation again and go to its last two steps. The predicted tags are turned into spans and compared with the gold spans, with the same <em>Petra</em> mistake as in the example above: one wrong token, one missed organisation, one location that does not exist.</p>
+<div class="sim-inline"><button class="sim-chip" data-display="bio-tagging"><span class="sim-chip-kind">NER</span>▶ Display: NER: BIO tags &amp; entity-level F1</button></div>
+
+<p>The report ends with averages. The <strong>micro average</strong> pools all entities before computing the scores, so frequent types weigh more. The <strong>macro average</strong> computes the scores for each type and then takes their plain mean, so every type counts equally. Report both when the types are unbalanced.</p>
+<h3 id="evaluate-the-checkpoint-yourself">Evaluate the checkpoint yourself</h3>
+<p>The next example measures the checkpoint from Section 4 on real test data, without any training, so it runs on the <abbr data-tip="Central Processing Unit: the ordinary processor of a computer" tabindex="0">CPU</abbr> of your codespace. The dataset is <strong><abbr data-tip="Wikipedia annotated for NER: the multilingual dataset used in this lesson" tabindex="0">WikiANN</abbr></strong>: Wikipedia sentences in many languages, <strong>ann</strong>otated with <abbr data-tip="Person" tabindex="0">PER</abbr>, ORG and LOC in the <abbr data-tip="Inside, Outside, Beginning, version 2: B- starts an entity, I- continues it, O is outside any entity" tabindex="0">IOB2</abbr> format. It is also known as <strong><abbr data-tip="The name of the WikiANN dataset inside the XTREME benchmark" tabindex="0">PAN-X</abbr></strong>, the name it has inside the <abbr data-tip="Cross-lingual TRansfer Evaluation of Multilingual Encoders: a benchmark of multilingual tasks" tabindex="0">XTREME</abbr> benchmark (Cross-lingual TRansfer Evaluation of Multilingual Encoders), and it is the dataset used in the textbook chapter.</p>
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Starts the course environment. The link it shows opens this lesson with its notebook beside it.">📓 Open in notebook</a><button class="try local" data-run="0" data-target="vscode" data-needs="datasets, seqeval, torch, transformers" title="Needs datasets, seqeval, torch, transformers — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>import torch
+from datasets import load_dataset
+from transformers import AutoModelForTokenClassification, AutoTokenizer
+from seqeval.metrics import classification_report, f1_score
+
+tok = AutoTokenizer.from_pretrained(checkpoint)
+model = AutoModelForTokenClassification.from_pretrained(checkpoint).eval()
+id2label = model.config.id2label
+
+def predict_tags(words):
+    &quot;&quot;&quot;One predicted tag per word: the prediction for the word&#x27;s first subword.&quot;&quot;&quot;
+    enc = tok(words, is_split_into_words=True, truncation=True, return_tensors=&quot;pt&quot;)
+    with torch.no_grad():
+        pred_ids = model(**enc).logits[0].argmax(dim=-1).tolist()
+    tags, previous = [], None
+    for position, word_id in enumerate(enc.word_ids()):
+        if word_id is not None and word_id != previous:
+            tags.append(id2label[pred_ids[position]])
+        previous = word_id
+    return tags
+
+def evaluate(lang, n=200):
+    test = load_dataset(&quot;unimelb-nlp/wikiann&quot;, lang, split=&quot;test&quot;).shuffle(seed=0)
+    test = test.select(range(min(n, len(test))))
+    names = test.features[&quot;ner_tags&quot;].feature.names
+    y_true, y_pred = [], []
+    for example in test:
+        pred = predict_tags(example[&quot;tokens&quot;])
+        gold = [names[i] for i in example[&quot;ner_tags&quot;]][:len(pred)]
+        y_true.append(gold)
+        y_pred.append(pred)
+    return y_true, y_pred
+
+for lang in [&quot;de&quot;, &quot;en&quot;, &quot;ar&quot;]:
+    y_true, y_pred = evaluate(lang)
+    print(f&quot;\n=== {lang} ===  entity-level F1 = {f1_score(y_true, y_pred):.3f}&quot;)
+    print(classification_report(y_true, y_pred))</textarea><pre><code class="language-python">import torch
+from datasets import load_dataset
+from transformers import AutoModelForTokenClassification, AutoTokenizer
+from seqeval.metrics import classification_report, f1_score
+
+tok = AutoTokenizer.from_pretrained(checkpoint)
+model = AutoModelForTokenClassification.from_pretrained(checkpoint).eval()
+id2label = model.config.id2label
+
+def predict_tags(words):
+    &quot;&quot;&quot;One predicted tag per word: the prediction for the word&#x27;s first subword.&quot;&quot;&quot;
+    enc = tok(words, is_split_into_words=True, truncation=True, return_tensors=&quot;pt&quot;)
+    with torch.no_grad():
+        pred_ids = model(**enc).logits[0].argmax(dim=-1).tolist()
+    tags, previous = [], None
+    for position, word_id in enumerate(enc.word_ids()):
+        if word_id is not None and word_id != previous:
+            tags.append(id2label[pred_ids[position]])
+        previous = word_id
+    return tags
+
+def evaluate(lang, n=200):
+    test = load_dataset(&quot;unimelb-nlp/wikiann&quot;, lang, split=&quot;test&quot;).shuffle(seed=0)
+    test = test.select(range(min(n, len(test))))
+    names = test.features[&quot;ner_tags&quot;].feature.names
+    y_true, y_pred = [], []
+    for example in test:
+        pred = predict_tags(example[&quot;tokens&quot;])
+        gold = [names[i] for i in example[&quot;ner_tags&quot;]][:len(pred)]
+        y_true.append(gold)
+        y_pred.append(pred)
+    return y_true, y_pred
+
+for lang in [&quot;de&quot;, &quot;en&quot;, &quot;ar&quot;]:
+    y_true, y_pred = evaluate(lang)
+    print(f&quot;\n=== {lang} ===  entity-level F1 = {f1_score(y_true, y_pred):.3f}&quot;)
+    print(classification_report(y_true, y_pred))</code></pre></div>
+<p><code>predict_tags</code> applies the convention of Section 6 in the other direction: the model predicts a tag for every token, and only the prediction at the first subword of each word is kept.</p>
+<p>German and English were in the model's training data. Arabic was not, so its score is a zero-shot result. Compare the three F1 values, and compare the entity types within each language. A sample of 200 sentences gives a rough estimate; raise <code>n</code> for a steadier one.</p>
+<h2 id="8-how-the-model-was-fine-tuned">8. How the Model Was Fine-Tuned</h2>
+<p>You have used the checkpoint; this section shows how it was produced. The code is for reading. Fine-tuning <abbr data-tip="XLM-RoBERTa: RoBERTa pre-trained on 100 languages; the model used in this lesson" tabindex="0">XLM-R</abbr> on thousands of sentences takes minutes on a <abbr data-tip="Graphics Processing Unit: the hardware that makes training fast" tabindex="0">GPU</abbr> and hours on the <abbr data-tip="Central Processing Unit: the ordinary processor of a computer" tabindex="0">CPU</abbr> of a codespace, which is why the lesson starts from the published result.</p>
+<p><strong>Fine-tuning in one paragraph.</strong> The model starts as the pre-trained XLM-R body with a new, randomly initialised token classification head. It is shown labelled sentences in small batches. For each batch it predicts a tag for every token, the cross-entropy loss measures how far those predictions are from the gold tags at every position that is not labelled <code>-100</code>, and backpropagation adjusts <strong>all</strong> the weights, body and head, by a small step. Repeating this over the whole training set a few times (each pass is an <em>epoch</em>) turns a general language model into an <abbr data-tip="Named Entity Recognition: finding names in text and labelling each with a type" tabindex="0">NER</abbr> tagger. After every epoch the model is scored on the validation set, which it never trains on, to check that it is improving on unseen sentences.</p>
+<p><strong>Animation: which weights change.</strong> Switch between feature extraction, fine-tuning and training from scratch. The fine-tuning mode is the one used here: every weight is trainable, the body moves a little from its pre-trained values, and the new head moves a lot.</p>
+<div class="sim-inline"><button class="sim-chip" data-display="finetune"><span class="sim-chip-kind">Transfer learning</span>▶ Display: Frozen vs fine-tuned weights</button></div>
+
+<p>The recipe has the same parts as in Week 2, and three of them are specific to token classification: the label alignment function, the data collator that pads labels, and the entity-level metric.</p>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-python">from datasets import load_dataset
+from transformers import (AutoConfig, AutoModelForTokenClassification, AutoTokenizer,
+                          DataCollatorForTokenClassification, Trainer, TrainingArguments)
+from seqeval.metrics import f1_score
+import numpy as np
+
+model_name = &quot;xlm-roberta-base&quot;
+xlmr_tok = AutoTokenizer.from_pretrained(model_name)
+
+# 1. Data: German WikiANN / PAN-X, with labels aligned to subwords (Section 6)
+panx_de = load_dataset(&quot;unimelb-nlp/wikiann&quot;, &quot;de&quot;)
+tag_names = panx_de[&quot;train&quot;].features[&quot;ner_tags&quot;].feature.names
+encoded = panx_de.map(tokenize_and_align_labels, batched=True,
+                      remove_columns=[&quot;tokens&quot;, &quot;ner_tags&quot;, &quot;langs&quot;, &quot;spans&quot;])
+
+# 2. Model: pre-trained body + a new 7-class token-classification head
+config = AutoConfig.from_pretrained(model_name, num_labels=len(tag_names),
+                                    id2label=dict(enumerate(tag_names)),
+                                    label2id={t: i for i, t in enumerate(tag_names)})
+model = AutoModelForTokenClassification.from_pretrained(model_name, config=config)
+
+# 3. Metric: entity-level F1, skipping every position labelled -100
+def compute_metrics(eval_pred):
+    preds = np.argmax(eval_pred.predictions, axis=2)
+    y_true, y_pred = [], []
+    for pred_row, label_row in zip(preds, eval_pred.label_ids):
+        keep = label_row != -100
+        y_true.append([tag_names[i] for i in label_row[keep]])
+        y_pred.append([tag_names[i] for i in pred_row[keep]])
+    return {&quot;f1&quot;: f1_score(y_true, y_pred)}
+
+# 4. Training
+args = TrainingArguments(output_dir=&quot;xlmr-panx-de&quot;, num_train_epochs=3,
+                         per_device_train_batch_size=24, per_device_eval_batch_size=24,
+                         eval_strategy=&quot;epoch&quot;, weight_decay=0.01, save_strategy=&quot;no&quot;)
+trainer = Trainer(model=model, args=args,
+                  data_collator=DataCollatorForTokenClassification(xlmr_tok),
+                  compute_metrics=compute_metrics,
+                  train_dataset=encoded[&quot;train&quot;], eval_dataset=encoded[&quot;validation&quot;])
+trainer.train()</code></pre></div>
+<p><strong>Reading the code, step by step</strong></p>
+<ol>
+<li><strong>Data.</strong> <code>load_dataset</code> returns the training, validation and test splits. <code>map</code> applies <code>tokenize_and_align_labels</code> from Section 6 to every split in batches. The original columns are then removed, so each example keeps only what the model needs: <code>input_ids</code>, <code>attention_mask</code> and the aligned <code>labels</code>.</li>
+<li><strong>Model.</strong> <code>AutoConfig</code> records the number of tags and the two mappings between tag names and IDs. <code>from_pretrained</code> then loads the pre-trained body and attaches a head with seven outputs. Because the mappings are saved inside the model, the <code>pipeline</code> in Section 4 can report <code>PER</code> or <code>LOC</code> instead of a class number.</li>
+<li><strong>Metric.</strong> After each epoch the <code>Trainer</code> passes the model's scores, of shape <code>[sentences, tokens, 7]</code>, and the gold label IDs to <code>compute_metrics</code>. The function takes the highest-scoring tag at each position, drops every position labelled <code>-100</code>, converts the IDs to tag names, and returns the entity-level <abbr data-tip="F1-score: the harmonic mean of precision and recall" tabindex="0">F1</abbr> from <abbr data-tip="Sequence labelling evaluation: the Python library that scores NER at the entity level" tabindex="0"><code>seqeval</code></abbr>. Without the <code>-100</code> filter, special tokens, extra subwords and padding would all be scored as if they were words.</li>
+<li><strong>Training.</strong> <code>TrainingArguments</code> holds the settings: three epochs, batches of 24 sentences, an evaluation at the end of every epoch, and a small weight decay that discourages large weights. <code>DataCollatorForTokenClassification</code> builds each batch, padding the inputs and padding the labels with <code>-100</code> (Section 6). <code>trainer.train()</code> runs the loop described above.</li>
+</ol>
+<p><strong>How the three NER-specific parts fit together.</strong> The alignment function decides <em>which positions count</em> by writing <code>-100</code> everywhere else. The collator keeps that decision intact when sentences of different lengths are put into one batch. The loss and the metric both respect it: the loss skips those positions during training, and <code>compute_metrics</code> removes them before scoring. If any one of the three is wrong, training still runs and still prints a number, which is why Section 10 begins with ways a result can look good and be wrong.</p>
+<p>In the textbook, three epochs on about 12,600 German sentences bring the validation F1 from 0.82 after the first epoch to about 0.86 after the third.</p>
+<h2 id="9-cross-lingual-transfer">9. Cross-Lingual Transfer</h2>
+<p>The textbook chapter sets up a realistic scenario: a customer in Switzerland, with documents in German, French, Italian and English. The training data is sampled in the proportions in which those languages are spoken there, so German dominates (about 63%) and English is rare (about 6%). Labelled data in a minority language is often scarce in practice, because annotating entities needs people who read that language well.</p>
+<p>Three fine-tuning strategies are compared, each evaluated on the test set of every language:</p>
+<table>
+<thead>
+<tr>
+<th>Fine-tuned on</th>
+<th>German</th>
+<th>French</th>
+<th>Italian</th>
+<th>English</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>German only (<strong>zero-shot</strong> for the other three)</td>
+<td>0.868</td>
+<td>0.714</td>
+<td>0.692</td>
+<td>0.589</td>
+</tr>
+<tr>
+<td>Each language separately</td>
+<td>0.868</td>
+<td>0.851</td>
+<td>0.819</td>
+<td>0.707</td>
+</tr>
+<tr>
+<td>All four languages together</td>
+<td>0.868</td>
+<td>0.865</td>
+<td>0.858</td>
+<td>0.787</td>
+</tr>
+</tbody>
+</table>
+<p><em>Entity-level <abbr data-tip="F1-score: the harmonic mean of precision and recall" tabindex="0">F1</abbr> on the test set, from Tunstall et al. (2022), Chapter 4.</em></p>
+<p><strong>What the table shows</strong></p>
+<ul>
+<li><strong>Zero-shot transfer works, at a price.</strong> A model that has never seen a labelled French sentence reaches 0.71 on French. That is about 15 points below what it achieves on German, and far above what an untrained head would give.</li>
+<li><strong>Training on all languages together is best everywhere.</strong> The multilingual model matches or beats the model trained on each language alone, and the gain is largest for the languages with the least data: Italian improves from 0.82 to 0.86 and English from 0.71 to 0.79.</li>
+<li><strong>Adding one language helps the others.</strong> In the chapter, adding French to the German training data raised the Italian and English scores by roughly ten points, although no Italian or English labels were added.</li>
+<li><strong>Distance between languages matters.</strong> Transfer tends to be stronger between related languages and weaker across language families or writing systems. The chapter also reports a surprise: the German model did worst on English, although both are Germanic languages. Treat relatedness as a guide and measure the result.</li>
+</ul>
+<h3 id="when-is-zero-shot-transfer-good-enough">When is zero-shot transfer good enough?</h3>
+<p>The chapter answers this with an experiment: fine-tune directly on French using 250, 500, 1,000, 2,000 and 4,000 labelled sentences, and compare each result with the zero-shot score from the German model.</p>
+<ul>
+<li>With 250 French sentences, direct fine-tuning reaches an F1 of only 0.14, far below the zero-shot 0.71.</li>
+<li>Zero-shot transfer stays competitive up to roughly <strong>750</strong> labelled sentences.</li>
+<li>With a few thousand sentences, direct fine-tuning reaches the level obtained on German.</li>
+</ul>
+<p>The practical rule: <strong>if you have no labels, or only a few hundred, in the target language, start with transfer from a related language.</strong> Collect more labels only if the measured score is too low for your application, and then train on all languages together.</p>
+<p><strong>The limits.</strong> The authors note that this good behaviour usually disappears when the target language is very different from the fine-tuning language, or when it was not among the languages used in pre-training. Arabic is one of <abbr data-tip="XLM-RoBERTa: RoBERTa pre-trained on 100 languages; the model used in this lesson" tabindex="0">XLM-R</abbr>'s 100 pre-training languages, but it differs from German, French, Italian and English in script, in word structure, and in having no capital letters to signal a name. The Arabic score you measured in Section 7 shows how far transfer carries in that harder case.</p>
+<h2 id="10-error-analysis">10. Error Analysis</h2>
+<p>A single <abbr data-tip="F1-score: the harmonic mean of precision and recall" tabindex="0">F1</abbr> value does not say <em>what</em> the model gets wrong. The chapter looks inside the German model by computing the loss of every token in the validation set and then asking which tokens, which tags and which sentences have the highest loss. Its findings are a good checklist for your own <abbr data-tip="Named Entity Recognition: finding names in text and labelling each with a type" tabindex="0">NER</abbr> Agent.</p>
+<p><strong>Three ways a result can look good and be wrong</strong></p>
+<ul>
+<li>Too many labels were masked with <code>-100</code> by mistake, so the loss falls because there is little left to predict.</li>
+<li>The metric function has a bug that overstates performance.</li>
+<li>The <code>O</code> class is counted as an ordinary class. It is by far the largest one, so it inflates accuracy and F1.</li>
+</ul>
+<p><strong>What the analysis found</strong></p>
+<ul>
+<li><strong>Organisations are the hardest type.</strong> <code>B-ORG</code> had the highest average loss of all tags, and the confusion matrix showed that the start of an organisation was often mistaken for its continuation, <code>I-ORG</code>. Organisation names are long, varied and often contain ordinary words. The <em>University of Petra</em> error in Section 7 is a small instance of the same weakness.</li>
+<li><strong>Function words inside names cause trouble.</strong> Words such as the German <em>von</em>, <em>der</em>, <em>in</em> and <em>und</em> are usually <code>O</code>, but they are also parts of entity names, so the model hesitates on them. English <em>of</em> behaves in the same way, as in <em>University of Petra</em>.</li>
+<li><strong>The data contain errors too.</strong> Among the sentences with the highest loss, the chapter found the United Nations and the Central African Republic annotated as <em>persons</em>, and a date annotated as an organisation. The model was right and the label was wrong.</li>
+</ul>
+<p>The last point has a general explanation. The <abbr data-tip="The name of the WikiANN dataset inside the XTREME benchmark" tabindex="0">PAN-X</abbr> annotations were produced automatically from Wikipedia, not by human annotators. Automatically generated labels are called a <strong>silver standard</strong>; labels written by people are a <strong>gold standard</strong>. Silver data are cheap and plentiful, and they contain systematic mistakes. One such pattern in PAN-X: Wikipedia titles often carry an explanation in parentheses, and the automatic process included the parentheses and their content in the entity.</p>
+<p><strong>The working method</strong> is a loop: train, inspect the highest-loss examples, correct the data or the code, and train again. An F1 measured against noisy labels also understates a good model, because the model is penalised for correct answers that disagree with wrong labels.</p>
+<h3 id="mini-challenge-find-the-worst-sentences">Mini-challenge: find the worst sentences</h3>
+<p>Reuse <code>evaluate("de")</code> from Section 7. Print the five sentences in which the predicted tags differ most from the gold tags, with words, gold tags and predictions side by side. For each one, decide whether the model or the annotation is at fault.</p>
+<h2 id="11-from-the-lesson-to-your-ner-agent">11. From the Lesson to Your NER Agent</h2>
+<p>The project milestone asks for an <abbr data-tip="Named Entity Recognition: finding names in text and labelling each with a type" tabindex="0">NER</abbr> Agent that extracts <strong>people, organisations, technologies, dates and locations</strong>, tested on at least five articles. The model in this lesson covers three of these five. A fine-tuned NER model can only output the entity types it was trained on, so dates and technologies need another source. A practical first design combines three extractors:</p>
+<table>
+<thead>
+<tr>
+<th>Entity type</th>
+<th>Extractor</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Person, organisation, location</td>
+<td>The fine-tuned transformer (Section 4)</td>
+<td>Open-ended names that depend on context</td>
+</tr>
+<tr>
+<td>Date</td>
+<td>Rules (regular expressions)</td>
+<td>Dates follow a small number of regular patterns</td>
+</tr>
+<tr>
+<td>Technology</td>
+<td>A term list (gazetteer) that you maintain</td>
+<td>No public NER dataset labels technologies in the way your project needs</td>
+</tr>
+</tbody>
+</table>
+<p>The two rule-based extractors are plain Python:</p>
+<div class="runnable"><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden>import re
+
+MONTHS = &quot;January|February|March|April|May|June|July|August|September|October|November|December&quot;
+DATE_PATTERNS = [
+    rf&quot;\b\d{{1,2}} (?:{MONTHS}) \d{{4}}\b&quot;,        # 14 November 2026
+    rf&quot;\b(?:{MONTHS}) \d{{1,2}}, \d{{4}}\b&quot;,       # November 14, 2026
+    rf&quot;\b(?:{MONTHS}) \d{{4}}\b&quot;,                  # November 2026
+    r&quot;\b\d{4}-\d{2}-\d{2}\b&quot;,                      # 2026-11-14
+    r&quot;\b(?:19|20)\d{2}\b&quot;,                         # 2017
+]
+TECHNOLOGIES = [&quot;XLM-RoBERTa&quot;, &quot;BERT&quot;, &quot;Transformer&quot;, &quot;LangChain&quot;, &quot;LangGraph&quot;, &quot;PyTorch&quot;, &quot;ChromaDB&quot;]
+
+def find_dates(text):
+    found = []
+    for pattern in DATE_PATTERNS:                   # most specific pattern first
+        for m in re.finditer(pattern, text):
+            overlaps = any(m.start() &lt; e and s &lt; m.end() for s, e, _ in found)
+            if not overlaps:
+                found.append((m.start(), m.end(), m.group()))
+    return [{&quot;type&quot;: &quot;DATE&quot;, &quot;text&quot;: t, &quot;start&quot;: s, &quot;end&quot;: e} for s, e, t in sorted(found)]
+
+def find_technologies(text):
+    found = []
+    for term in sorted(TECHNOLOGIES, key=len, reverse=True):    # longest term first
+        for m in re.finditer(rf&quot;(?&lt;!\w){re.escape(term)}(?!\w)&quot;, text):
+            overlaps = any(m.start() &lt; e and s &lt; m.end() for s, e, _ in found)
+            if not overlaps:
+                found.append((m.start(), m.end(), m.group()))
+    return [{&quot;type&quot;: &quot;TECH&quot;, &quot;text&quot;: t, &quot;start&quot;: s, &quot;end&quot;: e} for s, e, t in sorted(found)]
+
+article = (&quot;The Transformer was introduced in 2017. On 14 November 2026 the team in Amman &quot;
+           &quot;compared BERT with XLM-RoBERTa and stored the results in ChromaDB.&quot;)
+for entity in find_dates(article) + find_technologies(article):
+    print(entity)</textarea><pre><code class="language-python">import re
+
+MONTHS = &quot;January|February|March|April|May|June|July|August|September|October|November|December&quot;
+DATE_PATTERNS = [
+    rf&quot;\b\d{{1,2}} (?:{MONTHS}) \d{{4}}\b&quot;,        # 14 November 2026
+    rf&quot;\b(?:{MONTHS}) \d{{1,2}}, \d{{4}}\b&quot;,       # November 14, 2026
+    rf&quot;\b(?:{MONTHS}) \d{{4}}\b&quot;,                  # November 2026
+    r&quot;\b\d{4}-\d{2}-\d{2}\b&quot;,                      # 2026-11-14
+    r&quot;\b(?:19|20)\d{2}\b&quot;,                         # 2017
+]
+TECHNOLOGIES = [&quot;XLM-RoBERTa&quot;, &quot;BERT&quot;, &quot;Transformer&quot;, &quot;LangChain&quot;, &quot;LangGraph&quot;, &quot;PyTorch&quot;, &quot;ChromaDB&quot;]
+
+def find_dates(text):
+    found = []
+    for pattern in DATE_PATTERNS:                   # most specific pattern first
+        for m in re.finditer(pattern, text):
+            overlaps = any(m.start() &lt; e and s &lt; m.end() for s, e, _ in found)
+            if not overlaps:
+                found.append((m.start(), m.end(), m.group()))
+    return [{&quot;type&quot;: &quot;DATE&quot;, &quot;text&quot;: t, &quot;start&quot;: s, &quot;end&quot;: e} for s, e, t in sorted(found)]
+
+def find_technologies(text):
+    found = []
+    for term in sorted(TECHNOLOGIES, key=len, reverse=True):    # longest term first
+        for m in re.finditer(rf&quot;(?&lt;!\w){re.escape(term)}(?!\w)&quot;, text):
+            overlaps = any(m.start() &lt; e and s &lt; m.end() for s, e, _ in found)
+            if not overlaps:
+                found.append((m.start(), m.end(), m.group()))
+    return [{&quot;type&quot;: &quot;TECH&quot;, &quot;text&quot;: t, &quot;start&quot;: s, &quot;end&quot;: e} for s, e, t in sorted(found)]
+
+article = (&quot;The Transformer was introduced in 2017. On 14 November 2026 the team in Amman &quot;
+           &quot;compared BERT with XLM-RoBERTa and stored the results in ChromaDB.&quot;)
+for entity in find_dates(article) + find_technologies(article):
+    print(entity)</code></pre></div>
+<p>Both functions return the same fields as the transformer pipeline (a type, the text, and character positions), so the three result lists can be merged into one and sorted by position.</p>
+<p><strong>Design points for the agent</strong></p>
+<ul>
+<li><strong>Long articles.</strong> The model accepts at most 512 tokens. Split an article into paragraphs or sentences, run the model on each piece, and add the piece's offset to the <code>start</code> and <code>end</code> positions.</li>
+<li><strong>Normalise and count.</strong> The same entity appears many times and in several forms (<em>University of Petra</em>, <em>Petra University</em>, <em>UOP</em>). Decide how the agent merges them, and report each entity once with a count.</li>
+<li><strong>Keep the evidence.</strong> Store the character positions and the confidence score with every entity, so that the Writer and Critic agents can check a claim against the source text.</li>
+<li><strong>A language model as an extractor.</strong> From Week 4 on you can also ask a large language model (<abbr data-tip="Large Language Model" tabindex="0">LLM</abbr>) to extract entities with a prompt. That handles new types such as technologies without a term list, at the cost of speed, money and reproducibility. Whichever extractor you choose, evaluate it in the same way.</li>
+</ul>
+<p><strong>Testing on five articles.</strong> Choose five articles from your project's topic, and include at least one that is not in English if your sources are multilingual. For each article, write the list of entities you expect by hand; this is your gold standard. Run the agent, then report precision, recall and <abbr data-tip="F1-score: the harmonic mean of precision and recall" tabindex="0">F1</abbr> <strong>per entity type</strong>, as in Section 7. The per-type breakdown shows which extractor needs work.</p>
+<h2 id="12-check-your-understanding">12. Check Your Understanding</h2>
+<details>
+<summary>1. A dataset has five entity types. How many classes does the token classifier have in the IOB2 scheme?</summary>
+<p>Eleven: a B- tag and an I- tag for each of the five types, plus <code>O</code>.</p>
+</details>
+<details>
+<summary>2. What is the difference between the heads used for sequence classification and for token classification?</summary>
+<p>Both are a linear layer on top of the encoder. For sequence classification it is applied to one hidden state, that of <abbr data-tip="Classification token: BERT&#x27;s special token at the start of every input" tabindex="0"><code>[CLS]</code></abbr>, and gives one label. For token classification it is applied to every hidden state and gives one tag per token.</p>
+</details>
+<details>
+<summary>3. Why are the later subwords of a word given the label -100?</summary>
+<p>So that each word is counted once, whatever the number of pieces the tokeniser produces. The value <code>-100</code> is the default <code>ignore_index</code> of PyTorch's cross-entropy loss, so those positions add nothing to the loss.</p>
+</details>
+<details>
+<summary>4. A model tags every token as O on a test set in which 90% of the tokens are O. What are its token accuracy and its entity-level recall?</summary>
+<p>Its token accuracy is 90%, and its entity-level recall is zero, because it found none of the entities. This is why <abbr data-tip="Named Entity Recognition: finding names in text and labelling each with a type" tabindex="0">NER</abbr> is reported with entity-level precision, recall and <abbr data-tip="F1-score: the harmonic mean of precision and recall" tabindex="0">F1</abbr>.</p>
+</details>
+<details>
+<summary>5. What does "zero-shot cross-lingual transfer" mean in this lesson?</summary>
+<p>A multilingual model is fine-tuned on labelled data in one language and then used on another language for which it has seen no labelled examples at all.</p>
+</details>
+<details>
+<summary>6. You have 300 labelled sentences in a new language and a good model for a related language. What should you try first?</summary>
+<p>Evaluate the existing model on the new language without further training. In the textbook's experiment, zero-shot transfer from a related language stayed competitive with direct fine-tuning up to about 750 labelled sentences. The 300 sentences are more valuable as a test set, or added to a multilingual training set.</p>
+</details>
+<details>
+<summary>7. What is a silver-standard dataset, and why does it matter for evaluation?</summary>
+<p>A dataset whose labels were produced automatically instead of by human annotators. It contains systematic labelling errors, so a model can be penalised for correct predictions, and the measured F1 is only as trustworthy as the labels.</p>
+</details>
+<h2 id="13-summary-and-further-reading">13. Summary and Further Reading</h2>
+<p><strong>What you learned:</strong> <abbr data-tip="Named Entity Recognition: finding names in text and labelling each with a type" tabindex="0">NER</abbr> as token classification; the <abbr data-tip="Inside, Outside, Beginning, version 2: B- starts an entity, I- continues it, O is outside any entity" tabindex="0">IOB2</abbr> scheme; how the same encoder serves a different task by changing its head; why word labels must be aligned with subword tokens and how <code>-100</code> does it; entity-level evaluation with <abbr data-tip="Sequence labelling evaluation: the Python library that scores NER at the entity level" tabindex="0"><code>seqeval</code></abbr>; multilingual models and zero-shot cross-lingual transfer; and how error analysis reveals weaknesses in both a model and its data.</p>
+<p><strong>Further reading</strong></p>
+<ul>
+<li>Tunstall, von Werra &amp; Wolf, <em>Natural Language Processing with Transformers</em>, Revised Edition (O'Reilly, 2022), Chapter 4. Code and figures: https://github.com/nlp-with-transformers/notebooks</li>
+<li>Conneau et al. (2019), "Unsupervised Cross-Lingual Representation Learning at Scale" (XLM-RoBERTa): https://arxiv.org/abs/1911.02116</li>
+<li>Hu et al. (2020), "XTREME: A Massively Multilingual Multi-Task Benchmark for Evaluating Cross-Lingual Generalization": https://arxiv.org/abs/2003.11080</li>
+<li>Pan et al. (2017), "Cross-Lingual Name Tagging and Linking for 282 Languages" (WikiANN / PAN-X): https://aclanthology.org/P17-1178/</li>
+<li>Kudo &amp; Richardson (2018), "SentencePiece: A Simple and Language Independent Subword Tokenizer and Detokenizer for Neural Text Processing": https://arxiv.org/abs/1808.06226</li>
+<li>Hugging Face course, token classification: https://huggingface.co/learn/nlp-course/chapter7/2</li>
+<li>seqeval: https://github.com/chakki-works/seqeval</li>
+</ul>
+<p>The figures in this lesson come from the textbook's companion repository and are used under its Apache 2.0 licence.</p>
 <h2 id="try-it-yourself">Try it yourself</h2>
 <p class="lesson-intro"><b>▶ Try it</b> runs an example in the editor panel, inside your browser — change the code and press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to run it again. Examples that use PyTorch, Transformers, LangChain or an API cannot run in a browser: press <b>📓 Open in notebook</b> and run them in the course notebook, which opens beside the lesson.</p><h3 id="run-in-your-browser">Run in your browser</h3><p class="lesson-intro">Self-contained versions of this week's mechanisms, written with NumPy, scikit-learn or plain Python so they run here.</p><div class="runnable"><div class="code-title">From BIO tags to entity spans, and entity-level F1</div><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden>tokens = [&quot;Dr.&quot;, &quot;Albanna&quot;, &quot;teaches&quot;, &quot;at&quot;, &quot;the&quot;, &quot;University&quot;, &quot;of&quot;, &quot;Petra&quot;, &quot;in&quot;, &quot;Amman&quot;]
 gold   = [&quot;B-PER&quot;, &quot;I-PER&quot;, &quot;O&quot;, &quot;O&quot;, &quot;O&quot;, &quot;B-ORG&quot;, &quot;I-ORG&quot;, &quot;I-ORG&quot;, &quot;O&quot;, &quot;B-LOC&quot;]
@@ -80,7 +906,105 @@ tp = len(G &amp; P)
 precision, recall = tp / len(P), tp / len(G)
 f1 = 2 * precision * recall / (precision + recall)
 token_acc = sum(g == p for g, p in zip(gold, pred)) / len(gold)
-print(f&quot;\ntoken accuracy = {token_acc:.2f}, entity P={precision:.2f} R={recall:.2f} F1={f1:.2f}&quot;)</code></pre></div>
+print(f&quot;\ntoken accuracy = {token_acc:.2f}, entity P={precision:.2f} R={recall:.2f} F1={f1:.2f}&quot;)</code></pre></div><div class="runnable"><div class="code-title">Aligning word labels with subword tokens: where the -100 labels come from</div><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden># A toy subword tokenizer (greedy longest match) stands in for SentencePiece, so this runs in the browser.
+VOCAB = {&quot;Dr&quot;, &quot;.&quot;, &quot;Al&quot;, &quot;ban&quot;, &quot;na&quot;, &quot;teach&quot;, &quot;es&quot;, &quot;at&quot;, &quot;the&quot;, &quot;Univers&quot;, &quot;ity&quot;, &quot;of&quot;, &quot;Petra&quot;, &quot;in&quot;, &quot;Am&quot;, &quot;man&quot;}
+
+def split_word(word):
+    pieces, start = [], 0
+    while start &lt; len(word):
+        end = len(word)
+        while end &gt; start and word[start:end] not in VOCAB:
+            end -= 1
+        if end == start:                       # no piece matches: emit one unknown character
+            end = start + 1
+        pieces.append(word[start:end])
+        start = end
+    return pieces
+
+words = [&quot;Dr.&quot;, &quot;Albanna&quot;, &quot;teaches&quot;, &quot;at&quot;, &quot;the&quot;, &quot;University&quot;, &quot;of&quot;, &quot;Petra&quot;, &quot;in&quot;, &quot;Amman&quot;]
+tags  = [&quot;B-PER&quot;, &quot;I-PER&quot;, &quot;O&quot;, &quot;O&quot;, &quot;O&quot;, &quot;B-ORG&quot;, &quot;I-ORG&quot;, &quot;I-ORG&quot;, &quot;O&quot;, &quot;B-LOC&quot;]
+tag2id = {&quot;O&quot;: 0, &quot;B-PER&quot;: 1, &quot;I-PER&quot;: 2, &quot;B-ORG&quot;: 3, &quot;I-ORG&quot;: 4, &quot;B-LOC&quot;: 5, &quot;I-LOC&quot;: 6}
+
+tokens, word_ids = [&quot;&lt;s&gt;&quot;], [None]
+for i, w in enumerate(words):
+    for piece in split_word(w):
+        tokens.append(piece); word_ids.append(i)
+tokens.append(&quot;&lt;/s&gt;&quot;); word_ids.append(None)
+
+label_ids, previous = [], None
+for word_id in word_ids:
+    if word_id is None or word_id == previous:
+        label_ids.append(-100)                 # special token, or a later subword: ignored by the loss
+    else:
+        label_ids.append(tag2id[tags[word_id]])
+    previous = word_id
+
+print(f&quot;{&#x27;token&#x27;:10} {&#x27;word_id&#x27;:&gt;7} {&#x27;label_id&#x27;:&gt;8}  label&quot;)
+for t, w, l in zip(tokens, word_ids, label_ids):
+    name = &quot;IGN&quot; if l == -100 else tags[w]
+    print(f&quot;{t:10} {str(w):&gt;7} {l:&gt;8}  {name}&quot;)
+
+counted = sum(l != -100 for l in label_ids)
+print(f&quot;\n{len(tokens)} tokens, {len(words)} words, {counted} positions counted in the loss (one per word)&quot;)</textarea><pre><code class="language-python"># A toy subword tokenizer (greedy longest match) stands in for SentencePiece, so this runs in the browser.
+VOCAB = {&quot;Dr&quot;, &quot;.&quot;, &quot;Al&quot;, &quot;ban&quot;, &quot;na&quot;, &quot;teach&quot;, &quot;es&quot;, &quot;at&quot;, &quot;the&quot;, &quot;Univers&quot;, &quot;ity&quot;, &quot;of&quot;, &quot;Petra&quot;, &quot;in&quot;, &quot;Am&quot;, &quot;man&quot;}
+
+def split_word(word):
+    pieces, start = [], 0
+    while start &lt; len(word):
+        end = len(word)
+        while end &gt; start and word[start:end] not in VOCAB:
+            end -= 1
+        if end == start:                       # no piece matches: emit one unknown character
+            end = start + 1
+        pieces.append(word[start:end])
+        start = end
+    return pieces
+
+words = [&quot;Dr.&quot;, &quot;Albanna&quot;, &quot;teaches&quot;, &quot;at&quot;, &quot;the&quot;, &quot;University&quot;, &quot;of&quot;, &quot;Petra&quot;, &quot;in&quot;, &quot;Amman&quot;]
+tags  = [&quot;B-PER&quot;, &quot;I-PER&quot;, &quot;O&quot;, &quot;O&quot;, &quot;O&quot;, &quot;B-ORG&quot;, &quot;I-ORG&quot;, &quot;I-ORG&quot;, &quot;O&quot;, &quot;B-LOC&quot;]
+tag2id = {&quot;O&quot;: 0, &quot;B-PER&quot;: 1, &quot;I-PER&quot;: 2, &quot;B-ORG&quot;: 3, &quot;I-ORG&quot;: 4, &quot;B-LOC&quot;: 5, &quot;I-LOC&quot;: 6}
+
+tokens, word_ids = [&quot;&lt;s&gt;&quot;], [None]
+for i, w in enumerate(words):
+    for piece in split_word(w):
+        tokens.append(piece); word_ids.append(i)
+tokens.append(&quot;&lt;/s&gt;&quot;); word_ids.append(None)
+
+label_ids, previous = [], None
+for word_id in word_ids:
+    if word_id is None or word_id == previous:
+        label_ids.append(-100)                 # special token, or a later subword: ignored by the loss
+    else:
+        label_ids.append(tag2id[tags[word_id]])
+    previous = word_id
+
+print(f&quot;{&#x27;token&#x27;:10} {&#x27;word_id&#x27;:&gt;7} {&#x27;label_id&#x27;:&gt;8}  label&quot;)
+for t, w, l in zip(tokens, word_ids, label_ids):
+    name = &quot;IGN&quot; if l == -100 else tags[w]
+    print(f&quot;{t:10} {str(w):&gt;7} {l:&gt;8}  {name}&quot;)
+
+counted = sum(l != -100 for l in label_ids)
+print(f&quot;\n{len(tokens)} tokens, {len(words)} words, {counted} positions counted in the loss (one per word)&quot;)</code></pre></div><h3 id="test-code">Test code for the course environment</h3><div class="runnable local"><div class="code-title">Quick NER check on your own sentence</div><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Starts the course environment. The link it shows opens this lesson with its notebook beside it.">📓 Open in notebook</a><button class="try local" data-run="0" data-target="vscode" data-needs="transformers" title="Needs transformers — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from transformers import pipeline
+
+ner = pipeline(&quot;token-classification&quot;,
+               model=&quot;transformersbook/xlm-roberta-base-finetuned-panx-all&quot;,
+               aggregation_strategy=&quot;simple&quot;)
+for e in ner(&quot;Lina Haddad works for Orange Jordan in Irbid.&quot;):
+    print(e[&quot;entity_group&quot;], &quot;|&quot;, e[&quot;word&quot;], &quot;|&quot;, round(float(e[&quot;score&quot;]), 2))</textarea><pre><code class="language-python">from transformers import pipeline
+
+ner = pipeline(&quot;token-classification&quot;,
+               model=&quot;transformersbook/xlm-roberta-base-finetuned-panx-all&quot;,
+               aggregation_strategy=&quot;simple&quot;)
+for e in ner(&quot;Lina Haddad works for Orange Jordan in Irbid.&quot;):
+    print(e[&quot;entity_group&quot;], &quot;|&quot;, e[&quot;word&quot;], &quot;|&quot;, round(float(e[&quot;score&quot;]), 2))</code></pre></div><div class="runnable local"><div class="code-title">Entity-level scores with seqeval</div><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Starts the course environment. The link it shows opens this lesson with its notebook beside it.">📓 Open in notebook</a><button class="try local" data-run="0" data-target="vscode" data-needs="seqeval" title="Needs seqeval — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from seqeval.metrics import classification_report
+
+y_true = [[&quot;B-PER&quot;, &quot;I-PER&quot;, &quot;O&quot;, &quot;B-ORG&quot;, &quot;I-ORG&quot;, &quot;O&quot;, &quot;B-LOC&quot;]]
+y_pred = [[&quot;B-PER&quot;, &quot;I-PER&quot;, &quot;O&quot;, &quot;B-ORG&quot;, &quot;O&quot;, &quot;O&quot;, &quot;B-LOC&quot;]]
+print(classification_report(y_true, y_pred))</textarea><pre><code class="language-python">from seqeval.metrics import classification_report
+
+y_true = [[&quot;B-PER&quot;, &quot;I-PER&quot;, &quot;O&quot;, &quot;B-ORG&quot;, &quot;I-ORG&quot;, &quot;O&quot;, &quot;B-LOC&quot;]]
+y_pred = [[&quot;B-PER&quot;, &quot;I-PER&quot;, &quot;O&quot;, &quot;B-ORG&quot;, &quot;O&quot;, &quot;O&quot;, &quot;B-LOC&quot;]]
+print(classification_report(y_true, y_pred))</code></pre></div>
 <div class="lesson-nav"><a href="week02-text-classification.html">‹ Week 2: Text Classification</a><a href="week04-langchain.html">Week 4: LangChain Fundamentals ›</a></div>
 <footer class="site-footer">
 This site is based on the course site <a href="https://albanna-tutorials.com/cs/">albanna-tutorials.com/cs</a> by Dr. Abdulkarim Albanna, used with the author's permission.
@@ -109,7 +1033,7 @@ print(np.round(np.linspace(0, 1, 5), 2))</textarea></div>
   </section>
   <section class="wb-mode wb-anim" data-mode="anim">
     <div class="wb-toolbar light">
-      <select id="anim-select" aria-label="Choose animation"><optgroup label="This week"><option value="bio-tagging">NER: BIO tags &amp; entity-level F1</option><option value="classifier">Decision boundary, threshold &amp; F1</option></optgroup><optgroup label="Other weeks"><option value="matrix-multiply">Matrix multiplication, step by step</option><option value="vectors">Vectors, dot product &amp; cosine similarity</option><option value="attention">Self-attention: Q·Kᵀ → softmax → ·V</option><option value="pronoun">Attention: what does “it” refer to?</option><option value="qkv">Query, key and value for one word</option><option value="heads">Multi-head attention: one sentence, three heads</option><option value="multihead">Multi-head attention</option><option value="decoder">Decoder: masked and cross-attention</option><option value="tokenizer">Subword tokenisation</option><option value="posenc">Positional encoding: one word, step by step</option><option value="positional">Positional encoding</option><option value="finetune">Frozen vs fine-tuned weights</option><option value="distill">Distillation: hard label vs soft targets</option><option value="rag">RAG pipeline</option><option value="langgraph">LangGraph StateGraph</option><option value="sampling">Temperature, top-k, top-p</option><option value="moe">Mixture of Experts router</option><option value="react-loop">ReAct agent loop</option><option value="multi-agent">Multi-agent research pipeline</option><option value="mcp">MCP message flow</option><option value="lam">Browser agent: perceive → plan → act</option><option value="diffusion">Diffusion: noising &amp; denoising</option></optgroup></select>
+      <select id="anim-select" aria-label="Choose animation"><optgroup label="This week"><option value="bio-tagging">NER: BIO tags &amp; entity-level F1</option><option value="classifier">Decision boundary, threshold &amp; F1</option><option value="tokenizer">Subword tokenisation</option><option value="finetune">Frozen vs fine-tuned weights</option></optgroup><optgroup label="Other weeks"><option value="matrix-multiply">Matrix multiplication, step by step</option><option value="vectors">Vectors, dot product &amp; cosine similarity</option><option value="attention">Self-attention: Q·Kᵀ → softmax → ·V</option><option value="pronoun">Attention: what does “it” refer to?</option><option value="qkv">Query, key and value for one word</option><option value="heads">Multi-head attention: one sentence, three heads</option><option value="multihead">Multi-head attention</option><option value="decoder">Decoder: masked and cross-attention</option><option value="posenc">Positional encoding: one word, step by step</option><option value="positional">Positional encoding</option><option value="distill">Distillation: hard label vs soft targets</option><option value="rag">RAG pipeline</option><option value="langgraph">LangGraph StateGraph</option><option value="sampling">Temperature, top-k, top-p</option><option value="moe">Mixture of Experts router</option><option value="react-loop">ReAct agent loop</option><option value="multi-agent">Multi-agent research pipeline</option><option value="mcp">MCP message flow</option><option value="lam">Browser agent: perceive → plan → act</option><option value="diffusion">Diffusion: noising &amp; denoising</option></optgroup></select>
       <span class="spacer"></span>
       <button id="btn-full" class="btn ghost" title="Open full screen">⤢ Full screen</button>
     </div>
