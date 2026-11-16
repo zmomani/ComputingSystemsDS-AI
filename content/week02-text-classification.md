@@ -468,6 +468,15 @@ The first tweet is shorter than the second, so its `input_ids` end in a run of z
 |---|---|---|---|---|---|
 | ID | 0 | 100 | 101 | 102 | 103 |
 
+What each one is for:
+
+- `[PAD]` fills short texts up to the common length of the batch. It appears in almost every batch you build.
+- `[UNK]` stands for a piece of text that cannot be built from the vocabulary at all, such as a rare symbol. With subword tokenization this seldom happens.
+- `[CLS]` and `[SEP]` mark the start and the end of every text.
+- `[MASK]` hides a word during **pre-training**: the model sees "I drank a cup of `[MASK]`" and has to predict the hidden word (Theory 2). When you classify text, you never insert it.
+
+> **Three different "masks".** The word is used for three unrelated things in this lesson. The `[MASK]` *token* hides a word during pre-training. The *attention mask* is the row of 1s and 0s that tells the model which positions are padding. *Masked self-attention* is the rule in a decoder that a position may not look at later positions (Theory 1). `[PAD]` works together with the attention mask, not with `[MASK]`.
+
 - `padding=True` pads to the longest sequence in the batch (`padding="max_length"` pads to the model's max length instead). Padding adds special tokens so sequences in a batch have equal length.
 - `truncation=True` shortens sequences that exceed the model's maximum length. This prevents errors but may cut information.
 - `batched=True` processes the data in batches; `batch_size=None` treats the whole split as one batch.

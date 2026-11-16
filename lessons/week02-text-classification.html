@@ -555,6 +555,16 @@ print(emotion_encoded.column_names)</code></pre></div>
 </tr>
 </tbody>
 </table>
+<p>What each one is for:</p>
+<ul>
+<li><code>[PAD]</code> fills short texts up to the common length of the batch. It appears in almost every batch you build.</li>
+<li><code>[UNK]</code> stands for a piece of text that cannot be built from the vocabulary at all, such as a rare symbol. With subword tokenization this seldom happens.</li>
+<li><code>[CLS]</code> and <code>[SEP]</code> mark the start and the end of every text.</li>
+<li><code>[MASK]</code> hides a word during <strong>pre-training</strong>: the model sees "I drank a cup of <code>[MASK]</code>" and has to predict the hidden word (Theory 2). When you classify text, you never insert it.</li>
+</ul>
+<blockquote>
+<p><strong>Three different "masks".</strong> The word is used for three unrelated things in this lesson. The <code>[MASK]</code> <em>token</em> hides a word during pre-training. The <em>attention mask</em> is the row of 1s and 0s that tells the model which positions are padding. <em>Masked self-attention</em> is the rule in a decoder that a position may not look at later positions (Theory 1). <code>[PAD]</code> works together with the attention mask, not with <code>[MASK]</code>.</p>
+</blockquote>
 <ul>
 <li><code>padding=True</code> pads to the longest sequence in the batch (<code>padding="max_length"</code> pads to the model's max length instead). Padding adds special tokens so sequences in a batch have equal length.</li>
 <li><code>truncation=True</code> shortens sequences that exceed the model's maximum length. This prevents errors but may cut information.</li>

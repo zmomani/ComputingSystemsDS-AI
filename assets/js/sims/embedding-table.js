@@ -17,7 +17,10 @@ Sims.register('embedding-table', {
     const TIP = {
       t1: 'The embedding table is part of the model. It has one row for every token of the vocabulary (30,522 for DistilBERT) and 768 numbers in each row, about 23.4 million numbers in all. It is the same for every sentence.',
       t2: 'The matrix for this sentence: the rows fetched from the embedding table, in the order of the tokens. Its shape is number of tokens × 768. Everything the model does next, attention included, works on this matrix.',
-      row: (id, tok) => `Row ${id} of the embedding table: the vector of the token ${tok}. The ID of a token is nothing more than this row number.`,
+      special: { '[PAD]': 'Padding token: fills short texts up to the common length of the batch.', '[UNK]': 'Unknown token: stands for a piece of text that cannot be built from the vocabulary at all.',
+        '[CLS]': 'Classification token: added at the start of every text.', '[SEP]': 'Separator token: added at the end of every text.',
+        '[MASK]': 'Mask token: hides a word during pre-training so that the model learns to predict it. Not the same thing as the attention mask, and not used when classifying.' },
+      row: (id, tok) => `Row ${id} of the embedding table: the vector of the token ${tok}. ${TIP.special[tok] || ''} The ID of a token is nothing more than this row number.`,
       id: 'The token ID: the line on which this token stands in the vocabulary file. It says where to look, not what the token means.'
     };
     const steps = [{ i: 0 }].concat(sent.map((_, k) => ({ i: k + 1 })));
@@ -30,7 +33,7 @@ Sims.register('embedding-table', {
       const i = st.i, cur = i ? sent[i - 1] : null;
       S1.innerHTML = sent.map((t, k) => `<span class="emb-pill${k === i - 1 ? ' on' : ''}" data-tip="${TIP.id}" data-tip-pos="over">${t[0]}<small>ID ${t[1]}</small></span>`).join('');
       T1.innerHTML = rows.map(r => r[1] === null ? `<div class="emb-gap">⋮ ${r[2]}</div>` :
-        `<div class="emb-row${cur && r[0] === cur[1] ? ' hit' : ''}"><span class="emb-id" data-tip="${TIP.row(r[0], r[1])}" data-tip-pos="over">row ${r[0]}</span><span class="emb-tok">${r[1]}</span>${cells(r[0])}</div>`).join('');
+        `<div class="emb-row${cur && r[0] === cur[1] ? ' hit' : ''}"><span class="emb-id" data-tip="${TIP.row(r[0], r[1])}" data-tip-pos="over">row ${r[0]}</span><span class="emb-tok"${TIP.special[r[1]] ? ` data-tip="${TIP.special[r[1]]}" data-tip-pos="over" style="cursor:help"` : ''}>${r[1]}</span>${cells(r[0])}</div>`).join('');
       T2.innerHTML = sent.slice(0, i).map((t, k) => `<div class="emb-row${k === i - 1 ? ' hit new' : ''}"><span class="emb-id">pos ${k + 1}</span><span class="emb-tok">${t[0]}</span>${cells(t[1])}</div>`).join('') || '<div class="emb-gap">Empty. Press Next ▶.</div>';
       SH.textContent = i ? `Shape so far: ${i} × 768` : '';
       if (!i) L.explain('The tokenizer has given every token an <b>ID</b>. An ID is only a row number. The model keeps a table with one row of 768 learned numbers for each of its 30,522 tokens, and replaces each ID by its row. Press <b>Next ▶</b>. Move the pointer over a row number, a coloured square or a table title for details.', 'Start');
