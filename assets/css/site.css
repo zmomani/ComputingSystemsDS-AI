@@ -208,7 +208,7 @@ kbd { font-family: var(--mono); font-size: .8em; background: #eef1f5; border: 1p
 .local-btns { position: absolute; top: .45rem; right: .45rem; display: flex; gap: .3rem; z-index: 1; }
 .local-btns .try { position: static; text-decoration: none; }
 .runnable .try.colab-try { background: #e8710a; color: #fff; }
-.runnable.local .copy { right: 11.4rem; }
+.runnable.local .copy { right: 12.6rem; }
 .runnable.local:has(.vscode-try) .copy { right: 16.2rem; }
 .runnable .code-title + .local-btns { top: 1.95rem; }
 .colab-note { color: #ffd28a; font-family: var(--font); font-size: .9rem; white-space: normal; }

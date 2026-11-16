@@ -1,62 +1,25 @@
-# The course notebook: lessons and their Jupyter notebooks side by side
+# Codespaces: for the examples that are programs, not notebook steps
 
-606363 · Computing Systems for Data Science and AI · University of Petra
+## Where the course code runs
 
-You run the course code in **Jupyter notebooks that open beside the lesson**, in one browser window: the lesson on the
-left, its notebook on the right. The notebooks run on this codespace, a free cloud machine that is already set up for
-the course: Python 3.12, PyTorch (CPU), Hugging Face Transformers, LangChain, LangGraph, ChromaDB, the MCP SDK, Django,
-Streamlit, Playwright with Chromium, and Jupyter. Nothing to install on your laptop.
-
-## Start here
-
-1. **Wait for the link.** When this codespace opens, it starts the course notebook by itself. A terminal at the bottom
-   shows a box with a link, and your browser may open that link in a new tab (allow it if it asks).
-   The very first launch takes a few minutes while the libraries install.
-2. **No link?** Open a terminal (**Ctrl + `**) and run:
-
-   ```bash
-   bash scripts/start-lesson-lab.sh
-   ```
-
-   If your codespace was created before this change, run `git pull` first.
-3. **Open the link** (Ctrl+click). The course home page opens. Choose a lesson.
-4. **Press the button on any Python example** (**📓 To notebook**). The side panel opens that lesson's notebook and
-   selects the cell that holds the example. If the example is not in your notebook any more, a new cell is filled with it.
-5. **Press ▶ Run cell.** If the example needs earlier ones, press **⏫ Run all above, then this**
-   (not for model-training cells: those belong in Colab).
-
-Good to know:
-
-* The notebook in the panel is the file `notebooks/<lesson>.ipynb` in this codespace, so your work is saved there.
-* **↗ Full tab** opens the notebook in its own tab, with a file browser and a terminal (**File → New → Terminal**).
-* The first time a notebook opens, choose the kernel **Python 3** if it asks.
-* You can close this VS Code tab's panels and work only in the lesson tab. Keep the codespace itself running.
-* Stop the notebook server with `bash scripts/start-lesson-lab.sh stop`. Show the link again by running the script again.
-
-## If the lesson tab stops working
-
-A codespace **goes to sleep after 30 minutes without activity** (GitHub's rule; it protects your free hours).
-The lesson tab then shows a red bar, a "Kernel died" or "401" message, or a "404 Not Found" page.
-
-* **To wake it:** open <https://github.com/codespaces>, start your codespace again, wait for the link in its terminal,
-  and open the link. Your notebook file is saved; run the cells you need again, because the variables are gone.
-* **To avoid it while you work:** leave the terminal named for the course notebook open in the codespace tab. It prints
-  a line every few minutes while you are using a lesson tab, and that is what keeps the codespace awake. If you closed
-  that terminal, run `bash scripts/start-lesson-lab.sh watch` in a new one.
-* **If lessons do not open from the home page:** run `bash scripts/start-lesson-lab.sh` once more and reload the page.
-* You can also raise the limit for codespaces you create later: GitHub → Settings → Codespaces → *Default idle timeout*
-  (up to 240 minutes).
-
-## Where does each kind of code run?
-
-**Use the course notebook for all your coursework.** One environment means the same Python and the same libraries
-for every lesson.
-
-| On the course site you see | Where it runs | Why |
+| Button on the lesson page | Where it runs | Use it for |
 |---|---|---|
-| **▶ Try it** | In the lesson page, inside your browser | Quick experiments while reading — plain Python, NumPy, pandas, scikit-learn, matplotlib. |
-| **📓 Open in notebook** | The course notebook, on this codespace | Everything else: PyTorch, Transformers, LangChain, LangGraph, MCP servers, Ollama, Django, Playwright, Streamlit. The button starts the codespace; the link above then opens the lesson with its notebook beside it. |
-| **▶ Train in Colab** | Google Colab, with a free GPU | Only the two model-training exercises (Week 2 fine-tuning, Week 13 diffusion). The codespace has no GPU, so training there would take hours. Save the trained model (e.g. to Google Drive or the Hugging Face Hub) and load it in the course notebook. |
+| **▶ Try it** | Inside the lesson page, in your browser | Quick experiments with plain Python, NumPy, pandas, scikit-learn, matplotlib. |
+| **▶ Run in Colab** | Google Colab (free, needs a Google account) | Almost everything else: PyTorch, Transformers, LangChain, LangGraph. Each lesson has a notebook with all of its code in order and its installs in the first cell. For model training choose Runtime → Change runtime type → T4 GPU. |
+| **💻 Open in Codespaces** | This codespace: a free cloud computer with VS Code and a terminal | Only programs that keep running or consist of several files: the Django app, Streamlit, Ollama, MCP servers, Playwright. |
+
+**Most weeks you do not need this codespace at all.** Open it when a lesson example has the **💻 Open in Codespaces** button.
+
+## Using the codespace
+
+1. It opens as VS Code in your browser. The first start takes a few minutes while the course libraries are installed
+   (Python 3.12, PyTorch, Transformers, LangChain, LangGraph, MCP, Django, Streamlit, Playwright with Chromium).
+2. Open a terminal with **Ctrl + `** (back-tick).
+3. The lesson notebooks are in the folder `notebooks/`. Click one to open it in VS Code, choose the kernel **Python 3.12**
+   if it asks, and run the cells you need. Cells that begin with `%%writefile` save an application file; run that file
+   from the terminal as the table below describes.
+4. A codespace stops by itself after 30 minutes without activity. Your files are kept. Start it again from
+   <https://github.com/codespaces>.
 
 ## From notebook to script
 
@@ -90,8 +53,6 @@ Never put a key directly in a notebook or in code you push.
 | 12 | Playwright browser agent | Chromium is installed. Run headless: `browser = p.chromium.launch(headless=True)`. |
 | 13 | Streamlit / Gradio UI | `streamlit run app.py` (port 8501) or run the Gradio cell (port 7860). |
 
-Open a terminal with **Ctrl + `** (back-tick) in the codespace tab, or with **File → New → Terminal** in the notebook's **↗ Full tab** view.
-
 ## Save your work and your free hours
 
 * **This codespace is for practising with the lesson code — you cannot push to the course repository.** Your project lives in
@@ -112,4 +73,4 @@ pip install -r requirements.txt
 python -m playwright install chromium                  # only for Week 12
 ```
 
-Then run `bash scripts/start-lesson-lab.sh` and open the link it prints, or open the notebooks in any Jupyter. Install Ollama from ollama.com.
+Then open the notebooks in VS Code or in any Jupyter. Install Ollama from ollama.com.

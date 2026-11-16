@@ -134,10 +134,10 @@
   $$("[data-colab-link]").forEach((a) => { if (COLAB) a.href = COLAB; else a.remove(); });
   function vscodeNote(what) {
     const d = document.createElement("div"); d.className = "colab-note";
-    d.innerHTML = `<p>${what}</p><p>That needs a full Python installation with the course libraries (and sometimes programs that keep running), which a web page cannot provide. The course notebook has all of it.</p>` +
-      `<p><a class="btn codespaces" href="${lesson.dataset.codespaces}" target="_blank" rel="noopener">📓 Open in notebook</a> ` +
+    d.innerHTML = `<p>${what}</p><p>It is a program that keeps running or a file of an application, which neither a web page nor a notebook can host.</p>` +
+      `<p><a class="btn codespaces" href="${lesson.dataset.codespaces}" target="_blank" rel="noopener">💻 Open in Codespaces</a> ` +
       `<button class="btn ghost" data-copy-editor>Copy the code</button></p>` +
-      `<p class="small">This starts a free cloud machine set up for this course (a GitHub codespace). When it is ready, open the lesson link it shows: the lesson opens again with its Jupyter notebook beside it, and each example's button takes you to its cell. <a href="${lesson.dataset.guide}" target="_blank" rel="noopener">How it works</a></p>`;
+      `<p class="small">Codespaces is a free cloud computer with a terminal, already set up for this course. <a href="${lesson.dataset.guide}" target="_blank" rel="noopener">How to use it</a></p>`;
     el.out.appendChild(d);
     d.querySelector("[data-copy-editor]").addEventListener("click", (e) => copyText(editor.getValue(), e.currentTarget));
   }
@@ -145,9 +145,9 @@
     const browser = document.getElementById("run-in-your-browser");
     const d = document.createElement("div"); d.className = "colab-note";
     d.innerHTML = `<p>${what}</p><p>` +
-      (COLAB ? `<a class="btn colab" href="${COLAB}" target="_blank" rel="noopener"><span class="colab-logo">CO</span> Train it in Google Colab (GPU)</a> ` : "") +
+      (COLAB ? `<a class="btn colab" href="${COLAB}" target="_blank" rel="noopener"><span class="colab-logo">CO</span> Open this week's notebook in Colab</a> ` : "") +
       (browser ? `<button class="btn ghost" data-goto-browser>Run the in-browser version</button>` : "") +
-      `</p><p class="small">In Colab choose Runtime → Change runtime type → T4 GPU, then run the cells from the top. Save the trained model and bring it back to the course notebook.</p>`;
+      `</p><p class="small">Sign in with a Google account and run the cells from the top: the first cell installs what is missing, and later examples reuse earlier ones. For model training choose Runtime → Change runtime type → T4 GPU first.</p>`;
     el.out.appendChild(d);
     const g = d.querySelector("[data-goto-browser]");
     if (g) g.addEventListener("click", () => browser.scrollIntoView({ behavior: "smooth", block: "start" }));
@@ -272,8 +272,8 @@ builtins.input = input
       const mods = await loadPackagesFor(py, setup + "\n" + code);
       const unavailable = mods.filter((m) => !BROWSER_PKGS[m] && !py.runPython(`__import__("importlib.util").util.find_spec(${JSON.stringify(m)}) is not None`));
       if (unavailable.length) {
-        if (current.target === "colab") colabNote(`This example trains a model, which needs a GPU.`);
-        else vscodeNote(`This example needs <b>${unavailable.join(", ")}</b>, so it runs in the <b>course notebook</b>.`);
+        if (current.target === "colab") colabNote(`This example needs <b>${unavailable.join(", ")}</b>, so it runs in <b>Google Colab</b>.`);
+        else vscodeNote(`This example needs <b>${unavailable.join(", ")}</b>, so it runs in <b>Codespaces</b>.`);
         return;
       }
       const ns = py.globals.get("dict")();
@@ -311,8 +311,8 @@ builtins.input = input
     editor.setValue(code); clearOut();
     el.title.textContent = title;
     if (setup) out("note", "This example continues an earlier one in the lesson; that code runs first, silently.\n");
-    if (local && target === "colab") colabNote(`This example trains a model, which needs a GPU — the course notebook's free cloud machine has none, so it would take hours there.`);
-    else if (local) vscodeNote(`This example needs <b>${needs}</b>, so it runs in the <b>course notebook</b>.`);
+    if (local && target === "colab") colabNote(`This example needs <b>${needs}</b>, so it runs in <b>Google Colab</b>, not in this page.`);
+    else if (local) vscodeNote(`This example needs <b>${needs}</b>, so it runs in <b>Codespaces</b>.`);
     setTimeout(() => { editor.refresh(); editor.focus(); }, 0);
   }
 

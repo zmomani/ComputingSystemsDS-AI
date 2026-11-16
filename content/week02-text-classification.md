@@ -639,12 +639,12 @@ def compute_metrics(pred):
     return {"accuracy": acc, "f1": f1}
 ```
 
-### Before you train: moving to Google Colab
+### Before you train: switch on the GPU
 
 <div class="where-note" markdown="1">
 <div class="where-head">Optional notes. The lesson code below stays exactly as it is.</div>
 
-The three training examples that follow (*Setting up the Trainer*, *Training the model* and the tuning mini-challenge) need a GPU, so they run in Google Colab instead of the course notebook. Nothing here replaces the lesson code. Each note is an **extra cell** that you add to the Colab notebook, either as a setup step before training or as a fix when a particular message appears.
+The three training examples that follow (*Setting up the Trainer*, *Training the model* and the tuning mini-challenge) need a GPU. If you have run this week's Colab notebook without one so far, this is the point to switch it on. Nothing here replaces the lesson code. Each note is an **extra cell** that you add to the Colab notebook, either as a setup step before training or as a fix when a particular message appears.
 
 **How to add a cell in Colab.** Move the mouse between two cells and click **+ Code**, paste the snippet, and run it with `Shift`+`Enter`. *At the top* means above the first code cell of the notebook. *Above the Trainer cell* means directly above the cell that starts with `from transformers import Trainer, TrainingArguments`.
 
@@ -691,7 +691,7 @@ notebook_login()
 **Optional**
 
 - **See the GPU and its memory.** Run `!nvidia-smi` in a new cell anywhere in the notebook.
-- **Bring the trained model back to the course notebook.** Colab deletes its files when the session ends, so finish Section 8 (`trainer.push_to_hub(...)`) in Colab before you close the tab. Then, in the course notebook, run the *Using your model* cell with your own username. It downloads the model from the Hub, and prediction does not need a GPU.
+- **Keep the trained model.** Colab deletes its files when the session ends, so finish Section 8 (`trainer.push_to_hub(...)`) before you close the tab. In any later session, the *Using your model* cell with your own username downloads the model from the Hub, and prediction does not need a GPU.
 
 </div>
 

@@ -228,6 +228,8 @@ SCRIPT_FILE = re.compile(r'Path\(__file__\)|\bdjango\b|INSTALLED_APPS|urlpattern
 CODESPACES_URL = f'https://codespaces.new/{REPO}?quickstart=1'
 GUIDE_URL = f'https://github.com/{REPO}/blob/main/CODESPACES.md'
 
+CELL_IDS = {}
+
 def colab_url(slug):
     return f'https://colab.research.google.com/github/{REPO}/blob/main/notebooks/{slug}.ipynb'
 
@@ -239,14 +241,30 @@ def write_notebook(slug, title, page_html, res):
     mods = set()
     for c, _ in PAGE_BLOCKS: mods |= imported_modules(c)
     pip = sorted({PIP_NAMES[m] for m in mods if m in PIP_NAMES and m not in COLAB_PREINSTALLED})
+    gpu = slug in GPU_WEEKS
     cells = [md(f'# {title}\n\n606363 Computing Systems for Data Science and AI — every code example from the lesson page, in order.\n\n'
                 f'Lesson page: https://zmomani.github.io/ComputingSystemsDS-AI/lessons/{slug}.html\n\n'
-                '**How to use:** open this notebook in the course codespace (folder `notebooks/`) and run the cells from the top '
-                '(Shift+Enter, or Run All). Later examples often reuse variables from earlier ones. Examples that call OpenAI or other '
-                'APIs need your key as a Codespaces secret or in the `.env` file. For Ollama examples first run '
-                '`bash scripts/start-ollama.sh` in the terminal. Model-training examples are much faster on a GPU: open this notebook in '
-                'Google Colab and choose Runtime → Change runtime type → T4 GPU (in Colab add API keys with the 🔑 Secrets panel).')]
-    if pip: cells.append(code('# Only needed in Google Colab (the course codespace already has these)\n%pip install -q ' + ' '.join(pip)))
+                '**How to use this notebook in Google Colab**\n\n'
+                '1. Sign in with a Google account. Choose **File → Save a copy in Drive** if you want to keep your changes.\n'
+                + ('2. This lesson trains a model: choose **Runtime → Change runtime type → T4 GPU** before you run anything.\n' if gpu else
+                   '2. No GPU is needed for this lesson.\n') +
+                '3. Run the cells from the top with **Shift+Enter**, or **Runtime → Run all**. Later examples reuse variables from '
+                'earlier ones, so do not skip cells. The first time, Colab asks whether to run a notebook that comes from GitHub: '
+                'choose **Run anyway**.'
+                + ('\n4. Examples that call OpenAI or another service need your own key. Click the 🔑 **Secrets** icon in the left bar, add '
+                   '`OPENAI_API_KEY` (and `TAVILY_API_KEY` where the lesson uses web search) and switch on *Notebook access*. '
+                   'Never type a key into a cell.' if mods & API_MODS else ''))]
+    if pip: cells.append(code('# Libraries this lesson needs that Colab does not already have (takes about a minute)\n%pip install -q ' + ' '.join(pip)))
+    if mods & API_MODS:
+        cells.append(code('# Reads your API keys from the Colab Secrets panel (🔑 in the left bar), if you added any\n'
+                          'import os\n'
+                          'try:\n'
+                          '    from google.colab import userdata\n'
+                          '    for _key in ("OPENAI_API_KEY", "TAVILY_API_KEY", "ANTHROPIC_API_KEY", "HF_TOKEN"):\n'
+                          '        try: os.environ[_key] = userdata.get(_key)\n'
+                          '        except Exception: pass          # this key was not added: fine if the lesson does not use it\n'
+                          'except ImportError:\n'
+                          '    pass                                # not running in Colab: keys come from your .env file'))
     alltext = '\n'.join(c for c, _ in PAGE_BLOCKS)
     common = []
     if re.search(r'\bmath\.', alltext): common.append('import math')
@@ -259,7 +277,7 @@ def write_notebook(slug, title, page_html, res):
     if common: cells.append(code('# Imports that some of the lesson\'s code fragments assume\n' + '\n'.join(common)))
     frags = set(NB_FRAGMENTS.get(slug, []))
     import hashlib
-    used_files = set()
+    used_files = set(); block_cell = {}
     positions = [(m.start(), int(m.group(1))) for m in re.finditer(r'PYBLOCK(\d+)XEND', page_html)]
     last_head = None
     for pos, i in positions:
@@ -284,11 +302,14 @@ def write_notebook(slug, title, page_html, res):
                             '(it uses names from a larger program).*\n\n```python\n' + c + '\n```'))
         else:
             cells.append(code(c))
+        block_cell[i] = len(cells) - 1
     nb = {'cells': cells, 'metadata': {'kernelspec': {'display_name': 'Python 3', 'language': 'python', 'name': 'python3'},
           'language_info': {'name': 'python'}, 'colab': {'provenance': []}}, 'nbformat': 4, 'nbformat_minor': 5}
     for k, cell in enumerate(nb['cells']):
         cell['id'] = f'{slug[:12]}-{k:03d}'.replace('_', '-')
+        cell['metadata']['id'] = cell['id']      # Colab scrolls to this id (…ipynb#scrollTo=<id>)
         cell['source'] = [l for l in cell['source'].splitlines(keepends=True)]
+    CELL_IDS.clear(); CELL_IDS.update({i: nb['cells'][k]['id'] for i, k in block_cell.items()})
     NB_DIR.mkdir(exist_ok=True)
     (NB_DIR / f'{slug}.ipynb').write_text(json.dumps(nb, indent=1, ensure_ascii=False), encoding='utf-8')
     return True
@@ -298,14 +319,13 @@ def finalize(page_html, slug=None, title=None):
     res = classify_page()
     has_nb = write_notebook(slug, title, page_html, res) if slug else False
     colab = colab_url(slug) if has_nb else ''
-    gpu_btn = (f'<a class="btn colab" href="{colab}" target="_blank" rel="noopener"><span class="colab-logo">CO</span> Train on a GPU in Colab</a>'
-               if slug in GPU_WEEKS else '')
-    page_html = page_html.replace('COLABLINKX', (f'<div class="colab-bar"><a class="btn codespaces" href="{CODESPACES_URL}" target="_blank" rel="noopener">'
-        '📓 Open this week\'s notebook</a>' + gpu_btn +
-        f'<a class="muted small" href="{GUIDE_URL}" target="_blank" rel="noopener">How the notebook works</a></div>') if has_nb else '')
+    gpu_tip = ' Choose <b>Runtime → Change runtime type → T4 GPU</b> first: this lesson trains a model.' if slug in GPU_WEEKS else ''
+    page_html = page_html.replace('COLABLINKX', (f'<div class="colab-bar"><a class="btn colab" href="{colab}" target="_blank" rel="noopener">'
+        '<span class="colab-logo">CO</span> Open this week\'s notebook in Colab</a>'
+        f'<span class="muted small">All of this lesson\'s code, ready to run, with its installs in the first cell.{gpu_tip}</span></div>') if has_nb else '')
     def block(i):
         code, title = PAGE_BLOCKS[i]; r = res[i]
-        return python_block_html(code, title, r['run'], r.get('setup', ''), r.get('reason', ''))
+        return python_block_html(code, title, r['run'], r.get('setup', ''), r.get('reason', ''), CELL_IDS.get(i, ''))
     first_local = next((i for i, r in enumerate(res) if not r['run']), None)
     if first_local is not None:
         note = where_note([b for b, r in zip(PAGE_BLOCKS, res) if not r['run']])
@@ -340,24 +360,26 @@ def where_note(blocks):
     mods = set(); gpu = False
     for c, _ in blocks:
         mods |= imported_modules(c) | set(missing_modules(c)); gpu = gpu or needs_gpu(c)
-    items = ['<li><b>Everything else → the course notebook.</b> PyTorch, Transformers, LangChain, LangGraph, MCP servers, Ollama, Django, '
-             'Playwright and Streamlit need a full Python installation, large libraries, or programs that keep running — a web page has none '
-             'of these. <b>📓 Open in notebook</b> starts a free cloud machine already set up for this course (a GitHub codespace) and shows '
-             'a link that opens this lesson with its Jupyter notebook beside it. There, the button on each example takes you to the notebook '
-             'cell that holds it. Use the notebook for all your coursework, so everything runs in '
-             f'<b>one</b> environment (<a href="{GUIDE_URL}" target="_blank" rel="noopener">how it works</a>).</li>']
+    local = any(run_target(c) == 'vscode' for c, _ in blocks)
+    items = ['<li><b>Everything else → Google Colab.</b> PyTorch, Transformers, LangChain and LangGraph need a full Python installation and '
+             'large libraries, which a web page does not have. <b>▶ Run in Colab</b> opens this week\'s notebook in Google Colab, at the cell '
+             'that holds the example. The notebook contains all of the lesson\'s code in order, and its first cell installs what is missing. '
+             'Sign in with a Google account and run the cells from the top, because later examples reuse earlier ones.</li>']
     if mods & API_MODS:
-        items.append('<li><b>API keys.</b> LangChain, OpenAI and agent examples call services on the internet with your own key. Add it once as a '
-                     'Codespaces secret (GitHub → Settings → Codespaces → Secrets) or in the <code>.env</code> file — never in your code.</li>')
+        items.append('<li><b>API keys.</b> LangChain, OpenAI and agent examples call services on the internet with your own key. In Colab, add it '
+                     'once in the 🔑 <b>Secrets</b> panel (left bar) and switch on <i>Notebook access</i> — never type a key into your code.</li>')
     if gpu:
-        items.append('<li><b>Exception — model training → Google Colab.</b> Training a model needs a GPU, which the notebook\'s free cloud machine does not have '
-                     '(it would take hours on the CPU). The training examples below have <b>▶ Train in Colab</b>, which opens the same code '
-                     'with a free GPU. Save the trained model and bring it back to the course notebook.</li>')
+        items.append('<li><b>Model training needs a GPU.</b> In Colab choose <b>Runtime → Change runtime type → T4 GPU</b> before running the '
+                     'notebook. Without it, the training examples (<b>▶ Train in Colab</b>) take hours.</li>')
+    if local:
+        items.append('<li><b>Exception — programs that keep running.</b> Web apps and local servers (Django, Streamlit, Ollama, MCP servers, '
+                     'Playwright) are files and programs, not notebook steps. Those examples have <b>💻 Open in Codespaces</b>, a free cloud '
+                     f'computer with a terminal, already set up for this course (<a href="{GUIDE_URL}" target="_blank" rel="noopener">guide</a>).</li>')
     return ('<div class="where-note"><div class="where-head">Where does this code run — and why?</div>'
             '<p><b>▶ Try it</b> examples run inside this page, in your web browser — good for quick experiments with plain Python, '
             'NumPy, pandas, scikit-learn and matplotlib. From here on the examples need more:</p><ul>' + ''.join(items) + '</ul></div>')
 
-def python_block_html(code, title, run, setup, reason):
+def python_block_html(code, title, run, setup, reason, cell=''):
     esc = html.escape(code)
     pre = f'<pre><code class="language-python">{esc}</code></pre>'
     head = f'<div class="code-title">{html.escape(title)}</div>' if title else ''
@@ -365,20 +387,21 @@ def python_block_html(code, title, run, setup, reason):
     if run:
         btn = f'<button class="try" data-run="1">▶ Try it</button>'
         return f'<div class="runnable">{head}{btn}<button class="copy">Copy</button><textarea class="src" hidden>{esc}</textarea>{setup_ta}{pre}</div>'
+    colab = colab_url(CURRENT_SLUG[0]) + (f'#scrollTo={cell}' if cell else '')
     miss = ', '.join(missing_modules(code)) or ('code from the earlier examples in this lesson' if 'NameError' in reason else 'an API key or local files')
     if needs_gpu(code):
-        btn = (f'<span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Training needs a GPU — opens this code in Google Colab">▶ Train in Colab</a>'
+        btn = (f'<span class="local-btns"><a class="try colab-try" href="{colab}" target="_blank" rel="noopener" title="Training needs a GPU. Opens this week\'s notebook in Google Colab, at this example">▶ Train in Colab</a>'
                f'<button class="try local" data-run="0" data-target="colab" data-needs="a GPU for training" title="Opens in the editor">✎ Editor</button></span>')
         return f'<div class="runnable local">{head}{btn}<button class="copy">Copy</button><textarea class="src" hidden>{esc}</textarea>{pre}</div>'
-    if True:
+    if run_target(code) == 'vscode':
         vm = sorted((imported_modules(code) | set(missing_modules(code))) & VSCODE_MODS)
         miss = (', '.join({'django': 'Django', 'playwright': 'Playwright', 'ollama': 'Ollama', 'langchain_ollama': 'Ollama', 'streamlit': 'Streamlit'}.get(m, m) for m in vm)
                 or ('Django' if re.search(r'django|INSTALLED_APPS|urlpatterns', code) else 'an MCP server' if 'mcp.run(' in code else miss))
         btn = (f'<span class="local-btns"><a class="try vscode-try" href="{CODESPACES_URL}" target="_blank" rel="noopener" '
-               f'title="Starts the course environment. The link it shows opens this lesson with its notebook beside it.">📓 Open in notebook</a>'
+               f'title="A program that keeps running: opens a free cloud computer with a terminal, set up for this course">💻 Open in Codespaces</a>'
                f'<button class="try local" data-run="0" data-target="vscode" data-needs="{html.escape(miss)}" title="Needs {html.escape(miss)} — opens in the editor">✎ Editor</button></span>')
     else:
-        btn = (f'<span class="local-btns"><a class="try colab-try" data-colab-link="1" target="_blank" rel="noopener" title="Run it in Google Colab (opens this week\'s notebook)">▶ Run in Colab</a>'
+        btn = (f'<span class="local-btns"><a class="try colab-try" href="{colab}" target="_blank" rel="noopener" title="Opens this week\'s notebook in Google Colab, at this example">▶ Run in Colab</a>'
                f'<button class="try local" data-run="0" data-target="colab" data-needs="{html.escape(miss)}" title="Needs {html.escape(miss)} — opens in the editor">✎ Editor</button></span>')
     return f'<div class="runnable local">{head}{btn}<button class="copy">Copy</button><textarea class="src" hidden>{esc}</textarea>{pre}</div>'
 
@@ -601,7 +624,7 @@ def try_section(snippets, week=None):
     browser = BROWSER_EXAMPLES.get(week, [])
     if not snippets and not browser: return ''
     out = '''<h2 id="try-it-yourself">Try it yourself</h2>
-<p class="lesson-intro"><b>▶ Try it</b> runs an example in the editor panel, inside your browser — change the code and press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to run it again. Examples that use PyTorch, Transformers, LangChain or an API cannot run in a browser: press <b>📓 Open in notebook</b> and run them in the course notebook, which opens beside the lesson.</p>'''
+<p class="lesson-intro"><b>▶ Try it</b> runs an example in the editor panel, inside your browser — change the code and press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to run it again. Examples that use PyTorch, Transformers, LangChain or an API cannot run in a browser: press <b>▶ Run in Colab</b> to open them in this week's Google Colab notebook, ready to run.</p>'''
     if browser:
         out += '<h3 id="run-in-your-browser">Run in your browser</h3><p class="lesson-intro">Self-contained versions of this week\'s mechanisms, written with NumPy, scikit-learn or plain Python so they run here.</p>'
         out += ''.join(code_block_html(code, 'python', title) for title, code in browser)
@@ -619,8 +642,6 @@ def lesson_shell(title, active_slug, prev, nxt, inner, sims):
             f'<main class="lesson panel-closed" id="lesson"{data} data-codespaces="{CODESPACES_URL}" data-guide="{GUIDE_URL}"><article class="lesson-content" id="lesson-content">{inner}</article>'
             f'<div id="splitter" class="splitter" role="separator" aria-orientation="vertical" title="Drag to resize"></div>{workbench(sims)}</main>' +
             scripts(1, workbench=True))
-    if has_nb:   # lesson and notebook side by side when the page is opened from the course codespace (scripts/start-lesson-lab.sh)
-        page = page.replace('</body>', f'<script src="../assets/js/jupyter-panel.js?v={asset_v("assets/js/jupyter-panel.js")}"></script>\n</body>')
     return page
 
 def lesson_page(w, prev, nxt):
@@ -670,14 +691,14 @@ def index_page():
   <div class="eyebrow">{COURSE_CODE} · Faculty of Information Technology · University of Petra</div>
   <h1>Computing Systems for Data Science and Artificial Intelligence</h1>
   <p class="lead">A 16-week, project-driven course from transformers to agents: LLMs, Mixture of Experts, ReAct, multi-agent systems, MCP, Large Action Models and diffusion — built around a multi-agent research assistant that competes live in Week 15.</p>
-  <p class="lead small-lead">Each lesson has the explanation on the left and a panel on the right. <b>▶ Try it</b> runs an example in a live Python editor inside your browser — nothing to install. <b>▶ Display</b> opens an animation of the concept you are reading about. <b>📓 Open in notebook</b> opens the course notebook for everything else. Section taught by <b>{INSTRUCTOR}</b>.</p>
+  <p class="lead small-lead">Each lesson has the explanation on the left and a panel on the right. <b>▶ Try it</b> runs an example in a live Python editor inside your browser — nothing to install. <b>▶ Display</b> opens an animation of the concept you are reading about. <b>▶ Run in Colab</b> opens the week's notebook in Google Colab for everything else. Section taught by <b>{INSTRUCTOR}</b>.</p>
   <p><a class="btn primary" href="lessons/week01-transformers.html">Start with Week 1 ›</a> <a class="btn ghost" href="lessons/syllabus.html">Syllabus</a> <a class="btn ghost" href="lessons/project.html">Final project</a></p>
 
   <h2 id="where-code-runs">Where the code runs</h2>
   <div class="grid">
     <div class="card"><h3>▶ Try it — in your browser</h3><p>Plain Python, NumPy, pandas, scikit-learn and matplotlib run inside the lesson page itself. Instant, nothing to install — for experimenting while you read.</p></div>
-    <div class="card"><h3>📓 Notebook — for everything else</h3><p>A Jupyter notebook beside the lesson, running on a free cloud machine already set up for this course (a GitHub codespace): PyTorch, Transformers, LangChain, LangGraph, MCP, Ollama, Django, Playwright, Streamlit. Every lesson has its own notebook with all of its code in order, and the button on each example takes you to its cell. One environment for all your coursework. <a href="{GUIDE_URL}" target="_blank" rel="noopener">Guide</a></p><a class="btn codespaces" href="{CODESPACES_URL}" target="_blank" rel="noopener">📓 Open in notebook</a></div>
-    <div class="card"><h3><span class="colab-logo">CO</span> Colab — only for GPU training</h3><p>The notebook's cloud machine has no GPU. The two model-training exercises (Week 2 fine-tuning, Week 13 diffusion) have a <b>▶ Train in Colab</b> button that opens the same code with a free GPU.</p></div>
+    <div class="card"><h3><span class="colab-logo">CO</span> Colab — for everything else</h3><p>PyTorch, Transformers, LangChain and LangGraph run in Google Colab, a free notebook service that needs only a Google account. Every lesson has its own notebook with all of its code in order and its installs in the first cell. <b>▶ Run in Colab</b> on an example opens that notebook at the example's cell. For model training (Week 2, Week 13) switch on the free GPU: Runtime → Change runtime type → T4 GPU.</p></div>
+    <div class="card"><h3>💻 Codespaces — for programs that keep running</h3><p>A few examples are applications, not notebook steps: the Django app, Streamlit, Ollama, MCP servers and Playwright. They have <b>💻 Open in Codespaces</b>, a free cloud computer with a terminal, already set up for this course. <a href="{GUIDE_URL}" target="_blank" rel="noopener">Guide</a></p></div>
   </div>
 
   <h2 id="curriculum">16-week curriculum</h2>
@@ -731,7 +752,7 @@ def index_page():
   {footer()}
 </div>'''
     return (head('Home') + topbar(0) + f'<main class="home">{inner}</main>' +
-            scripts(0).replace('</body>', f'<script src="assets/js/jupyter-panel.js?v={asset_v("assets/js/jupyter-panel.js")}"></script>\n</body>'))
+            scripts(0))
 
 def main():
     nav = [(f'{w["slug"]}.html', w['title'], w['n']) for w in WEEKS]
