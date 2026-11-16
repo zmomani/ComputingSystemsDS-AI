@@ -528,6 +528,8 @@ The project milestone asks for an <abbr data-tip="Named Entity Recognition: find
 | Date | Rules (regular expressions) | Dates follow a small number of regular patterns |
 | Technology | A term list (gazetteer) that you maintain | No public NER dataset labels technologies in the way your project needs |
 
+> **Note: spaCy and the project page.** The [project page](project.html) names another tool for this component: **spaCy**, a free Python library with ready-made language pipelines. A spaCy pipeline splits a text into words and marks its named entities in one call, with no training on your side, and its English pipelines label dates as well as people, organisations and places. It is a quick way to get a working extractor. This lesson uses a transformer instead, so that you can see how such a tool works inside. For what the NER Agent must produce, and the tools you may use, the project page is the reference.
+
 The two rule-based extractors are plain Python:
 
 ```python
