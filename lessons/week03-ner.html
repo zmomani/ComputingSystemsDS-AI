@@ -157,10 +157,10 @@
 </tbody>
 </table>
 <h2 id="1-what-is-named-entity-recognition">1. What is Named Entity Recognition?</h2>
-<p><strong>Named entity recognition (<abbr data-tip="Named Entity Recognition: finding names in text and labelling each with a type" tabindex="0">NER</abbr>)</strong> finds the spans of text that name real-world things and assigns each span a type. The three types used throughout this lesson are <strong><abbr data-tip="Person" tabindex="0">PER</abbr></strong> (person), <strong><abbr data-tip="Organisation" tabindex="0">ORG</abbr></strong> (organisation) and <strong><abbr data-tip="Location" tabindex="0">LOC</abbr></strong> (location).</p>
-<blockquote>
-<p><strong>Dr. Albanna</strong><sub>PER</sub> teaches at the <strong>University of Petra</strong><sub>ORG</sub> in <strong>Amman</strong><sub>LOC</sub>.</p>
-</blockquote>
+<p><strong>Named entity recognition (<abbr data-tip="Named Entity Recognition: finding names in text and labelling each with a type" tabindex="0">NER</abbr>)</strong> finds the pieces of text that name real-world things and assigns each one a type. Such a piece is called a <strong>span</strong>: one word, or several words in a row, with a definite start and end. <em>Amman</em> is a span of one word and <em>University of Petra</em> is a span of three. The three types used throughout this lesson are <strong><abbr data-tip="Person" tabindex="0">PER</abbr></strong> (person), <strong><abbr data-tip="Organisation" tabindex="0">ORG</abbr></strong> (organisation) and <strong><abbr data-tip="Location" tabindex="0">LOC</abbr></strong> (location).</p>
+<p class="ner-example"><mark class="ent ent-per">Dr. Albanna<span class="ent-label">PER</span></mark> teaches at the <mark class="ent ent-org">University of Petra<span class="ent-label">ORG</span></mark> in <mark class="ent ent-loc">Amman<span class="ent-label">LOC</span></mark>.</p>
+
+<p>Each highlighted span is one entity, and the small label after it is its type. This sentence has three entities, although it has ten words.</p>
 <p>Two things make this harder than it looks. An entity can span several words, so the model must find where it starts and where it ends. And the same word can belong to different types depending on its context: <em>Petra</em> is a location when it means the ancient city and part of an organisation in <em>University of Petra</em>.</p>
 <p><strong>Where NER is used</strong></p>
 <ul>

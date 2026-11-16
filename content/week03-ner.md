@@ -53,9 +53,11 @@ Each abbreviation is also explained where it first appears. In the text, an abbr
 
 ## 1. What is Named Entity Recognition?
 
-**Named entity recognition (<abbr data-tip="Named Entity Recognition: finding names in text and labelling each with a type" tabindex="0">NER</abbr>)** finds the spans of text that name real-world things and assigns each span a type. The three types used throughout this lesson are **<abbr data-tip="Person" tabindex="0">PER</abbr>** (person), **<abbr data-tip="Organisation" tabindex="0">ORG</abbr>** (organisation) and **<abbr data-tip="Location" tabindex="0">LOC</abbr>** (location).
+**Named entity recognition (<abbr data-tip="Named Entity Recognition: finding names in text and labelling each with a type" tabindex="0">NER</abbr>)** finds the pieces of text that name real-world things and assigns each one a type. Such a piece is called a **span**: one word, or several words in a row, with a definite start and end. *Amman* is a span of one word and *University of Petra* is a span of three. The three types used throughout this lesson are **<abbr data-tip="Person" tabindex="0">PER</abbr>** (person), **<abbr data-tip="Organisation" tabindex="0">ORG</abbr>** (organisation) and **<abbr data-tip="Location" tabindex="0">LOC</abbr>** (location).
 
-> **Dr. Albanna**<sub>PER</sub> teaches at the **University of Petra**<sub>ORG</sub> in **Amman**<sub>LOC</sub>.
+<p class="ner-example"><mark class="ent ent-per">Dr. Albanna<span class="ent-label">PER</span></mark> teaches at the <mark class="ent ent-org">University of Petra<span class="ent-label">ORG</span></mark> in <mark class="ent ent-loc">Amman<span class="ent-label">LOC</span></mark>.</p>
+
+Each highlighted span is one entity, and the small label after it is its type. This sentence has three entities, although it has ten words.
 
 Two things make this harder than it looks. An entity can span several words, so the model must find where it starts and where it ends. And the same word can belong to different types depending on its context: *Petra* is a location when it means the ancient city and part of an organisation in *University of Petra*.
 
