@@ -36,7 +36,7 @@ WEEKS = [
   dict(n=2, slug='week02-text-classification', title='Text Classification', ilo='K1, P1',
        topics='Text classification, sentiment analysis, feature extraction vs. fine-tuning, evaluation metrics',
        milestone='Classification Agent that labels sources by type and relevance; evaluate on 20+ sources',
-       files=['week02-text-classification.md'], sims=['finetune', 'distill', 'classifier', 'tokenizer', 'padding', 'vectors']),
+       files=['week02-text-classification.md'], sims=['finetune', 'distill', 'classifier', 'tokenizer', 'embedding-table', 'padding', 'vectors']),
   dict(n=3, slug='week03-ner', title='Named Entity Recognition (NER)', ilo='P1, T1',
        topics='Token classification, BIO tagging, multilingual NER, per-entity evaluation',
        milestone='NER Agent extracting people, organisations, technologies, dates and locations; test on 5+ articles',
@@ -99,6 +99,7 @@ EXTRA_PAGES = [
 
 # Simulation catalogue (mirrors the JS registry; used for cards and the index page)
 SIMS = {
+  'embedding-table': ('From token IDs to vectors: the DistilBERT embedding table', 'Tokenization', 'Each token ID is a row number in a table of 30,522 rows × 768 numbers. Step through a sentence and watch each row being copied into the matrix the model works on. Real DistilBERT IDs.'),
   'padding': ('Padding and attention masks: building the input batch', 'Tokenization', 'Three texts of different lengths get [CLS] and [SEP], are padded with zeros, receive an attention mask and are stacked into the input batch. Hover over any symbol for its meaning.'),
   'matrix-multiply': ('Matrix multiplication, step by step', 'Linear algebra', 'Row of A × column of B, one cell at a time, with the running sum.'),
   'vectors': ('Vectors, dot product & cosine similarity', 'Linear algebra', 'Drag two vectors; see u+v, u·v, θ and cos θ — the geometry behind embeddings.'),
@@ -125,7 +126,7 @@ SIMS = {
   'lam': ('Browser agent: perceive → plan → act', 'LAMs', 'A mock browsing task with allowlist and no-payment gates.'),
   'diffusion': ('Diffusion: noising & denoising', 'Diffusion', 'Scrub t under a β schedule, read ᾱ_t and SNR, then denoise step by step.'),
 }
-SIM_FILES = ['matrix-multiply', 'vectors', 'attention', 'pronoun', 'qkv', 'heads', 'multihead', 'decoder', 'tokenizer', 'padding', 'posenc', 'positional', 'finetune', 'distill', 'classifier', 'bio-tagging', 'rag', 'langgraph', 'sampling', 'moe', 'react-loop', 'multi-agent', 'mcp', 'lam', 'diffusion']
+SIM_FILES = ['matrix-multiply', 'vectors', 'attention', 'pronoun', 'qkv', 'heads', 'multihead', 'decoder', 'tokenizer', 'embedding-table', 'padding', 'posenc', 'positional', 'finetune', 'distill', 'classifier', 'bio-tagging', 'rag', 'langgraph', 'sampling', 'moe', 'react-loop', 'multi-agent', 'mcp', 'lam', 'diffusion']
 
 
 # ---------------------------------------------------------------- runnability

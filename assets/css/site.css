@@ -384,3 +384,23 @@ abbr[data-tip]:focus-visible { outline: 2px solid var(--accent); outline-offset:
 .pad-limit { width: 0; height: 37px; flex: none; border-left: 2.5px dashed #c9302c; margin: 0 3px; cursor: help; padding: 0 4px 0 0; }
 .pad-cell.beyond { background: #f7941d; box-shadow: 0 0 0 2px #c9302c; }
 .pad-cell.cut { background: #f3c9a0; color: #8a5a17; text-decoration: line-through; opacity: .75; }
+
+/* Embedding-table animation (assets/js/sims/embedding-table.js) and the caveat box used inside animations */
+.sim-caveat { background: #fff; border: 1px solid #ecdcc0; border-radius: 6px; padding: 6px 9px; margin: 2px 0 8px; font-size: .84rem; }
+.emb-sim { width: 100%; font-size: .8rem; }
+.emb-label { font-weight: 700; margin: 2px 0 6px; cursor: help; }
+.emb-sent { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
+.emb-pill { font-family: var(--mono); padding: 3px 9px; border: 1px solid #c9d0da; border-radius: 6px; text-align: center; cursor: help; }
+.emb-pill small { display: block; font-size: .7rem; color: #6b7480; }
+.emb-pill.on { background: #fff3d6; border-color: #c8862b; }
+.emb-tables { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: flex-start; }
+.emb-box { border: 1px solid var(--line); border-radius: 8px; padding: 5px 3px; min-width: 300px; }
+.emb-row { display: flex; align-items: center; gap: 2px; padding: 2px 6px; border-radius: 5px; }
+.emb-row.hit { background: #fff3d6; outline: 1.5px solid #c8862b; }
+.emb-row.new { animation: pad-pop .45s ease-out; }
+.emb-id { width: 72px; white-space: nowrap; flex: none; text-align: right; font-family: var(--mono); color: #5b6470; margin-right: 6px; cursor: help; }
+.emb-tok { width: 54px; flex: none; font-family: var(--mono); font-weight: 600; }
+.emb-c { width: 15px; height: 15px; flex: none; border-radius: 2px; cursor: help; }
+.emb-more { margin-left: 5px; font-size: .72rem; color: #6b7480; cursor: help; white-space: nowrap; }
+.emb-gap { color: #8a929c; font-size: .74rem; padding: 1px 6px 1px 84px; }
+.emb-shape { font-size: .78rem; color: #5b6470; margin-top: 6px; min-height: 1.2em; }

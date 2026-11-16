@@ -404,6 +404,12 @@ Three things can be read from this output:
 2. **Everything was lowercased.** That is a property of this checkpoint, whose name ends in "uncased".
 3. **Two words were split.** "Tokenizing" became `token` and `##izing`, and "NLP" became `nl` and `##p`, because neither is common enough to be in the vocabulary as a whole. The prefix `##` means "this piece continues the previous one", which is how `convert_tokens_to_string` knows where to join them again.
 
+**From IDs to vectors.** The IDs are not what the model computes with. Its first layer is a table, the **embedding table**, with one row of 768 learned numbers for each of the 30,522 tokens in the vocabulary. A token ID is the number of a row in that table: 101 fetches the row of `[CLS]`, 19204 the row of `token`. The rows fetched for a sentence, stacked in order, form the matrix that the rest of the model works on. The two animations below show both steps, splitting and lookup.
+
+{{display: tokenizer embedding-table}}
+
+> **The numbers in these animations are examples.** The first animation splits text with a small hand-made vocabulary of about 70 pieces, so its token IDs differ from the ones printed above: it gives "the" the ID 100, which in DistilBERT is `[UNK]`, while DistilBERT's "the" is 1996. The second animation uses the real DistilBERT IDs. In both, the coloured squares stand for numbers, and only a few are drawn. The actual numbers would not fit: the real table has 30,522 rows of 768 decimals each, about 23.4 million numbers, and even one seven-token sentence needs 7 × 768 = 5,376 of them.
+
 ### Tokenizer properties
 
 ```python
