@@ -3,7 +3,7 @@
 Sims.register('padding', {
   title: 'Padding and attention masks: building the input batch',
   kind: 'Tokenization · Week 2',
-  short: 'Three texts of different lengths get [CLS] and [SEP], are padded with zeros to the longest one, receive an attention mask, and are stacked into the input batch.',
+  short: 'Three texts of different lengths get [CLS] and [SEP], are padded with zeros to the longest one, receive an attention mask, and are stacked into the input batch. The last two steps show the opposite case: truncating a text that is too long.',
   mount(root, H) {
     const L = H.layout(root, { legend: true });
     // The token IDs of the textbook figure. 101 = [CLS], 102 = [SEP], 0 = [PAD]; the other numbers are placeholders.
@@ -21,7 +21,10 @@ Sims.register('padding', {
       mask: 'attention_mask: one number per position of input_ids. 1 means "real token, use it"; 0 means "padding, ignore it". The tokenizer returns it together with input_ids.',
       text: n => `Text ${n}: one text of the batch (in this lesson, one tweet) after the tokenizer has turned it into token IDs.`,
       batch: `Input batch: the rows stacked into one matrix with ${texts.length} rows (texts) and ${W} columns (positions). The model processes all rows at once, which is why they must have the same length.`,
-      len: 'The number of positions in this row. A matrix needs the same number in every row.'
+      len: 'The number of positions in this row. A matrix needs the same number in every row.',
+      limit: 'The model\'s maximum length. For DistilBERT it is 512 tokens (tokenizer.model_max_length). It is drawn as 13 here so that it fits in the picture.',
+      cut: 'A token beyond the model\'s limit. truncation=True removes it, so the model never sees this part of the text.',
+      sepmoved: '[SEP], ID 102. After truncation the tokenizer still closes the text with [SEP], so the last position inside the limit is used for it.'
     };
     const SPECIAL = [['[PAD]', 0, 'Padding token. Fills short texts up to the common length. Used in this picture.'],
                      ['[UNK]', 100, 'Unknown token. Stands for a piece of text that cannot be built from the vocabulary at all. Rare with subword tokenization, and not used in this picture.'],
@@ -39,19 +42,23 @@ Sims.register('padding', {
       { k: 'mask3', label: 'Step 8 · Attention mask, Text 3', html: 'Text 3: ten <b>1</b>s and three <b>0</b>s. Note that <code>[CLS]</code> and <code>[SEP]</code> count as real tokens: their mask value is 1.' },
       { k: 'stack', label: 'Step 9 · Stack into matrices', html: 'The rows are stacked. The result is two matrices of the same shape, <b>3 × 13</b>: <code>input_ids</code> and <code>attention_mask</code>. This pair is the <b>input batch</b>, and it is exactly what <code>tokenize(batch)</code> returns in the lesson.' },
       { k: 'model', label: 'Step 10 · What the model does', html: 'Inside the model, every position with mask 0 is left out of the attention calculation (faded here). The prediction for Text 1 is therefore the same as if it had been sent alone, without padding.' }
+      ,{ k: 'long', label: 'Step 11 · A text that is too long', html: 'Padding handles texts that are too <i>short</i>. A model also has a <b>maximum length</b>: 512 tokens for DistilBERT, drawn here as <b>13</b>. Text 4 has 18 positions, so five of them lie beyond the limit (the dashed line).' },
+      { k: 'trunc', label: 'Step 12 · Truncation', html: '<code>truncation=True</code> cuts the text at the limit: the first 12 positions are kept, <code>[SEP]</code> (102) closes the row, and the rest is thrown away. The row is full, so its mask is thirteen <b>1</b>s. Truncation loses information, which is why it is a safeguard and not a routine step. The tweets in this lesson are far below 512 tokens, so nothing is cut.' }
     ];
+    const long4 = [45, 12, 88, 31, 6, 59, 72, 40, 19, 63, 27, 94, 8, 51, 33, 76];      // Text 4: 16 word-pieces, 18 positions with [CLS] and [SEP]
     const order = steps.map(s => s.k), at = k => order.indexOf(k);
 
     L.stage.style.display = 'block';
     L.stage.innerHTML = `<div class="pad-sim">
       <table class="pad-special"><tr><th>Special token</th>${SPECIAL.map(s => `<td data-tip="${s[2]}" data-tip-pos="over" data-sp="${s[1]}"><code>${s[0]}</code></td>`).join('')}</tr>
         <tr><th>ID</th>${SPECIAL.map(s => `<td data-tip="${s[2]}" data-tip-pos="over" data-sp="${s[1]}">${s[1]}</td>`).join('')}</tr></table>
-      <div class="pad-blocks"><div class="pad-block" data-b="ids"></div><div class="pad-block" data-b="mask"></div></div></div>`;
+      <div class="pad-blocks"><div class="pad-block" data-b="ids"></div><div class="pad-block" data-b="mask"></div></div><div class="pad-trunc" data-b="trunc"></div></div>`;
     const bIds = L.stage.querySelector('[data-b="ids"]'), bMask = L.stage.querySelector('[data-b="mask"]');
+    const bTrunc = L.stage.querySelector('[data-b="trunc"]');
     const cell = (cls, txt, tip) => `<span class="pad-cell ${cls}" data-tip="${tip}" data-tip-pos="over">${txt}</span>`;
 
     function render(st) {
-      const n = at(st.k), stacked = n >= at('stack'), fade = st.k === 'model';
+      const n = at(st.k), stacked = n >= at('stack'), fade = n >= at('model');
       const padded = i => i === 1 || (i === 0 && n >= at('pad1')) || (i === 2 && n >= at('pad3'));
       const masked = i => n >= at('mask' + (i + 1));
       const hot = { pad1: 0, pad3: 2, mask1: 0, mask2: 1, mask3: 2 }[st.k];
@@ -79,12 +86,28 @@ Sims.register('padding', {
       bMask.className = 'pad-block' + (stacked ? ' stacked' : '');
       bMask.style.visibility = n >= at('mask1') ? 'visible' : 'hidden';
       bMask.innerHTML = head('Attention masks', TIP.mask, `${texts.length} × ${W}`) + `<div class="pad-rows">${mask}</div>`;
+      // the opposite case: a text longer than the model's limit
+      if (n >= at('long')) {
+        const cutNow = st.k === 'trunc', all = [101].concat(long4, [102]);
+        let r = '';
+        all.forEach((v, j) => {
+          if (j === W) r += `<span class="pad-limit" data-tip="${TIP.limit}" data-tip-pos="over"></span>`;
+          if (cutNow && j === W - 1) r += cell('sep new', 102, TIP.sepmoved);
+          else if (j >= W) r += cell('tok' + (cutNow ? ' cut' : ' beyond'), v, cutNow ? TIP.cut : TIP.id(v));
+          else r += cell(j === 0 ? 'cls' : 'tok', v, j === 0 ? TIP.cls : TIP.id(v));
+        });
+        let m = ''; if (cutNow) for (let j = 0; j < W; j++) m += cell('m1 new', 1, TIP.m1);
+        bTrunc.style.display = 'block';
+        bTrunc.innerHTML = `<div class="pad-head"><span data-tip="${TIP.limit}" data-tip-pos="over">A longer text · limit ${W} in this picture (512 for DistilBERT)</span></div>` +
+          `<div class="pad-row"><span class="pad-name" data-tip="${TIP.text(4)}" data-tip-pos="over">Text 4</span>${r}<span class="pad-len" data-tip="${TIP.len}" data-tip-pos="over">${cutNow ? W : all.length}</span></div>` +
+          (cutNow ? `<div class="pad-row"><span class="pad-name" data-tip="${TIP.mask}" data-tip-pos="over">mask</span>${m}</div>` : '');
+      } else { bTrunc.style.display = 'none'; bTrunc.innerHTML = ''; }
       const used = { 0: n >= at('pad1'), 101: n >= at('special'), 102: n >= at('special') };
       L.stage.querySelectorAll('[data-sp]').forEach(td => td.classList.toggle('on', !!used[td.dataset.sp]));
       L.explain(st.html, st.label);
     }
     const S = H.stepper(L, () => steps, render, { interval: 2600 });
-    L.setLegend([['#f7941d', 'token ID (101 = [CLS], 102 = [SEP])'], ['#c9ccd1', '0 = [PAD] (padding)'], ['#5aa9de', 'mask 1: real token'], ['#c9302c', 'mask 0: ignore']]);
+    L.setLegend([['#f7941d', 'token ID (101 = [CLS], 102 = [SEP])'], ['#c9ccd1', '0 = [PAD] (padding)'], ['#5aa9de', 'mask 1: real token'], ['#c9302c', 'mask 0: ignore'], ['#f3c9a0', 'cut by truncation']]);
     L.setNotes(`<p>The picture reproduces Figure 2-3 of the textbook (Chapter 2, "Tokenizing the Whole Dataset"), with its numbers.</p>
       <p>Points worth saying aloud: (1) padding goes to the longest text <i>of the batch</i>, not of the dataset, which is why the lesson uses <code>batch_size=None</code> to pad the whole split to one length; (2) <code>truncation=True</code> is the opposite operation, cutting texts longer than the model's limit of 512 tokens; (3) the mask is needed because 0 is an ordinary row of the embedding table: without the mask the model would read seven "words" at the end of Text 1.</p>
       <p>Question for the class: what would the masks look like if all three texts had the same length?</p>`);

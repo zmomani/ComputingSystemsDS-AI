@@ -379,3 +379,8 @@ abbr[data-tip]:focus-visible { outline: 2px solid var(--accent); outline-offset:
 .code-tip.lit { background: #ffe9b8; }
 .code-notes-hint { font-size: .82rem; color: var(--ink-2); margin: -.35rem 0 1rem; }
 .code-notes-hint span { border-bottom: 1.5px dotted #8a5a17; }
+.pad-trunc { margin-top: 16px; padding-top: 12px; border-top: 1px dashed #c9d0da; }
+.pad-trunc .pad-head { margin-left: 50px; }
+.pad-limit { width: 0; height: 37px; flex: none; border-left: 2.5px dashed #c9302c; margin: 0 3px; cursor: help; padding: 0 4px 0 0; }
+.pad-cell.beyond { background: #f7941d; box-shadow: 0 0 0 2px #c9302c; }
+.pad-cell.cut { background: #f3c9a0; color: #8a5a17; text-decoration: line-through; opacity: .75; }

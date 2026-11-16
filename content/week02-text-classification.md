@@ -470,9 +470,10 @@ The first tweet is shorter than the second, so its `input_ids` end in a run of z
 
 The attention mask tells the model which positions are real tokens (1) and which are padding (0), so that padding does not influence the result:
 
+<figure class="fig"><img src="../assets/img/attention-mask-padding.png" alt="Three texts of different lengths are padded with zeros to the same length; each has an attention mask with 1 for real tokens and 0 for padding, and the vectors are stacked into input matrices"><figcaption>For each batch, the input sequences are padded to the length of the longest one, and the attention mask marks the padded positions to be ignored. Figure from the companion repository of Tunstall et al., <em>Natural Language Processing with Transformers</em> (2022), Apache 2.0 licence.</figcaption></figure>
+
 {{display: padding}}
 
-<figure class="fig"><img src="../assets/img/attention-mask-padding.png" alt="Three texts of different lengths are padded with zeros to the same length; each has an attention mask with 1 for real tokens and 0 for padding, and the vectors are stacked into input matrices"><figcaption>For each batch, the input sequences are padded to the length of the longest one, and the attention mask marks the padded positions to be ignored. Figure from the companion repository of Tunstall et al., <em>Natural Language Processing with Transformers</em> (2022), Apache 2.0 licence.</figcaption></figure>
 
 ### Mini-challenge: tokenize a custom sentence
 
