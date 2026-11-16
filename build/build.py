@@ -36,7 +36,7 @@ WEEKS = [
   dict(n=2, slug='week02-text-classification', title='Text Classification', ilo='K1, P1',
        topics='Text classification, sentiment analysis, feature extraction vs. fine-tuning, evaluation metrics',
        milestone='Classification Agent that labels sources by type and relevance; evaluate on 20+ sources',
-       files=['week02-text-classification.md'], sims=['finetune', 'distill', 'classifier', 'tokenizer', 'embedding-table', 'padding', 'vectors']),
+       files=['week02-text-classification.md'], sims=['finetune', 'distill', 'tokenizer', 'embedding-table', 'padding', 'classifier']),
   dict(n=3, slug='week03-ner', title='Named Entity Recognition (NER)', ilo='P1, T1',
        topics='Token classification, BIO tagging, multilingual NER, per-entity evaluation',
        milestone='NER Agent extracting people, organisations, technologies, dates and locations; test on 5+ articles',

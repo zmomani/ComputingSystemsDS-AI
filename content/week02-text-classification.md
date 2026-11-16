@@ -620,6 +620,10 @@ print(classification_report(y_valid, y_preds, target_names=labels))
 
 **Why build a baseline?** It sets minimum expectations, is quick to build, reveals which classes are easy or hard, and gives a reference point. A suspiciously strong baseline may indicate dataset issues; similar scores across models point to feature limits; class imbalance usually shows up here.
 
+**What the classifier is doing, as a picture.** Each tweet is now a point whose coordinates are its 768 features, and the logistic regression looks for boundaries that separate the points of one emotion from the others. The animation shows this with two classes and two dimensions so that it can be drawn: a line is trained to separate the points, and the confusion matrix, precision, recall and F1 are recomputed as it moves. The lesson has six emotions and never changes the decision threshold; the slider is there to show how precision and recall pull against each other.
+
+{{display: classifier}}
+
 ### Mini-challenge: random forest
 
 ```python
