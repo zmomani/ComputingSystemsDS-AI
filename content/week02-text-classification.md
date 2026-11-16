@@ -426,10 +426,34 @@ emotion_encoded = emotions.map(tokenize, batched=True, batch_size=None)
 print(emotion_encoded.column_names)
 ```
 
+```code-notes
+emotions :: emotions is the dataset loaded in Section 2. It is a DatasetDict with three splits (train, validation, test); every split has the columns text and label.
+.reset_format() :: In Section 2 the dataset was switched to pandas output with set_format(type="pandas") so that it could be explored as a DataFrame. reset_format() switches it back to its normal output, so that batch["text"] below is a plain list of strings.
+def tokenize(batch) :: Defines our own function. We never call it with data ourselves: map() below calls it and passes in batch, a dictionary with one list per column, for example {"text": ["i feel fine", ...], "label": [1, ...]}.
+return :: The function hands back whatever the tokenizer produced: a dictionary with the keys input_ids and attention_mask. map() turns each key into a new column.
+tokenizer( :: The DistilBERT tokenizer object created earlier with AutoTokenizer.from_pretrained(model_ckp). Calling it on a list of texts converts all of them to token IDs in one go.
+batch["text"] :: The column text of this batch: a list of tweets, each one a string. This is the only column the tokenizer needs.
+padding=True :: Fill the shorter texts with zeros (the ID of [PAD]) until every text is as long as the longest one in the batch. Without it, each text keeps its own length.
+truncation=True :: Cut any text that is longer than the model's limit (512 tokens for DistilBERT). Tweets are much shorter, so here it is only a safeguard.
+emotion_encoded :: The result: a new DatasetDict with the same three splits and two extra columns. The original emotions is not changed.
+emotions.map( :: map() is a method of the dataset. It runs a function over the data of every split and adds what the function returns as new columns.
+tokenize @3 :: The function is passed by name, without parentheses. We give map() the function itself; map() is the one that calls it.
+batched=True :: Send many rows to the function at once, as lists, in place of one row at a time. The tokenizer is much faster on lists, and padding only makes sense when several texts are seen together.
+batch_size=None :: How many rows form one batch. None means the whole split is one batch, so every text in the split is padded to the same length: that of the longest text in the split.
+.column_names :: An attribute, not a function (no parentheses). It lists the columns of each split. Expect text, label, input_ids and attention_mask.
+```
+
 To see what `tokenize` returns, apply it to the first two tweets:
 
 ```python
 print(tokenize(emotions["train"][:2]))
+```
+
+```code-notes
+emotions["train"] :: Selects one split of the DatasetDict by its name, like a key of a dictionary. The result is the training set.
+[:2] :: A slice: the first two rows (rows 0 and 1). Slicing a dataset gives a dictionary of lists, {"text": [tweet 0, tweet 1], "label": [...]}, which is exactly the shape of batch that tokenize expects.
+tokenize( :: Here we call our function ourselves, on a tiny batch of two tweets, to look at its output before map() applies it to everything.
+print( :: Shows the returned dictionary: input_ids with two rows of equal length, and attention_mask with 1 for real tokens and 0 for padding.
 ```
 
 The first tweet is shorter than the second, so its `input_ids` end in a run of zeros that brings it to the same length. Zero is the ID of the padding token, one of five special tokens in this vocabulary:
@@ -445,6 +469,8 @@ The first tweet is shorter than the second, so its `input_ids` end in a run of z
 
 
 The attention mask tells the model which positions are real tokens (1) and which are padding (0), so that padding does not influence the result:
+
+{{display: padding}}
 
 <figure class="fig"><img src="../assets/img/attention-mask-padding.png" alt="Three texts of different lengths are padded with zeros to the same length; each has an attention mask with 1 for real tokens and 0 for padding, and the vectors are stacked into input matrices"><figcaption>For each batch, the input sequences are padded to the length of the longest one, and the attention mask marks the padded positions to be ignored. Figure from the companion repository of Tunstall et al., <em>Natural Language Processing with Transformers</em> (2022), Apache 2.0 licence.</figcaption></figure>
 

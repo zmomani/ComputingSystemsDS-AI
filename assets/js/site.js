@@ -337,6 +337,39 @@ builtins.input = input
   if (location.hash.startsWith("#display=")) { openPanel("anim"); showAnim(location.hash.slice(9)); }
 })();
 
+/* Helper notes on code: a hidden .code-notes element lists [piece of code, note, n-th occurrence] for the code block before it. */
+(function () {
+  function annotate(code, piece, note, nth, group) {
+    let from = -1; const full = code.textContent;
+    for (let k = 0; k < nth; k++) { from = full.indexOf(piece, from + 1); if (from < 0) return; }
+    const to = from + piece.length, walker = document.createTreeWalker(code, NodeFilter.SHOW_TEXT), parts = [];
+    let pos = 0, node;
+    while ((node = walker.nextNode())) {
+      const a = Math.max(from, pos), b = Math.min(to, pos + node.length);
+      if (a < b && !node.parentElement.closest(".code-tip")) parts.push([node, a - pos, b - pos]);
+      pos += node.length;
+    }
+    parts.forEach(([n, a, b]) => {
+      const mid = n.splitText(a); mid.splitText(b - a);
+      if (!mid.nodeValue.trim()) return;
+      const s = document.createElement("span"); s.className = "code-tip"; s.dataset.tip = note; s.dataset.tipPos = "over"; s.dataset.g = group;
+      mid.parentNode.replaceChild(s, mid); s.appendChild(mid);
+    });
+  }
+  let g = 0;
+  const start = () => document.querySelectorAll(".code-notes").forEach((box) => {
+    let target = box.previousElementSibling;
+    while (target && !target.querySelector("pre code")) target = target.previousElementSibling;
+    const code = target && target.querySelector("pre code"); if (!code) return;
+    let notes = []; try { notes = JSON.parse(box.dataset.notes); } catch (e) { return; }
+    notes.forEach(([piece, note, nth]) => annotate(code, piece, note, nth || 1, "g" + (++g)));
+  });
+  // after the syntax highlighter, which rewrites the code blocks when the page has loaded (registered earlier in this file)
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
+  const lit = (e, on) => { const t = e.target.closest && e.target.closest(".code-tip"); if (t) document.querySelectorAll(`.code-tip[data-g="${t.dataset.g}"]`).forEach((x) => x.classList.toggle("lit", on)); };
+  document.addEventListener("mouseover", (e) => lit(e, true)); document.addEventListener("mouseout", (e) => lit(e, false));
+})();
+
 /* Helper notes for abbreviations: <abbr data-tip="…"> shows a small bubble on hover, keyboard focus or tap. */
 (function () {
   let tip = null, owner = null;
@@ -345,11 +378,13 @@ builtins.input = input
     if (!tip) { tip = document.createElement("div"); tip.className = "abbr-tip"; tip.setAttribute("role", "tooltip"); document.body.appendChild(tip); }
     tip.textContent = el.dataset.tip; tip.hidden = false; owner = el;
     const r = el.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
-    const left = Math.min(Math.max(8, r.left), window.innerWidth - w - 8);
-    let top = r.bottom + 6; if (top + h > window.innerHeight - 8) top = r.top - h - 6;
+    const over = el.dataset.tipPos === "over";     // symbols inside an animation: note centred above the symbol
+    const left = Math.min(Math.max(8, over ? r.left + r.width / 2 - w / 2 : r.left), window.innerWidth - w - 8);
+    let top = over ? r.top - h - 6 : r.bottom + 6;
+    if (top < 8) top = r.bottom + 6; else if (top + h > window.innerHeight - 8) top = r.top - h - 6;
     tip.style.left = left + "px"; tip.style.top = top + "px";
   }
-  const find = e => (e.target && e.target.closest) ? e.target.closest("abbr[data-tip]") : null;
+  const find = e => (e.target && e.target.closest) ? e.target.closest("[data-tip]") : null;
   document.addEventListener("mouseover", e => { const a = find(e); if (a) show(a); else if (owner) hide(); });
   document.addEventListener("focusin", e => { const a = find(e); if (a) show(a); });
   document.addEventListener("focusout", hide);

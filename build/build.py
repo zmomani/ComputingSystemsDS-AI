@@ -36,7 +36,7 @@ WEEKS = [
   dict(n=2, slug='week02-text-classification', title='Text Classification', ilo='K1, P1',
        topics='Text classification, sentiment analysis, feature extraction vs. fine-tuning, evaluation metrics',
        milestone='Classification Agent that labels sources by type and relevance; evaluate on 20+ sources',
-       files=['week02-text-classification.md'], sims=['finetune', 'distill', 'classifier', 'tokenizer', 'vectors']),
+       files=['week02-text-classification.md'], sims=['finetune', 'distill', 'classifier', 'tokenizer', 'padding', 'vectors']),
   dict(n=3, slug='week03-ner', title='Named Entity Recognition (NER)', ilo='P1, T1',
        topics='Token classification, BIO tagging, multilingual NER, per-entity evaluation',
        milestone='NER Agent extracting people, organisations, technologies, dates and locations; test on 5+ articles',
@@ -99,6 +99,7 @@ EXTRA_PAGES = [
 
 # Simulation catalogue (mirrors the JS registry; used for cards and the index page)
 SIMS = {
+  'padding': ('Padding and attention masks: building the input batch', 'Tokenization', 'Three texts of different lengths get [CLS] and [SEP], are padded with zeros, receive an attention mask and are stacked into the input batch. Hover over any symbol for its meaning.'),
   'matrix-multiply': ('Matrix multiplication, step by step', 'Linear algebra', 'Row of A × column of B, one cell at a time, with the running sum.'),
   'vectors': ('Vectors, dot product & cosine similarity', 'Linear algebra', 'Drag two vectors; see u+v, u·v, θ and cos θ — the geometry behind embeddings.'),
   'attention': ('Self-attention: Q·Kᵀ → softmax → ·V', 'Transformers', 'Five stages of scaled dot-product attention on a 4-token sentence, with heatmaps.'),
@@ -124,7 +125,7 @@ SIMS = {
   'lam': ('Browser agent: perceive → plan → act', 'LAMs', 'A mock browsing task with allowlist and no-payment gates.'),
   'diffusion': ('Diffusion: noising & denoising', 'Diffusion', 'Scrub t under a β schedule, read ᾱ_t and SNR, then denoise step by step.'),
 }
-SIM_FILES = ['matrix-multiply', 'vectors', 'attention', 'pronoun', 'qkv', 'heads', 'multihead', 'decoder', 'tokenizer', 'posenc', 'positional', 'finetune', 'distill', 'classifier', 'bio-tagging', 'rag', 'langgraph', 'sampling', 'moe', 'react-loop', 'multi-agent', 'mcp', 'lam', 'diffusion']
+SIM_FILES = ['matrix-multiply', 'vectors', 'attention', 'pronoun', 'qkv', 'heads', 'multihead', 'decoder', 'tokenizer', 'padding', 'posenc', 'positional', 'finetune', 'distill', 'classifier', 'bio-tagging', 'rag', 'langgraph', 'sampling', 'moe', 'react-loop', 'multi-agent', 'mcp', 'lam', 'diffusion']
 
 
 # ---------------------------------------------------------------- runnability
@@ -177,6 +178,19 @@ def code_block_html(code, lang, title=None):
     lang = LANG_ALIAS.get(lang.lower(), lang.lower())
     # ```python-note: an optional side snippet. Shown and highlighted as Python with a Copy button,
     # but it is not a lesson example: no Try it / Codespaces button and it is left out of the notebook.
+    if lang == 'code-notes':
+        # ```code-notes after a code block: one "piece of code :: note" per line. The page script underlines each piece in the
+        # block above and shows its note when the pointer is over it (first occurrence; add @2, @3 for a later one).
+        notes = []
+        for line in code.splitlines():
+            if '::' not in line: continue
+            piece, note = (x.strip() for x in line.split('::', 1))
+            nth = 1
+            m = re.search(r'\s@(\d+)$', piece)
+            if m: nth = int(m.group(1)); piece = piece[:m.start()].rstrip()
+            notes.append([piece, note, nth])
+        return ('<div class="code-notes" hidden data-notes="' + html.escape(json.dumps(notes, ensure_ascii=False)) + '"></div>'
+                '<p class="code-notes-hint">Move the pointer over the <span>underlined</span> parts of the code to see what each one does.</p>')
     note_only = lang == 'python-note'
     if note_only: lang = 'python'
     esc = html.escape(code)
