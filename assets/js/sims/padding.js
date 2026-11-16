@@ -43,7 +43,7 @@ Sims.register('padding', {
       { k: 'stack', label: 'Step 9 · Stack into matrices', html: 'The rows are stacked. The result is two matrices of the same shape, <b>3 × 13</b>: <code>input_ids</code> and <code>attention_mask</code>. This pair is the <b>input batch</b>, and it is exactly what <code>tokenize(batch)</code> returns in the lesson.' },
       { k: 'model', label: 'Step 10 · What the model does', html: 'Inside the model, every position with mask 0 is left out of the attention calculation (faded here). The prediction for Text 1 is therefore the same as if it had been sent alone, without padding.' }
       ,{ k: 'long', label: 'Step 11 · A text that is too long', html: 'Padding handles texts that are too <i>short</i>. A model also has a <b>maximum length</b>: 512 tokens for DistilBERT, drawn here as <b>13</b>. Text 4 has 18 positions, so five of them lie beyond the limit (the dashed line).' },
-      { k: 'trunc', label: 'Step 12 · Truncation', html: '<code>truncation=True</code> cuts the text at the limit: the first 12 positions are kept, <code>[SEP]</code> (102) closes the row, and the rest is thrown away. The row is full, so its mask is thirteen <b>1</b>s. Truncation loses information, which is why it is a safeguard and not a routine step. The tweets in this lesson are far below 512 tokens, so nothing is cut.' }
+      { k: 'trunc', label: 'Step 12 · Truncation', html: '<code>truncation=True</code> cuts the text at the limit: <code>[CLS]</code> and the first 11 word-pieces are kept, <code>[SEP]</code> (102) moves up to close the row at position 13, and the last five word-pieces (94, 8, 51, 33, 76) are thrown away. They are not passed on to another row: the model never sees them. The row is full, so its mask is thirteen <b>1</b>s. Truncation loses information, which is why it is a safeguard and not a routine step. The tweets in this lesson are far below 512 tokens, so nothing is cut.' }
     ];
     const long4 = [45, 12, 88, 31, 6, 59, 72, 40, 19, 63, 27, 94, 8, 51, 33, 76];      // Text 4: 16 word-pieces, 18 positions with [CLS] and [SEP]
     const order = steps.map(s => s.k), at = k => order.indexOf(k);
@@ -90,12 +90,15 @@ Sims.register('padding', {
       if (n >= at('long')) {
         const cutNow = st.k === 'trunc', all = [101].concat(long4, [102]);
         let r = '';
-        all.forEach((v, j) => {
-          if (j === W) r += `<span class="pad-limit" data-tip="${TIP.limit}" data-tip-pos="over"></span>`;
-          if (cutNow && j === W - 1) r += cell('sep new', 102, TIP.sepmoved);
-          else if (j >= W) r += cell('tok' + (cutNow ? ' cut' : ' beyond'), v, cutNow ? TIP.cut : TIP.id(v));
-          else r += cell(j === 0 ? 'cls' : 'tok', v, j === 0 ? TIP.cls : TIP.id(v));
+        const limit = `<span class="pad-limit" data-tip="${TIP.limit}" data-tip-pos="over"></span>`;
+        if (!cutNow) all.forEach((v, j) => {
+          if (j === W) r += limit;
+          r += j === 0 ? cell('cls', v, TIP.cls) : j === all.length - 1 ? cell('sep beyond', v, TIP.sep) : cell('tok' + (j >= W ? ' beyond' : ''), v, TIP.id(v));
         });
+        else {            // keep [CLS] and the first W - 2 word-pieces, close with [SEP]; every later word-piece is dropped
+          r += cell('cls', 101, TIP.cls) + long4.slice(0, W - 2).map(v => cell('tok', v, TIP.id(v))).join('') + cell('sep new', 102, TIP.sepmoved) + limit;
+          r += long4.slice(W - 2).map(v => cell('tok cut', v, TIP.cut)).join('');
+        }
         let m = ''; if (cutNow) for (let j = 0; j < W; j++) m += cell('m1 new', 1, TIP.m1);
         bTrunc.style.display = 'block';
         bTrunc.innerHTML = `<div class="pad-head"><span data-tip="${TIP.limit}" data-tip-pos="over">A longer text · limit ${W} in this picture (512 for DistilBERT)</span></div>` +
