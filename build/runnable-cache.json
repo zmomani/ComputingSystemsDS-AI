@@ -2229,5 +2229,489 @@
 "setup": "",
 "reason": ""
 }
+],
+"6aea62eb7c961c401bcec72df9fcb32bdb6cc40ae0d87a94595efeb4fe6d94be": [
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'emotions' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'emotions' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'df' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'df' is not defined"
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "text = \"Tokenizing text is a core task of NLP.\"\ntokenized_text = list(text)\nprint(tokenized_text)",
+"reason": ""
+},
+{
+"run": true,
+"setup": "text = \"Tokenizing text is a core task of NLP.\"\ntokenized_text = list(text)\nprint(tokenized_text)\n\ntoken2idx = {ch: idx for idx, ch in enumerate(sorted(set(tokenized_text)))}\nprint(token2idx)\n# {' ': 0, '.': 1, 'L': 2, 'N': 3, 'P': 4, 'T': 5, 'a': 6, 'c': 7, 'e': 8, 'f': 9, 'g': 10,\n#  'i': 11, 'k': 12, 'n': 13, 'o': 14, 'r': 15, 's': 16, 't': 17, 'x': 18, 'z': 19}",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "text = \"Tokenizing text is a core task of NLP.\"\ntokenized_text = list(text)\nprint(tokenized_text)\n\ntoken2idx = {ch: idx for idx, ch in enumerate(sorted(set(tokenized_text)))}\nprint(token2idx)\n# {' ': 0, '.': 1, 'L': 2, 'N': 3, 'P': 4, 'T': 5, 'a': 6, 'c': 7, 'e': 8, 'f': 9, 'g': 10,\n#  'i': 11, 'k': 12, 'n': 13, 'o': 14, 'r': 15, 's': 16, 't': 17, 'x': 18, 'z': 19}\n\ninput_ids = [token2idx[token] for token in tokenized_text]\nprint(input_ids)\n# [5, 14, 12, 8, 13, 11, 19, 11, 13, 10, 0, 17, 8, 18, 17, 0, 11, 16, 0, 6, 0, 7,\n#  14, 15, 8, 0, 17, 6, 16, 12, 0, 14, 9, 0, 3, 2, 4, 1]\n\nimport pandas as pd\n\ncategorical_df = pd.DataFrame({\"Name\": [\"Bumblebee\", \"Optimus Prime\", \"Megatron\"], \"Label ID\": [0, 1, 2]})\nprint(categorical_df)\nprint(pd.get_dummies(categorical_df[\"Name\"]))",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'tokenizer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'tokenizer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'emotions' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'tokenize' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'tokenizer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'emotion_encoded' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'X_train' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'X_train' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'X_train' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'lr_clf' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'y_valid' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'X_train' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'trainer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'trainer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'trainer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'classification_report' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'emotions' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'trainer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'validation_results' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+}
+],
+"3cde3102e556f148caffcabaaeb795b8878e215757ae69481eebc994f281ec29": [
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'emotions' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'emotions' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'df' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'df' is not defined"
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "text = \"Tokenizing text is a core task of NLP.\"\ntokenized_text = list(text)\nprint(tokenized_text)",
+"reason": ""
+},
+{
+"run": true,
+"setup": "text = \"Tokenizing text is a core task of NLP.\"\ntokenized_text = list(text)\nprint(tokenized_text)\n\ntoken2idx = {ch: idx for idx, ch in enumerate(sorted(set(tokenized_text)))}\nprint(token2idx)\n# {' ': 0, '.': 1, 'L': 2, 'N': 3, 'P': 4, 'T': 5, 'a': 6, 'c': 7, 'e': 8, 'f': 9, 'g': 10,\n#  'i': 11, 'k': 12, 'n': 13, 'o': 14, 'r': 15, 's': 16, 't': 17, 'x': 18, 'z': 19}",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "text = \"Tokenizing text is a core task of NLP.\"\ntokenized_text = list(text)\nprint(tokenized_text)\n\ntoken2idx = {ch: idx for idx, ch in enumerate(sorted(set(tokenized_text)))}\nprint(token2idx)\n# {' ': 0, '.': 1, 'L': 2, 'N': 3, 'P': 4, 'T': 5, 'a': 6, 'c': 7, 'e': 8, 'f': 9, 'g': 10,\n#  'i': 11, 'k': 12, 'n': 13, 'o': 14, 'r': 15, 's': 16, 't': 17, 'x': 18, 'z': 19}\n\ninput_ids = [token2idx[token] for token in tokenized_text]\nprint(input_ids)\n# [5, 14, 12, 8, 13, 11, 19, 11, 13, 10, 0, 17, 8, 18, 17, 0, 11, 16, 0, 6, 0, 7,\n#  14, 15, 8, 0, 17, 6, 16, 12, 0, 14, 9, 0, 3, 2, 4, 1]\n\nimport pandas as pd\n\ncategorical_df = pd.DataFrame({\"Name\": [\"Bumblebee\", \"Optimus Prime\", \"Megatron\"], \"Label ID\": [0, 1, 2]})\nprint(categorical_df)\nprint(pd.get_dummies(categorical_df[\"Name\"], dtype=int))",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'tokenizer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'tokenizer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'emotions' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'tokenize' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'tokenizer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'emotion_encoded' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'X_train' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'X_train' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'X_train' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'lr_clf' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'y_valid' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'X_train' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'trainer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'trainer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'trainer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'classification_report' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'emotions' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'trainer' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'validation_results' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+}
 ]
 }

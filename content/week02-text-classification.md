@@ -81,8 +81,6 @@ Two remarks keep this picture honest. Large decoder-only models now also transla
 
 **In this lesson.** Emotion classification means reading a complete tweet and assigning one label, so the lesson uses an encoder, DistilBERT. This is also why the vector of the first token, `[CLS]`, can serve as a summary of the sentence: in an encoder that token has attended to every word.
 
-{{display: decoder attention}}
-
 ### Theory 2: transfer learning
 
 **The principle.** Transfer learning means that knowledge gained on one task is reused on another, so that training does not start from randomly initialized weights. With transformers it is carried out in two stages.
@@ -295,21 +293,87 @@ print(percentages)
 
 **Tokenization** splits text into tokens and maps each token to a numeric ID so the model can process it.
 
-### What is tokenization? (character-level example)
+This part follows "From Text to Tokens" in Chapter 2 of the textbook and uses its example sentence. It looks at the two extremes first, characters and words, and then at the compromise that transformers use.
+
+### Character tokenization
+
+The simplest scheme gives the model one character at a time. A Python string can be turned into a list of its characters in one line:
 
 ```python
-text = "My name is kareem"
+text = "Tokenizing text is a core task of NLP."
 tokenized_text = list(text)
 print(tokenized_text)
-
-token2index = {ch: idx for idx, ch in enumerate(sorted(set(tokenized_text)))}
-print(token2index)
-# {' ': 0, 'M': 1, 'a': 2, 'e': 3, 'i': 4, 'k': 5, 'm': 6, 'n': 7, 'r': 8, 's': 9, 'y': 10}
 ```
 
-Production systems use **subword** tokenization methods such as WordPiece (BERT), BPE (GPT) or SentencePiece.
+The result is a list of 38 characters, spaces and the full stop included. A model cannot work with letters, so each distinct character is given a number. This step is called **numericalization**:
 
-### Using Hugging Face tokenizers
+```python
+token2idx = {ch: idx for idx, ch in enumerate(sorted(set(tokenized_text)))}
+print(token2idx)
+# {' ': 0, '.': 1, 'L': 2, 'N': 3, 'P': 4, 'T': 5, 'a': 6, 'c': 7, 'e': 8, 'f': 9, 'g': 10,
+#  'i': 11, 'k': 12, 'n': 13, 'o': 14, 'r': 15, 's': 16, 't': 17, 'x': 18, 'z': 19}
+```
+
+This is the **vocabulary**: 20 distinct characters, each with its own integer. With it, the whole text becomes a list of integers, the `input_ids`:
+
+```python
+input_ids = [token2idx[token] for token in tokenized_text]
+print(input_ids)
+# [5, 14, 12, 8, 13, 11, 19, 11, 13, 10, 0, 17, 8, 18, 17, 0, 11, 16, 0, 6, 0, 7,
+#  14, 15, 8, 0, 17, 6, 16, 12, 0, 14, 9, 0, 3, 2, 4, 1]
+```
+
+**From IDs to one-hot vectors.** The IDs have one drawback: they look like quantities. `z` is 19 and `a` is 6, but `z` is not "more" than `a`, and adding two IDs gives the ID of an unrelated character. The textbook illustrates the problem, and its usual solution, with a small table of names:
+
+```python
+import pandas as pd
+
+categorical_df = pd.DataFrame({"Name": ["Bumblebee", "Optimus Prime", "Megatron"], "Label ID": [0, 1, 2]})
+print(categorical_df)
+print(pd.get_dummies(categorical_df["Name"], dtype=int))
+```
+
+The label IDs suggest an order among the three names that does not exist. `get_dummies` removes it by giving every name its own column, with a 1 in that column and 0 everywhere else. Each row is then a **one-hot vector**. The same is done with the characters, using PyTorch:
+
+```python
+import torch
+import torch.nn.functional as F
+
+input_ids = torch.tensor(input_ids)
+one_hot_encodings = F.one_hot(input_ids, num_classes=len(token2idx))
+print(one_hot_encodings.shape)        # torch.Size([38, 20])
+
+print(f"Token: {tokenized_text[0]}")
+print(f"Tensor index: {input_ids[0]}")
+print(f"One-hot: {one_hot_encodings[0]}")
+```
+
+There are 38 vectors, one per character, and each has 20 positions, one per entry of the vocabulary. The first character is `T`, whose ID is 5, so its vector has a single 1 at position 5. Always pass `num_classes`: without it, PyTorch sizes the vectors from the largest ID that happens to occur, which can be smaller than the vocabulary.
+
+**What character tokenization costs.** It never meets an unknown word and it copes with misspellings, but it throws away the structure of the text. The model would have to learn from data alone that certain letters form words, which takes a great deal of data, memory and computation. For that reason it is rarely used.
+
+### Word tokenization
+
+The opposite extreme keeps whole words. The simplest version splits the text at spaces:
+
+```python
+tokenized_text = text.split()
+print(tokenized_text)
+# ['Tokenizing', 'text', 'is', 'a', 'core', 'task', 'of', 'NLP.']
+```
+
+Each word could now be numbered as the characters were, and the model no longer has to discover words for itself. Two problems appear at once:
+
+- **Punctuation is not handled.** `NLP.` with its full stop is one token, different from `NLP`.
+- **The vocabulary explodes.** Every inflected form, spelling variant and typing error is a new word, so the vocabulary of a real corpus can reach millions of entries. The first layer of a network needs one row of weights per entry: with one million words and vectors of one thousand numbers, that layer alone has one billion weights.
+
+The usual remedy is to keep only the most frequent words, for example the top 100,000, and to map every other word to one shared token for "unknown", written `[UNK]`. The price is that the model learns nothing about any word that falls outside the list.
+
+### Subword tokenization
+
+Subword tokenization takes the useful half of each extreme. Frequent words stay whole, which keeps sequences short. Rare words are split into smaller known pieces, so nothing is ever unknown and misspellings can still be represented. The pieces are not designed by hand: they are learned from the pre-training corpus by a statistical algorithm. BERT and DistilBERT use the one called **WordPiece**.
+
+The clearest way to understand it is to watch it work. `AutoTokenizer` loads the tokenizer that belongs to a pre-trained model, given the model's name on the Hub:
 
 ```python
 from transformers import AutoTokenizer
@@ -317,25 +381,38 @@ from transformers import AutoTokenizer
 model_ckp = "distilbert-base-uncased"
 tokenizer = AutoTokenizer.from_pretrained(model_ckp)
 
-text = "My name is kareem"
 encoded_text = tokenizer(text)
 print(encoded_text)
+# {'input_ids': [101, 19204, 6026, 3793, 2003, 1037, 4563, 4708, 1997, 17953, 2361, 1012, 102],
+#  'attention_mask': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}
+```
 
+The first run shows progress bars while the tokenizer's files are downloaded from the Hub; later runs read them from a cache on disk. As in the character example, the text has become a list of integers in `input_ids` (the `attention_mask` is explained below). The IDs can be turned back into tokens to see what the tokenizer did:
+
+```python
 tokens = tokenizer.convert_ids_to_tokens(encoded_text.input_ids)
 print(tokens)
+# ['[CLS]', 'token', '##izing', 'text', 'is', 'a', 'core', 'task', 'of', 'nl', '##p', '.', '[SEP]']
 
 print(tokenizer.convert_tokens_to_string(tokens))
+# [CLS] tokenizing text is a core task of nlp. [SEP]
 ```
+
+Three things can be read from this output:
+
+1. **Special tokens were added.** `[CLS]` marks the start of the sequence and `[SEP]` its end. Their names differ from model to model.
+2. **Everything was lowercased.** That is a property of this checkpoint, whose name ends in "uncased".
+3. **Two words were split.** "Tokenizing" became `token` and `##izing`, and "NLP" became `nl` and `##p`, because neither is common enough to be in the vocabulary as a whole. The prefix `##` means "this piece continues the previous one", which is how `convert_tokens_to_string` knows where to join them again.
 
 ### Tokenizer properties
 
 ```python
-print(tokenizer.vocab_size)          # vocabulary size
-print(tokenizer.model_input_names)   # inputs the model expects
-print(tokenizer.model_max_length)    # maximum sequence length
+print(tokenizer.vocab_size)          # 30522: the number of tokens in the vocabulary
+print(tokenizer.model_max_length)    # 512: the longest sequence the model accepts
+print(tokenizer.model_input_names)   # ['input_ids', 'attention_mask']: what the model expects
 ```
 
-The tokenizer output contains `input_ids` (token IDs), `attention_mask` (which tokens to attend to), and special tokens such as `[CLS]` and `[SEP]`.
+> **Always use the tokenizer the model was trained with.** Each token ID is the number of a row in the model's embedding table. A different tokenizer assigns different numbers to the same words, so to the model it is as if the vocabulary had been shuffled.
 
 ### Tokenizing the entire dataset
 
@@ -348,6 +425,18 @@ def tokenize(batch):
 emotion_encoded = emotions.map(tokenize, batched=True, batch_size=None)
 print(emotion_encoded.column_names)
 ```
+
+To see what `tokenize` returns, apply it to the first two tweets:
+
+```python
+print(tokenize(emotions["train"][:2]))
+```
+
+The first tweet is shorter than the second, so its `input_ids` end in a run of zeros that brings it to the same length. Zero is the ID of the padding token, one of five special tokens in this vocabulary:
+
+| Special token | `[PAD]` | `[UNK]` | `[CLS]` | `[SEP]` | `[MASK]` |
+|---|---|---|---|---|---|
+| ID | 0 | 100 | 101 | 102 | 103 |
 
 - `padding=True` pads to the longest sequence in the batch (`padding="max_length"` pads to the model's max length instead). Padding adds special tokens so sequences in a batch have equal length.
 - `truncation=True` shortens sequences that exceed the model's maximum length. This prevents errors but may cut information.

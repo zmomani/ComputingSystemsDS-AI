@@ -122,8 +122,6 @@
 </table>
 <p>Two remarks keep this picture honest. Large decoder-only models now also translate, summarize and classify, by treating every task as the continuation of a prompt. Encoder-only models remain the common choice for classification when the model must be small, fast and cheap to run.</p>
 <p><strong>In this lesson.</strong> Emotion classification means reading a complete tweet and assigning one label, so the lesson uses an encoder, DistilBERT. This is also why the vector of the first token, <code>[CLS]</code>, can serve as a summary of the sentence: in an encoder that token has attended to every word.</p>
-<div class="sim-inline"><button class="sim-chip" data-display="decoder"><span class="sim-chip-kind">Transformers</span>▶ Display: Decoder: masked and cross-attention</button><button class="sim-chip" data-display="attention"><span class="sim-chip-kind">Transformers</span>▶ Display: Self-attention: Q·Kᵀ → softmax → ·V</button></div>
-
 <h3 id="theory-2-transfer-learning">Theory 2: transfer learning</h3>
 <p><strong>The principle.</strong> Transfer learning means that knowledge gained on one task is reused on another, so that training does not start from randomly initialized weights. With transformers it is carried out in two stages.</p>
 <figure class="fig"><img src="../assets/img/transfer-learning.png" alt="On the left, supervised learning: model A is trained on domain A and model B on domain B, separately. On the right, transfer learning: the body trained on domain A is reused, with a new head B, for domain B"><figcaption>Ordinary supervised learning (left) trains a separate model for every task. Transfer learning (right) reuses the body trained on the first task and gives it a new head for the second. Figure from the companion repository of Tunstall et al., <em>Natural Language Processing with Transformers</em> (2022), Apache 2.0 licence.</figcaption></figure>
@@ -367,54 +365,149 @@ print(percentages)</textarea><pre><code class="language-python">percentages = df
 print(percentages)</code></pre></div>
 <h2 id="3-tokenization-and-data-preparation">3. Tokenization and Data Preparation</h2>
 <p><strong>Tokenization</strong> splits text into tokens and maps each token to a numeric ID so the model can process it.</p>
-<h3 id="what-is-tokenization-character-level-example">What is tokenization? (character-level example)</h3>
-<div class="runnable"><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden>text = &quot;My name is kareem&quot;
+<p>This part follows "From Text to Tokens" in Chapter 2 of the textbook and uses its example sentence. It looks at the two extremes first, characters and words, and then at the compromise that transformers use.</p>
+<h3 id="character-tokenization">Character tokenization</h3>
+<p>The simplest scheme gives the model one character at a time. A Python string can be turned into a list of its characters in one line:</p>
+<div class="runnable"><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden>text = &quot;Tokenizing text is a core task of NLP.&quot;
+tokenized_text = list(text)
+print(tokenized_text)</textarea><pre><code class="language-python">text = &quot;Tokenizing text is a core task of NLP.&quot;
+tokenized_text = list(text)
+print(tokenized_text)</code></pre></div>
+<p>The result is a list of 38 characters, spaces and the full stop included. A model cannot work with letters, so each distinct character is given a number. This step is called <strong>numericalization</strong>:</p>
+<div class="runnable"><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden>token2idx = {ch: idx for idx, ch in enumerate(sorted(set(tokenized_text)))}
+print(token2idx)
+# {&#x27; &#x27;: 0, &#x27;.&#x27;: 1, &#x27;L&#x27;: 2, &#x27;N&#x27;: 3, &#x27;P&#x27;: 4, &#x27;T&#x27;: 5, &#x27;a&#x27;: 6, &#x27;c&#x27;: 7, &#x27;e&#x27;: 8, &#x27;f&#x27;: 9, &#x27;g&#x27;: 10,
+#  &#x27;i&#x27;: 11, &#x27;k&#x27;: 12, &#x27;n&#x27;: 13, &#x27;o&#x27;: 14, &#x27;r&#x27;: 15, &#x27;s&#x27;: 16, &#x27;t&#x27;: 17, &#x27;x&#x27;: 18, &#x27;z&#x27;: 19}</textarea><textarea class="setup" hidden>text = &quot;Tokenizing text is a core task of NLP.&quot;
+tokenized_text = list(text)
+print(tokenized_text)</textarea><pre><code class="language-python">token2idx = {ch: idx for idx, ch in enumerate(sorted(set(tokenized_text)))}
+print(token2idx)
+# {&#x27; &#x27;: 0, &#x27;.&#x27;: 1, &#x27;L&#x27;: 2, &#x27;N&#x27;: 3, &#x27;P&#x27;: 4, &#x27;T&#x27;: 5, &#x27;a&#x27;: 6, &#x27;c&#x27;: 7, &#x27;e&#x27;: 8, &#x27;f&#x27;: 9, &#x27;g&#x27;: 10,
+#  &#x27;i&#x27;: 11, &#x27;k&#x27;: 12, &#x27;n&#x27;: 13, &#x27;o&#x27;: 14, &#x27;r&#x27;: 15, &#x27;s&#x27;: 16, &#x27;t&#x27;: 17, &#x27;x&#x27;: 18, &#x27;z&#x27;: 19}</code></pre></div>
+<p>This is the <strong>vocabulary</strong>: 20 distinct characters, each with its own integer. With it, the whole text becomes a list of integers, the <code>input_ids</code>:</p>
+<div class="runnable"><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden>input_ids = [token2idx[token] for token in tokenized_text]
+print(input_ids)
+# [5, 14, 12, 8, 13, 11, 19, 11, 13, 10, 0, 17, 8, 18, 17, 0, 11, 16, 0, 6, 0, 7,
+#  14, 15, 8, 0, 17, 6, 16, 12, 0, 14, 9, 0, 3, 2, 4, 1]</textarea><textarea class="setup" hidden>text = &quot;Tokenizing text is a core task of NLP.&quot;
 tokenized_text = list(text)
 print(tokenized_text)
 
-token2index = {ch: idx for idx, ch in enumerate(sorted(set(tokenized_text)))}
-print(token2index)
-# {&#x27; &#x27;: 0, &#x27;M&#x27;: 1, &#x27;a&#x27;: 2, &#x27;e&#x27;: 3, &#x27;i&#x27;: 4, &#x27;k&#x27;: 5, &#x27;m&#x27;: 6, &#x27;n&#x27;: 7, &#x27;r&#x27;: 8, &#x27;s&#x27;: 9, &#x27;y&#x27;: 10}</textarea><pre><code class="language-python">text = &quot;My name is kareem&quot;
+token2idx = {ch: idx for idx, ch in enumerate(sorted(set(tokenized_text)))}
+print(token2idx)
+# {&#x27; &#x27;: 0, &#x27;.&#x27;: 1, &#x27;L&#x27;: 2, &#x27;N&#x27;: 3, &#x27;P&#x27;: 4, &#x27;T&#x27;: 5, &#x27;a&#x27;: 6, &#x27;c&#x27;: 7, &#x27;e&#x27;: 8, &#x27;f&#x27;: 9, &#x27;g&#x27;: 10,
+#  &#x27;i&#x27;: 11, &#x27;k&#x27;: 12, &#x27;n&#x27;: 13, &#x27;o&#x27;: 14, &#x27;r&#x27;: 15, &#x27;s&#x27;: 16, &#x27;t&#x27;: 17, &#x27;x&#x27;: 18, &#x27;z&#x27;: 19}</textarea><pre><code class="language-python">input_ids = [token2idx[token] for token in tokenized_text]
+print(input_ids)
+# [5, 14, 12, 8, 13, 11, 19, 11, 13, 10, 0, 17, 8, 18, 17, 0, 11, 16, 0, 6, 0, 7,
+#  14, 15, 8, 0, 17, 6, 16, 12, 0, 14, 9, 0, 3, 2, 4, 1]</code></pre></div>
+<p><strong>From IDs to one-hot vectors.</strong> The IDs have one drawback: they look like quantities. <code>z</code> is 19 and <code>a</code> is 6, but <code>z</code> is not "more" than <code>a</code>, and adding two IDs gives the ID of an unrelated character. The textbook illustrates the problem, and its usual solution, with a small table of names:</p>
+<div class="runnable"><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden>import pandas as pd
+
+categorical_df = pd.DataFrame({&quot;Name&quot;: [&quot;Bumblebee&quot;, &quot;Optimus Prime&quot;, &quot;Megatron&quot;], &quot;Label ID&quot;: [0, 1, 2]})
+print(categorical_df)
+print(pd.get_dummies(categorical_df[&quot;Name&quot;], dtype=int))</textarea><pre><code class="language-python">import pandas as pd
+
+categorical_df = pd.DataFrame({&quot;Name&quot;: [&quot;Bumblebee&quot;, &quot;Optimus Prime&quot;, &quot;Megatron&quot;], &quot;Label ID&quot;: [0, 1, 2]})
+print(categorical_df)
+print(pd.get_dummies(categorical_df[&quot;Name&quot;], dtype=int))</code></pre></div>
+<p>The label IDs suggest an order among the three names that does not exist. <code>get_dummies</code> removes it by giving every name its own column, with a 1 in that column and 0 everywhere else. Each row is then a <strong>one-hot vector</strong>. The same is done with the characters, using PyTorch:</p>
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Starts the course environment. The link it shows opens this lesson with its notebook beside it.">📓 Open in notebook</a><button class="try local" data-run="0" data-target="vscode" data-needs="torch" title="Needs torch — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>import torch
+import torch.nn.functional as F
+
+input_ids = torch.tensor(input_ids)
+one_hot_encodings = F.one_hot(input_ids, num_classes=len(token2idx))
+print(one_hot_encodings.shape)        # torch.Size([38, 20])
+
+print(f&quot;Token: {tokenized_text[0]}&quot;)
+print(f&quot;Tensor index: {input_ids[0]}&quot;)
+print(f&quot;One-hot: {one_hot_encodings[0]}&quot;)</textarea><pre><code class="language-python">import torch
+import torch.nn.functional as F
+
+input_ids = torch.tensor(input_ids)
+one_hot_encodings = F.one_hot(input_ids, num_classes=len(token2idx))
+print(one_hot_encodings.shape)        # torch.Size([38, 20])
+
+print(f&quot;Token: {tokenized_text[0]}&quot;)
+print(f&quot;Tensor index: {input_ids[0]}&quot;)
+print(f&quot;One-hot: {one_hot_encodings[0]}&quot;)</code></pre></div>
+<p>There are 38 vectors, one per character, and each has 20 positions, one per entry of the vocabulary. The first character is <code>T</code>, whose ID is 5, so its vector has a single 1 at position 5. Always pass <code>num_classes</code>: without it, PyTorch sizes the vectors from the largest ID that happens to occur, which can be smaller than the vocabulary.</p>
+<p><strong>What character tokenization costs.</strong> It never meets an unknown word and it copes with misspellings, but it throws away the structure of the text. The model would have to learn from data alone that certain letters form words, which takes a great deal of data, memory and computation. For that reason it is rarely used.</p>
+<h3 id="word-tokenization">Word tokenization</h3>
+<p>The opposite extreme keeps whole words. The simplest version splits the text at spaces:</p>
+<div class="runnable"><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden>tokenized_text = text.split()
+print(tokenized_text)
+# [&#x27;Tokenizing&#x27;, &#x27;text&#x27;, &#x27;is&#x27;, &#x27;a&#x27;, &#x27;core&#x27;, &#x27;task&#x27;, &#x27;of&#x27;, &#x27;NLP.&#x27;]</textarea><textarea class="setup" hidden>text = &quot;Tokenizing text is a core task of NLP.&quot;
 tokenized_text = list(text)
 print(tokenized_text)
 
-token2index = {ch: idx for idx, ch in enumerate(sorted(set(tokenized_text)))}
-print(token2index)
-# {&#x27; &#x27;: 0, &#x27;M&#x27;: 1, &#x27;a&#x27;: 2, &#x27;e&#x27;: 3, &#x27;i&#x27;: 4, &#x27;k&#x27;: 5, &#x27;m&#x27;: 6, &#x27;n&#x27;: 7, &#x27;r&#x27;: 8, &#x27;s&#x27;: 9, &#x27;y&#x27;: 10}</code></pre></div>
-<p>Production systems use <strong>subword</strong> tokenization methods such as WordPiece (BERT), BPE (GPT) or SentencePiece.</p>
-<h3 id="using-hugging-face-tokenizers">Using Hugging Face tokenizers</h3>
+token2idx = {ch: idx for idx, ch in enumerate(sorted(set(tokenized_text)))}
+print(token2idx)
+# {&#x27; &#x27;: 0, &#x27;.&#x27;: 1, &#x27;L&#x27;: 2, &#x27;N&#x27;: 3, &#x27;P&#x27;: 4, &#x27;T&#x27;: 5, &#x27;a&#x27;: 6, &#x27;c&#x27;: 7, &#x27;e&#x27;: 8, &#x27;f&#x27;: 9, &#x27;g&#x27;: 10,
+#  &#x27;i&#x27;: 11, &#x27;k&#x27;: 12, &#x27;n&#x27;: 13, &#x27;o&#x27;: 14, &#x27;r&#x27;: 15, &#x27;s&#x27;: 16, &#x27;t&#x27;: 17, &#x27;x&#x27;: 18, &#x27;z&#x27;: 19}
+
+input_ids = [token2idx[token] for token in tokenized_text]
+print(input_ids)
+# [5, 14, 12, 8, 13, 11, 19, 11, 13, 10, 0, 17, 8, 18, 17, 0, 11, 16, 0, 6, 0, 7,
+#  14, 15, 8, 0, 17, 6, 16, 12, 0, 14, 9, 0, 3, 2, 4, 1]
+
+import pandas as pd
+
+categorical_df = pd.DataFrame({&quot;Name&quot;: [&quot;Bumblebee&quot;, &quot;Optimus Prime&quot;, &quot;Megatron&quot;], &quot;Label ID&quot;: [0, 1, 2]})
+print(categorical_df)
+print(pd.get_dummies(categorical_df[&quot;Name&quot;], dtype=int))</textarea><pre><code class="language-python">tokenized_text = text.split()
+print(tokenized_text)
+# [&#x27;Tokenizing&#x27;, &#x27;text&#x27;, &#x27;is&#x27;, &#x27;a&#x27;, &#x27;core&#x27;, &#x27;task&#x27;, &#x27;of&#x27;, &#x27;NLP.&#x27;]</code></pre></div>
+<p>Each word could now be numbered as the characters were, and the model no longer has to discover words for itself. Two problems appear at once:</p>
+<ul>
+<li><strong>Punctuation is not handled.</strong> <code>NLP.</code> with its full stop is one token, different from <code>NLP</code>.</li>
+<li><strong>The vocabulary explodes.</strong> Every inflected form, spelling variant and typing error is a new word, so the vocabulary of a real corpus can reach millions of entries. The first layer of a network needs one row of weights per entry: with one million words and vectors of one thousand numbers, that layer alone has one billion weights.</li>
+</ul>
+<p>The usual remedy is to keep only the most frequent words, for example the top 100,000, and to map every other word to one shared token for "unknown", written <code>[UNK]</code>. The price is that the model learns nothing about any word that falls outside the list.</p>
+<h3 id="subword-tokenization">Subword tokenization</h3>
+<p>Subword tokenization takes the useful half of each extreme. Frequent words stay whole, which keeps sequences short. Rare words are split into smaller known pieces, so nothing is ever unknown and misspellings can still be represented. The pieces are not designed by hand: they are learned from the pre-training corpus by a statistical algorithm. BERT and DistilBERT use the one called <strong>WordPiece</strong>.</p>
+<p>The clearest way to understand it is to watch it work. <code>AutoTokenizer</code> loads the tokenizer that belongs to a pre-trained model, given the model's name on the Hub:</p>
 <div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Starts the course environment. The link it shows opens this lesson with its notebook beside it.">📓 Open in notebook</a><button class="try local" data-run="0" data-target="vscode" data-needs="transformers" title="Needs transformers — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from transformers import AutoTokenizer
 
 model_ckp = &quot;distilbert-base-uncased&quot;
 tokenizer = AutoTokenizer.from_pretrained(model_ckp)
 
-text = &quot;My name is kareem&quot;
 encoded_text = tokenizer(text)
 print(encoded_text)
-
-tokens = tokenizer.convert_ids_to_tokens(encoded_text.input_ids)
-print(tokens)
-
-print(tokenizer.convert_tokens_to_string(tokens))</textarea><pre><code class="language-python">from transformers import AutoTokenizer
+# {&#x27;input_ids&#x27;: [101, 19204, 6026, 3793, 2003, 1037, 4563, 4708, 1997, 17953, 2361, 1012, 102],
+#  &#x27;attention_mask&#x27;: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}</textarea><pre><code class="language-python">from transformers import AutoTokenizer
 
 model_ckp = &quot;distilbert-base-uncased&quot;
 tokenizer = AutoTokenizer.from_pretrained(model_ckp)
 
-text = &quot;My name is kareem&quot;
 encoded_text = tokenizer(text)
 print(encoded_text)
-
-tokens = tokenizer.convert_ids_to_tokens(encoded_text.input_ids)
+# {&#x27;input_ids&#x27;: [101, 19204, 6026, 3793, 2003, 1037, 4563, 4708, 1997, 17953, 2361, 1012, 102],
+#  &#x27;attention_mask&#x27;: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}</code></pre></div>
+<p>The first run shows progress bars while the tokenizer's files are downloaded from the Hub; later runs read them from a cache on disk. As in the character example, the text has become a list of integers in <code>input_ids</code> (the <code>attention_mask</code> is explained below). The IDs can be turned back into tokens to see what the tokenizer did:</p>
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Starts the course environment. The link it shows opens this lesson with its notebook beside it.">📓 Open in notebook</a><button class="try local" data-run="0" data-target="vscode" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>tokens = tokenizer.convert_ids_to_tokens(encoded_text.input_ids)
 print(tokens)
+# [&#x27;[CLS]&#x27;, &#x27;token&#x27;, &#x27;##izing&#x27;, &#x27;text&#x27;, &#x27;is&#x27;, &#x27;a&#x27;, &#x27;core&#x27;, &#x27;task&#x27;, &#x27;of&#x27;, &#x27;nl&#x27;, &#x27;##p&#x27;, &#x27;.&#x27;, &#x27;[SEP]&#x27;]
 
-print(tokenizer.convert_tokens_to_string(tokens))</code></pre></div>
+print(tokenizer.convert_tokens_to_string(tokens))
+# [CLS] tokenizing text is a core task of nlp. [SEP]</textarea><pre><code class="language-python">tokens = tokenizer.convert_ids_to_tokens(encoded_text.input_ids)
+print(tokens)
+# [&#x27;[CLS]&#x27;, &#x27;token&#x27;, &#x27;##izing&#x27;, &#x27;text&#x27;, &#x27;is&#x27;, &#x27;a&#x27;, &#x27;core&#x27;, &#x27;task&#x27;, &#x27;of&#x27;, &#x27;nl&#x27;, &#x27;##p&#x27;, &#x27;.&#x27;, &#x27;[SEP]&#x27;]
+
+print(tokenizer.convert_tokens_to_string(tokens))
+# [CLS] tokenizing text is a core task of nlp. [SEP]</code></pre></div>
+<p>Three things can be read from this output:</p>
+<ol>
+<li><strong>Special tokens were added.</strong> <code>[CLS]</code> marks the start of the sequence and <code>[SEP]</code> its end. Their names differ from model to model.</li>
+<li><strong>Everything was lowercased.</strong> That is a property of this checkpoint, whose name ends in "uncased".</li>
+<li><strong>Two words were split.</strong> "Tokenizing" became <code>token</code> and <code>##izing</code>, and "NLP" became <code>nl</code> and <code>##p</code>, because neither is common enough to be in the vocabulary as a whole. The prefix <code>##</code> means "this piece continues the previous one", which is how <code>convert_tokens_to_string</code> knows where to join them again.</li>
+</ol>
 <h3 id="tokenizer-properties">Tokenizer properties</h3>
-<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Starts the course environment. The link it shows opens this lesson with its notebook beside it.">📓 Open in notebook</a><button class="try local" data-run="0" data-target="vscode" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>print(tokenizer.vocab_size)          # vocabulary size
-print(tokenizer.model_input_names)   # inputs the model expects
-print(tokenizer.model_max_length)    # maximum sequence length</textarea><pre><code class="language-python">print(tokenizer.vocab_size)          # vocabulary size
-print(tokenizer.model_input_names)   # inputs the model expects
-print(tokenizer.model_max_length)    # maximum sequence length</code></pre></div>
-<p>The tokenizer output contains <code>input_ids</code> (token IDs), <code>attention_mask</code> (which tokens to attend to), and special tokens such as <code>[CLS]</code> and <code>[SEP]</code>.</p>
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Starts the course environment. The link it shows opens this lesson with its notebook beside it.">📓 Open in notebook</a><button class="try local" data-run="0" data-target="vscode" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>print(tokenizer.vocab_size)          # 30522: the number of tokens in the vocabulary
+print(tokenizer.model_max_length)    # 512: the longest sequence the model accepts
+print(tokenizer.model_input_names)   # [&#x27;input_ids&#x27;, &#x27;attention_mask&#x27;]: what the model expects</textarea><pre><code class="language-python">print(tokenizer.vocab_size)          # 30522: the number of tokens in the vocabulary
+print(tokenizer.model_max_length)    # 512: the longest sequence the model accepts
+print(tokenizer.model_input_names)   # [&#x27;input_ids&#x27;, &#x27;attention_mask&#x27;]: what the model expects</code></pre></div>
+<blockquote>
+<p><strong>Always use the tokenizer the model was trained with.</strong> Each token ID is the number of a row in the model's embedding table. A different tokenizer assigns different numbers to the same words, so to the model it is as if the vocabulary had been shuffled.</p>
+</blockquote>
 <h3 id="tokenizing-the-entire-dataset">Tokenizing the entire dataset</h3>
 <div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Starts the course environment. The link it shows opens this lesson with its notebook beside it.">📓 Open in notebook</a><button class="try local" data-run="0" data-target="vscode" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>emotions.reset_format()   # undo the pandas format set earlier
 
@@ -429,6 +522,31 @@ def tokenize(batch):
 
 emotion_encoded = emotions.map(tokenize, batched=True, batch_size=None)
 print(emotion_encoded.column_names)</code></pre></div>
+<p>To see what <code>tokenize</code> returns, apply it to the first two tweets:</p>
+<div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="Starts the course environment. The link it shows opens this lesson with its notebook beside it.">📓 Open in notebook</a><button class="try local" data-run="0" data-target="vscode" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>print(tokenize(emotions[&quot;train&quot;][:2]))</textarea><pre><code class="language-python">print(tokenize(emotions[&quot;train&quot;][:2]))</code></pre></div>
+<p>The first tweet is shorter than the second, so its <code>input_ids</code> end in a run of zeros that brings it to the same length. Zero is the ID of the padding token, one of five special tokens in this vocabulary:</p>
+<table>
+<thead>
+<tr>
+<th>Special token</th>
+<th><code>[PAD]</code></th>
+<th><code>[UNK]</code></th>
+<th><code>[CLS]</code></th>
+<th><code>[SEP]</code></th>
+<th><code>[MASK]</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ID</td>
+<td>0</td>
+<td>100</td>
+<td>101</td>
+<td>102</td>
+<td>103</td>
+</tr>
+</tbody>
+</table>
 <ul>
 <li><code>padding=True</code> pads to the longest sequence in the batch (<code>padding="max_length"</code> pads to the model's max length instead). Padding adds special tokens so sequences in a batch have equal length.</li>
 <li><code>truncation=True</code> shortens sequences that exceed the model's maximum length. This prevents errors but may cut information.</li>
