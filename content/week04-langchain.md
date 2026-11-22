@@ -18,7 +18,6 @@ By the end of this part you will be able to:
 - Turn a model's free text into a checked Python object
 - Build a sequential chain, with one or with several inputs and outputs
 - Route a question to the prompt that suits it
-- Read LangChain code written in 2023–2024 and rewrite it for the current library
 
 **Goal:** five small working programs (a translator, an email assistant, a review analyser, a two-step code generator and a subject router), which are the building blocks of the agents in your project.
 
@@ -60,10 +59,10 @@ LangChain is installed as several packages. Knowing which package holds what mak
 | `langchain-huggingface`, `langchain-openai`, … | One package per provider | The local chat model and the embedding model |
 | `langchain-text-splitters` | Text splitters | Part 2 |
 | `langchain-community` | Integrations maintained by the community, among them most document loaders | Part 2 |
-| `langchain-classic` | The older chain classes, kept so that old programs still run | Reading 2024 code |
+| `langchain-classic` | The older chain classes, kept so that old programs still run | Not used |
 | `langgraph` | Graphs of steps with state, loops and memory | Week 5 |
 
-> **Careful: most LangChain code on the internet is written for an older version.** LangChain 1.0 moved the classes that older tutorials are built on (`LLMChain`, `SimpleSequentialChain`, `MultiPromptChain` and others) out of the `langchain` package and into `langchain-classic`. A line such as `from langchain.chains import LLMChain` now fails with `ModuleNotFoundError: No module named 'langchain.chains'`. The course slides were written in January 2024, so each section of this lesson shows the slide's code beside its current form. The ideas are the same; the notation is shorter.
+> **Careful: most LangChain code on the internet is written for an older version.** Tutorials from before LangChain 1.0 use classes such as `LLMChain` that have since moved out of the `langchain` package, so their import lines fail with `ModuleNotFoundError`. This lesson uses the current library throughout; if code you find elsewhere fails in this way, it is old, and the [migration guide](https://docs.langchain.com/oss/python/migrate/langchain-v1) shows what replaced it.
 
 ## 2. A Chat Model Without an API Key
 
@@ -267,22 +266,6 @@ for piece in translate_chain.stream({"language": "Arabic", "text": "The lecture 
 
 > **Terms: Runnable.** Anything that can stand on either side of `|` is called a **Runnable**: a prompt template, a model, a parser, a retriever, or a whole chain. All of them offer `invoke`, `batch` and `stream`. Because a chain is itself a Runnable, chains can be joined into larger chains, which is what Sections 6 and 7 do.
 
-### The same chain in the 2024 notation
-
-The slides define this chain with the class `LLMChain`: "an LLMChain consists of a PromptTemplate, a model and an optional output parser. It takes input variables, uses the PromptTemplate to format them into a prompt, passes the prompt to the model, and uses the output parser, if one is given, to parse the output." That description still fits exactly; only the way of writing it has changed.
-
-```python-note
-# 2024 (course slides). Today this needs:  pip install langchain-classic
-from langchain_classic.chains import LLMChain
-
-translate_chain_2024 = LLMChain(llm=llm, prompt=translate_prompt)
-translate_chain_2024.run(language="French", text="Good morning, how are you?")
-
-# Current: the same three parts, joined with |
-translate_chain = translate_prompt | llm | StrOutputParser()
-translate_chain.invoke({"language": "French", "text": "Good morning, how are you?"})
-```
-
 ## 5. Structured Output
 
 The third use case in the slides reads a customer review and extracts three facts from it: whether the item was a gift, how many days the delivery took, and what the customer said about the price. A program that receives this answer cannot work with a paragraph. It needs a Python object with three fields.
@@ -409,34 +392,9 @@ The slides draw the general case: four chains, in which one user input feeds two
 
 <figure class="fig wide"><img src="../assets/img/slides-chains-multiple-inputs-outputs.png" alt="Four chains. The user input goes to chain 1 and to chain 3. The output of chain 1 is the input of chain 2. The outputs of chain 2 and chain 3 are the inputs of chain 4, which gives the final output"><figcaption>A sequential chain with several inputs and outputs. Figure from Dr. Albanna&#x27;s course slides.</figcaption></figure>
 
-### The same chains in the 2024 notation
-
-This is the script from the course, shortened. On the current libraries it stops at its first line.
-
-```python-note
-# 2024 (course slides)
-from langchain.llms import OpenAI                       # ModuleNotFoundError today
-from langchain.chains import LLMChain                   # ModuleNotFoundError today
-from langchain.chains import SimpleSequentialChain      # ModuleNotFoundError today
-
-llm = OpenAI(temperature=.7)
-html_chain = LLMChain(llm=llm, prompt=html_prompt)
-python_chain = LLMChain(llm=llm, prompt=python_prompt)
-overall_chain = SimpleSequentialChain(chains=[html_chain, python_chain], verbose=True)
-python_code = overall_chain.run("add two numbers")
-```
-
-| 2024 | Current |
-|---|---|
-| `from langchain.llms import OpenAI` | A chat model from a provider package, or `init_chat_model(...)` |
-| `LLMChain(llm=llm, prompt=prompt)` | `prompt | llm | StrOutputParser()` |
-| `SimpleSequentialChain(chains=[a, b])` | `{"code": a} | b` |
-| `SequentialChain(...)` with `output_key` and `input_variables` | `RunnablePassthrough.assign(code=a) | RunnablePassthrough.assign(explanation=b)` |
-| `chain.run("add two numbers")` | `chain.invoke({"name": "add two numbers"})` |
-
 ## 7. Routing
 
-Sometimes one prompt cannot serve every input. A physics question is answered best by a prompt that speaks as a physics teacher, and a history question by another. **Routing** means sending each input to the chain that suits it. The slides build this with a class named `RouterChain`, in nine steps.
+Sometimes one prompt cannot serve every input. A physics question is answered best by a prompt that speaks as a physics teacher, and a history question by another. **Routing** means sending each input to the chain that suits it.
 
 <figure class="fig wide"><img src="../assets/img/router-chain.svg" alt="A question enters a router chain, which replies with one subject. Arrows lead to five prompts: physics, math, history, computer science and a default. All five lead to the chat model, which writes the answer"><figcaption>Routing. The model is called twice: once to name the subject, and once to answer with the prompt chosen for that subject.</figcaption></figure>
 
@@ -494,19 +452,9 @@ Follow one question through the chain. `assign` adds the key `subject` to the di
 
 > **Careful: the router's reply is text, and text is untidy.** The model may reply `Physics`, `physics.` or `The subject is physics`. The function therefore lowers the case and tests whether a subject name occurs *in* the reply, where an exact comparison would fail. The third question matches no subject and falls through to the default prompt. Always give a router a default.
 
-The slides draw the same design with the names of the 2024 classes: a *router chain*, the *destination chains* and a *default chain*.
+The slides draw the same design and name its three parts: the *router chain*, which is `router_chain` above; the *destination chains*, which are the subject prompts followed by the model; and the *default chain*, which is `default_prompt` followed by the model.
 
 <figure class="fig wide"><img src="../assets/img/slides-router-chain.png" alt="An input goes to the router chain, in which an LLM holds a list of subjects such as math and history. If the input is related to a subject, it goes to that destination chain. Otherwise it goes to the default chain. Each chain gives an output"><figcaption>Router chain, destination chains and default chain. Figure from Dr. Albanna&#x27;s course slides.</figcaption></figure>
-
-The nine steps of the slides map onto this code as follows.
-
-| Slides (2024) | Current code |
-|---|---|
-| Steps 1–2: prompt templates with a name and a description, then one `LLMChain` per template in `destination_chains` | The dictionary `subject_prompts` |
-| Step 3: a default chain | `default_prompt` |
-| Steps 4–5: `MULTI_PROMPT_ROUTER_TEMPLATE`, `RouterOutputParser`, `LLMRouterChain` | `router_prompt` and `router_chain` |
-| Steps 7–8: `MultiPromptChain(router_chain, destination_chains, default_chain)` | `pick_prompt` and `routed_chain` |
-| Step 9: `chain.run("What is greedy algorithms?")` | `routed_chain.invoke({"input": ...})` |
 
 In Week 5 the same idea returns in LangGraph, where the function that chooses the next step is called a *conditional edge*.
 
@@ -523,9 +471,9 @@ A prompt template receives a dictionary and returns messages. A chat model recei
 </details>
 
 <details markdown="1">
-<summary>2. A tutorial from 2023 begins with <code>from langchain.chains import LLMChain</code>. What happens when you run it today, and what are your two options?</summary>
+<summary>2. In a few-shot chat prompt, how is one example represented, and why would you use an example selector?</summary>
 
-It fails with `ModuleNotFoundError`, because that class was moved out of the `langchain` package. One option is to install `langchain-classic` and import the class from `langchain_classic.chains`. The other, which is the better one for new code, is to rewrite the chain as `prompt | llm | StrOutputParser()`.
+One example is a pair of messages: a human message with the input and an AI message with the wanted answer. An example selector is used when there are too many examples to place in every prompt: it chooses, for each input, the few that are most useful, for instance the most similar ones.
 </details>
 
 <details markdown="1">
@@ -560,12 +508,12 @@ Twice: once to name the subject and once to answer. The default is needed becaus
 
 ## 10. Summary and Further Reading
 
-**What you learned:** LangChain gives prompts, models and parsers one interface, so that they can be joined with `|` and exchanged for one another. A prompt template separates the fixed instruction from the values that arrive at run time. An output parser turns free text into a checked object. Chains can be placed in sequence, can carry a dictionary that grows at each step, and can choose their next step from the model's own reply. The class names of 2024 have gone; the ideas behind them are unchanged.
+**What you learned:** LangChain gives prompts, models and parsers one interface, so that they can be joined with `|` and exchanged for one another. A prompt template separates the fixed instruction from the values that arrive at run time. An output parser turns free text into a checked object. Chains can be placed in sequence, can carry a dictionary that grows at each step, and can choose their next step from the model's own reply.
 
 **Further reading**
 
 - LangChain documentation: https://docs.langchain.com/oss/python/langchain/overview
-- LangChain v1 migration guide (what moved to `langchain-classic`): https://docs.langchain.com/oss/python/migrate/langchain-v1
+- LangChain v1 migration guide, for updating older code: https://docs.langchain.com/oss/python/migrate/langchain-v1
 - Chat models in LangChain: https://docs.langchain.com/oss/python/langchain/models
 - Structured output: https://docs.langchain.com/oss/python/langchain/structured-output
 - Hugging Face chat models in LangChain: https://docs.langchain.com/oss/python/integrations/chat/huggingface

@@ -282,7 +282,7 @@ The second half is a complete search: the question is embedded, compared with al
 
 ### Other vector stores: Chroma and Pinecone
 
-The in-memory store disappears when the notebook closes. For your project the milestone names **Chroma**, which saves its data in a folder. The script of the course slides uses **Pinecone**, a hosted database that needs an account and a key. Because every vector store in LangChain has the same interface, only the lines that create the store change.
+The in-memory store disappears when the notebook closes. For your project the milestone names **Chroma**, which saves its data in a folder. The course slides use **Pinecone**, a hosted database that needs an account and a key. Because every vector store in LangChain has the same interface, only the lines that create the store change.
 
 ```python-note
 # Chroma: stored in a local folder.   pip install langchain-chroma
@@ -299,7 +299,7 @@ from langchain_pinecone import PineconeVectorStore
 vector_store = PineconeVectorStore.from_documents(chunks, embeddings, index_name="test")
 ```
 
-> **Note: the Pinecone lines of the 2024 script no longer run.** The script begins with `pinecone.init(api_key=..., environment=...)`. The current Pinecone library has removed that function and stops with an error that asks you to create a `Pinecone` object. The import `from langchain.vectorstores import Pinecone` has gone as well; the class is now `PineconeVectorStore` in the package `langchain-pinecone`. The Chroma lines above were run for this lesson. The Pinecone lines follow the current interface but were not run, because they need an account.
+> **Note: what was tested.** The Chroma lines above were run for this lesson. The Pinecone lines follow the current interface of `langchain-pinecone` but were not run, because they need an account.
 
 ## 8. Step 5: Retrieve and Generate
 
