@@ -419,3 +419,31 @@ abbr[data-tip]:focus-visible { outline: 2px solid var(--accent); outline-offset:
 .lesson-content blockquote.box-terms { background: #f1eefb; border-left-color: #6b56c2; }
 .lesson-content blockquote.box-terms .box-tag { color: #4d3c9a; }
 .lesson-content blockquote.box code { overflow-wrap: anywhere; }
+
+/* Week 3 figure: one padded sentence from the input end (IDs, mask) to the output end (predictions compared with labels) */
+.lp-wrap { overflow-x: auto; padding: 14px 10px 8px; }
+.lp { display: inline-block; text-align: left; font-size: .78rem; }
+.lp-row { display: flex; align-items: stretch; gap: 3px; margin-bottom: 5px; }
+.lp-name { width: 104px; flex: none; font-weight: 700; display: flex; align-items: center; cursor: help; }
+.lp-c { width: 44px; min-height: 30px; flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 4px; font-variant-numeric: tabular-nums; cursor: help; line-height: 1.15; }
+.lp-c small { font-size: .58rem; font-weight: 400; opacity: .95; }
+.lp-tok { background: #f3f5f8; border: 1px solid #d5dae1; font-family: var(--mono); font-size: .66rem; color: #1b1f24; }
+.lp-tok.lp-pad { color: #8a929c; border-style: dashed; }
+.lp-id { background: #f7941d; color: #fff; font-size: .66rem; }
+.lp-id.lp-pad { background: #d3d6da; color: #3c434b; }
+.lp-m1 { background: #5aa9de; color: #fff; }
+.lp-m0 { background: #c9302c; color: #fff; }
+.lp-pred { background: #6b56c2; color: #fff; font-weight: 700; }
+.lp-pred.lp-ign { background: #e4e0f4; color: #8f86b8; font-weight: 400; }
+.lp-lab { background: #2e8b57; color: #fff; font-weight: 700; }
+.lp-skip { background: #fff; border: 1.5px dashed #9aa3ad; color: #6b7480; font-size: .7rem; }
+.lp-skip.lp-new { border-color: #c9302c; color: #a02622; background: #fdeeee; }
+.lp-cmp { min-height: 22px; font-size: .82rem; font-weight: 700; }
+.lp-cmp-ok { color: #1f6b41; } .lp-cmp-bad { color: #fff; background: #c9302c; } .lp-cmp-skip { color: #9aa3ad; font-size: .62rem; font-weight: 400; }
+.lp-band { margin: 7px 0 5px 107px; width: 608px; font-size: .72rem; color: #5b6470; text-align: center; }
+.lp-band-model { background: #1e3a5f; color: #fff; border-radius: 6px; padding: 7px 0; font-weight: 700; font-size: .76rem; margin-top: 8px; }
+.lp-band-cmp { color: #a02622; }
+.lp-brace { display: flex; gap: 3px; margin-left: 107px; font-size: .68rem; color: #5b6470; }
+.lp-brace span { border-top: 2px solid #9aa3ad; padding-top: 3px; text-align: center; }
+.lp-brace span:first-child { width: 467px; }
+.lp-brace span:last-child { width: 138px; border-top-color: #c9302c; color: #a02622; }
