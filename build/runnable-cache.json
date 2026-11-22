@@ -2713,5 +2713,813 @@
 "setup": "",
 "reason": ""
 }
+],
+"e93f92c167ab1e23ed1b907cb6595565dd933728dff7b2addc618bbbff95828a": [
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'llm' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'ChatPromptTemplate' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'translate_chain' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'parser' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'parser' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'ChatPromptTemplate' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'ChatPromptTemplate' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'ChatPromptTemplate' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'RecursiveCharacterTextSplitter' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'vector_store' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'llm' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'rag_chain' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'RunnablePassthrough' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'tablet' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'db' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+}
+],
+"1e92938912e45ed5eec92f44f309127d6a5ffd90d36babde5f9faeccf479f328": [
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'llm' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'ChatPromptTemplate' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'translate_chain' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'parser' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'parser' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'ChatPromptTemplate' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'ChatPromptTemplate' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'RecursiveCharacterTextSplitter' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'vector_store' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'llm' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'rag_chain' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'RunnablePassthrough' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'tablet' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'db' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+}
+],
+"665f7e53a237dc27c3f06f464d35fa4895d86fccd3f2bc088feafca34324f7f4": [
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'llm' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'ChatPromptTemplate' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'translate_chain' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'parser' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'parser' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'ChatPromptTemplate' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'ChatPromptTemplate' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'RecursiveCharacterTextSplitter' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'vector_store' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'llm' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'rag_chain' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'RunnablePassthrough' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'tablet' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'db' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+}
+],
+"f8181e6ac57ddb6eb0af04986b56d16bbbec69d29d4729bc67eb86c4dcdb6c40": [
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'llm' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'ChatPromptTemplate' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'translate_chain' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'parser' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'parser' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'ChatPromptTemplate' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'ChatPromptTemplate' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'RecursiveCharacterTextSplitter' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'vector_store' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'llm' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'rag_chain' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'RunnablePassthrough' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'tablet' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": true,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": "NameError: name 'db' is not defined"
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+},
+{
+"run": false,
+"setup": "",
+"reason": ""
+}
 ]
 }

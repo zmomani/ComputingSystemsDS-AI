@@ -1,202 +1,552 @@
 ---
 week: 4
-title: LangChain Fundamentals
-source: https://albanna-tutorials.com/langchain.html
+title: LangChain: Prompts, Chains and Routing
+source: Dr. Abdulkarim Albanna's LangChain slides (Days 4 and 5); the LangChain v1 documentation (docs.langchain.com)
 ---
-# LangChain Fundamentals
+# LangChain: Prompts, Chains and Routing
 
+*From one call to a model, to a program built around it.* Level: intermediate · about 75 minutes · LangChain 1.x, Hugging Face Transformers. The lesson follows the order of the course slides on LangChain and uses the current LangChain documentation for all code.
 
-## Welcome to LangChain Python
+## What You'll Learn
 
-A framework for developing applications powered by large language models (LLMs).
+By the end of this part you will be able to:
 
-Official documentation: https://python.langchain.com/
+- Say what LangChain is, and name the packages it is divided into today
+- Load a chat model that runs inside Google Colab without an API key
+- Write a prompt template and fill it with values
+- Join a prompt, a model and an output parser into a chain with the pipe operator `|`
+- Turn a model's free text into a checked Python object
+- Build a sequential chain, with one or with several inputs and outputs
+- Route a question to the prompt that suits it
+- Read LangChain code written in 2023–2024 and rewrite it for the current library
 
-## The LangChain Framework
+**Goal:** five small working programs (a translator, an email assistant, a review analyser, a two-step code generator and a subject router), which are the building blocks of the agents in your project.
 
-LangChain simplifies every stage of the LLM application lifecycle, from development to productionization to deployment.
+**Prerequisites:** [Week 2](week02-text-classification.html) and [Week 3](week03-ner.html). You should be comfortable with Python dictionaries and functions, and with loading a model from the Hugging Face Hub.
 
-![LangChain Framework Diagram](https://raw.githubusercontent.com/langchain-ai/langchain/v0.3/docs/static/svg/langchain_stack_062024.svg)
+### Abbreviations used in this lesson
 
-*Figure: the LangChain stack — open-source libraries (langchain-core, langchain, langchain-community, LangGraph) at the base, LangSmith for productionization, and LangGraph Cloud / LangServe for deployment.*
+| Abbreviation | Stands for | In one line |
+|---|---|---|
+| LLM | Large Language Model | A model that continues or answers text |
+| API | Application Programming Interface | The way one program asks another for a service; here, a model that runs on a company's servers |
+| LCEL | LangChain Expression Language | The notation that joins components with `|` |
+| JSON | JavaScript Object Notation | A text format for structured data: `{"key": value}` |
+| RAG | Retrieval-Augmented Generation | Finding relevant text first and giving it to the model with the question; the subject of the second part of this week |
+| GPU, CPU | Graphics / Central Processing Unit | A language model answers much faster on a GPU |
 
-## Development
+## 1. What is LangChain?
 
-Build your applications using LangChain's open-source building blocks, components, and third-party integrations.
+A language model does one thing: it receives text and returns text. An application needs more than that. It must build the text that goes in, call the model, check what comes out, and often fetch documents or call other programs on the way. **LangChain** is an open-source Python framework for writing this surrounding program. It gives every kind of component (a prompt, a model, a parser, a document loader, a vector store) a standard interface, so that components can be joined together and exchanged for one another.
 
-### Building Blocks (LCEL)
+The practical benefit is exchange. In this lesson you will write each program once, with a small model that runs in Colab. If you later change one line to use a hosted model from OpenAI or Google, the remainder of the program stays as it is.
 
-Create composable chains with LangChain Expression Language, providing flexibility and reusability.
+<figure class="fig wide"><img src="../assets/img/langchain-components.png" alt="Six components around the LangChain logo: memory, prompt templates, indexes, LLMs, chains and agents, each with a short description"><figcaption>The six kinds of component in LangChain. Figure from Dr. Albanna's course slides.</figcaption></figure>
 
-Reference: https://python.langchain.com/docs/concepts/#langchain-expression-language-lcel
+> **Note: two names in this figure have changed.** The figure uses the vocabulary of 2023. What it calls **Indexes** is now described as *retrieval*: document loaders, text splitters, embedding models, vector stores and retrievers, which are the subject of the second part of this week. What it calls **LLMs** are now mostly **chat models**. If you look for an "Indexes" page in the current documentation, you will not find one.
 
-### LangGraph
+This week covers four of the six components: prompt templates, models and chains in this part, and retrieval in the next. Agents are the subject of Weeks 5 and 9, and memory is treated in Week 5 with LangGraph.
 
-Build stateful agents with first-class streaming and human-in-the-loop support for complex applications.
+### The packages
 
-Reference: https://python.langchain.com/docs/concepts/#langgraph
+LangChain is installed as several packages. Knowing which package holds what makes the import lines in this lesson readable.
 
-## Productionization
+| Package | What it holds | Used in this lesson for |
+|---|---|---|
+| `langchain-core` | The basic interfaces: prompts, messages, output parsers, and the pipe operator | Almost every example |
+| `langchain` | Agents and helpers for choosing a model (`create_agent`, `init_chat_model`) | The optional hosted model |
+| `langchain-huggingface`, `langchain-openai`, … | One package per provider | The local chat model and the embedding model |
+| `langchain-text-splitters` | Text splitters | Part 2 |
+| `langchain-community` | Integrations maintained by the community, among them most document loaders | Part 2 |
+| `langchain-classic` | The older chain classes, kept so that old programs still run | Reading 2024 code |
+| `langgraph` | Graphs of steps with state, loops and memory | Week 5 |
 
-Use LangSmith to inspect, monitor and evaluate your chains, so that you can continuously optimize and deploy with confidence.
+> **Careful: most LangChain code on the internet is written for an older version.** LangChain 1.0 moved the classes that older tutorials are built on (`LLMChain`, `SimpleSequentialChain`, `MultiPromptChain` and others) out of the `langchain` package and into `langchain-classic`. A line such as `from langchain.chains import LLMChain` now fails with `ModuleNotFoundError: No module named 'langchain.chains'`. The course slides were written in January 2024, so each section of this lesson shows the slide's code beside its current form. The ideas are the same; the notation is shorter.
 
-### LangSmith
+## 2. A Chat Model Without an API Key
 
-A developer platform that lets you debug, test, evaluate, and monitor LLM applications.
+The slides call OpenAI's models, which need an account, a key and payment. In this lesson the default model is **Qwen2.5-1.5B-Instruct**, an open model with about 1.5 billion parameters, published under the Apache 2.0 licence. It runs inside your own Colab session, so no registration is needed, and it understands Arabic as well as English.
 
-Reference: https://docs.smith.langchain.com/
+Before you run the cell, choose **Runtime → Change runtime type → T4 GPU**. The code also works on a CPU, but each answer then takes far longer.
 
-## Deployment
+```python
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
+from langchain_huggingface import ChatHuggingFace, HuggingFacePipeline
 
-Turn your LangGraph applications into production-ready APIs and Assistants with LangGraph Cloud.
+MODEL_ID = "Qwen/Qwen2.5-1.5B-Instruct"
 
-### LangGraph Cloud
+tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
+model = AutoModelForCausalLM.from_pretrained(MODEL_ID)
+if torch.cuda.is_available():
+    model = model.half().to("cuda")          # half precision on the GPU: less memory, faster
 
-Deploy your LangGraph applications as production-ready APIs and Assistants.
+generator = pipeline("text-generation", model=model, tokenizer=tokenizer,
+                     max_new_tokens=300, do_sample=False, return_full_text=False)
+llm = ChatHuggingFace(llm=HuggingFacePipeline(pipeline=generator))
 
-Reference: https://langchain-ai.github.io/langgraph/cloud/
+print("Running on:", "GPU" if torch.cuda.is_available() else "CPU")
+print(llm.invoke("In one sentence, what is LangChain?").content)
+```
 
-## LangChain Libraries
+```code-notes
+from_pretrained @2 :: Downloads the model's weights the first time (about 3 GB) and loads them into memory.
+max_new_tokens=300 :: The longest reply the model may write, in tokens. A longer reply is cut off at this length.
+do_sample=False :: Always choose the most probable next token, so the same question gives the same answer every time.
+return_full_text=False :: Return only the new text, without repeating the prompt.
+ChatHuggingFace :: Wraps the Hugging Face pipeline so that LangChain can use it like any other chat model.
+llm.invoke :: Send one input to the model and wait for the whole reply.
+```
 
-The framework consists of the following open-source libraries:
+The first run downloads the model, so allow a few minutes. The last line is your first LangChain call: `invoke` sends an input and returns a message object, whose text is in `.content`.
 
-| Library | Role |
+> **Terms: LLM and chat model.** An **LLM** in the older sense receives one string and continues it. A **chat model** receives a list of *messages*, each with a role, and returns one message. The roles are **system** (instructions for the whole conversation), **human** (what the user says) and **AI** (what the model replies). Almost every current model is a chat model, and LangChain's current interfaces are built for them. The variable is still named `llm` here, as in the slides and in most tutorials.
+
+> **Note: what a small model can and cannot do.** A model of this size translates, summarises, rewrites and answers from a given text reasonably well. It is weaker than a large hosted model at following strict output formats, at long reasoning, and at writing longer programs. When an example in this lesson gives a poor answer, read the prompt that was sent before you conclude that the code is wrong: Section 3 shows how.
+
+### Optional: a hosted model instead
+
+If you have a key for a hosted model, two lines replace the local model, and every later example works unchanged. This is the exchange that Section 1 promised. The cell does nothing until you change `False` to `True`, so the notebook runs without a key.
+
+```python
+USE_HOSTED_MODEL = False          # change to True only if you have an API key
+
+if USE_HOSTED_MODEL:
+    # The key is read from Colab's Secrets panel (the key icon in the left bar), under the name OPENAI_API_KEY.
+    # Model names change often: take a current name from the provider's own list.
+    from langchain.chat_models import init_chat_model
+    llm = init_chat_model("openai:gpt-4o-mini", temperature=0)
+```
+
+`init_chat_model` takes a string of the form `provider:model`. For Google's models the string begins with `google_genai:`, the package to install is `langchain-google-genai`, and the key is named `GOOGLE_API_KEY`.
+
+## 3. Prompts
+
+A **prompt** is the input that is passed to the model. The slides put it this way: prompts are the new way to program models. In an application the prompt is almost never a fixed sentence. It has a fixed part, written by the developer, and places for values that arrive at run time: the user's text, a language, a retrieved document. A **prompt template** holds the fixed part and names the places.
+
+The first use case in the slides is a translation app: the user chooses a language, types a sentence and receives the translation.
+
+<figure class="fig"><img src="../assets/img/app-translation.png" alt="A web form titled Translation: a language selector set to Arabic, an English sentence, a Send button, and the Arabic translation below"><figcaption>The translation app from the course slides. Its whole logic is one prompt template with two placeholders. Screenshot from Dr. Albanna's course slides.</figcaption></figure>
+
+```python
+from langchain_core.prompts import ChatPromptTemplate
+
+translate_prompt = ChatPromptTemplate.from_messages([
+    ("system", "You are a translator. Translate the user's text into {language}. Reply with the translation only."),
+    ("human", "{text}"),
+])
+
+messages = translate_prompt.format_messages(
+    language="Arabic",
+    text="Abdulkarim Albanna is from Jordan and works at the University of Petra.",
+)
+for m in messages:
+    print(f"{m.type}: {m.content}")
+print("Input variables:", translate_prompt.input_variables)
+```
+
+This cell does not call the model. It prints the messages that *would* be sent:
+
+```text
+system: You are a translator. Translate the user's text into Arabic. Reply with the translation only.
+human: Abdulkarim Albanna is from Jordan and works at the University of Petra.
+Input variables: ['language', 'text']
+```
+
+The template found the two placeholders, `{language}` and `{text}`, by itself. Now send the messages to the model:
+
+```python
+reply = llm.invoke(messages)
+print(reply.content)
+```
+
+> **Tip: when a result is poor, print the prompt.** `format_messages` shows exactly what the model receives. Most problems in an LLM application are visible there: a placeholder that was filled with the wrong value, an instruction that is ambiguous, or a document that was never inserted.
+
+> **Careful: a literal brace must be doubled.** The template treats everything between `{` and `}` as a placeholder. To show the model a real brace, for example in a JSON example, write `{{` and `}}`. A single brace gives a `KeyError` or an error about a missing variable.
+
+### The email assistant
+
+The second use case answers a customer's email in the customer's language. Only the system message changes; the code has the same shape. The template is reusable: the same object serves every email and every language.
+
+<figure class="fig"><img src="../assets/img/app-email-reply.png" alt="A web form titled Customer Email response: a short Arabic email from a customer, and below it a longer polite reply in Arabic"><figcaption>The customer email app from the course slides, with an Arabic email and the generated reply. Screenshot from Dr. Albanna's course slides.</figcaption></figure>
+
+```python
+email_prompt = ChatPromptTemplate.from_messages([
+    ("system", "You work in customer service for a software company. Write a short, polite reply "
+               "to the customer's email. Write the reply in {language}."),
+    ("human", "{email}"),
+])
+
+messages = email_prompt.format_messages(
+    language="Arabic",
+    email="اسمي عبدالكريم البنا، أود أن أسأل عن خدمات الشركة للمطورين.",
+)
+print(llm.invoke(messages).content)
+```
+
+## 4. Chains and the Pipe Operator
+
+In Section 3 two steps were written by hand: fill the template, then call the model. A **chain** joins such steps so that the output of each becomes the input of the next. In current LangChain a chain is written with the pipe operator `|`, a notation called the LangChain Expression Language (<abbr data-tip="LangChain Expression Language: the notation that joins components with |" tabindex="0">LCEL</abbr>).
+
+<figure class="fig wide"><img src="../assets/img/lcel-chains.svg" alt="Three diagrams. First: input, prompt template, chat model, output parser, output, joined by arrows. Second: an HTML chain whose output, code, is the input of a Python chain. Third: a dictionary that gains the key code and then the key explanation"><figcaption>The three chain shapes of this lesson: a single chain (this section), a sequential chain, and a chain with several inputs and outputs (Section 6).</figcaption></figure>
+
+```python
+from langchain_core.output_parsers import StrOutputParser
+
+translate_chain = translate_prompt | llm | StrOutputParser()
+
+print(translate_chain.invoke({"language": "French", "text": "Good morning, how are you?"}))
+```
+
+Read the first line from left to right. The dictionary given to `invoke` goes into the prompt template, which produces messages. The messages go into the model, which produces a message. That message goes into `StrOutputParser`, which keeps its text. The chain as a whole receives a dictionary and returns a string.
+
+Every chain has the same three methods, whatever it contains:
+
+```python
+# batch: several inputs in one call
+results = translate_chain.batch([
+    {"language": "German", "text": "Where is the library?"},
+    {"language": "Spanish", "text": "Where is the library?"},
+])
+print(results)
+
+# stream: receive the reply piece by piece, as a chat window shows it
+for piece in translate_chain.stream({"language": "Arabic", "text": "The lecture starts at ten."}):
+    print(piece, end="", flush=True)
+```
+
+> **Terms: Runnable.** Anything that can stand on either side of `|` is called a **Runnable**: a prompt template, a model, a parser, a retriever, or a whole chain. All of them offer `invoke`, `batch` and `stream`. Because a chain is itself a Runnable, chains can be joined into larger chains, which is what Sections 6 and 7 do.
+
+### The same chain in the 2024 notation
+
+The slides define this chain with the class `LLMChain`: "an LLMChain consists of a PromptTemplate, a model and an optional output parser. It takes input variables, uses the PromptTemplate to format them into a prompt, passes the prompt to the model, and uses the output parser, if one is given, to parse the output." That description still fits exactly; only the way of writing it has changed.
+
+```python-note
+# 2024 (course slides). Today this needs:  pip install langchain-classic
+from langchain_classic.chains import LLMChain
+
+translate_chain_2024 = LLMChain(llm=llm, prompt=translate_prompt)
+translate_chain_2024.run(language="French", text="Good morning, how are you?")
+
+# Current: the same three parts, joined with |
+translate_chain = translate_prompt | llm | StrOutputParser()
+translate_chain.invoke({"language": "French", "text": "Good morning, how are you?"})
+```
+
+## 5. Structured Output
+
+The third use case in the slides reads a customer review and extracts three facts from it: whether the item was a gift, how many days the delivery took, and what the customer said about the price. A program that receives this answer cannot work with a paragraph. It needs a Python object with three fields.
+
+<figure class="fig"><img src="../assets/img/app-review-extraction.png" alt="A web form titled Customer review: an Arabic review, and below it a JSON object with the keys gift, delivery_days and price_value"><figcaption>The review app from the course slides: free text goes in and a JSON object with three keys comes out. Screenshot from Dr. Albanna's course slides.</figcaption></figure>
+
+The method has three steps: describe the object you want, tell the model to answer in that form, and parse the answer. The description is a **Pydantic** class, which is a Python class whose fields have types that are checked.
+
+```python
+from pydantic import BaseModel, Field
+from langchain_core.output_parsers import PydanticOutputParser
+
+class Review(BaseModel):
+    gift: bool = Field(description="Was the item bought as a gift for someone else?")
+    delivery_days: int = Field(description="Number of days the delivery took; -1 if the review does not say")
+    price_value: list[str] = Field(description="Sentences or phrases about the price or the value of the item")
+
+parser = PydanticOutputParser(pydantic_object=Review)
+```
+
+The parser does two jobs. The first is to write the instruction for the model. Print it:
+
+```python
+print(parser.get_format_instructions())
+```
+
+The output is a paragraph that asks for JSON and gives the schema of the three fields, built from the class above. The second job is to turn the model's reply into a `Review` object. You can try that without the model:
+
+```python
+review = parser.parse('{"gift": true, "delivery_days": 5, "price_value": ["بسعر ٢٠ دينار"]}')
+print(review)
+print(review.delivery_days + 1)      # a real integer, not the text "5"
+```
+
+```text
+gift=True delivery_days=5 price_value=['بسعر ٢٠ دينار']
+6
+```
+
+Now build the chain. The format instructions are a value that never changes, so they are fixed in the template once, with `partial`.
+
+```python
+review_prompt = ChatPromptTemplate.from_messages([
+    ("system", "Extract information from the customer review.\n{format_instructions}"),
+    ("human", "{review}"),
+]).partial(format_instructions=parser.get_format_instructions())
+
+review_chain = review_prompt | llm | parser
+
+from langchain_core.exceptions import OutputParserException
+
+try:
+    result = review_chain.invoke({"review": "اشتريت هدية لصديقي أحمد بسعر ٢٠ دينار، واستغرق التوصيل أكثر من ٥ أيام."})
+    print(result)
+    print("Gift?", result.gift, "| Days:", result.delivery_days)
+except OutputParserException as error:
+    print("The model's reply did not fit the Review class:\n", error)
+```
+
+The review says: "I bought a gift for my friend Ahmad for 20 dinars, and the delivery took more than 5 days."
+
+> **Careful: the parser checks the answer; it does not force it.** The instruction asks the model for JSON, and a small model does not always obey. It may add a sentence before the JSON or leave a field out. The parser then raises an `OutputParserException` whose message shows the text that the model wrote, and the cell above catches it and prints it. This is the correct behaviour: a program should notice a malformed answer, not continue with wrong data. To see the raw reply on its own, run the chain without its last step: `(review_prompt | llm | StrOutputParser()).invoke(...)`.
+
+### With a hosted model: `with_structured_output`
+
+Large hosted models have a built-in way of returning structured data, and the current documentation recommends it. The model is given the class directly; no format instructions and no parser are needed.
+
+```python-note
+# Works with hosted chat models (OpenAI, Google, Anthropic and others)
+structured_llm = llm.with_structured_output(Review)
+result = structured_llm.invoke("I bought it as a gift for my friend. It arrived after 5 days and was worth the 20 dinars.")
+```
+
+> **Note: why this lesson uses the parser.** The local Hugging Face wrapper does not support this method for a Pydantic class: the call raises `NotImplementedError`. The parser method works with every model, because it relies only on text going in and text coming out. It is also the method of the course slides, so nothing is lost by learning it first.
+
+## 6. Sequential Chains
+
+A **sequential chain** runs chains one after another: the output of one is the input of the next. The slides distinguish two kinds, one with a single input and output, and one with several.
+
+The example from the slides has two steps. The first model call writes an HTML page for a small program that teaches children programming. The second receives that HTML, converts it into Python and explains it.
+
+```python
+html_prompt = ChatPromptTemplate.from_template(
+    "You are a web developer. Write a short HTML page for a program that teaches children "
+    "programming. The program is: {name}. Reply with the HTML code only."
+)
+python_prompt = ChatPromptTemplate.from_template(
+    "You are a Python developer. Convert the following HTML page into a short Python program "
+    "that does the same job, then explain the program in three sentences.\n\n{code}"
+)
+
+html_chain = html_prompt | llm | StrOutputParser()
+python_chain = python_prompt | llm | StrOutputParser()
+
+overall_chain = {"code": html_chain} | python_chain
+
+print(overall_chain.invoke({"name": "add two numbers"}))
+```
+
+The line that joins the two chains is `{"code": html_chain} | python_chain`. A dictionary on the left of `|` means: run each value, and put the result under its key. Here `html_chain` runs, and its output becomes the value of `code`, which is the placeholder that `python_prompt` expects.
+
+This chain makes two model calls, each of up to 300 tokens, so it is the slowest example of the lesson. On a CPU it can take a few minutes.
+
+### Several inputs and outputs
+
+The chain above returns only the final text; the HTML is lost on the way. To keep every intermediate result, let each step *add* a key to one dictionary, with `RunnablePassthrough.assign`.
+
+```python
+from langchain_core.runnables import RunnablePassthrough
+
+full_chain = (
+    RunnablePassthrough.assign(code=html_chain)
+    | RunnablePassthrough.assign(explanation=python_chain)
+)
+
+result = full_chain.invoke({"name": "add two numbers"})
+print(result.keys())
+print(result["code"][:300])
+```
+
+`result` is a dictionary with three keys: `name`, which you supplied, and `code` and `explanation`, which the two steps added. A later step can use any of them: a third prompt could contain both `{name}` and `{code}`.
+
+### The same chains in the 2024 notation
+
+This is the script from the course, shortened. On the current libraries it stops at its first line.
+
+```python-note
+# 2024 (course slides)
+from langchain.llms import OpenAI                       # ModuleNotFoundError today
+from langchain.chains import LLMChain                   # ModuleNotFoundError today
+from langchain.chains import SimpleSequentialChain      # ModuleNotFoundError today
+
+llm = OpenAI(temperature=.7)
+html_chain = LLMChain(llm=llm, prompt=html_prompt)
+python_chain = LLMChain(llm=llm, prompt=python_prompt)
+overall_chain = SimpleSequentialChain(chains=[html_chain, python_chain], verbose=True)
+python_code = overall_chain.run("add two numbers")
+```
+
+| 2024 | Current |
 |---|---|
-| **langchain-core** | Base abstractions and LangChain Expression Language that form the foundation of LangChain. |
-| **langchain-community** | Third party integrations enabling connections to external services and tools. |
-| **langchain** | Chains, agents, and retrieval strategies that make up an application's cognitive architecture. |
-| **LangGraph** | Build robust and stateful multi-actor applications with LLMs by modeling steps as edges and nodes in a graph. |
-| **LangServe** | Deploy LangChain chains as REST APIs for easy integration with other services. |
-| **LangSmith** | A developer platform that lets you debug, test, evaluate, and monitor LLM applications. |
+| `from langchain.llms import OpenAI` | A chat model from a provider package, or `init_chat_model(...)` |
+| `LLMChain(llm=llm, prompt=prompt)` | `prompt | llm | StrOutputParser()` |
+| `SimpleSequentialChain(chains=[a, b])` | `{"code": a} | b` |
+| `SequentialChain(...)` with `output_key` and `input_variables` | `RunnablePassthrough.assign(code=a) | RunnablePassthrough.assign(explanation=b)` |
+| `chain.run("add two numbers")` | `chain.invoke({"name": "add two numbers"})` |
 
-> Note: these docs focus on the Python LangChain library. For the JavaScript version see https://js.langchain.com/.
+## 7. Routing
 
-## Tutorials
+Sometimes one prompt cannot serve every input. A physics question is answered best by a prompt that speaks as a physics teacher, and a history question by another. **Routing** means sending each input to the chain that suits it. The slides build this with a class named `RouterChain`, in nine steps.
 
-If you're looking to build something specific or are more of a hands-on learner, check out our tutorials section.
+<figure class="fig wide"><img src="../assets/img/router-chain.svg" alt="A question enters a router chain, which replies with one subject. Arrows lead to five prompts: physics, math, history, computer science and a default. All five lead to the chat model, which writes the answer"><figcaption>Routing. The model is called twice: once to name the subject, and once to answer with the prompt chosen for that subject.</figcaption></figure>
 
-### Build a Simple LLM Application
+The current form needs three pieces: the destination prompts, a small chain that names the subject, and a function that picks the prompt.
 
-Learn how to create a basic application powered by large language models.
-https://python.langchain.com/docs/tutorials/llm_chain/
+```python
+teacher = {
+    "physics": "You are a physics professor. Explain concisely and name the law or principle involved.",
+    "math": "You are a mathematician. Break the problem into steps and solve them in order.",
+    "history": "You are a historian. Give dates and causes, and say how certain the evidence is.",
+    "computer science": "You are a computer scientist. Explain the idea, then give its time and space cost.",
+}
+subject_prompts = {
+    subject: ChatPromptTemplate.from_messages([("system", instruction), ("human", "{input}")])
+    for subject, instruction in teacher.items()
+}
+default_prompt = ChatPromptTemplate.from_messages([("human", "{input}")])
 
-### Build a Chatbot
+router_prompt = ChatPromptTemplate.from_template(
+    "Which subject does this question belong to? Choose one of: physics, math, history, "
+    "computer science, other. Reply with the subject only.\n\nQuestion: {input}"
+)
+router_chain = router_prompt | llm | StrOutputParser()
 
-Create your own conversational AI assistant using LangChain's components.
-https://python.langchain.com/docs/tutorials/chatbot/
+print(router_chain.invoke({"input": "What is black body radiation?"}))
+```
 
-### Build an Agent
+The last line tests the router alone. It should print one subject. Now the function that turns that word into a prompt, and the whole chain:
 
-Develop intelligent agents that can perform tasks and make decisions autonomously.
-https://python.langchain.com/docs/tutorials/agents/
+```python
+from langchain_core.runnables import RunnableLambda
 
-### Introduction to LangGraph
+def pick_prompt(info):
+    subject = info["subject"].strip().lower()
+    for name, prompt in subject_prompts.items():
+        if name in subject:
+            return prompt
+    return default_prompt                      # no subject matched
 
-Learn how to use LangGraph to build stateful, multi-actor applications with LLMs.
-https://langchain-ai.github.io/langgraph/tutorials/introduction/
+routed_chain = (
+    RunnablePassthrough.assign(subject=router_chain)
+    | RunnableLambda(pick_prompt)
+    | llm
+    | StrOutputParser()
+)
 
-All tutorials: https://python.langchain.com/docs/tutorials/
+for question in ["What is black body radiation?",
+                 "What are greedy algorithms?",
+                 "What should I cook for dinner?"]:
+    print("Q:", question)
+    print("A:", routed_chain.invoke({"input": question}), "\n")
+```
 
-## Guides & Reference
+Follow one question through the chain. `assign` adds the key `subject` to the dictionary, using the router. `pick_prompt` receives the dictionary and returns one of the prompt templates. When a function inside a chain returns a Runnable, LangChain runs that Runnable on the same input, so the chosen prompt is filled with the question. The model then answers.
 
-### How-to guides
+> **Careful: the router's reply is text, and text is untidy.** The model may reply `Physics`, `physics.` or `The subject is physics`. The function therefore lowers the case and tests whether a subject name occurs *in* the reply, where an exact comparison would fail. The third question matches no subject and falls through to the default prompt. Always give a router a default.
 
-Short answers to "How do I….?" types of questions. These guides help you quickly accomplish common tasks.
-https://python.langchain.com/docs/how_to/ — LangGraph how-tos: https://langchain-ai.github.io/langgraph/how-tos/
+The nine steps of the slides map onto this code as follows.
 
-### Conceptual guide
+| Slides (2024) | Current code |
+|---|---|
+| Steps 1–2: prompt templates with a name and a description, then one `LLMChain` per template in `destination_chains` | The dictionary `subject_prompts` |
+| Step 3: a default chain | `default_prompt` |
+| Steps 4–5: `MULTI_PROMPT_ROUTER_TEMPLATE`, `RouterOutputParser`, `LLMRouterChain` | `router_prompt` and `router_chain` |
+| Steps 7–8: `MultiPromptChain(router_chain, destination_chains, default_chain)` | `pick_prompt` and `routed_chain` |
+| Step 9: `chain.run("What is greedy algorithms?")` | `routed_chain.invoke({"input": ...})` |
 
-Introductions to all the key parts of LangChain you'll need to know! High level explanations of all LangChain concepts.
-https://python.langchain.com/docs/concepts/ — LangGraph concepts: https://langchain-ai.github.io/langgraph/concepts/
+In Week 5 the same idea returns in LangGraph, where the function that chooses the next step is called a *conditional edge*.
 
-### API reference
+## 8. From the Lesson to Your Project
 
-Full documentation of all classes and methods in the LangChain Python packages.
-https://python.langchain.com/api_reference/
+The project milestone for this week asks for a prompt template for each agent. The patterns of this part are the ones you need: a system message that states the agent's role (Section 3), a Pydantic class wherever another agent or program must read the result (Section 5), and a router wherever the pipeline has to choose a path (Section 7). The requirements themselves are on the [project page](project.html).
 
-## Additional Resources
+## 9. Check Your Understanding
 
-- **LangSmith** — Trace and evaluate your language model applications and intelligent agents to help you move from prototype to production. https://docs.smith.langchain.com/
-- **LangGraph** — Build stateful, multi-actor applications with LLMs. Integrates smoothly with LangChain, but can be used without it. https://langchain-ai.github.io/langgraph
-- **Versions** — See what changed in v0.3, learn how to migrate legacy code, read up on versioning policies, and more. https://python.langchain.com/docs/versions/v0_3/
-- **Security** — Read up on security best practices to make sure you're developing safely with LangChain. https://python.langchain.com/docs/security/
-- **Integrations** — LangChain is part of a rich ecosystem of tools that integrate with our framework and build on top of it. https://python.langchain.com/docs/integrations/providers/
-- **Contributing** — Check out the developer's guide for guidelines on contributing and help getting your dev environment set up. https://python.langchain.com/docs/contributing/
+<details markdown="1">
+<summary>1. What are the three parts of the simplest chain, and what does each one receive and return?</summary>
 
-## Quick Links
+A prompt template receives a dictionary and returns messages. A chat model receives messages and returns one message. An output parser receives that message and returns a Python value, in the simplest case a string.
+</details>
 
-- LangChain docs: https://python.langchain.com/
-- Tutorials: https://python.langchain.com/docs/tutorials/
-- How-to guides: https://python.langchain.com/docs/how_to/
-- Concepts: https://python.langchain.com/docs/concepts/
-- API reference: https://python.langchain.com/api_reference/
-- GitHub: https://github.com/langchain-ai/langchain
+<details markdown="1">
+<summary>2. A tutorial from 2023 begins with <code>from langchain.chains import LLMChain</code>. What happens when you run it today, and what are your two options?</summary>
 
-## Key concepts worth simulating
+It fails with `ModuleNotFoundError`, because that class was moved out of the `langchain` package. One option is to install `langchain-classic` and import the class from `langchain_classic.chains`. The other, which is the better one for new code, is to rewrite the chain as `prompt | llm | StrOutputParser()`.
+</details>
 
-- **The LLM application lifecycle as three stages**: Development (building blocks) → Productionization (LangSmith traces/evals) → Deployment (LangGraph Cloud / LangServe API). Animate an app moving through the stages, with the relevant library lighting up at each stage.
-- **The library stack diagram**: langchain-core at the base; langchain and langchain-community on top; LangGraph beside them; LangSmith and LangServe/LangGraph Cloud as the outer layers. Let the student click each box to see what it provides and which imports come from it (`from langchain_core...`, `from langchain_community...`).
-- **LCEL pipe composition**: prompt template → chat model → output parser as a pipeline built with `|`; show a user dict entering on the left, the rendered prompt, the raw AIMessage, then the parsed string exiting on the right.
-- **Chains vs agents**: a linear chain where the path is fixed, versus an agent where the LLM chooses a tool at run time; a toggle that re-routes the same question through both.
-- **Prompt variable substitution**: a template with `{topic}` placeholders filling in live as the student types into input fields.
-- **Tracing in LangSmith**: a nested run tree (chain → prompt → llm → parser) with latency and token counts per span, to motivate "productionization".
+<details markdown="1">
+<summary>3. Your template contains a JSON example, and filling it raises an error about a missing variable. Why?</summary>
+
+The braces of the JSON example are read as placeholders. Literal braces in a template must be doubled: `{{` and `}}`.
+</details>
+
+<details markdown="1">
+<summary>4. What are the two jobs of <code>PydanticOutputParser</code>?</summary>
+
+It writes the format instructions that are placed in the prompt, and it converts the model's reply into an object of the given class, raising an error if the reply does not fit.
+</details>
+
+<details markdown="1">
+<summary>5. The review chain raises <code>OutputParserException</code>. Is the code wrong? What do you do first?</summary>
+
+Not necessarily. The exception means that the model's reply was not valid JSON for the class. Look at the raw reply first, by running the chain without the parser. Then make the instruction stricter, shorten the review, or use a stronger model.
+</details>
+
+<details markdown="1">
+<summary>6. What is the difference between <code>{"code": html_chain} | python_chain</code> and the version with <code>RunnablePassthrough.assign</code>?</summary>
+
+Both run the two chains in order. The first returns only the final text. The second returns a dictionary that still contains the original input and every intermediate result.
+</details>
+
+<details markdown="1">
+<summary>7. How many times is the model called for one question in the routed chain, and why does the router need a default?</summary>
+
+Twice: once to name the subject and once to answer. The default is needed because some questions belong to none of the listed subjects, and because the router's reply is free text that may match nothing.
+</details>
+
+## 10. Summary and Further Reading
+
+**What you learned:** LangChain gives prompts, models and parsers one interface, so that they can be joined with `|` and exchanged for one another. A prompt template separates the fixed instruction from the values that arrive at run time. An output parser turns free text into a checked object. Chains can be placed in sequence, can carry a dictionary that grows at each step, and can choose their next step from the model's own reply. The class names of 2024 have gone; the ideas behind them are unchanged.
+
+**Further reading**
+
+- LangChain documentation: https://docs.langchain.com/oss/python/langchain/overview
+- LangChain v1 migration guide (what moved to `langchain-classic`): https://docs.langchain.com/oss/python/migrate/langchain-v1
+- Chat models in LangChain: https://docs.langchain.com/oss/python/langchain/models
+- Structured output: https://docs.langchain.com/oss/python/langchain/structured-output
+- Hugging Face chat models in LangChain: https://docs.langchain.com/oss/python/integrations/chat/huggingface
+- Qwen2.5-1.5B-Instruct, the model used in this lesson: https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct
+
+**Figure credits.** The components figure and the three app screenshots come from Dr. Abdulkarim Albanna's course slides. The chain and routing diagrams were drawn for this lesson.
 
 ## Test code
 
-```python
-# 1. Verify installation and call a chat model directly
-# pip install langchain langchain-core langchain-openai
-import os
-from langchain_openai import ChatOpenAI
-from langchain_core.messages import HumanMessage
-
-os.environ["OPENAI_API_KEY"] = "your-api-key-here"
-
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
-print(llm.invoke([HumanMessage(content="In one sentence, what is LangChain?")]).content)
-```
+### A chain without a model: see what each step produces
 
 ```python
-# 2. A minimal LCEL chain: prompt template -> LLM -> output parser
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.messages import AIMessage
+from langchain_core.runnables import RunnableLambda
 from langchain_core.output_parsers import StrOutputParser
-from langchain_openai import ChatOpenAI
-
-prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are a concise tutor for a data-science course."),
-    ("human", "Explain {topic} in two sentences."),
-])
-chain = prompt | ChatOpenAI(model="gpt-4o-mini", temperature=0) | StrOutputParser()
-
-print(chain.invoke({"topic": "LangChain Expression Language"}))
-```
-
-```python
-# 3. Inspect the pieces of a chain without an API key
-from langchain_core.prompts import ChatPromptTemplate
 
 prompt = ChatPromptTemplate.from_messages([
     ("system", "You are a helpful assistant."),
     ("human", "Summarize {text} for a {audience}."),
 ])
-messages = prompt.format_messages(text="the LangChain stack", audience="first-year student")
-for m in messages:
-    print(f"{m.type}: {m.content}")
-print("Input variables:", prompt.input_variables)
+echo_model = RunnableLambda(lambda p: AIMessage(content=f"(the model received {len(p.to_messages())} messages)"))
+
+chain = prompt | echo_model | StrOutputParser()
+print(prompt.input_variables)
+print(chain.invoke({"text": "the LangChain packages", "audience": "first-year student"}))
 ```
 
-```python
-# 4. Stream tokens from a chain (streaming is first-class in LCEL)
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
-from langchain_openai import ChatOpenAI
+### Parse a model's JSON reply into a checked object
 
-chain = (
-    ChatPromptTemplate.from_template("List three uses of {tool} as bullet points.")
-    | ChatOpenAI(model="gpt-4o-mini")
-    | StrOutputParser()
-)
-for chunk in chain.stream({"tool": "LangSmith"}):
-    print(chunk, end="", flush=True)
-print()
+```python
+from pydantic import BaseModel, Field
+from langchain_core.output_parsers import PydanticOutputParser
+
+class Source(BaseModel):
+    title: str = Field(description="Title of the source")
+    year: int = Field(description="Year of publication")
+    relevant: bool = Field(description="Is the source relevant to the research topic?")
+
+parser = PydanticOutputParser(pydantic_object=Source)
+print(parser.parse('{"title": "Attention Is All You Need", "year": 2017, "relevant": true}'))
 ```
