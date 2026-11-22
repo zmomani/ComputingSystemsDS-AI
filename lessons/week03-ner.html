@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="../assets/vendor/codemirror/material-darker.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
-<link rel="stylesheet" href="../assets/css/site.css?v=1a88630d">
+<link rel="stylesheet" href="../assets/css/site.css?v=84579475">
 </head>
 <body><header class="topbar">
   <a class="brand" href="../index.html">
@@ -162,6 +162,7 @@
 
 <p>Each highlighted span is one entity, and the small label after it is its type. This sentence has three entities, although it has ten words.</p>
 <p>Two things make this harder than it looks. An entity can span several words, so the model must find where it starts and where it ends. And the same word can belong to different types depending on its context: <em>Petra</em> is a location when it means the ancient city and part of an organisation in <em>University of Petra</em>.</p>
+<blockquote class="box box-note"><p><span class="box-tag">Note</span><strong>NER is a task, not a model.</strong> NER names the problem: text goes in, labelled spans come out. Several kinds of system can solve it: hand-written rules and lists of names, earlier neural networks, a pre-trained encoder fine-tuned on labelled sentences (this lesson, and Chapter 4 of the textbook), a ready-made library such as spaCy, or a large language model that is asked to list the entities. They differ in how they work, not in what they deliver.</p></blockquote>
 <p><strong>Where NER is used</strong></p>
 <ul>
 <li><strong>Structured data from text:</strong> turn a collection of documents into a table of who, where and which organisation.</li>
@@ -175,8 +176,7 @@
 <h2 id="2-the-iob2-tagging-scheme">2. The IOB2 Tagging Scheme</h2>
 <p>A classifier outputs one label per item, but an entity is a <em>span</em> of several items. The <abbr data-tip="Inside, Outside, Beginning, version 2: B- starts an entity, I- continues it, O is outside any entity" tabindex="0">IOB2</abbr> scheme solves this by giving every word a tag that says both the entity type and the position of the word inside the entity.</p>
 <blockquote>
-<p><strong>What the name means.</strong> IOB stands for <strong>I</strong>nside, <strong>O</strong>utside, <strong>B</strong>eginning, the three kinds of tag. The scheme is often called <abbr data-tip="Beginning, Inside, Outside: another name for the IOB2 tagging scheme" tabindex="0">BIO</abbr>, which is the same three letters in a different order. The <strong>2</strong> marks the second version of the scheme, in which <em>every</em> entity starts with a <code>B-</code> tag. In the original version, <code>B-</code> was used only when an entity came directly after another entity of the same type.</p>
-</blockquote>
+<p><strong>What the name means.</strong> IOB stands for <strong>I</strong>nside, <strong>O</strong>utside, <strong>B</strong>eginning, the three kinds of tag. The scheme is often called <abbr data-tip="Beginning, Inside, Outside: another name for the IOB2 tagging scheme" tabindex="0">BIO</abbr>, which is the same three letters in a different order. The <strong>2</strong> marks the second version of the scheme, in which <em>every</em> entity starts with a <code>B-</code> tag. In the original version, <code>B-</code> was used only when an entity came directly after another entity of the same type.</p></blockquote>
 <p>The three kinds of tag are:</p>
 <ul>
 <li><strong><code>B-XXX</code></strong>: the word <strong>b</strong>egins an entity of type XXX.</li>
@@ -217,15 +217,16 @@
 </table>
 <p><strong>Why a separate B- tag is needed.</strong> Without it, two entities of the same type that stand next to each other would merge into one. In <em>"He visited Amman Irbid and Aqaba"</em>, the tags <code>B-LOC B-LOC O B-LOC</code> keep Amman and Irbid apart; with only <code>LOC LOC O LOC</code> they would read as a single place called "Amman Irbid".</p>
 <p><strong>How many classes?</strong> With <em>k</em> entity types there are <span class="arithmatex">\(2k + 1\)</span> tags: a B- and an I- tag for each type, plus <code>O</code>. For <abbr data-tip="Person" tabindex="0">PER</abbr>, <abbr data-tip="Organisation" tabindex="0">ORG</abbr> and <abbr data-tip="Location" tabindex="0">LOC</abbr> that gives seven classes: <code>O, B-PER, I-PER, B-ORG, I-ORG, B-LOC, I-LOC</code>.</p>
+<blockquote class="box box-note"><p><span class="box-tag">Note</span><strong>Three entity types is a choice made by the dataset.</strong> PAN-X, the dataset behind this lesson, labels three types, which gives seven classes. Other datasets differ: CoNLL-2003 has four types (it adds MISC for nationalities, events and products), so nine classes; OntoNotes 5 has eighteen types, among them dates, times, money and percentages, so 37 classes. A model can only output the types it was trained with. A model trained on PER, ORG and LOC will never return a date.</p></blockquote>
 <p><strong>Valid sequences.</strong> An <code>I-XXX</code> tag must follow a <code>B-XXX</code> or <code>I-XXX</code> tag of the same type. A sequence such as <code>O I-ORG</code> is not valid IOB2, although a model can still produce it, because each word is classified separately.</p>
+<blockquote class="box box-tip"><p><span class="box-tag">Tip</span><strong>Punctuation is tagged like any other word.</strong> In NER data every punctuation mark is a token of its own with its own tag. Outside an entity it is <code>O</code>: in <em>"He visited Amman, Irbid and Aqaba."</em> the comma and the full stop are both <code>O</code>. Inside a name it belongs to the entity: <em>Washington , D.C.</em> is <code>B-LOC I-LOC I-LOC</code>, and <em>Procter &amp; Gamble</em> is <code>B-ORG I-ORG I-ORG</code>. There is no special rule; the model learns the difference from context. This also explains the example above: in ordinary writing a comma, tagged <code>O</code>, would separate Amman from Irbid. Two entities touch with nothing between them mostly in headlines, addresses, tables and transcripts of speech, and there the B- tag is what keeps them apart.</p></blockquote>
 <p><strong>Animation: tagging a sentence.</strong> Step through the sentence one token at a time and watch each word receive its <code>B-</code>, <code>I-</code> or <code>O</code> tag. Stop when the whole sentence is tagged; the last two steps of the animation, spans and scoring, belong to Section 7.</p>
 <div class="sim-inline"><button class="sim-chip" data-display="bio-tagging"><span class="sim-chip-kind">NER</span>▶ Display: NER: BIO tags &amp; entity-level F1</button></div>
 
 <h3 id="mini-challenge-tag-by-hand">Mini-challenge: tag by hand</h3>
 <p>Write the IOB2 tags for this sentence, then check your answer.</p>
 <blockquote>
-<p>Lina Haddad works for Orange Jordan in Irbid.</p>
-</blockquote>
+<p>Lina Haddad works for Orange Jordan in Irbid.</p></blockquote>
 <details>
 <summary>Show the answer</summary>
 <p><code>B-PER I-PER O O B-ORG I-ORG O B-LOC O</code> — nine tags, because the final full stop is a token as well and it is tagged <code>O</code>.</p>
@@ -235,6 +236,7 @@
 <figure class="fig"><img src="../assets/img/ner-sequence-classification.png" alt="A transformer encoder produces one hidden state per token; only the hidden state of the CLS token goes through a linear layer to give one label, Positive"><figcaption>Sequence classification (Week 2): one label for the whole input, taken from the <code>[CLS]</code> position. Figure from the companion repository of Tunstall et al. (2022), Apache 2.0 licence.</figcaption></figure>
 
 <p><abbr data-tip="Named Entity Recognition: finding names in text and labelling each with a type" tabindex="0">NER</abbr> uses the same encoder and almost the same head. The difference is that <strong>every</strong> hidden state goes through the linear layer, so the model produces one tag per token. This is why NER is called a <strong>token classification</strong> task.</p>
+<blockquote class="box box-careful"><p><span class="box-tag">Common confusion</span><strong>The models in these two pictures do not fill in blanks.</strong> A pre-trained BERT can only predict hidden words, and it is fair to ask how such a model classifies anything. The answer is that its word-predicting part is removed. Pre-trained BERT is a body with a <em>fill-in-the-blank head</em> on top. For a new task that head is thrown away and a different one is attached to the same body: a sequence head in the first picture, a token head in the second. Nothing that generates words is left in either. What is kept is the body, which turns every token into a vector that describes the token in its context. Guessing hidden words was only the exercise that forced the body to learn good vectors.</p></blockquote>
 <figure class="fig"><img src="../assets/img/ner-token-classification.png" alt="The same encoder, but the hidden state of every token goes through the linear layer, giving the tags B-PER, IGN, I-PER, O, B-LOC, I-LOC"><figcaption>Token classification: the same linear layer is applied to every token's hidden state. <code>IGN</code> marks a subword that is ignored, explained in Section 6. Figure from the companion repository of Tunstall et al. (2022), Apache 2.0 licence.</figcaption></figure>
 
 <table>
@@ -285,6 +287,41 @@ class TokenClassificationHead(nn.Module):
     def forward(self, hidden_states):            # [batch, tokens, hidden_size]
         return self.classifier(self.dropout(hidden_states))   # [batch, tokens, num_labels]</code></pre></div>
 <p>When a body is loaded with a new head, the body starts from its pre-trained weights and the head starts from random values. Before fine-tuning, such a model outputs meaningless tags. Fine-tuning on labelled sentences is what makes the head useful, exactly as in Week 2.</p>
+<blockquote class="box box-careful"><p><span class="box-tag">Common confusion</span><strong>Nothing is masked when a model is trained for NER.</strong> Masking belongs to pre-training, where the text has no labels: a word is hidden so that the hidden word can serve as the correct answer. In NER the correct answers are already in the data, written by people, so nothing needs to be hidden. The model sees the complete sentence and predicts a tag for every token, and each prediction is compared with the given tag. The label <code>-100</code> of Section 6 is not a mask either: it only tells the loss to skip a position when scoring.</p></blockquote>
+<blockquote class="box box-note"><p><span class="box-tag">Note</span><strong>Every token is labelled separately, and all of them in one pass.</strong> An encoder reads the whole sentence at once; it never produced one word at a time, which is how decoder models such as GPT work. The head is then applied to each token's vector on its own, with the same weights each time: the calculation for <em>Albanna</em> does not look at the vector of <em>Petra</em>. The context is not lost, because self-attention in the body has already put it into each vector. The price of this independence is the invalid sequence mentioned in Section 2, such as <code>O I-ORG</code>: nothing in the head checks the neighbouring tags.</p></blockquote>
+<blockquote class="box box-note"><p><span class="box-tag">Note</span><strong>The head's linear layer is not "the FFN".</strong> The head is one fully connected layer, 768 inputs to 7 outputs, with no hidden layer and no activation function. The <em>feed-forward network</em> (FFN) of a transformer is something else: a block inside every layer of the body, with two linear layers and an activation between them (768 → 3072 → 768). Both are feed-forward in the broad sense, but "the FFN" refers to the block in the body. With a single linear layer the head can only draw flat boundaries between the classes, which is enough because the body has already separated them.</p></blockquote>
+<blockquote class="box box-terms"><p><span class="box-tag">Terms</span><strong>Transfer learning, pre-training, fine-tuning.</strong> These are often used as if they meant the same thing. They nest inside one another.</p>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Transfer learning</td>
+<td>The general idea: reuse what a model learned on one task for another task.</td>
+</tr>
+<tr>
+<td>Pre-training</td>
+<td>The first stage: the model learns general knowledge from a very large amount of text, usually unlabelled. Done once, by the model's creators.</td>
+</tr>
+<tr>
+<td>Feature extraction</td>
+<td>One way of doing the second stage: the body is frozen and only a new head or classifier is trained (Week 2, Sections 4 and 5).</td>
+</tr>
+<tr>
+<td>Fine-tuning</td>
+<td>Another way of doing the second stage: body and head are both trained further on labelled examples of the task. Used without qualification, it means <strong>all</strong> the weights are trained. This is what Week 3 does.</td>
+</tr>
+<tr>
+<td>Parameter-efficient fine-tuning</td>
+<td>A third way, common for large language models: the original weights stay frozen and a small number of added weights are trained (LoRA, adapters).</td>
+</tr>
+</tbody>
+</table>
+<p>So fine-tuning is always transfer learning, but transfer learning is not always fine-tuning.</p></blockquote>
 <h2 id="4-a-first-ner-system">4. A First NER System</h2>
 <p>Fine-tuning a model of this size needs a <abbr data-tip="Graphics Processing Unit: the hardware that makes training fast" tabindex="0">GPU</abbr>, so in this lesson you start from a model that is already fine-tuned: the checkpoint the textbook authors trained in Chapter 4 and published on the Hugging Face Hub. Section 8 shows how it was made.</p>
 <p>The <code>pipeline</code> function wraps the three steps (tokenise, run the model, turn tag scores back into entities) into one call:</p>
@@ -316,6 +353,7 @@ for s in sentences:
     for e in ner(s):
         print(f&quot;   {e[&#x27;entity_group&#x27;]:4} {e[&#x27;word&#x27;]!r:32} score={e[&#x27;score&#x27;]:.2f}&quot;)</code></pre></div>
 <p>The first run downloads the model (about 1 GB), so allow a minute or two.</p>
+<blockquote class="box box-note"><p><span class="box-tag">Note</span><strong>What you have just loaded.</strong> The name of the checkpoint describes it. <code>xlm-roberta-base</code> is XLM-R, a model pre-trained on text in 100 languages; Section 5 explains it. <code>panx</code> is PAN-X, the dataset of labelled sentences on which it was fine-tuned; Section 8 shows how. <code>all</code> means the four languages of that fine-tuning together: German, French, Italian and English.</p></blockquote>
 <p><strong>What <code>aggregation_strategy="simple"</code> does.</strong> The model predicts a tag for every subword token. Without aggregation, the pipeline returns those raw pieces one by one. With <code>"simple"</code>, it merges neighbouring tokens that belong to the same entity and returns whole spans with their type, their text, a confidence score, and their character positions (<code>start</code>, <code>end</code>) in the original string.</p>
 <p><strong>One model, three languages.</strong> The same model handled English, German and Arabic. It was fine-tuned on German, French, Italian and English only, so the Arabic sentence is a first look at <em>cross-lingual transfer</em>, the subject of Section 9. Check its Arabic answer carefully; you will measure how reliable it is later in the lesson.</p>
 <h3 id="mini-challenge-break-it">Mini-challenge: break it</h3>
@@ -326,12 +364,14 @@ for s in sentences:
 <li>A sentence that mixes two languages (code-switching): <code>"The meeting is in عمّان next week with Dr. Khalid"</code>.</li>
 </ol>
 <h2 id="5-multilingual-transformers">5. Multilingual Transformers</h2>
+<p>Section 4 used one model for three languages. This section explains what kind of model can do that.</p>
 <p>A model such as <abbr data-tip="Distilled BERT: the smaller, faster BERT used in Week 2" tabindex="0">DistilBERT</abbr> was pre-trained on English text only. For other languages there are two options: find a model pre-trained on that language, or use one model pre-trained on many languages at once. The second option is attractive when your documents are in several languages, because maintaining one model is far easier than maintaining one per language.</p>
 <ul>
 <li><strong><abbr data-tip="Multilingual BERT: BERT pre-trained on Wikipedia in many languages" tabindex="0">mBERT</abbr></strong> (multilingual <abbr data-tip="Bidirectional Encoder Representations from Transformers" tabindex="0">BERT</abbr>) was one of the first. It has the architecture and the pre-training objective of BERT, with Wikipedia articles in many languages as its pre-training corpus.</li>
 <li><strong><abbr data-tip="Cross-lingual Language Model + RoBERTa: RoBERTa pre-trained on 100 languages" tabindex="0">XLM-RoBERTa</abbr> (<abbr data-tip="XLM-RoBERTa: RoBERTa pre-trained on 100 languages; the model used in this lesson" tabindex="0">XLM-R</abbr>)</strong> replaced it as the usual choice. The name joins two earlier models: <abbr data-tip="Cross-lingual Language Model: an earlier family of multilingual models" tabindex="0">XLM</abbr>, the <em>cross-lingual language model</em>, and <abbr data-tip="Robustly Optimized BERT Pretraining Approach: BERT with an improved pre-training recipe" tabindex="0">RoBERTa</abbr>, a <em>robustly optimized BERT pretraining approach</em>, which is BERT trained with an improved recipe. XLM-R is pre-trained with masked language modelling (<abbr data-tip="Masked Language Modelling: pre-training by hiding words and predicting them" tabindex="0">MLM</abbr>) only: words are hidden and the model learns to predict them. Its text covers 100 languages. Its corpus is far larger than mBERT's: Wikipedia plus 2.5 terabytes of web text from Common Crawl. The extra data matters most for languages with little Wikipedia content.</li>
 </ul>
 <p>A multilingual model receives no signal telling it which language it is reading. Even so, the representations it learns generalise across languages: after fine-tuning on one language it can often perform the task on another. This is <strong>zero-shot cross-lingual transfer</strong>. It also makes such models suitable for <strong>code-switching</strong>, where a speaker mixes languages inside one conversation or one sentence, as many Arabic speakers do with English.</p>
+<blockquote class="box box-terms"><p><span class="box-tag">Terms</span><strong>Zero-shot.</strong> A "shot" is an example of the task, and zero-shot means that none was supplied for the case at hand. In <strong>zero-shot cross-lingual transfer</strong> a model is fine-tuned with labelled sentences in one language and then used on another language for which it has seen no labelled sentence at all. You will meet the same word for prompts: a <strong>zero-shot prompt</strong> gives a large language model an instruction and no worked example, and a <strong>few-shot prompt</strong> adds a handful of examples. The difference lies in where the examples would go. Here they would go into the training data and change the weights; in a prompt they sit in the input and the weights do not change.</p></blockquote>
 <h3 id="a-closer-look-at-tokenisation">A closer look at tokenisation</h3>
 <p>One tokeniser must serve 100 languages, including languages that do not separate words with spaces. XLM-R therefore uses <strong>SentencePiece</strong> instead of BERT's WordPiece, with a vocabulary of about 250,000 tokens, several times larger than that of a monolingual model.</p>
 <p>Tokenisation is itself a pipeline of four steps:</p>
@@ -343,6 +383,8 @@ for s in sentences:
 <li><strong>The tokeniser model</strong> splits each unit into subwords from the learned vocabulary. WordPiece, <abbr data-tip="Byte-Pair Encoding: a subword algorithm that repeatedly merges the most frequent pair of symbols" tabindex="0">BPE</abbr> (Byte-Pair Encoding) and Unigram are three algorithms for this. This is the only step that is trained on data.</li>
 <li><strong>Post-processing</strong> adds the special tokens, such as <abbr data-tip="Classification token: BERT&#x27;s special token at the start of every input" tabindex="0"><code>[CLS]</code></abbr> and <abbr data-tip="Separator token: BERT&#x27;s special token at the end of a sequence" tabindex="0"><code>[SEP]</code></abbr> (<em>separator</em>) for BERT, or <abbr data-tip="Start of sequence: XLM-R&#x27;s special token, with the role of [CLS]" tabindex="0"><code>&lt;s&gt;</code></abbr> and <abbr data-tip="End of sequence: XLM-R&#x27;s special token, with the role of [SEP]" tabindex="0"><code>&lt;/s&gt;</code></abbr> (start and end of sequence) for XLM-R.</li>
 </ol>
+<blockquote class="box box-careful"><p><span class="box-tag">Common confusion</span><strong>Lowercasing helps some tasks and harms NER.</strong> Models with "uncased" in their name, such as the <code>distilbert-base-uncased</code> of Week 2, turn all text into lower case. That keeps the vocabulary small, and for a task like emotion classification capital letters carry almost no information. For NER a capital letter is one of the strongest clues that a word is a name, so NER models normally keep the original case: XLM-R does, and the comparison below uses <code>bert-base-cased</code>. This is also why the lower-case sentence in the Section 4 challenge is hard for this model. It learned to rely on capitals, and they are missing.</p></blockquote>
+<blockquote class="box box-terms"><p><span class="box-tag">Terms</span><strong>Subword and WordPiece are not the same thing.</strong> <em>Subword</em> is the general word for a token that is smaller than a word and larger than a character, and for the approach as a whole. <em>WordPiece</em> is one particular algorithm for building a subword vocabulary, the one used by BERT and DistilBERT. BPE (GPT, RoBERTa) and Unigram, as implemented in SentencePiece (XLM-R, T5), are other algorithms of the same kind. Every WordPiece token is a subword; not every subword tokeniser is WordPiece.</p></blockquote>
 <p>Compare the two tokenisers on the same sentence:</p>
 <div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week03-ner.ipynb#scrollTo=week03-ner-006" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="transformers" title="Needs transformers — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from transformers import AutoTokenizer
 
@@ -577,8 +619,9 @@ for lang in [&quot;de&quot;, &quot;en&quot;, &quot;ar&quot;]:
 <p><code>predict_tags</code> applies the convention of Section 6 in the other direction: the model predicts a tag for every token, and only the prediction at the first subword of each word is kept.</p>
 <p>German and English were in the model's training data. Arabic was not, so its score is a zero-shot result. Compare the three F1 values, and compare the entity types within each language. A sample of 200 sentences gives a rough estimate; raise <code>n</code> for a steadier one.</p>
 <h2 id="8-how-the-model-was-fine-tuned">8. How the Model Was Fine-Tuned</h2>
-<p>You have used the checkpoint; this section shows how it was produced. The code is for reading. Fine-tuning <abbr data-tip="XLM-RoBERTa: RoBERTa pre-trained on 100 languages; the model used in this lesson" tabindex="0">XLM-R</abbr> on thousands of sentences takes minutes on a <abbr data-tip="Graphics Processing Unit: the hardware that makes training fast" tabindex="0">GPU</abbr> and hours on the <abbr data-tip="Central Processing Unit: the ordinary processor of a computer" tabindex="0">CPU</abbr> of a codespace, which is why the lesson starts from the published result.</p>
+<p>You have used the checkpoint; this section shows how it was produced. The code is for reading. Fine-tuning <abbr data-tip="XLM-RoBERTa: RoBERTa pre-trained on 100 languages; the model used in this lesson" tabindex="0">XLM-R</abbr> on thousands of sentences takes minutes on a <abbr data-tip="Graphics Processing Unit: the hardware that makes training fast" tabindex="0">GPU</abbr> and hours on the <abbr data-tip="Central Processing Unit: the ordinary processor of a computer" tabindex="0">CPU</abbr> alone, which is why the lesson starts from the published result.</p>
 <p><strong>Fine-tuning in one paragraph.</strong> The model starts as the pre-trained XLM-R body with a new, randomly initialised token classification head. It is shown labelled sentences in small batches. For each batch it predicts a tag for every token, the cross-entropy loss measures how far those predictions are from the gold tags at every position that is not labelled <code>-100</code>, and backpropagation adjusts <strong>all</strong> the weights, body and head, by a small step. Repeating this over the whole training set a few times (each pass is an <em>epoch</em>) turns a general language model into an <abbr data-tip="Named Entity Recognition: finding names in text and labelling each with a type" tabindex="0">NER</abbr> tagger. After every epoch the model is scored on the validation set, which it never trains on, to check that it is improving on unseen sentences.</p>
+<blockquote class="box box-tip"><p><span class="box-tag">Tip</span><strong>Nothing has to be "unfrozen".</strong> A model loaded with <code>AutoModelForTokenClassification.from_pretrained(...)</code> has all of its weights trainable from the start; you would have to freeze layers on purpose to get anything else. What protects the pre-trained knowledge is a gentle training: a very small learning rate (the <code>Trainer</code> default, 5e-5) and only three epochs. The body is nudged towards the task, not relearned. The head, which starts from random values, changes the most.</p></blockquote>
 <p><strong>Animation: which weights change.</strong> Switch between feature extraction, fine-tuning and training from scratch. The fine-tuning mode is the one used here: every weight is trainable, the body moves a little from its pre-trained values, and the new head moves a lot.</p>
 <div class="sim-inline"><button class="sim-chip" data-display="finetune"><span class="sim-chip-kind">Transfer learning</span>▶ Display: Frozen vs fine-tuned weights</button></div>
 
@@ -732,9 +775,8 @@ trainer.train()</code></pre></div>
 </tr>
 </tbody>
 </table>
-<blockquote>
-<p><strong>Note: spaCy and the project page.</strong> The <a href="project.html">project page</a> names another tool for this component: <strong>spaCy</strong>, a free Python library with ready-made language pipelines. A spaCy pipeline splits a text into words and marks its named entities in one call, with no training on your side, and its English pipelines label dates as well as people, organisations and places. It is a quick way to get a working extractor. This lesson uses a transformer instead, so that you can see how such a tool works inside. For what the NER Agent must produce, and the tools you may use, the project page is the reference.</p>
-</blockquote>
+<blockquote class="box box-note"><p><span class="box-tag">Note</span><strong>About spaCy and the project page.</strong> The <a href="project.html">project page</a> names another tool for this component: <strong>spaCy</strong>, a free Python library with ready-made language pipelines. A spaCy pipeline splits a text into words and marks its named entities in one call, with no training on your side, and its English pipelines label dates as well as people, organisations and places. It is a quick way to get a working extractor. This lesson uses a transformer instead, so that you can see how such a tool works inside. For what the NER Agent must produce, and the tools you may use, the project page is the reference.</p></blockquote>
+<blockquote class="box box-tip"><p><span class="box-tag">Tip</span><strong>Two routes for your NER Agent, and where the examples go.</strong> The project page allows a trained NER model or "LLM extraction with structured output". With a <strong>fine-tuned model</strong>, as in this lesson, the examples are in the training data: thousands of labelled sentences shaped the weights, the entity types are fixed, and the model is small and fast. With a <strong>large language model</strong>, the examples, if there are any, are in the prompt: you write an instruction (zero-shot) or add a few worked examples (few-shot), no training takes place, and you may ask for any entity type, dates and technologies included. Be ready to say which route your team chose and why.</p></blockquote>
 <p>The two rule-based extractors are plain Python:</p>
 <div class="runnable"><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden>import re
 

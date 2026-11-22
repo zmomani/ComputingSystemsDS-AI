@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="../assets/vendor/codemirror/material-darker.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
-<link rel="stylesheet" href="../assets/css/site.css?v=1a88630d">
+<link rel="stylesheet" href="../assets/css/site.css?v=84579475">
 </head>
 <body><header class="topbar">
   <a class="brand" href="../index.html">
@@ -76,8 +76,7 @@
 <li><strong>Edges</strong> — connections that control the flow, including conditional routes and cycles.</li>
 </ul>
 <blockquote>
-<p><strong>Key insight:</strong> the edge from the <em>tools</em> node back to the <em>agent</em> node is what sets LangGraph apart. The agent can call tools repeatedly until it has enough information. This is the ReAct (Reason + Act) pattern.</p>
-</blockquote>
+<p><strong>Key insight:</strong> the edge from the <em>tools</em> node back to the <em>agent</em> node is what sets LangGraph apart. The agent can call tools repeatedly until it has enough information. This is the ReAct (Reason + Act) pattern.</p></blockquote>
 <p><strong>When to use LangGraph:</strong> ReAct-style tool-using agents, multi-agent systems, workflows with human approval steps, state that persists across conversations, and pipelines with branching and error handling.</p>
 <p><strong>Where the tutorial ends:</strong> a multi-agent research assistant with tools, conditional routing, memory, and human-in-the-loop support.</p>
 <h2 id="step-2-installation-setup">Step 2: Installation &amp; Setup</h2>
@@ -116,8 +115,7 @@ load_dotenv()  # reads from .env file in project root
 # Option 3: Tavily for web search (used in later steps)
 os.environ[&quot;TAVILY_API_KEY&quot;] = &quot;tvly-your-key-here&quot;</code></pre></div>
 <blockquote>
-<p><strong>Security warning:</strong> never hardcode API keys in source code. Keep them in environment variables or a <code>.env</code> file that is excluded from version control.</p>
-</blockquote>
+<p><strong>Security warning:</strong> never hardcode API keys in source code. Keep them in environment variables or a <code>.env</code> file that is excluded from version control.</p></blockquote>
 <h3 id="project-structure">Project Structure</h3>
 <div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">langgraph-tutorial/
 ├── .env                  # API keys (add to .gitignore!)
@@ -196,8 +194,7 @@ response = llm.invoke([HumanMessage(content=&quot;Say &#x27;LangGraph is ready!&
 print(response.content)
 # Expected output: LangGraph is ready!</code></pre></div>
 <blockquote>
-<p><strong>Checkpoint:</strong> if you get a valid response from the LLM, your environment is ready.</p>
-</blockquote>
+<p><strong>Checkpoint:</strong> if you get a valid response from the LLM, your environment is ready.</p></blockquote>
 <h2 id="step-3-core-concepts-state">Step 3: Core Concepts – State</h2>
 <p><strong>State</strong> is the central data structure of a LangGraph application. Every node receives the full state and returns only the parts it changed; LangGraph merges those partial updates.</p>
 <h3 id="defining-state-with-typeddict">Defining State with TypedDict</h3>
@@ -241,8 +238,7 @@ class AgentState(TypedDict):
 # Usage: your nodes just return {&quot;messages&quot;: [new_message]}
 # and it gets appended to the conversation history.</code></pre></div>
 <blockquote>
-<p><strong>Why MessagesState?</strong> Chat history should grow by appending, never by overwriting.</p>
-</blockquote>
+<p><strong>Why MessagesState?</strong> Chat history should grow by appending, never by overwriting.</p></blockquote>
 <h3 id="custom-state-with-annotated-types-and-reducers">Custom State with Annotated Types and Reducers</h3>
 <p><code>Annotated</code> types attach a <strong>reducer</strong> that controls how updates merge. A reducer takes the current value and the update and returns the new value.</p>
 <div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week05-langgraph.ipynb#scrollTo=week05-langg-014" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core, langgraph" title="Needs langchain_core, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from typing import TypedDict, Annotated
@@ -363,8 +359,7 @@ def add_ten(state: CounterState) -&gt; dict:
 # After double_it: {&quot;value&quot;: 10, &quot;history&quot;: [&quot;doubled to 10&quot;]}
 # After add_ten:   {&quot;value&quot;: 20, &quot;history&quot;: [&quot;doubled to 10&quot;, &quot;added 10 to get 20&quot;]}</code></pre></div>
 <blockquote>
-<p><strong>Key takeaway:</strong> state design is the most important decision in a LangGraph application; it determines how data moves through the whole system.</p>
-</blockquote>
+<p><strong>Key takeaway:</strong> state design is the most important decision in a LangGraph application; it determines how data moves through the whole system.</p></blockquote>
 <h2 id="step-4-core-concepts-nodes">Step 4: Core Concepts – Nodes</h2>
 <p><strong>Nodes</strong> are plain Python functions. Each takes the current state, performs an operation, and returns a partial update.</p>
 <h3 id="node-signature">Node Signature</h3>
@@ -562,8 +557,7 @@ graph.add_node(&quot;summarize&quot;, summarize_text)
 # Node names are used when defining edges (next step!)</code></pre></div>
 <blockquote>
 <p><strong>Common mistake:</strong> node names must be unique. Adding a second node with the same name raises a <code>ValueError</code> ("Node <code>analyze</code> already present").</p>
-<p><strong>Key takeaway:</strong> a node can do almost anything — call an LLM, run a tool, hit an API. It only has to accept state and return a partial state.</p>
-</blockquote>
+<p><strong>Key takeaway:</strong> a node can do almost anything — call an LLM, run a tool, hit an API. It only has to accept state and return a partial state.</p></blockquote>
 <h2 id="step-5-core-concepts-edges">Step 5: Core Concepts – Edges</h2>
 <p><strong>Edges</strong> decide which node runs next. LangGraph supports normal edges, conditional edges, and the special entry/finish points.</p>
 <h3 id="normal-edges">Normal Edges</h3>
@@ -791,8 +785,7 @@ print(result[&quot;messages&quot;][-1].content)</code></pre></div>
 <li><strong>Invoking</strong> — runs the graph on an initial state and returns the final state.</li>
 </ul>
 <blockquote>
-<p><strong>That's it!</strong> The five-part pattern — LLM, node, graph, compile, invoke — applies to every LangGraph project.</p>
-</blockquote>
+<p><strong>That's it!</strong> The five-part pattern — LLM, node, graph, compile, invoke — applies to every LangGraph project.</p></blockquote>
 <h3 id="interactive-chat-loop">Interactive Chat Loop</h3>
 <div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week05-langgraph.ipynb#scrollTo=week05-langg-036" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core, langchain_openai, langgraph" title="Needs langchain_core, langchain_openai, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import MessagesState
@@ -858,8 +851,7 @@ while True:
     ai_message = result[&quot;messages&quot;][-1]
     print(f&quot;\nBot: {ai_message.content}&quot;)</code></pre></div>
 <blockquote>
-<p><strong>No memory yet:</strong> the chatbot forgets earlier messages between <code>invoke()</code> calls because each call starts fresh. Step 9 adds memory through checkpointing.</p>
-</blockquote>
+<p><strong>No memory yet:</strong> the chatbot forgets earlier messages between <code>invoke()</code> calls because each call starts fresh. Step 9 adds memory through checkpointing.</p></blockquote>
 <h3 id="streaming-output">Streaming Output</h3>
 <div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week05-langgraph.ipynb#scrollTo=week05-langg-038" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># Stream events from the graph
 for event in graph.stream(
@@ -1107,8 +1099,7 @@ for msg in result[&quot;messages&quot;]:
     if hasattr(msg, &quot;tool_calls&quot;) and msg.tool_calls:
         print(f&quot;  Tool calls: {[tc[&#x27;name&#x27;] for tc in msg.tool_calls]}&quot;)</code></pre></div>
 <blockquote>
-<p><strong>How it works:</strong> the LLM reads the user message and chooses which tools to call. <code>ToolNode</code> runs them, the results go back to the LLM, and the LLM writes a final answer that combines them.</p>
-</blockquote>
+<p><strong>How it works:</strong> the LLM reads the user message and chooses which tools to call. <code>ToolNode</code> runs them, the results go back to the LLM, and the LLM writes a final answer that combines them.</p></blockquote>
 <h2 id="step-8-conditional-routing-cycles">Step 8: Conditional Routing &amp; Cycles</h2>
 <p>The <strong>ReAct</strong> pattern (Reason + Act) is a loop between an agent node and a tools node. The agent:</p>
 <ol>
@@ -1149,9 +1140,7 @@ def should_continue(state: MessagesState) -&gt; Literal[&quot;tools&quot;, &quot
 
     # Otherwise, the LLM is done -- go to END
     return &quot;__end__&quot;</code></pre></div>
-<blockquote>
-<p><strong>Note:</strong> <code>"__end__"</code> is the internal name for the END node. You can use the <code>END</code> constant in a path map instead, and the prebuilt <code>tools_condition</code> does the same job as this custom <code>should_continue</code>.</p>
-</blockquote>
+<blockquote class="box box-note"><p><span class="box-tag">Note</span><strong></strong> <code>"__end__"</code> is the internal name for the END node. You can use the <code>END</code> constant in a path map instead, and the prebuilt <code>tools_condition</code> does the same job as this custom <code>should_continue</code>.</p></blockquote>
 <h3 id="building-a-react-agent-with-cycles">Building a ReAct Agent with Cycles</h3>
 <div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week05-langgraph.ipynb#scrollTo=week05-langg-052" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core, langchain_openai, langgraph" title="Needs langchain_core, langchain_openai, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import MessagesState
@@ -1392,8 +1381,7 @@ def should_continue_with_limit(state: MessagesState) -&gt; Literal[&quot;tools&q
 
     return &quot;__end__&quot;</code></pre></div>
 <blockquote>
-<p><strong>Safety tip:</strong> always set iteration limits to prevent runaway agents. You can also pass <code>{"recursion_limit": N}</code> in the config when invoking the graph.</p>
-</blockquote>
+<p><strong>Safety tip:</strong> always set iteration limits to prevent runaway agents. You can also pass <code>{"recursion_limit": N}</code> in the config when invoking the graph.</p></blockquote>
 <h2 id="step-9-checkpointing-human-in-the-loop">Step 9: Checkpointing &amp; Human-in-the-Loop</h2>
 <p>A <strong>checkpointer</strong> saves the state after every node. <code>MemorySaver</code> enables:</p>
 <ul>
@@ -1499,8 +1487,7 @@ print(result3[&quot;messages&quot;][-1].content)
 # Output: &quot;I don&#x27;t know your name. Could you tell me?&quot;</code></pre></div>
 <blockquote>
 <p><strong>Key insight:</strong> <code>thread_id</code> works like a session ID. Invocations that share a thread ID share a conversation history; different thread IDs are fully isolated.</p>
-<p><strong>Production usage:</strong> <code>MemorySaver</code> keeps state in RAM, so it is lost on restart. For persistence use <code>SqliteSaver</code> or <code>PostgresSaver</code> from the <code>langgraph-checkpoint-sqlite</code> / <code>langgraph-checkpoint-postgres</code> packages.</p>
-</blockquote>
+<p><strong>Production usage:</strong> <code>MemorySaver</code> keeps state in RAM, so it is lost on restart. For persistence use <code>SqliteSaver</code> or <code>PostgresSaver</code> from the <code>langgraph-checkpoint-sqlite</code> / <code>langgraph-checkpoint-postgres</code> packages.</p></blockquote>
 <h3 id="human-in-the-loop-interrupt-beforeafter">Human-in-the-Loop: Interrupt Before/After</h3>
 <table>
 <thead>
@@ -2170,8 +2157,7 @@ print(&quot;=&quot; * 60)
 for msg in result[&quot;messages&quot;]:
     print(f&quot;  {msg.content[:100]}&quot;)</code></pre></div>
 <blockquote>
-<p><strong>Congratulations!</strong> You have built a multi-agent system with a supervisor, specialised workers, tools, state management, and memory persistence.</p>
-</blockquote>
+<p><strong>Congratulations!</strong> You have built a multi-agent system with a supervisor, specialised workers, tools, state management, and memory persistence.</p></blockquote>
 <p><strong>Ways to extend this system</strong></p>
 <ul>
 <li>Add more agents: create new node functions and register them in the supervisor's routing logic.</li>
@@ -2181,8 +2167,7 @@ for msg in result[&quot;messages&quot;]:
 <li>Stream intermediate results to the user.</li>
 </ul>
 <blockquote>
-<p><strong>Pro tip:</strong> use LangSmith to trace and debug LangGraph apps in production — which nodes ran, what state was passed, and how long each step took.</p>
-</blockquote>
+<p><strong>Pro tip:</strong> use LangSmith to trace and debug LangGraph apps in production — which nodes ran, what state was passed, and how long each step took.</p></blockquote>
 <h2 id="step-11-django-integration">Step 11: Django Integration</h2>
 <p>Wrap the LangGraph agent in a Django web application: a module-level agent shared across requests, a per-session <code>thread_id</code> for memory, a JSON API endpoint, and a browser chat UI.</p>
 <h3 id="project-structure_1">Project Structure</h3>
@@ -2232,8 +2217,7 @@ python-dotenv&gt;=1.0.0</code></pre></div>
 DJANGO_SECRET_KEY=your-django-secret-key
 DEBUG=True</code></pre></div>
 <blockquote>
-<p><strong>Security:</strong> never commit <code>.env</code> to version control; add it to <code>.gitignore</code>.</p>
-</blockquote>
+<p><strong>Security:</strong> never commit <code>.env</code> to version control; add it to <code>.gitignore</code>.</p></blockquote>
 <h3 id="step-4-django-settings-configsettingspy">Step 4: Django Settings (config/settings.py)</h3>
 <div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="A program that keeps running: opens a free cloud computer with a terminal, set up for this course">💻 Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="Django" title="Needs Django — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>import os
 from pathlib import Path
@@ -2590,8 +2574,7 @@ def chat_with_agent(user_message: str, thread_id: str = &quot;default&quot;) -&g
 <p><strong>Key design decisions:</strong>
 - The agent is built once as a module-level singleton so the graph is not rebuilt on every request.
 - <code>MemorySaver</code> with thread IDs gives each user session its own conversation memory.
-- <code>tools_condition</code> routes to tools when the LLM requests them, then loops back to the chatbot.</p>
-</blockquote>
+- <code>tools_condition</code> routes to tools when the LLM requests them, then loops back to the chatbot.</p></blockquote>
 <h3 id="step-6-django-urls-configurlspy">Step 6: Django URLs (config/urls.py)</h3>
 <div class="runnable local"><span class="local-btns"><a class="try vscode-try" href="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" target="_blank" rel="noopener" title="A program that keeps running: opens a free cloud computer with a terminal, set up for this course">💻 Open in Codespaces</a><button class="try local" data-run="0" data-target="vscode" data-needs="Django" title="Needs Django — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from django.contrib import admin
 from django.urls import path, include

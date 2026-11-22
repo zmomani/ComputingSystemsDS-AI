@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="../assets/vendor/codemirror/material-darker.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
-<link rel="stylesheet" href="../assets/css/site.css?v=1a88630d">
+<link rel="stylesheet" href="../assets/css/site.css?v=84579475">
 </head>
 <body><header class="topbar">
   <a class="brand" href="../index.html">
@@ -29,8 +29,7 @@
 <p>The cycle is:</p>
 <div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">Thought → Action → Observation → Thought → … → Answer</code></pre></div>
 <blockquote>
-<p><strong>Key Insight:</strong> separating reasoning from tool use lets a language model handle problems that neither capability could solve alone.</p>
-</blockquote>
+<p><strong>Key Insight:</strong> separating reasoning from tool use lets a language model handle problems that neither capability could solve alone.</p></blockquote>
 <h2 id="2-setting-up-the-environment">2. Setting Up the Environment</h2>
 <p>Import the libraries, load the API key from a <code>.env</code> file, create an OpenAI client, and send a test message to confirm the connection works.</p>
 <div class="where-note"><div class="where-head">Where does this code run — and why?</div><p><b>▶ Try it</b> examples run inside this page, in your web browser — good for quick experiments with plain Python, NumPy, pandas, scikit-learn and matplotlib. From here on the examples need more:</p><ul><li><b>Everything else → Google Colab.</b> PyTorch, Transformers, LangChain and LangGraph need a full Python installation and large libraries, which a web page does not have. <b>▶ Run in Colab</b> opens this week's notebook in Google Colab, at the cell that holds the example. The notebook contains all of the lesson's code in order, and its first cell installs what is missing. Sign in with a Google account and run the cells from the top, because later examples reuse earlier ones.</li><li><b>API keys.</b> LangChain, OpenAI and agent examples call services on the internet with your own key. In Colab, add it once in the 🔑 <b>Secrets</b> panel (left bar) and switch on <i>Notebook access</i> — never type a key into your code.</li></ul></div><div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week09-react-agents.ipynb#scrollTo=week09-react-004" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="dotenv, httpx, openai" title="Needs dotenv, httpx, openai — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># environment_setup.py
@@ -73,8 +72,7 @@ print(chat_completion.choices[0].message.content)</code></pre></div>
 <h2 id="3-creating-the-basic-agent-class">3. Creating the Basic Agent Class</h2>
 <p>The <code>Agent</code> class keeps the <strong>conversation history</strong> and an optional system message. The constructor sets up that state; <code>__call__</code> appends the user's message, queries the model and stores the reply; <code>execute</code> sends the full history to the API.</p>
 <blockquote>
-<p><strong>Design Pattern:</strong> the agent is <em>stateful</em> — it keeps the full conversation history internally, so each new call builds on everything that came before.</p>
-</blockquote>
+<p><strong>Design Pattern:</strong> the agent is <em>stateful</em> — it keeps the full conversation history internally, so each new call builds on everything that came before.</p></blockquote>
 <div class="runnable"><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden># agent.py
 class Agent:
     def __init__(self, system=&quot;&quot;):
@@ -117,8 +115,7 @@ class Agent:
 <h2 id="4-defining-the-react-prompt">4. Defining the ReAct Prompt</h2>
 <p>The system prompt teaches the model the <strong>Thought, Action, PAUSE, Observation</strong> loop, lists the available tools (a calculator and a dog-breed weight lookup), and includes a worked example session.</p>
 <blockquote>
-<p><strong>Important:</strong> the <code>PAUSE</code> keyword tells the model to stop generating after it requests an action, so the program can run the tool and feed the result back as an <code>Observation</code>.</p>
-</blockquote>
+<p><strong>Important:</strong> the <code>PAUSE</code> keyword tells the model to stop generating after it requests an action, so the program can run the tool and feed the result back as an <code>Observation</code>.</p></blockquote>
 <div class="runnable"><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden># react_prompt.py
 prompt = &quot;&quot;&quot;
 You run in a loop of Thought, Action, PAUSE, Observation.
@@ -266,8 +263,7 @@ known_actions = {
 <h2 id="6-creating-the-agent-loop">6. Creating the Agent Loop</h2>
 <p>The <code>query</code> function starts an agent with the ReAct prompt and sends it the question. It uses a <strong>regular expression</strong> to find any requested <code>Action:</code> line, runs the matching tool, and sends the result back as an <code>Observation:</code>. The loop ends when the model produces no further action.</p>
 <blockquote>
-<p><strong>Safety Feature:</strong> the <code>max_turns</code> limit stops the loop from running indefinitely.</p>
-</blockquote>
+<p><strong>Safety Feature:</strong> the <code>max_turns</code> limit stops the loop from running indefinitely.</p></blockquote>
 <div class="runnable"><button class="try" data-run="1">▶ Try it</button><button class="copy">Copy</button><textarea class="src" hidden># agent_loop.py
 action_re = re.compile(r&#x27;^Action: (\w+): (.*)$&#x27;)   # python regular expression to select action
 
@@ -640,8 +636,7 @@ What is their combined weight&quot;&quot;&quot;
 <li><strong>Multiple actions per turn</strong> for better efficiency.</li>
 </ul>
 <blockquote>
-<p><strong>Advanced Implementation:</strong> for more sophisticated agents, a framework such as <strong>LangChain</strong> offers many of these extensions ready-made.</p>
-</blockquote>
+<p><strong>Advanced Implementation:</strong> for more sophisticated agents, a framework such as <strong>LangChain</strong> offers many of these extensions ready-made.</p></blockquote>
 <h2 id="10-key-takeaways">10. Key Takeaways</h2>
 <ol>
 <li>Pairing <strong>reasoning with tool use</strong> gives a strong problem-solving pattern.</li>

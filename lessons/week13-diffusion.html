@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="../assets/vendor/codemirror/material-darker.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
-<link rel="stylesheet" href="../assets/css/site.css?v=1a88630d">
+<link rel="stylesheet" href="../assets/css/site.css?v=84579475">
 </head>
 <body><header class="topbar">
   <a class="brand" href="../index.html">
@@ -40,8 +40,7 @@
 | 2021 | <em>Improved Denoising Diffusion Probabilistic Models</em> — better sampling techniques |
 | 2022 | Stability AI releases Stable Diffusion, bringing diffusion models to the mainstream |</p>
 <blockquote>
-<p><strong>Key insight.</strong> Diffusion models gradually add noise to data, then learn to reverse that process to generate realistic, diverse samples.</p>
-</blockquote>
+<p><strong>Key insight.</strong> Diffusion models gradually add noise to data, then learn to reverse that process to generate realistic, diverse samples.</p></blockquote>
 <h2 id="2-fundamentals">2. Fundamentals</h2>
 <p>Diffusion models destroy structure in data with a <strong>forward process</strong>, then learn to restore it with a <strong>reverse process</strong>.</p>
 <ul>
@@ -81,8 +80,7 @@
 <p>This shortcut is essential for training.
 5. <strong>End result</strong> — after T steps, x_T is approximately standard Gaussian noise; all original structure is gone.</p>
 <blockquote>
-<p><strong>Important insight.</strong> The forward process is never used to generate images. It only defines the mathematical framework for learning the reverse process, which does the generating.</p>
-</blockquote>
+<p><strong>Important insight.</strong> The forward process is never used to generate images. It only defines the mathematical framework for learning the reverse process, which does the generating.</p></blockquote>
 <div class="where-note"><div class="where-head">Where does this code run — and why?</div><p><b>▶ Try it</b> examples run inside this page, in your web browser — good for quick experiments with plain Python, NumPy, pandas, scikit-learn and matplotlib. From here on the examples need more:</p><ul><li><b>Everything else → Google Colab.</b> PyTorch, Transformers, LangChain and LangGraph need a full Python installation and large libraries, which a web page does not have. <b>▶ Run in Colab</b> opens this week's notebook in Google Colab, at the cell that holds the example. The notebook contains all of the lesson's code in order, and its first cell installs what is missing. Sign in with a Google account and run the cells from the top, because later examples reuse earlier ones.</li><li><b>Model training needs a GPU.</b> In Colab choose <b>Runtime → Change runtime type → T4 GPU</b> before running the notebook. Without it, the training examples (<b>▶ Train in Colab</b>) take hours.</li></ul></div><div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week13-diffusion.ipynb#scrollTo=week13-diffu-003" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="torch" title="Needs torch — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>def forward_diffusion_sample(x_0, t, device):
     &quot;&quot;&quot;
     Takes an image and a timestep as input and
@@ -274,8 +272,7 @@
 - <strong>Cascaded diffusion</strong> — chains models at increasing resolutions for very high-resolution output; DALL-E 2 uses this to reach 1024×1024.
 - <strong>Score-based models</strong> — model the gradient of the log-density instead of predicting noise; under certain conditions mathematically equivalent to diffusion models.</p>
 <blockquote>
-<p><strong>Architectural flexibility.</strong> The only hard requirement is matching input and output dimensions, which makes the architecture easy to adapt.</p>
-</blockquote>
+<p><strong>Architectural flexibility.</strong> The only hard requirement is matching input and output dimensions, which makes the architecture easy to adapt.</p></blockquote>
 <h2 id="6-training-diffusion-models">6. Training Diffusion Models</h2>
 <p>Training teaches the network to predict the noise added during the forward process.</p>
 <p><strong>Objective.</strong> The full objective is a variational bound on the negative log-likelihood, one KL term per timestep:</p>
@@ -346,8 +343,7 @@
 - Mixed-precision training for speed on modern GPUs.
 - Exponential moving average (EMA) of model weights, which often improves results.</p>
 <blockquote>
-<p><strong>Training stability.</strong> Diffusion models are generally more stable than GANs: they avoid mode collapse and converge more consistently.</p>
-</blockquote>
+<p><strong>Training stability.</strong> Diffusion models are generally more stable than GANs: they avoid mode collapse and converge more consistently.</p></blockquote>
 <p><strong>Conditional training</strong>
 - <strong>Class-conditional</strong> — feed the class label with the noisy image and timestep; convert labels to learned embeddings, combine with timestep embeddings, inject throughout the model.
 - <strong>Text-conditional</strong> — encode prompts with a pre-trained encoder (CLIP), process through extra layers, inject via <strong>cross-attention</strong> so the model learns to match descriptions.

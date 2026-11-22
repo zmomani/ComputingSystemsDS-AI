@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="../assets/vendor/codemirror/material-darker.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
-<link rel="stylesheet" href="../assets/css/site.css?v=1a88630d">
+<link rel="stylesheet" href="../assets/css/site.css?v=84579475">
 </head>
 <body><header class="topbar">
   <a class="brand" href="../index.html">
@@ -28,8 +28,7 @@
 <p>Mixture of Experts is a neural network architecture that replaces a single dense model with <strong>several specialized sub-models called experts</strong>. In LLMs, MoE swaps the dense feedforward (FFN) layers of the transformer for sets of expert networks, so the <em>total</em> parameter count can grow enormously while the compute spent <em>per token</em> stays manageable.</p>
 <p>A <strong>router</strong> (gating network) decides which experts process each token, so only a small subset of the parameters is active at any time. Typical configurations use 8–64 experts per layer with top-2 routing, leaving roughly 20% of parameters active per token.</p>
 <blockquote>
-<p>"Mixture of Experts enable models to be pretrained with far less compute, which means you can dramatically scale up the model or dataset size with the same compute budget as a dense model." — Hugging Face blog</p>
-</blockquote>
+<p>"Mixture of Experts enable models to be pretrained with far less compute, which means you can dramatically scale up the model or dataset size with the same compute budget as a dense model." — Hugging Face blog</p></blockquote>
 <h2 id="how-moe-works-in-llms">How MoE Works in LLMs</h2>
 <ol>
 <li><strong>Input processing:</strong> the token embedding enters the MoE layer inside a transformer block.</li>
@@ -69,8 +68,7 @@
 <li><strong>Flexible resource allocation:</strong> compute is directed where each token needs it, unlike dense models that apply uniform computation.</li>
 </ol>
 <blockquote>
-<p>"Mixtral outperforms Llama 2 70B on most benchmarks with 6x faster inference." — Mistral AI (2023)</p>
-</blockquote>
+<p>"Mixtral outperforms Llama 2 70B on most benchmarks with 6x faster inference." — Mistral AI (2023)</p></blockquote>
 <h3 id="dense-vs-moe-comparison">Dense vs. MoE comparison</h3>
 <table>
 <thead>

@@ -420,6 +420,8 @@ def python_block_html(code, title, run, setup, reason, cell=''):
                f'<button class="try local" data-run="0" data-target="colab" data-needs="{html.escape(miss)}" title="Needs {html.escape(miss)} — opens in the editor">✎ Editor</button></span>')
     return f'<div class="runnable local">{head}{btn}<button class="copy">Copy</button><textarea class="src" hidden>{esc}</textarea>{pre}</div>'
 
+BOX_LABEL = {'Note': 'Note', 'Tip': 'Tip', 'Careful': 'Common confusion', 'Terms': 'Terms'}
+
 def md_to_html(text):
     blocks = []
     def stash(m):
@@ -430,6 +432,20 @@ def md_to_html(text):
     text = FENCE.sub(stash, text)
     MD.reset()
     out = MD.convert(text)
+    # > **Note: …** / **Tip: …** / **Careful: …** / **Terms: …** become coloured boxes with a small label
+    # Markdown joins quoted notes that follow one another into a single blockquote, so each note is cut out again first.
+    def boxes(m):
+        parts = re.split(r'(?=<p><strong>(?:Note|Tip|Careful|Terms): ?)', m.group(1))
+        html_out = ''
+        for part in parts:
+            if not part.strip(): continue
+            k = re.match(r'<p><strong>(Note|Tip|Careful|Terms): ?', part)
+            if k:
+                rest = part[k.end():].rstrip(); rest = rest[:1].upper() + rest[1:]     # the title now opens the box, so it starts with a capital
+                html_out += f'<blockquote class="box box-{k.group(1).lower()}"><p><span class="box-tag">{BOX_LABEL[k.group(1)]}</span><strong>' + rest + '</blockquote>\n'
+            else: html_out += '<blockquote>' + part.rstrip() + '</blockquote>\n'
+        return html_out.rstrip('\n')
+    out = re.sub(r'<blockquote>(.*?)</blockquote>', boxes, out, flags=re.S)
     out = re.sub(r'<p>\s*CODEBLOCK(\d+)XEND\s*</p>', lambda m: blocks[int(m.group(1))], out)
     out = re.sub(r'CODEBLOCK(\d+)XEND', lambda m: blocks[int(m.group(1))], out)
     return out

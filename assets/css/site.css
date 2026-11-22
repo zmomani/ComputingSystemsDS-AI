@@ -404,3 +404,17 @@ abbr[data-tip]:focus-visible { outline: 2px solid var(--accent); outline-offset:
 .emb-more { margin-left: 5px; font-size: .72rem; color: #6b7480; cursor: help; white-space: nowrap; }
 .emb-gap { color: #8a929c; font-size: .74rem; padding: 1px 6px 1px 84px; }
 .emb-shape { font-size: .78rem; color: #5b6470; margin-top: 6px; min-height: 1.2em; }
+
+/* Coloured side notes: > **Note: …**, **Tip: …**, **Careful: …**, **Terms: …** (see md_to_html in build.py) */
+.lesson-content blockquote.box { border-left-width: 5px; padding: .7rem 1rem .75rem; }
+.lesson-content blockquote.box .box-tag { display: block; font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .15rem; }
+.lesson-content blockquote.box table { margin: .5rem 0 .2rem; font-size: .92em; background: rgba(255,255,255,.6); }
+.lesson-content blockquote.box-note { background: #eaf2fc; border-left-color: #2f6fb7; }
+.lesson-content blockquote.box-note .box-tag { color: #1f5591; }
+.lesson-content blockquote.box-tip { background: #e8f5ec; border-left-color: #2e8b57; }
+.lesson-content blockquote.box-tip .box-tag { color: #1f6b41; }
+.lesson-content blockquote.box-careful { background: #fdeeee; border-left-color: #c9302c; }
+.lesson-content blockquote.box-careful .box-tag { color: #a02622; }
+.lesson-content blockquote.box-terms { background: #f1eefb; border-left-color: #6b56c2; }
+.lesson-content blockquote.box-terms .box-tag { color: #4d3c9a; }
+.lesson-content blockquote.box code { overflow-wrap: anywhere; }

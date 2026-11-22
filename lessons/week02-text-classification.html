@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="../assets/vendor/codemirror/material-darker.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
-<link rel="stylesheet" href="../assets/css/site.css?v=1a88630d">
+<link rel="stylesheet" href="../assets/css/site.css?v=84579475">
 </head>
 <body><header class="topbar">
   <a class="brand" href="../index.html">
@@ -282,9 +282,7 @@
 !pip install pandas
 !pip install matplotlib
 !pip install torch</code></pre></div>
-<blockquote>
-<p><strong>Tip:</strong> If installation fails, consult the library's installation guide. Google Colab is a good option because most of these libraries are pre-installed.</p>
-</blockquote>
+<blockquote class="box box-tip"><p><span class="box-tag">Tip</span><strong></strong> If installation fails, consult the library's installation guide. Google Colab is a good option because most of these libraries are pre-installed.</p></blockquote>
 <h3 id="mini-challenge-verify-your-setup">Mini-challenge: verify your setup</h3>
 <p>Import <code>torch</code>, <code>transformers</code> and <code>datasets</code> and print each version to confirm everything imports successfully.</p>
 <div class="where-note"><div class="where-head">Where does this code run — and why?</div><p><b>▶ Try it</b> examples run inside this page, in your web browser — good for quick experiments with plain Python, NumPy, pandas, scikit-learn and matplotlib. From here on the examples need more:</p><ul><li><b>Everything else → Google Colab.</b> PyTorch, Transformers, LangChain and LangGraph need a full Python installation and large libraries, which a web page does not have. <b>▶ Run in Colab</b> opens this week's notebook in Google Colab, at the cell that holds the example. The notebook contains all of the lesson's code in order, and its first cell installs what is missing. Sign in with a Google account and run the cells from the top, because later examples reuse earlier ones.</li><li><b>Model training needs a GPU.</b> In Colab choose <b>Runtime → Change runtime type → T4 GPU</b> before running the notebook. Without it, the training examples (<b>▶ Train in Colab</b>) take hours.</li></ul></div><div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week02-text-classification.ipynb#scrollTo=week02-text--004" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="datasets, torch, transformers" title="Needs datasets, torch, transformers — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>import torch
@@ -503,8 +501,7 @@ print(tokenizer.convert_tokens_to_string(tokens))
 <div class="sim-inline"><button class="sim-chip" data-display="tokenizer"><span class="sim-chip-kind">Transformers</span>▶ Display: Subword tokenisation</button><button class="sim-chip" data-display="embedding-table"><span class="sim-chip-kind">Tokenization</span>▶ Display: From token IDs to vectors: the DistilBERT embedding table</button></div>
 
 <blockquote>
-<p><strong>The numbers in these animations are examples.</strong> The first animation splits text with a small hand-made vocabulary of about 70 pieces, so its token IDs differ from the ones printed above: it gives "the" the ID 100, which in DistilBERT is <code>[UNK]</code>, while DistilBERT's "the" is 1996. The second animation uses the real DistilBERT IDs. In both, the coloured squares stand for numbers, and only a few are drawn. The actual numbers would not fit: the real table has 30,522 rows of 768 decimals each, about 23.4 million numbers, and even one seven-token sentence needs 7 × 768 = 5,376 of them.</p>
-</blockquote>
+<p><strong>The numbers in these animations are examples.</strong> The first animation splits text with a small hand-made vocabulary of about 70 pieces, so its token IDs differ from the ones printed above: it gives "the" the ID 100, which in DistilBERT is <code>[UNK]</code>, while DistilBERT's "the" is 1996. The second animation uses the real DistilBERT IDs. In both, the coloured squares stand for numbers, and only a few are drawn. The actual numbers would not fit: the real table has 30,522 rows of 768 decimals each, about 23.4 million numbers, and even one seven-token sentence needs 7 × 768 = 5,376 of them.</p></blockquote>
 <h3 id="tokenizer-properties">Tokenizer properties</h3>
 <div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week02-text-classification.ipynb#scrollTo=week02-text--027" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>print(tokenizer.vocab_size)          # 30522: the number of tokens in the vocabulary
 print(tokenizer.model_max_length)    # 512: the longest sequence the model accepts
@@ -512,8 +509,7 @@ print(tokenizer.model_input_names)   # [&#x27;input_ids&#x27;, &#x27;attention_m
 print(tokenizer.model_max_length)    # 512: the longest sequence the model accepts
 print(tokenizer.model_input_names)   # [&#x27;input_ids&#x27;, &#x27;attention_mask&#x27;]: what the model expects</code></pre></div>
 <blockquote>
-<p><strong>Always use the tokenizer the model was trained with.</strong> Each token ID is the number of a row in the model's embedding table. A different tokenizer assigns different numbers to the same words, so to the model it is as if the vocabulary had been shuffled.</p>
-</blockquote>
+<p><strong>Always use the tokenizer the model was trained with.</strong> Each token ID is the number of a row in the model's embedding table. A different tokenizer assigns different numbers to the same words, so to the model it is as if the vocabulary had been shuffled.</p></blockquote>
 <h3 id="tokenizing-the-entire-dataset">Tokenizing the entire dataset</h3>
 <div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week02-text-classification.ipynb#scrollTo=week02-text--029" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>emotions.reset_format()   # undo the pandas format set earlier
 
@@ -563,8 +559,7 @@ print(emotion_encoded.column_names)</code></pre></div>
 <li><code>[MASK]</code> hides a word during <strong>pre-training</strong>: the model sees "I drank a cup of <code>[MASK]</code>" and has to predict the hidden word (Theory 2). When you classify text, you never insert it.</li>
 </ul>
 <blockquote>
-<p><strong>Three different "masks".</strong> The word is used for three unrelated things in this lesson. The <code>[MASK]</code> <em>token</em> hides a word during pre-training. The <em>attention mask</em> is the row of 1s and 0s that tells the model which positions are padding. <em>Masked self-attention</em> is the rule in a decoder that a position may not look at later positions (Theory 1). <code>[PAD]</code> works together with the attention mask, not with <code>[MASK]</code>.</p>
-</blockquote>
+<p><strong>Three different "masks".</strong> The word is used for three unrelated things in this lesson. The <code>[MASK]</code> <em>token</em> hides a word during pre-training. The <em>attention mask</em> is the row of 1s and 0s that tells the model which positions are padding. <em>Masked self-attention</em> is the rule in a decoder that a position may not look at later positions (Theory 1). <code>[PAD]</code> works together with the attention mask, not with <code>[MASK]</code>.</p></blockquote>
 <ul>
 <li><code>padding=True</code> pads to the longest sequence in the batch (<code>padding="max_length"</code> pads to the model's max length instead). Padding adds special tokens so sequences in a batch have equal length.</li>
 <li><code>truncation=True</code> shortens sequences that exceed the model's maximum length. This prevents errors but may cut information.</li>
@@ -926,8 +921,7 @@ trainer = Trainer(
 </tbody>
 </table>
 <blockquote>
-<p><strong>Version note:</strong> Transformers releases before 4.46 used the older names <code>evaluation_strategy</code> and <code>Trainer(tokenizer=...)</code>; the current names are <code>eval_strategy</code> and <code>processing_class=...</code>. <code>push_to_hub=True</code> requires that you are logged in (see Section 8).</p>
-</blockquote>
+<p><strong>Version note:</strong> Transformers releases before 4.46 used the older names <code>evaluation_strategy</code> and <code>Trainer(tokenizer=...)</code>; the current names are <code>eval_strategy</code> and <code>processing_class=...</code>. <code>push_to_hub=True</code> requires that you are logged in (see Section 8).</p></blockquote>
 <h3 id="training-the-model">Training the model</h3>
 <div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week02-text-classification.ipynb#scrollTo=week02-text--058" target="_blank" rel="noopener" title="Training needs a GPU. Opens this week's notebook in Google Colab, at this example">▶ Train in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="a GPU for training" title="Opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>trainer.train()</textarea><pre><code class="language-python">trainer.train()</code></pre></div>
 <p>Training runs for the configured epochs, reports metrics after each epoch, saves checkpoints and shows a progress bar.</p>
