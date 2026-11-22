@@ -6,7 +6,8 @@ Sims.register('tokenizer', {
   mount(root, H) {
     const L = H.layout(root, { legend: true });
     // A tiny illustrative vocabulary: whole common words + frequent pieces; everything else falls back to characters.
-    const vocab = ['the', 'a', 'cat', 'sat', 'on', 'mat', 'dog', 'ran', 'is', 'are', 'to', 'and', 'in', 'of', 'ing', 'ed', 'er', 'un', 're', 'ly', 'tion', 'al', 'es', 's', 'trans', 'form', 'former', 'att', 'ention', 'learn', 'model', 'token', 'ize', 'iz', 'ation', 'data', 'science', 'ai', 'agent', 'we', 'you', 'it', 'be', 'play', 'walk', 'jump', 'quick', 'brown', 'fox', 'over', 'lazy', 'un', 'happy', 'ness', 'ful', 'pre', 'dict', 'ab', 'sorb', 'ing', 'comput', 'er', 'ers', 'ness', 'ly', 'ous', 'ive'];
+    const vocab = ['the', 'a', 'cat', 'sat', 'on', 'mat', 'dog', 'ran', 'is', 'are', 'to', 'and', 'in', 'of', 'ing', 'ed', 'er', 'un', 're', 'ly', 'tion', 'al', 'es', 's', 'trans', 'form', 'former', 'att', 'ention', 'learn', 'model', 'token', 'ize', 'iz', 'ation', 'data', 'science', 'ai', 'agent', 'we', 'you', 'it', 'be', 'play', 'walk', 'jump', 'quick', 'brown', 'fox', 'over', 'lazy', 'un', 'happy', 'ness', 'ful', 'pre', 'dict', 'ab', 'sorb', 'ing', 'comput', 'er', 'ers', 'ness', 'ly', 'ous', 'ive',
+      'able', 'ible', 'happi', 'ment', 'less', 'est', 'ity', 'dis', 'mis', 'under', 'stand', 'help', 'use', 'kind', 'teach', 'work', 'read', 'writ', 'e', 'y', 'ion', 'ic', 'ist', 'ism'];
     const uniq = Array.from(new Set(vocab)); const id = new Map(uniq.map((t, i) => [t, 100 + i]));
     const rnd = H.seeded(3); const embed = t => { const r = H.seeded(id.get(t) || (t.charCodeAt(0) * 31)); return [r() * 2 - 1, r() * 2 - 1, r() * 2 - 1, r() * 2 - 1]; };
     let text = 'Transformers are learning tokenization quickly';
