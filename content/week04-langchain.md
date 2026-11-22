@@ -236,6 +236,8 @@ print(llm.invoke(messages).content)
 
 In Section 3 two steps were written by hand: fill the template, then call the model. A **chain** joins such steps so that the output of each becomes the input of the next. In current LangChain a chain is written with the pipe operator `|`, a notation called the LangChain Expression Language (<abbr data-tip="LangChain Expression Language: the notation that joins components with |" tabindex="0">LCEL</abbr>).
 
+<figure class="fig"><img src="../assets/img/slides-chain-links.png" alt="Two links of a steel chain, joined"><figcaption>A chain: each link holds the next. Photograph from Dr. Albanna&#x27;s course slides.</figcaption></figure>
+
 <figure class="fig wide"><img src="../assets/img/lcel-chains.svg" alt="Three diagrams. First: input, prompt template, chat model, output parser, output, joined by arrows. Second: an HTML chain whose output, code, is the input of a Python chain. Third: a dictionary that gains the key code and then the key explanation"><figcaption>The three chain shapes of this lesson: a single chain (this section), a sequential chain, and a chain with several inputs and outputs (Section 6).</figcaption></figure>
 
 ```python
@@ -569,7 +571,7 @@ Twice: once to name the subject and once to answer. The default is needed becaus
 - Hugging Face chat models in LangChain: https://docs.langchain.com/oss/python/integrations/chat/huggingface
 - Qwen2.5-1.5B-Instruct, the model used in this lesson: https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct
 
-**Figure credits.** The components figure, the three app screenshots, the example-selector table, and the figures of LangChain's connections, of chains with several inputs and outputs, and of the router chain come from Dr. Abdulkarim Albanna's course slides. The first chain diagram and the first routing diagram were drawn for this lesson. Product logos that appear in the figures are trademarks of their owners.
+**Figure credits.** The components figure, the three app screenshots, the example-selector table, and the figures of LangChain's connections, of chains with several inputs and outputs, and of the router chain, and the photograph of a chain, come from Dr. Abdulkarim Albanna's course slides. The first chain diagram and the first routing diagram were drawn for this lesson. Product logos that appear in the figures are trademarks of their owners.
 
 ## Test code
 
