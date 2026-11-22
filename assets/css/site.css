@@ -418,3 +418,24 @@ abbr[data-tip]:focus-visible { outline: 2px solid var(--accent); outline-offset:
 .lesson-content blockquote.box-terms { background: #f1eefb; border-left-color: #6b56c2; }
 .lesson-content blockquote.box-terms .box-tag { color: #4d3c9a; }
 .lesson-content blockquote.box code { overflow-wrap: anywhere; }
+
+/* Week 3 figure: input IDs, attention mask and labels of one padded sentence */
+.lp-wrap { overflow-x: auto; padding: 14px 12px 8px; }
+.lp { display: inline-block; text-align: left; font-size: .8rem; }
+.lp-row { display: flex; align-items: stretch; gap: 3px; margin-bottom: 6px; }
+.lp-name { width: 108px; flex: none; font-weight: 700; display: flex; align-items: center; cursor: help; }
+.lp-c { width: 50px; min-height: 30px; flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 4px; font-variant-numeric: tabular-nums; cursor: help; line-height: 1.15; }
+.lp-c small { font-size: .62rem; font-weight: 400; opacity: .95; }
+.lp-tok { background: #f3f5f8; border: 1px solid #d5dae1; font-family: var(--mono); font-size: .72rem; color: #1b1f24; }
+.lp-tok.lp-pad { color: #8a929c; border-style: dashed; }
+.lp-id { background: #f7941d; color: #fff; font-size: .7rem; }
+.lp-id.lp-pad { background: #d3d6da; color: #3c434b; }
+.lp-m1 { background: #5aa9de; color: #fff; }
+.lp-m0 { background: #c9302c; color: #fff; }
+.lp-lab { background: #2e8b57; color: #fff; font-weight: 700; }
+.lp-skip { background: #fff; border: 1.5px dashed #9aa3ad; color: #6b7480; font-size: .72rem; }
+.lp-skip.lp-new { border-color: #c9302c; color: #a02622; background: #fdeeee; }
+.lp-brace { display: flex; gap: 3px; margin-left: 111px; font-size: .7rem; color: #5b6470; }
+.lp-brace span { border-top: 2px solid #9aa3ad; padding-top: 3px; text-align: center; }
+.lp-brace span:first-child { width: 527px; }
+.lp-brace span:last-child { width: 156px; border-top-color: #c9302c; color: #a02622; }
