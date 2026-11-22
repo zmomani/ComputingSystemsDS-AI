@@ -110,7 +110,7 @@ SIMS = {
   'qkv': ('Query, key and value for one word', 'Transformers', 'Project to Q, K, V, score q·k against every key, softmax, then mix the values.'),
   'multihead': ('Multi-head attention', 'Transformers', 'One query word through three heads: project, attend, mix, concatenate, W_O.'),
   'decoder': ('Decoder: masked and cross-attention', 'Transformers', 'Causal mask, cross-attention to the encoder, next-word softmax; inference loop vs. training.'),
-  'tokenizer': ('Subword tokenisation', 'Transformers', 'Type text, see WordPiece-style tokens, IDs and the embedding lookup.'),
+  'tokenizer': ('Subword tokenisation: WordPiece (##) and SentencePiece (▁) styles', 'Transformers', 'Type a sentence and watch it split into subword tokens with IDs. A menu switches between the WordPiece style of BERT and the SentencePiece style of XLM-R.'),
   'positional': ('Positional encoding', 'Transformers', 'Sinusoid heatmap and per-dimension waves; why attention needs position.'),
   'finetune': ('Frozen vs fine-tuned weights', 'Transfer learning', 'Feature extraction, fine-tuning and training from scratch: which weights are trainable and how far they move.'),
   'distill': ('Distillation: hard label vs soft targets', 'Distillation', 'A student learns a masked word from the one correct answer or from the teacher\'s full distribution; change the temperature.'),
