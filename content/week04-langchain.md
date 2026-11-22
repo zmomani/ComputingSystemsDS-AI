@@ -41,6 +41,8 @@ A language model does one thing: it receives text and returns text. An applicati
 
 The practical benefit is exchange. In this lesson you will write each program once, with a small model that runs in Colab. If you later change one line to use a hosted model from OpenAI or Google, the remainder of the program stays as it is.
 
+<figure class="fig wide"><img src="../assets/img/slides-langchain-connects.png" alt="The LangChain logo in the centre, with model providers above it, a user asking a question on the left, mail services on the right and documents below"><figcaption>LangChain sits between the user, the models, and the places where information lives: documents and mail. Figure from Dr. Albanna&#x27;s course slides. The product logos are trademarks of their owners.</figcaption></figure>
+
 <figure class="fig wide"><img src="../assets/img/langchain-components.png" alt="Six components around the LangChain logo: memory, prompt templates, indexes, LLMs, chains and agents, each with a short description"><figcaption>The six kinds of component in LangChain. Figure from Dr. Albanna's course slides.</figcaption></figure>
 
 > **Note: two names in this figure have changed.** The figure uses the vocabulary of 2023. What it calls **Indexes** is now described as *retrieval*: document loaders, text splitters, embedding models, vector stores and retrievers, which are the subject of the second part of this week. What it calls **LLMs** are now mostly **chat models**. If you look for an "Indexes" page in the current documentation, you will not find one.
@@ -163,6 +165,52 @@ print(reply.content)
 > **Tip: when a result is poor, print the prompt.** `format_messages` shows exactly what the model receives. Most problems in an LLM application are visible there: a placeholder that was filled with the wrong value, an instruction that is ambiguous, or a document that was never inserted.
 
 > **Careful: a literal brace must be doubled.** The template treats everything between `{` and `}` as a placeholder. To show the model a real brace, for example in a JSON example, write `{{` and `}}`. A single brace gives a `KeyError` or an error about a missing variable.
+
+### Few-shot examples and example selectors
+
+A prompt can also teach by example. Showing the model a few solved cases before the real one is called **few-shot prompting**, and it is often the quickest way to fix the form of an answer. In a chat prompt each example is a pair of messages: a human message with the input, and an AI message with the answer you want.
+
+```python
+from langchain_core.prompts import FewShotChatMessagePromptTemplate
+
+examples = [
+    {"review": "The screen is sharp and the battery lasts two days.", "label": "positive"},
+    {"review": "It stopped charging after a week.", "label": "negative"},
+    {"review": "وصل الجهاز في موعده وهو يعمل جيدا.", "label": "positive"},
+]
+example_prompt = ChatPromptTemplate.from_messages([("human", "{review}"), ("ai", "{label}")])
+few_shot = FewShotChatMessagePromptTemplate(example_prompt=example_prompt, examples=examples)
+
+sentiment_prompt = ChatPromptTemplate.from_messages([
+    ("system", "Classify the customer review as positive or negative. Reply with one word."),
+    few_shot,
+    ("human", "{review}"),
+])
+
+messages = sentiment_prompt.format_messages(review="The keyboard broke on the second day.")
+for m in messages:
+    print(f"{m.type}: {m.content}")
+print("Model:", llm.invoke(messages).content)
+```
+
+The loop prints the prompt before the model is called. The three examples appear as a short conversation that has already taken place, and the real review is the last message:
+
+```text
+system: Classify the customer review as positive or negative. Reply with one word.
+human: The screen is sharp and the battery lasts two days.
+ai: positive
+human: It stopped charging after a week.
+ai: negative
+human: وصل الجهاز في موعده وهو يعمل جيدا.
+ai: positive
+human: The keyboard broke on the second day.
+```
+
+With three examples, all of them can go into every prompt. With three hundred they cannot, and most would be irrelevant to any one input. An **example selector** chooses, for each input, which examples to include. The slides list four kinds.
+
+<figure class="fig wide"><img src="../assets/img/slides-example-selector-types.png" alt="A table of four example selector types. Similarity: uses semantic similarity between inputs and examples. MMR: uses Max Marginal Relevance. Length: selects examples by how many fit within a certain length. Ngram: uses n-gram overlap between inputs and examples"><figcaption>The four kinds of example selector. Table from Dr. Albanna&#x27;s course slides, after the LangChain documentation.</figcaption></figure>
+
+> **Note: two of these selectors are retrieval in miniature.** The *Similarity* and *MMR* selectors embed the examples, store the vectors, and pick the examples closest to the input. That is the mechanism of the second part of this week, applied to examples instead of documents. Three of the four classes are in `langchain_core.example_selectors`; the n-gram selector is in `langchain_community`.
 
 ### The email assistant
 
@@ -355,6 +403,10 @@ print(result["code"][:300])
 
 `result` is a dictionary with three keys: `name`, which you supplied, and `code` and `explanation`, which the two steps added. A later step can use any of them: a third prompt could contain both `{name}` and `{code}`.
 
+The slides draw the general case: four chains, in which one user input feeds two chains, and the last chain receives the outputs of two earlier ones. Each arrow in the picture is one key of the shared dictionary.
+
+<figure class="fig wide"><img src="../assets/img/slides-chains-multiple-inputs-outputs.png" alt="Four chains. The user input goes to chain 1 and to chain 3. The output of chain 1 is the input of chain 2. The outputs of chain 2 and chain 3 are the inputs of chain 4, which gives the final output"><figcaption>A sequential chain with several inputs and outputs. Figure from Dr. Albanna&#x27;s course slides.</figcaption></figure>
+
 ### The same chains in the 2024 notation
 
 This is the script from the course, shortened. On the current libraries it stops at its first line.
@@ -440,6 +492,10 @@ Follow one question through the chain. `assign` adds the key `subject` to the di
 
 > **Careful: the router's reply is text, and text is untidy.** The model may reply `Physics`, `physics.` or `The subject is physics`. The function therefore lowers the case and tests whether a subject name occurs *in* the reply, where an exact comparison would fail. The third question matches no subject and falls through to the default prompt. Always give a router a default.
 
+The slides draw the same design with the names of the 2024 classes: a *router chain*, the *destination chains* and a *default chain*.
+
+<figure class="fig wide"><img src="../assets/img/slides-router-chain.png" alt="An input goes to the router chain, in which an LLM holds a list of subjects such as math and history. If the input is related to a subject, it goes to that destination chain. Otherwise it goes to the default chain. Each chain gives an output"><figcaption>Router chain, destination chains and default chain. Figure from Dr. Albanna&#x27;s course slides.</figcaption></figure>
+
 The nine steps of the slides map onto this code as follows.
 
 | Slides (2024) | Current code |
@@ -513,7 +569,7 @@ Twice: once to name the subject and once to answer. The default is needed becaus
 - Hugging Face chat models in LangChain: https://docs.langchain.com/oss/python/integrations/chat/huggingface
 - Qwen2.5-1.5B-Instruct, the model used in this lesson: https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct
 
-**Figure credits.** The components figure and the three app screenshots come from Dr. Abdulkarim Albanna's course slides. The chain and routing diagrams were drawn for this lesson.
+**Figure credits.** The components figure, the three app screenshots, the example-selector table, and the figures of LangChain's connections, of chains with several inputs and outputs, and of the router chain come from Dr. Abdulkarim Albanna's course slides. The first chain diagram and the first routing diagram were drawn for this lesson. Product logos that appear in the figures are trademarks of their owners.
 
 ## Test code
 

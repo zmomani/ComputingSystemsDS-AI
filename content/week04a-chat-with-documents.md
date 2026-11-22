@@ -38,11 +38,17 @@ By the end of this part you will be able to:
 
 Suppose a company wants a chatbot that answers questions about its own documents. The first idea is to send each question directly to a commercial model such as ChatGPT. The course slides give three reasons why this fails.
 
+<figure class="fig"><img src="../assets/img/slides-llm-api-logos.png" alt="The words LLM API like ChatGPT, beside the ChatGPT and Gemini logos"><figcaption>The first idea: ask a commercial model directly. Figure from Dr. Albanna&#x27;s course slides. The product logos are trademarks of their owners.</figcaption></figure>
+
 - **The model has not seen your documents.** It was trained on text that was public at one moment in the past. Internal documents were never in that text, and documents written after that moment could not be.
 - **The model knows a great deal that is irrelevant.** Its training data contains far more unrelated context than context for your question.
 - **The model fills gaps with invention.** Asked about something it has not seen, a language model can produce a fluent answer that is false. This is called *hallucination*.
 
+<figure class="fig"><img src="../assets/img/slides-private-vs-public-knowledge.png" alt="Two circles that barely overlap. One is the private knowledge base: documentation, notes and PDF files. The other is the public internet as of September 2021. The LLM was trained on the public circle only"><figcaption>What the model was trained on, and what your question is about, are two different sets. The date is that of the model on the 2024 slide; every model has such a date. Figure from Dr. Albanna&#x27;s course slides; originally from the SwirlAI Newsletter (newsletter.swirlai.com).</figcaption></figure>
+
 The second idea is to put the documents into the prompt: write the question, paste the whole knowledge base beside it, and instruct the model to answer from that text only. This works for one short document. For a real knowledge base it meets a limit: every model has a **context window**, a maximum number of tokens that it can read at once.
+
+<figure class="fig wide"><img src="../assets/img/slides-context-length-limit.png" alt="A prompt made of a meta-prompt and additional context taken from the private knowledge base. A bracket marks the maximum context length, between about 4,000 and 33,000 tokens. The prompt goes to the LLM, which gives an answer"><figcaption>The second idea: put the knowledge base into the prompt. The prompt cannot be longer than the context length. Figure from Dr. Albanna&#x27;s course slides; originally from the SwirlAI Newsletter (newsletter.swirlai.com).</figcaption></figure>
 
 > **Note: the numbers on the slides have changed, and the argument has not.** The slides, written in January 2024, give context windows of about 4,000 to 33,000 tokens, with 1,000 tokens equal to roughly 750 words. Windows have grown since then: the small model of this lesson accepts 32,768 tokens, and large hosted models accept far more. Three costs remain. A company's documents are still larger than any window. Every token in the prompt costs time and, with a hosted model, money, on every single question. And a model answers less accurately when the passage it needs is buried in a long, mostly irrelevant prompt. The textbook makes the same point with a calculation: if a product has 30 reviews and each takes 100 milliseconds to process, reading all of them costs 3 seconds for every question.
 
@@ -97,6 +103,10 @@ The course slides list the same pipeline as nine steps.
 7. The database performs an **approximate nearest neighbour** (<abbr data-tip="Approximate Nearest Neighbour: a fast search for the vectors closest to a given vector, which accepts a small loss of accuracy" tabindex="0">ANN</abbr>) search and returns the closest vectors.
 8. **Map** the returned vectors back to the text chunks they stand for.
 9. **Pass** the question and the retrieved chunks to the model in one prompt.
+
+The slides also show all nine steps in one diagram. Follow the circled numbers.
+
+<figure class="fig wide"><img src="../assets/img/slides-rag-all-steps.png" alt="One diagram of the whole system with numbered steps. Steps 1 to 4: the private knowledge base is split into chunks, embedded and stored in a vector database. Steps 5 to 9: the query from the chat interface is embedded, an approximate nearest neighbour search finds the closest chunks, and the prompt with the query and the context goes to the LLM, which returns the answer"><figcaption>All nine steps of a chatbot over a private knowledge base. Figure from Dr. Albanna&#x27;s course slides; originally from the SwirlAI Newsletter (newsletter.swirlai.com).</figcaption></figure>
 
 <figure class="fig"><img src="../assets/img/rag-document-chunks-vectorstore.png" alt="A document is split into nine document chunks, which are stored in a vector store"><figcaption>Indexing in one picture: document, chunks, vector store. Figure from Dr. Albanna's course slides.</figcaption></figure>
 
@@ -182,7 +192,7 @@ Splitting is, in the words of the slides, important and tricky: the pieces must 
 
 Both have two settings. **`chunk_size`** is the maximum length of a chunk in characters. **`chunk_overlap`** is the number of characters that the end of one chunk shares with the start of the next, so that a sentence cut at a border still appears whole in one of the two.
 
-<figure class="fig wide"><img src="../assets/img/chunk-overlap.svg" alt="A document as a long bar, and three chunks beneath it. Each chunk has the length chunk_size, and neighbouring chunks share a strip of length chunk_overlap"><figcaption>Chunk size and chunk overlap. The shaded strips belong to two chunks.</figcaption></figure>
+<figure class="fig wide"><img src="../assets/img/slides-chunk-size-overlap.png" alt="Lines of text. A bracket on the left marks one chunk and is labelled chunk_size. A smaller bracket on the right marks the lines that this chunk shares with the next one and is labelled chunk_overlap"><figcaption>Chunk size and chunk overlap. Figure from Dr. Albanna&#x27;s course slides; originally from the DeepLearning.AI short course "LangChain: Chat with Your Data".</figcaption></figure>
 
 The slides demonstrate the settings with very small numbers, so that the effect can be read off directly.
 
@@ -292,6 +302,10 @@ vector_store = PineconeVectorStore.from_documents(chunks, embeddings, index_name
 > **Note: the Pinecone lines of the 2024 script no longer run.** The script begins with `pinecone.init(api_key=..., environment=...)`. The current Pinecone library has removed that function and stops with an error that asks you to create a `Pinecone` object. The import `from langchain.vectorstores import Pinecone` has gone as well; the class is now `PineconeVectorStore` in the package `langchain-pinecone`. The Chroma lines above were run for this lesson. The Pinecone lines follow the current interface but were not run, because they need an account.
 
 ## 8. Step 5: Retrieve and Generate
+
+Four stages are built: loading, splitting, embedding and storage. The slides call the whole system *chat with your documents* and draw it in five boxes. The last two, retrieval and output, are this section.
+
+<figure class="fig wide"><img src="../assets/img/slides-chat-with-documents-pipeline.png" alt="Five boxes in a row: document loading from URLs, PDFs and databases; splitting into splits; storage in a vector store; retrieval of the relevant splits for a query; and output, where a prompt goes to the LLM and gives the answer"><figcaption>Chat with your documents, in five stages. Figure from Dr. Albanna&#x27;s course slides; originally from the DeepLearning.AI short course "LangChain: Chat with Your Data".</figcaption></figure>
 
 Everything is in place for the second phase. A **retriever** is the vector store seen as a chain component: it receives a question and returns documents. Because it is a Runnable, it can be joined with `|` like the components of the first part.
 
@@ -494,7 +508,7 @@ Every additional chunk lengthens the prompt, which makes the answer slower and, 
 - LangChain documentation, building a semantic search engine: https://docs.langchain.com/oss/python/langchain/knowledge-base
 - LangChain documentation, building a RAG agent: https://docs.langchain.com/oss/python/langchain/rag
 
-**Figure credits.** The three architecture figures come from the textbook's companion repository and are used under its Apache 2.0 licence. The indexing and retrieval figures come from the LangChain documentation and are used under its MIT licence. The two pipeline pictures and the data-sources figure come from Dr. Abdulkarim Albanna's course slides. The chunk-overlap diagram was drawn for this lesson.
+**Figure credits.** The three architecture figures come from the textbook's companion repository and are used under its Apache 2.0 licence. The indexing and retrieval figures come from the LangChain documentation and are used under its MIT licence. The remaining figures come from Dr. Abdulkarim Albanna's course slides. Of these, three originate from the SwirlAI Newsletter (newsletter.swirlai.com), as marked on them, and three (the data sources, the five-stage pipeline, and chunk size and overlap) from the DeepLearning.AI short course "LangChain: Chat with Your Data". Product logos that appear in the figures are trademarks of their owners.
 
 ## Test code
 
