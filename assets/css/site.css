@@ -165,6 +165,7 @@ kbd { font-family: var(--mono); font-size: .8em; background: #eef1f5; border: 1p
 .lesson-content img { max-width: 100%; }
 .lesson-content .fig { margin: 1.1rem auto; text-align: center; }
 .lesson-content .fig img { background: #fff; border-radius: 6px; border: 1px solid var(--border); max-height: 420px; width: auto; }
+.lesson-content .fig.wide img { max-height: none; width: 100%; height: auto; }
 .lesson-content .fig figcaption { font-size: .85rem; color: var(--muted); margin-top: .4rem; }
 .lesson-content .katex-display { overflow-x: auto; overflow-y: hidden; }
 .lesson-head { margin-bottom: 1rem; }

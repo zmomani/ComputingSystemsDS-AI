@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="../assets/vendor/codemirror/material-darker.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
-<link rel="stylesheet" href="../assets/css/site.css?v=7bc104e0">
+<link rel="stylesheet" href="../assets/css/site.css?v=a021af20">
 </head>
 <body><header class="topbar">
   <a class="brand" href="../index.html">
@@ -20,117 +20,1143 @@
   <nav class="topnav"><a class="btn ghost" href="week03-ner.html" title="Named Entity Recognition (NER)">‹ Prev</a><select id="lesson-select" aria-label="Choose lesson"><option value="">Lessons…</option><option value="syllabus.html">Course Syllabus</option><option value="project.html">Final Project</option><option value="week01-transformers.html">Week 1 · Transformer Architecture</option><option value="week02-text-classification.html">Week 2 · Text Classification</option><option value="week03-ner.html">Week 3 · Named Entity Recognition (NER)</option><option value="week04-langchain.html" selected>Week 4 · LangChain Fundamentals</option><option value="week05-langgraph.html">Week 5 · LangGraph</option><option value="week06-llms.html">Week 6 · Large Language Models (LLMs)</option><option value="week07-moe.html">Week 7 · Mixture of Experts (MoE)</option><option value="week08-midterm.html">Week 8 · Midterm Exam</option><option value="week09-react-agents.html">Week 9 · AI Agents &amp; ReAct</option><option value="week10-multi-agent.html">Week 10 · Multi-Agent Systems</option><option value="week11-mcp.html">Week 11 · Model Context Protocol (MCP)</option><option value="week12-lams.html">Week 12 · Large Action Models (LAMs)</option><option value="week13-diffusion.html">Week 13 · Diffusion Models</option><option value="week14-project.html">Week 14 · Project Development &amp; Final Testing</option><option value="week15-competition.html">Week 15 · Competition Day &amp; Presentations</option><option value="week16-final.html">Week 16 · Final Exam</option></select><a class="btn ghost" href="week05-langgraph.html" title="LangGraph">Next ›</a></nav>
   <button id="btn-panel" class="btn accent" title="Show or hide the editor / animation panel">⇆ Panel</button><div class="status" id="py-status"><span class="dot"></span><span id="py-status-text">Python loads on first run</span></div>
 </header><main class="lesson panel-closed" id="lesson" data-colab="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb" data-codespaces="https://codespaces.new/zmomani/ComputingSystemsDS-AI?quickstart=1" data-guide="https://github.com/zmomani/ComputingSystemsDS-AI/blob/main/CODESPACES.md"><article class="lesson-content" id="lesson-content"><div class="lesson-head"><div class="eyebrow">Week 4 · ILO K1, P1</div><h1>LangChain Fundamentals</h1>
-<p class="lesson-intro"><b>Topics:</b> LangChain chains, prompts, memory, loaders, splitters, vector stores, RAG<br><b>Project milestone:</b> Prompt templates for each agent, document loaders, ChromaDB store, basic RAG chain</p></div>
-<div class="colab-bar"><a class="btn colab" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb" target="_blank" rel="noopener"><span class="colab-logo">CO</span> Open this week's notebook in Colab</a><span class="muted small">All of this lesson's code, ready to run, with its installs in the first cell.</span></div>
+<p class="lesson-intro"><b>Topics:</b> LangChain prompts, chains, structured output, routing; document loaders, splitters, embeddings, vector stores, RAG<br><b>Project milestone:</b> Prompt templates for each agent, document loaders, ChromaDB store, basic RAG chain</p></div>
+<div class="colab-bar"><a class="btn colab" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb" target="_blank" rel="noopener"><span class="colab-logo">CO</span> Open this week's notebook in Colab</a><span class="muted small">All of this lesson's code, ready to run, with its installs in the first cell. Choose <b>Runtime → Change runtime type → T4 GPU</b> first: this lesson runs a small language model, which is slow without a GPU.</span></div>
 <div class="sim-strip"><div class="sim-strip-head">Animations for this week — open them in the panel</div><div class="sim-strip-items"><button class="sim-chip" data-display="rag"><span class="sim-chip-kind">LangChain</span>▶ Display: RAG pipeline</button><button class="sim-chip" data-display="vectors"><span class="sim-chip-kind">Linear algebra</span>▶ Display: Vectors, dot product &amp; cosine similarity</button></div></div>
-<details class="contents"><summary>Contents (21 sections)</summary><ol><li><a href="#part-langchain-fundamentals">LangChain Fundamentals</a></li><li><a href="#welcome-to-langchain-python">Welcome to LangChain Python</a></li><li><a href="#the-langchain-framework">The LangChain Framework</a></li><li><a href="#development">Development</a></li><li><a href="#productionization">Productionization</a></li><li><a href="#deployment">Deployment</a></li><li><a href="#langchain-libraries">LangChain Libraries</a></li><li><a href="#tutorials">Tutorials</a></li><li><a href="#guides-reference">Guides &amp; Reference</a></li><li><a href="#additional-resources">Additional Resources</a></li><li><a href="#quick-links">Quick Links</a></li><li><a href="#part-chat-with-databases">Chat with Databases</a></li><li><a href="#introduction">Introduction</a></li><li><a href="#chat-interface">Chat Interface</a></li><li><a href="#database-schema">Database Schema</a></li><li><a href="#how-langchain-connects-to-databases">How LangChain Connects to Databases</a></li><li><a href="#security-considerations">Security Considerations</a></li><li><a href="#process-flow">Process Flow</a></li><li><a href="#sample-queries">Sample Queries</a></li><li><a href="#implementation-code">Implementation Code</a></li><li><a href="#closing-note">Closing note</a></li></ol></details>
-<h2 class="part" id="part-langchain-fundamentals">LangChain Fundamentals</h2>
-<h2 id="welcome-to-langchain-python">Welcome to LangChain Python</h2>
-<p>A framework for developing applications powered by large language models (LLMs).</p>
-<p>Official documentation: https://python.langchain.com/</p>
-<h2 id="the-langchain-framework">The LangChain Framework</h2>
-<p>LangChain simplifies every stage of the LLM application lifecycle, from development to productionization to deployment.</p>
-<p><img alt="LangChain Framework Diagram" src="https://raw.githubusercontent.com/langchain-ai/langchain/v0.3/docs/static/svg/langchain_stack_062024.svg" /></p>
-<p><em>Figure: the LangChain stack — open-source libraries (langchain-core, langchain, langchain-community, LangGraph) at the base, LangSmith for productionization, and LangGraph Cloud / LangServe for deployment.</em></p>
-<h2 id="development">Development</h2>
-<p>Build your applications using LangChain's open-source building blocks, components, and third-party integrations.</p>
-<h3 id="building-blocks-lcel">Building Blocks (LCEL)</h3>
-<p>Create composable chains with LangChain Expression Language, providing flexibility and reusability.</p>
-<p>Reference: https://python.langchain.com/docs/concepts/#langchain-expression-language-lcel</p>
-<h3 id="langgraph">LangGraph</h3>
-<p>Build stateful agents with first-class streaming and human-in-the-loop support for complex applications.</p>
-<p>Reference: https://python.langchain.com/docs/concepts/#langgraph</p>
-<h2 id="productionization">Productionization</h2>
-<p>Use LangSmith to inspect, monitor and evaluate your chains, so that you can continuously optimize and deploy with confidence.</p>
-<h3 id="langsmith">LangSmith</h3>
-<p>A developer platform that lets you debug, test, evaluate, and monitor LLM applications.</p>
-<p>Reference: https://docs.smith.langchain.com/</p>
-<h2 id="deployment">Deployment</h2>
-<p>Turn your LangGraph applications into production-ready APIs and Assistants with LangGraph Cloud.</p>
-<h3 id="langgraph-cloud">LangGraph Cloud</h3>
-<p>Deploy your LangGraph applications as production-ready APIs and Assistants.</p>
-<p>Reference: https://langchain-ai.github.io/langgraph/cloud/</p>
-<h2 id="langchain-libraries">LangChain Libraries</h2>
-<p>The framework consists of the following open-source libraries:</p>
+<details class="contents"><summary>Contents (37 sections)</summary><ol><li><a href="#part-langchain-prompts-chains-and-routing">LangChain: Prompts, Chains and Routing</a></li><li><a href="#what-youll-learn">What You'll Learn</a></li><li><a href="#1-what-is-langchain">1. What is LangChain?</a></li><li><a href="#2-a-chat-model-without-an-api-key">2. A Chat Model Without an API Key</a></li><li><a href="#3-prompts">3. Prompts</a></li><li><a href="#4-chains-and-the-pipe-operator">4. Chains and the Pipe Operator</a></li><li><a href="#5-structured-output">5. Structured Output</a></li><li><a href="#6-sequential-chains">6. Sequential Chains</a></li><li><a href="#7-routing">7. Routing</a></li><li><a href="#8-from-the-lesson-to-your-project">8. From the Lesson to Your Project</a></li><li><a href="#9-check-your-understanding">9. Check Your Understanding</a></li><li><a href="#10-summary-and-further-reading">10. Summary and Further Reading</a></li><li><a href="#part-chat-with-your-documents-rag">Chat with Your Documents (RAG)</a></li><li><a href="#what-youll-learn-in-this-part">What You'll Learn in This Part</a></li><li><a href="#1-why-a-model-alone-is-not-enough">1. Why a Model Alone Is Not Enough</a></li><li><a href="#2-from-retriever-reader-to-rag">2. From Retriever-Reader to RAG</a></li><li><a href="#3-the-pipeline-index-once-answer-many-times">3. The Pipeline: Index Once, Answer Many Times</a></li><li><a href="#4-step-1-load">4. Step 1: Load</a></li><li><a href="#5-step-2-split">5. Step 2: Split</a></li><li><a href="#6-step-3-embed">6. Step 3: Embed</a></li><li><a href="#7-step-4-store">7. Step 4: Store</a></li><li><a href="#8-step-5-retrieve-and-generate">8. Step 5: Retrieve and Generate</a></li><li><a href="#9-measuring-the-retriever">9. Measuring the Retriever</a></li><li><a href="#10-rag-chain-or-rag-agent">10. RAG Chain or RAG Agent?</a></li><li><a href="#11-from-the-lesson-to-your-project">11. From the Lesson to Your Project</a></li><li><a href="#12-check-your-understanding-rag">12. Check Your Understanding: RAG</a></li><li><a href="#13-summary-and-further-reading-rag">13. Summary and Further Reading: RAG</a></li><li><a href="#part-chat-with-databases">Chat with Databases</a></li><li><a href="#introduction">Introduction</a></li><li><a href="#chat-interface">Chat Interface</a></li><li><a href="#database-schema">Database Schema</a></li><li><a href="#how-langchain-connects-to-databases">How LangChain Connects to Databases</a></li><li><a href="#security-considerations">Security Considerations</a></li><li><a href="#process-flow">Process Flow</a></li><li><a href="#sample-queries">Sample Queries</a></li><li><a href="#implementation-code">Implementation Code</a></li><li><a href="#closing-note">Closing note</a></li></ol></details>
+<h2 class="part" id="part-langchain-prompts-chains-and-routing">LangChain: Prompts, Chains and Routing</h2>
+<p><em>From one call to a model, to a program built around it.</em> Level: intermediate · about 75 minutes · LangChain 1.x, Hugging Face Transformers. The lesson follows the order of the course slides on LangChain and uses the current LangChain documentation for all code.</p>
+<h2 id="what-youll-learn">What You'll Learn</h2>
+<p>By the end of this part you will be able to:</p>
+<ul>
+<li>Say what LangChain is, and name the packages it is divided into today</li>
+<li>Load a chat model that runs inside Google Colab without an API key</li>
+<li>Write a prompt template and fill it with values</li>
+<li>Join a prompt, a model and an output parser into a chain with the pipe operator <code>|</code></li>
+<li>Turn a model's free text into a checked Python object</li>
+<li>Build a sequential chain, with one or with several inputs and outputs</li>
+<li>Route a question to the prompt that suits it</li>
+<li>Read LangChain code written in 2023–2024 and rewrite it for the current library</li>
+</ul>
+<p><strong>Goal:</strong> five small working programs (a translator, an email assistant, a review analyser, a two-step code generator and a subject router), which are the building blocks of the agents in your project.</p>
+<p><strong>Prerequisites:</strong> <a href="week02-text-classification.html">Week 2</a> and <a href="week03-ner.html">Week 3</a>. You should be comfortable with Python dictionaries and functions, and with loading a model from the Hugging Face Hub.</p>
+<h3 id="abbreviations-used-in-this-lesson">Abbreviations used in this lesson</h3>
 <table>
 <thead>
 <tr>
-<th>Library</th>
-<th>Role</th>
+<th>Abbreviation</th>
+<th>Stands for</th>
+<th>In one line</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>langchain-core</strong></td>
-<td>Base abstractions and LangChain Expression Language that form the foundation of LangChain.</td>
+<td>LLM</td>
+<td>Large Language Model</td>
+<td>A model that continues or answers text</td>
 </tr>
 <tr>
-<td><strong>langchain-community</strong></td>
-<td>Third party integrations enabling connections to external services and tools.</td>
+<td>API</td>
+<td>Application Programming Interface</td>
+<td>The way one program asks another for a service; here, a model that runs on a company's servers</td>
 </tr>
 <tr>
-<td><strong>langchain</strong></td>
-<td>Chains, agents, and retrieval strategies that make up an application's cognitive architecture.</td>
+<td>LCEL</td>
+<td>LangChain Expression Language</td>
+<td>The notation that joins components with <code>|</code></td>
 </tr>
 <tr>
-<td><strong>LangGraph</strong></td>
-<td>Build robust and stateful multi-actor applications with LLMs by modeling steps as edges and nodes in a graph.</td>
+<td>JSON</td>
+<td>JavaScript Object Notation</td>
+<td>A text format for structured data: <code>{"key": value}</code></td>
 </tr>
 <tr>
-<td><strong>LangServe</strong></td>
-<td>Deploy LangChain chains as REST APIs for easy integration with other services.</td>
+<td>RAG</td>
+<td>Retrieval-Augmented Generation</td>
+<td>Finding relevant text first and giving it to the model with the question; the subject of the second part of this week</td>
 </tr>
 <tr>
-<td><strong>LangSmith</strong></td>
-<td>A developer platform that lets you debug, test, evaluate, and monitor LLM applications.</td>
+<td>GPU, CPU</td>
+<td>Graphics / Central Processing Unit</td>
+<td>A language model answers much faster on a GPU</td>
 </tr>
 </tbody>
 </table>
-<blockquote>
-<p>Note: these docs focus on the Python LangChain library. For the JavaScript version see https://js.langchain.com/.</p></blockquote>
-<h2 id="tutorials">Tutorials</h2>
-<p>If you're looking to build something specific or are more of a hands-on learner, check out our tutorials section.</p>
-<h3 id="build-a-simple-llm-application">Build a Simple LLM Application</h3>
-<p>Learn how to create a basic application powered by large language models.
-https://python.langchain.com/docs/tutorials/llm_chain/</p>
-<h3 id="build-a-chatbot">Build a Chatbot</h3>
-<p>Create your own conversational AI assistant using LangChain's components.
-https://python.langchain.com/docs/tutorials/chatbot/</p>
-<h3 id="build-an-agent">Build an Agent</h3>
-<p>Develop intelligent agents that can perform tasks and make decisions autonomously.
-https://python.langchain.com/docs/tutorials/agents/</p>
-<h3 id="introduction-to-langgraph">Introduction to LangGraph</h3>
-<p>Learn how to use LangGraph to build stateful, multi-actor applications with LLMs.
-https://langchain-ai.github.io/langgraph/tutorials/introduction/</p>
-<p>All tutorials: https://python.langchain.com/docs/tutorials/</p>
-<h2 id="guides-reference">Guides &amp; Reference</h2>
-<h3 id="how-to-guides">How-to guides</h3>
-<p>Short answers to "How do I….?" types of questions. These guides help you quickly accomplish common tasks.
-https://python.langchain.com/docs/how_to/ — LangGraph how-tos: https://langchain-ai.github.io/langgraph/how-tos/</p>
-<h3 id="conceptual-guide">Conceptual guide</h3>
-<p>Introductions to all the key parts of LangChain you'll need to know! High level explanations of all LangChain concepts.
-https://python.langchain.com/docs/concepts/ — LangGraph concepts: https://langchain-ai.github.io/langgraph/concepts/</p>
-<h3 id="api-reference">API reference</h3>
-<p>Full documentation of all classes and methods in the LangChain Python packages.
-https://python.langchain.com/api_reference/</p>
-<h2 id="additional-resources">Additional Resources</h2>
+<h2 id="1-what-is-langchain">1. What is LangChain?</h2>
+<p>A language model does one thing: it receives text and returns text. An application needs more than that. It must build the text that goes in, call the model, check what comes out, and often fetch documents or call other programs on the way. <strong>LangChain</strong> is an open-source Python framework for writing this surrounding program. It gives every kind of component (a prompt, a model, a parser, a document loader, a vector store) a standard interface, so that components can be joined together and exchanged for one another.</p>
+<p>The practical benefit is exchange. In this lesson you will write each program once, with a small model that runs in Colab. If you later change one line to use a hosted model from OpenAI or Google, the remainder of the program stays as it is.</p>
+<figure class="fig wide"><img src="../assets/img/langchain-components.png" alt="Six components around the LangChain logo: memory, prompt templates, indexes, LLMs, chains and agents, each with a short description"><figcaption>The six kinds of component in LangChain. Figure from Dr. Albanna's course slides.</figcaption></figure>
+
+<blockquote class="box box-note"><p><span class="box-tag">Note</span><strong>Two names in this figure have changed.</strong> The figure uses the vocabulary of 2023. What it calls <strong>Indexes</strong> is now described as <em>retrieval</em>: document loaders, text splitters, embedding models, vector stores and retrievers, which are the subject of the second part of this week. What it calls <strong>LLMs</strong> are now mostly <strong>chat models</strong>. If you look for an "Indexes" page in the current documentation, you will not find one.</p></blockquote>
+<p>This week covers four of the six components: prompt templates, models and chains in this part, and retrieval in the next. Agents are the subject of Weeks 5 and 9, and memory is treated in Week 5 with LangGraph.</p>
+<h3 id="the-packages">The packages</h3>
+<p>LangChain is installed as several packages. Knowing which package holds what makes the import lines in this lesson readable.</p>
+<table>
+<thead>
+<tr>
+<th>Package</th>
+<th>What it holds</th>
+<th>Used in this lesson for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>langchain-core</code></td>
+<td>The basic interfaces: prompts, messages, output parsers, and the pipe operator</td>
+<td>Almost every example</td>
+</tr>
+<tr>
+<td><code>langchain</code></td>
+<td>Agents and helpers for choosing a model (<code>create_agent</code>, <code>init_chat_model</code>)</td>
+<td>The optional hosted model</td>
+</tr>
+<tr>
+<td><code>langchain-huggingface</code>, <code>langchain-openai</code>, …</td>
+<td>One package per provider</td>
+<td>The local chat model and the embedding model</td>
+</tr>
+<tr>
+<td><code>langchain-text-splitters</code></td>
+<td>Text splitters</td>
+<td>Part 2</td>
+</tr>
+<tr>
+<td><code>langchain-community</code></td>
+<td>Integrations maintained by the community, among them most document loaders</td>
+<td>Part 2</td>
+</tr>
+<tr>
+<td><code>langchain-classic</code></td>
+<td>The older chain classes, kept so that old programs still run</td>
+<td>Reading 2024 code</td>
+</tr>
+<tr>
+<td><code>langgraph</code></td>
+<td>Graphs of steps with state, loops and memory</td>
+<td>Week 5</td>
+</tr>
+</tbody>
+</table>
+<blockquote class="box box-careful"><p><span class="box-tag">Common confusion</span><strong>Most LangChain code on the internet is written for an older version.</strong> LangChain 1.0 moved the classes that older tutorials are built on (<code>LLMChain</code>, <code>SimpleSequentialChain</code>, <code>MultiPromptChain</code> and others) out of the <code>langchain</code> package and into <code>langchain-classic</code>. A line such as <code>from langchain.chains import LLMChain</code> now fails with <code>ModuleNotFoundError: No module named 'langchain.chains'</code>. The course slides were written in January 2024, so each section of this lesson shows the slide's code beside its current form. The ideas are the same; the notation is shorter.</p></blockquote>
+<h2 id="2-a-chat-model-without-an-api-key">2. A Chat Model Without an API Key</h2>
+<p>The slides call OpenAI's models, which need an account, a key and payment. In this lesson the default model is <strong>Qwen2.5-1.5B-Instruct</strong>, an open model with about 1.5 billion parameters, published under the Apache 2.0 licence. It runs inside your own Colab session, so no registration is needed, and it understands Arabic as well as English.</p>
+<p>Before you run the cell, choose <strong>Runtime → Change runtime type → T4 GPU</strong>. The code also works on a CPU, but each answer then takes far longer.</p>
+<div class="where-note"><div class="where-head">Where does this code run — and why?</div><p><b>▶ Try it</b> examples run inside this page, in your web browser — good for quick experiments with plain Python, NumPy, pandas, scikit-learn and matplotlib. From here on the examples need more:</p><ul><li><b>Everything else → Google Colab.</b> PyTorch, Transformers, LangChain and LangGraph need a full Python installation and large libraries, which a web page does not have. <b>▶ Run in Colab</b> opens this week's notebook in Google Colab, at the cell that holds the example. The notebook contains all of the lesson's code in order, and its first cell installs what is missing. Sign in with a Google account and run the cells from the top, because later examples reuse earlier ones.</li><li><b>A GPU makes this lesson fast.</b> The examples run a small language model inside the notebook. In Colab choose <b>Runtime → Change runtime type → T4 GPU</b> before running it. Without a GPU the code still works, but each answer takes much longer.</li><li><b>API keys.</b> The first two parts of this lesson need no key and no registration. Only the optional hosted-model cell and the last part, <i>Chat with Databases</i>, call a service on the internet with your own key. In Colab, add it once in the 🔑 <b>Secrets</b> panel (left bar) and switch on <i>Notebook access</i> — never type a key into your code.</li><li><b>Exception — programs that keep running.</b> Web apps and local servers (Django, Streamlit, Ollama, MCP servers, Playwright) are files and programs, not notebook steps. Those examples have <b>💻 Open in Codespaces</b>, a free cloud computer with a terminal, already set up for this course (<a href="https://github.com/zmomani/ComputingSystemsDS-AI/blob/main/CODESPACES.md" target="_blank" rel="noopener">guide</a>).</li></ul></div><div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-005" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_huggingface, torch, transformers" title="Needs langchain_huggingface, torch, transformers — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
+from langchain_huggingface import ChatHuggingFace, HuggingFacePipeline
+
+MODEL_ID = &quot;Qwen/Qwen2.5-1.5B-Instruct&quot;
+
+tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
+model = AutoModelForCausalLM.from_pretrained(MODEL_ID)
+if torch.cuda.is_available():
+    model = model.half().to(&quot;cuda&quot;)          # half precision on the GPU: less memory, faster
+
+generator = pipeline(&quot;text-generation&quot;, model=model, tokenizer=tokenizer,
+                     max_new_tokens=300, do_sample=False, return_full_text=False)
+llm = ChatHuggingFace(llm=HuggingFacePipeline(pipeline=generator))
+
+print(&quot;Running on:&quot;, &quot;GPU&quot; if torch.cuda.is_available() else &quot;CPU&quot;)
+print(llm.invoke(&quot;In one sentence, what is LangChain?&quot;).content)</textarea><pre><code class="language-python">import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
+from langchain_huggingface import ChatHuggingFace, HuggingFacePipeline
+
+MODEL_ID = &quot;Qwen/Qwen2.5-1.5B-Instruct&quot;
+
+tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
+model = AutoModelForCausalLM.from_pretrained(MODEL_ID)
+if torch.cuda.is_available():
+    model = model.half().to(&quot;cuda&quot;)          # half precision on the GPU: less memory, faster
+
+generator = pipeline(&quot;text-generation&quot;, model=model, tokenizer=tokenizer,
+                     max_new_tokens=300, do_sample=False, return_full_text=False)
+llm = ChatHuggingFace(llm=HuggingFacePipeline(pipeline=generator))
+
+print(&quot;Running on:&quot;, &quot;GPU&quot; if torch.cuda.is_available() else &quot;CPU&quot;)
+print(llm.invoke(&quot;In one sentence, what is LangChain?&quot;).content)</code></pre></div>
+<div class="code-notes" hidden data-notes="[[&quot;from_pretrained&quot;, &quot;Downloads the model&#x27;s weights the first time (about 3 GB) and loads them into memory.&quot;, 2], [&quot;max_new_tokens=300&quot;, &quot;The longest reply the model may write, in tokens. A longer reply is cut off at this length.&quot;, 1], [&quot;do_sample=False&quot;, &quot;Always choose the most probable next token, so the same question gives the same answer every time.&quot;, 1], [&quot;return_full_text=False&quot;, &quot;Return only the new text, without repeating the prompt.&quot;, 1], [&quot;ChatHuggingFace&quot;, &quot;Wraps the Hugging Face pipeline so that LangChain can use it like any other chat model.&quot;, 1], [&quot;llm.invoke&quot;, &quot;Send one input to the model and wait for the whole reply.&quot;, 1]]"></div><p class="code-notes-hint">Move the pointer over the <span>underlined</span> parts of the code to see what each one does.</p>
+<p>The first run downloads the model, so allow a few minutes. The last line is your first LangChain call: <code>invoke</code> sends an input and returns a message object, whose text is in <code>.content</code>.</p>
+<blockquote class="box box-terms"><p><span class="box-tag">Terms</span><strong>LLM and chat model.</strong> An <strong>LLM</strong> in the older sense receives one string and continues it. A <strong>chat model</strong> receives a list of <em>messages</em>, each with a role, and returns one message. The roles are <strong>system</strong> (instructions for the whole conversation), <strong>human</strong> (what the user says) and <strong>AI</strong> (what the model replies). Almost every current model is a chat model, and LangChain's current interfaces are built for them. The variable is still named <code>llm</code> here, as in the slides and in most tutorials.</p></blockquote>
+<blockquote class="box box-note"><p><span class="box-tag">Note</span><strong>What a small model can and cannot do.</strong> A model of this size translates, summarises, rewrites and answers from a given text reasonably well. It is weaker than a large hosted model at following strict output formats, at long reasoning, and at writing longer programs. When an example in this lesson gives a poor answer, read the prompt that was sent before you conclude that the code is wrong: Section 3 shows how.</p></blockquote>
+<h3 id="optional-a-hosted-model-instead">Optional: a hosted model instead</h3>
+<p>If you have a key for a hosted model, two lines replace the local model, and every later example works unchanged. This is the exchange that Section 1 promised. The cell does nothing until you change <code>False</code> to <code>True</code>, so the notebook runs without a key.</p>
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-007" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain" title="Needs langchain — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>USE_HOSTED_MODEL = False          # change to True only if you have an API key
+
+if USE_HOSTED_MODEL:
+    # The key is read from Colab&#x27;s Secrets panel (the key icon in the left bar), under the name OPENAI_API_KEY.
+    # Model names change often: take a current name from the provider&#x27;s own list.
+    from langchain.chat_models import init_chat_model
+    llm = init_chat_model(&quot;openai:gpt-4o-mini&quot;, temperature=0)</textarea><pre><code class="language-python">USE_HOSTED_MODEL = False          # change to True only if you have an API key
+
+if USE_HOSTED_MODEL:
+    # The key is read from Colab&#x27;s Secrets panel (the key icon in the left bar), under the name OPENAI_API_KEY.
+    # Model names change often: take a current name from the provider&#x27;s own list.
+    from langchain.chat_models import init_chat_model
+    llm = init_chat_model(&quot;openai:gpt-4o-mini&quot;, temperature=0)</code></pre></div>
+<p><code>init_chat_model</code> takes a string of the form <code>provider:model</code>. For Google's models the string begins with <code>google_genai:</code>, the package to install is <code>langchain-google-genai</code>, and the key is named <code>GOOGLE_API_KEY</code>.</p>
+<h2 id="3-prompts">3. Prompts</h2>
+<p>A <strong>prompt</strong> is the input that is passed to the model. The slides put it this way: prompts are the new way to program models. In an application the prompt is almost never a fixed sentence. It has a fixed part, written by the developer, and places for values that arrive at run time: the user's text, a language, a retrieved document. A <strong>prompt template</strong> holds the fixed part and names the places.</p>
+<p>The first use case in the slides is a translation app: the user chooses a language, types a sentence and receives the translation.</p>
+<figure class="fig"><img src="../assets/img/app-translation.png" alt="A web form titled Translation: a language selector set to Arabic, an English sentence, a Send button, and the Arabic translation below"><figcaption>The translation app from the course slides. Its whole logic is one prompt template with two placeholders. Screenshot from Dr. Albanna's course slides.</figcaption></figure>
+
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-009" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core" title="Needs langchain_core — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langchain_core.prompts import ChatPromptTemplate
+
+translate_prompt = ChatPromptTemplate.from_messages([
+    (&quot;system&quot;, &quot;You are a translator. Translate the user&#x27;s text into {language}. Reply with the translation only.&quot;),
+    (&quot;human&quot;, &quot;{text}&quot;),
+])
+
+messages = translate_prompt.format_messages(
+    language=&quot;Arabic&quot;,
+    text=&quot;Abdulkarim Albanna is from Jordan and works at the University of Petra.&quot;,
+)
+for m in messages:
+    print(f&quot;{m.type}: {m.content}&quot;)
+print(&quot;Input variables:&quot;, translate_prompt.input_variables)</textarea><pre><code class="language-python">from langchain_core.prompts import ChatPromptTemplate
+
+translate_prompt = ChatPromptTemplate.from_messages([
+    (&quot;system&quot;, &quot;You are a translator. Translate the user&#x27;s text into {language}. Reply with the translation only.&quot;),
+    (&quot;human&quot;, &quot;{text}&quot;),
+])
+
+messages = translate_prompt.format_messages(
+    language=&quot;Arabic&quot;,
+    text=&quot;Abdulkarim Albanna is from Jordan and works at the University of Petra.&quot;,
+)
+for m in messages:
+    print(f&quot;{m.type}: {m.content}&quot;)
+print(&quot;Input variables:&quot;, translate_prompt.input_variables)</code></pre></div>
+<p>This cell does not call the model. It prints the messages that <em>would</em> be sent:</p>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">system: You are a translator. Translate the user&#x27;s text into Arabic. Reply with the translation only.
+human: Abdulkarim Albanna is from Jordan and works at the University of Petra.
+Input variables: [&#x27;language&#x27;, &#x27;text&#x27;]</code></pre></div>
+<p>The template found the two placeholders, <code>{language}</code> and <code>{text}</code>, by itself. Now send the messages to the model:</p>
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-010" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>reply = llm.invoke(messages)
+print(reply.content)</textarea><pre><code class="language-python">reply = llm.invoke(messages)
+print(reply.content)</code></pre></div>
+<blockquote class="box box-tip"><p><span class="box-tag">Tip</span><strong>When a result is poor, print the prompt.</strong> <code>format_messages</code> shows exactly what the model receives. Most problems in an LLM application are visible there: a placeholder that was filled with the wrong value, an instruction that is ambiguous, or a document that was never inserted.</p></blockquote>
+<blockquote class="box box-careful"><p><span class="box-tag">Common confusion</span><strong>A literal brace must be doubled.</strong> The template treats everything between <code>{</code> and <code>}</code> as a placeholder. To show the model a real brace, for example in a JSON example, write <code>{{</code> and <code>}}</code>. A single brace gives a <code>KeyError</code> or an error about a missing variable.</p></blockquote>
+<h3 id="the-email-assistant">The email assistant</h3>
+<p>The second use case answers a customer's email in the customer's language. Only the system message changes; the code has the same shape. The template is reusable: the same object serves every email and every language.</p>
+<figure class="fig"><img src="../assets/img/app-email-reply.png" alt="A web form titled Customer Email response: a short Arabic email from a customer, and below it a longer polite reply in Arabic"><figcaption>The customer email app from the course slides, with an Arabic email and the generated reply. Screenshot from Dr. Albanna's course slides.</figcaption></figure>
+
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-012" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>email_prompt = ChatPromptTemplate.from_messages([
+    (&quot;system&quot;, &quot;You work in customer service for a software company. Write a short, polite reply &quot;
+               &quot;to the customer&#x27;s email. Write the reply in {language}.&quot;),
+    (&quot;human&quot;, &quot;{email}&quot;),
+])
+
+messages = email_prompt.format_messages(
+    language=&quot;Arabic&quot;,
+    email=&quot;اسمي عبدالكريم البنا، أود أن أسأل عن خدمات الشركة للمطورين.&quot;,
+)
+print(llm.invoke(messages).content)</textarea><pre><code class="language-python">email_prompt = ChatPromptTemplate.from_messages([
+    (&quot;system&quot;, &quot;You work in customer service for a software company. Write a short, polite reply &quot;
+               &quot;to the customer&#x27;s email. Write the reply in {language}.&quot;),
+    (&quot;human&quot;, &quot;{email}&quot;),
+])
+
+messages = email_prompt.format_messages(
+    language=&quot;Arabic&quot;,
+    email=&quot;اسمي عبدالكريم البنا، أود أن أسأل عن خدمات الشركة للمطورين.&quot;,
+)
+print(llm.invoke(messages).content)</code></pre></div>
+<h2 id="4-chains-and-the-pipe-operator">4. Chains and the Pipe Operator</h2>
+<p>In Section 3 two steps were written by hand: fill the template, then call the model. A <strong>chain</strong> joins such steps so that the output of each becomes the input of the next. In current LangChain a chain is written with the pipe operator <code>|</code>, a notation called the LangChain Expression Language (<abbr data-tip="LangChain Expression Language: the notation that joins components with |" tabindex="0">LCEL</abbr>).</p>
+<figure class="fig wide"><img src="../assets/img/lcel-chains.svg" alt="Three diagrams. First: input, prompt template, chat model, output parser, output, joined by arrows. Second: an HTML chain whose output, code, is the input of a Python chain. Third: a dictionary that gains the key code and then the key explanation"><figcaption>The three chain shapes of this lesson: a single chain (this section), a sequential chain, and a chain with several inputs and outputs (Section 6).</figcaption></figure>
+
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-014" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core" title="Needs langchain_core — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langchain_core.output_parsers import StrOutputParser
+
+translate_chain = translate_prompt | llm | StrOutputParser()
+
+print(translate_chain.invoke({&quot;language&quot;: &quot;French&quot;, &quot;text&quot;: &quot;Good morning, how are you?&quot;}))</textarea><pre><code class="language-python">from langchain_core.output_parsers import StrOutputParser
+
+translate_chain = translate_prompt | llm | StrOutputParser()
+
+print(translate_chain.invoke({&quot;language&quot;: &quot;French&quot;, &quot;text&quot;: &quot;Good morning, how are you?&quot;}))</code></pre></div>
+<p>Read the first line from left to right. The dictionary given to <code>invoke</code> goes into the prompt template, which produces messages. The messages go into the model, which produces a message. That message goes into <code>StrOutputParser</code>, which keeps its text. The chain as a whole receives a dictionary and returns a string.</p>
+<p>Every chain has the same three methods, whatever it contains:</p>
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-015" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># batch: several inputs in one call
+results = translate_chain.batch([
+    {&quot;language&quot;: &quot;German&quot;, &quot;text&quot;: &quot;Where is the library?&quot;},
+    {&quot;language&quot;: &quot;Spanish&quot;, &quot;text&quot;: &quot;Where is the library?&quot;},
+])
+print(results)
+
+# stream: receive the reply piece by piece, as a chat window shows it
+for piece in translate_chain.stream({&quot;language&quot;: &quot;Arabic&quot;, &quot;text&quot;: &quot;The lecture starts at ten.&quot;}):
+    print(piece, end=&quot;&quot;, flush=True)</textarea><pre><code class="language-python"># batch: several inputs in one call
+results = translate_chain.batch([
+    {&quot;language&quot;: &quot;German&quot;, &quot;text&quot;: &quot;Where is the library?&quot;},
+    {&quot;language&quot;: &quot;Spanish&quot;, &quot;text&quot;: &quot;Where is the library?&quot;},
+])
+print(results)
+
+# stream: receive the reply piece by piece, as a chat window shows it
+for piece in translate_chain.stream({&quot;language&quot;: &quot;Arabic&quot;, &quot;text&quot;: &quot;The lecture starts at ten.&quot;}):
+    print(piece, end=&quot;&quot;, flush=True)</code></pre></div>
+<blockquote class="box box-terms"><p><span class="box-tag">Terms</span><strong>Runnable.</strong> Anything that can stand on either side of <code>|</code> is called a <strong>Runnable</strong>: a prompt template, a model, a parser, a retriever, or a whole chain. All of them offer <code>invoke</code>, <code>batch</code> and <code>stream</code>. Because a chain is itself a Runnable, chains can be joined into larger chains, which is what Sections 6 and 7 do.</p></blockquote>
+<h3 id="the-same-chain-in-the-2024-notation">The same chain in the 2024 notation</h3>
+<p>The slides define this chain with the class <code>LLMChain</code>: "an LLMChain consists of a PromptTemplate, a model and an optional output parser. It takes input variables, uses the PromptTemplate to format them into a prompt, passes the prompt to the model, and uses the output parser, if one is given, to parse the output." That description still fits exactly; only the way of writing it has changed.</p>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-python"># 2024 (course slides). Today this needs:  pip install langchain-classic
+from langchain_classic.chains import LLMChain
+
+translate_chain_2024 = LLMChain(llm=llm, prompt=translate_prompt)
+translate_chain_2024.run(language=&quot;French&quot;, text=&quot;Good morning, how are you?&quot;)
+
+# Current: the same three parts, joined with |
+translate_chain = translate_prompt | llm | StrOutputParser()
+translate_chain.invoke({&quot;language&quot;: &quot;French&quot;, &quot;text&quot;: &quot;Good morning, how are you?&quot;})</code></pre></div>
+<h2 id="5-structured-output">5. Structured Output</h2>
+<p>The third use case in the slides reads a customer review and extracts three facts from it: whether the item was a gift, how many days the delivery took, and what the customer said about the price. A program that receives this answer cannot work with a paragraph. It needs a Python object with three fields.</p>
+<figure class="fig"><img src="../assets/img/app-review-extraction.png" alt="A web form titled Customer review: an Arabic review, and below it a JSON object with the keys gift, delivery_days and price_value"><figcaption>The review app from the course slides: free text goes in and a JSON object with three keys comes out. Screenshot from Dr. Albanna's course slides.</figcaption></figure>
+
+<p>The method has three steps: describe the object you want, tell the model to answer in that form, and parse the answer. The description is a <strong>Pydantic</strong> class, which is a Python class whose fields have types that are checked.</p>
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-017" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core, pydantic" title="Needs langchain_core, pydantic — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from pydantic import BaseModel, Field
+from langchain_core.output_parsers import PydanticOutputParser
+
+class Review(BaseModel):
+    gift: bool = Field(description=&quot;Was the item bought as a gift for someone else?&quot;)
+    delivery_days: int = Field(description=&quot;Number of days the delivery took; -1 if the review does not say&quot;)
+    price_value: list[str] = Field(description=&quot;Sentences or phrases about the price or the value of the item&quot;)
+
+parser = PydanticOutputParser(pydantic_object=Review)</textarea><pre><code class="language-python">from pydantic import BaseModel, Field
+from langchain_core.output_parsers import PydanticOutputParser
+
+class Review(BaseModel):
+    gift: bool = Field(description=&quot;Was the item bought as a gift for someone else?&quot;)
+    delivery_days: int = Field(description=&quot;Number of days the delivery took; -1 if the review does not say&quot;)
+    price_value: list[str] = Field(description=&quot;Sentences or phrases about the price or the value of the item&quot;)
+
+parser = PydanticOutputParser(pydantic_object=Review)</code></pre></div>
+<p>The parser does two jobs. The first is to write the instruction for the model. Print it:</p>
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-018" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>print(parser.get_format_instructions())</textarea><pre><code class="language-python">print(parser.get_format_instructions())</code></pre></div>
+<p>The output is a paragraph that asks for JSON and gives the schema of the three fields, built from the class above. The second job is to turn the model's reply into a <code>Review</code> object. You can try that without the model:</p>
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-019" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>review = parser.parse(&#x27;{&quot;gift&quot;: true, &quot;delivery_days&quot;: 5, &quot;price_value&quot;: [&quot;بسعر ٢٠ دينار&quot;]}&#x27;)
+print(review)
+print(review.delivery_days + 1)      # a real integer, not the text &quot;5&quot;</textarea><pre><code class="language-python">review = parser.parse(&#x27;{&quot;gift&quot;: true, &quot;delivery_days&quot;: 5, &quot;price_value&quot;: [&quot;بسعر ٢٠ دينار&quot;]}&#x27;)
+print(review)
+print(review.delivery_days + 1)      # a real integer, not the text &quot;5&quot;</code></pre></div>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">gift=True delivery_days=5 price_value=[&#x27;بسعر ٢٠ دينار&#x27;]
+6</code></pre></div>
+<p>Now build the chain. The format instructions are a value that never changes, so they are fixed in the template once, with <code>partial</code>.</p>
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-020" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core" title="Needs langchain_core — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>review_prompt = ChatPromptTemplate.from_messages([
+    (&quot;system&quot;, &quot;Extract information from the customer review.\n{format_instructions}&quot;),
+    (&quot;human&quot;, &quot;{review}&quot;),
+]).partial(format_instructions=parser.get_format_instructions())
+
+review_chain = review_prompt | llm | parser
+
+from langchain_core.exceptions import OutputParserException
+
+try:
+    result = review_chain.invoke({&quot;review&quot;: &quot;اشتريت هدية لصديقي أحمد بسعر ٢٠ دينار، واستغرق التوصيل أكثر من ٥ أيام.&quot;})
+    print(result)
+    print(&quot;Gift?&quot;, result.gift, &quot;| Days:&quot;, result.delivery_days)
+except OutputParserException as error:
+    print(&quot;The model&#x27;s reply did not fit the Review class:\n&quot;, error)</textarea><pre><code class="language-python">review_prompt = ChatPromptTemplate.from_messages([
+    (&quot;system&quot;, &quot;Extract information from the customer review.\n{format_instructions}&quot;),
+    (&quot;human&quot;, &quot;{review}&quot;),
+]).partial(format_instructions=parser.get_format_instructions())
+
+review_chain = review_prompt | llm | parser
+
+from langchain_core.exceptions import OutputParserException
+
+try:
+    result = review_chain.invoke({&quot;review&quot;: &quot;اشتريت هدية لصديقي أحمد بسعر ٢٠ دينار، واستغرق التوصيل أكثر من ٥ أيام.&quot;})
+    print(result)
+    print(&quot;Gift?&quot;, result.gift, &quot;| Days:&quot;, result.delivery_days)
+except OutputParserException as error:
+    print(&quot;The model&#x27;s reply did not fit the Review class:\n&quot;, error)</code></pre></div>
+<p>The review says: "I bought a gift for my friend Ahmad for 20 dinars, and the delivery took more than 5 days."</p>
+<blockquote class="box box-careful"><p><span class="box-tag">Common confusion</span><strong>The parser checks the answer; it does not force it.</strong> The instruction asks the model for JSON, and a small model does not always obey. It may add a sentence before the JSON or leave a field out. The parser then raises an <code>OutputParserException</code> whose message shows the text that the model wrote, and the cell above catches it and prints it. This is the correct behaviour: a program should notice a malformed answer, not continue with wrong data. To see the raw reply on its own, run the chain without its last step: <code>(review_prompt | llm | StrOutputParser()).invoke(...)</code>.</p></blockquote>
+<h3 id="with-a-hosted-model-with_structured_output">With a hosted model: <code>with_structured_output</code></h3>
+<p>Large hosted models have a built-in way of returning structured data, and the current documentation recommends it. The model is given the class directly; no format instructions and no parser are needed.</p>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-python"># Works with hosted chat models (OpenAI, Google, Anthropic and others)
+structured_llm = llm.with_structured_output(Review)
+result = structured_llm.invoke(&quot;I bought it as a gift for my friend. It arrived after 5 days and was worth the 20 dinars.&quot;)</code></pre></div>
+<blockquote class="box box-note"><p><span class="box-tag">Note</span><strong>Why this lesson uses the parser.</strong> The local Hugging Face wrapper does not support this method for a Pydantic class: the call raises <code>NotImplementedError</code>. The parser method works with every model, because it relies only on text going in and text coming out. It is also the method of the course slides, so nothing is lost by learning it first.</p></blockquote>
+<h2 id="6-sequential-chains">6. Sequential Chains</h2>
+<p>A <strong>sequential chain</strong> runs chains one after another: the output of one is the input of the next. The slides distinguish two kinds, one with a single input and output, and one with several.</p>
+<p>The example from the slides has two steps. The first model call writes an HTML page for a small program that teaches children programming. The second receives that HTML, converts it into Python and explains it.</p>
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-022" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>html_prompt = ChatPromptTemplate.from_template(
+    &quot;You are a web developer. Write a short HTML page for a program that teaches children &quot;
+    &quot;programming. The program is: {name}. Reply with the HTML code only.&quot;
+)
+python_prompt = ChatPromptTemplate.from_template(
+    &quot;You are a Python developer. Convert the following HTML page into a short Python program &quot;
+    &quot;that does the same job, then explain the program in three sentences.\n\n{code}&quot;
+)
+
+html_chain = html_prompt | llm | StrOutputParser()
+python_chain = python_prompt | llm | StrOutputParser()
+
+overall_chain = {&quot;code&quot;: html_chain} | python_chain
+
+print(overall_chain.invoke({&quot;name&quot;: &quot;add two numbers&quot;}))</textarea><pre><code class="language-python">html_prompt = ChatPromptTemplate.from_template(
+    &quot;You are a web developer. Write a short HTML page for a program that teaches children &quot;
+    &quot;programming. The program is: {name}. Reply with the HTML code only.&quot;
+)
+python_prompt = ChatPromptTemplate.from_template(
+    &quot;You are a Python developer. Convert the following HTML page into a short Python program &quot;
+    &quot;that does the same job, then explain the program in three sentences.\n\n{code}&quot;
+)
+
+html_chain = html_prompt | llm | StrOutputParser()
+python_chain = python_prompt | llm | StrOutputParser()
+
+overall_chain = {&quot;code&quot;: html_chain} | python_chain
+
+print(overall_chain.invoke({&quot;name&quot;: &quot;add two numbers&quot;}))</code></pre></div>
+<p>The line that joins the two chains is <code>{"code": html_chain} | python_chain</code>. A dictionary on the left of <code>|</code> means: run each value, and put the result under its key. Here <code>html_chain</code> runs, and its output becomes the value of <code>code</code>, which is the placeholder that <code>python_prompt</code> expects.</p>
+<p>This chain makes two model calls, each of up to 300 tokens, so it is the slowest example of the lesson. On a CPU it can take a few minutes.</p>
+<h3 id="several-inputs-and-outputs">Several inputs and outputs</h3>
+<p>The chain above returns only the final text; the HTML is lost on the way. To keep every intermediate result, let each step <em>add</em> a key to one dictionary, with <code>RunnablePassthrough.assign</code>.</p>
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-024" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core" title="Needs langchain_core — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langchain_core.runnables import RunnablePassthrough
+
+full_chain = (
+    RunnablePassthrough.assign(code=html_chain)
+    | RunnablePassthrough.assign(explanation=python_chain)
+)
+
+result = full_chain.invoke({&quot;name&quot;: &quot;add two numbers&quot;})
+print(result.keys())
+print(result[&quot;code&quot;][:300])</textarea><pre><code class="language-python">from langchain_core.runnables import RunnablePassthrough
+
+full_chain = (
+    RunnablePassthrough.assign(code=html_chain)
+    | RunnablePassthrough.assign(explanation=python_chain)
+)
+
+result = full_chain.invoke({&quot;name&quot;: &quot;add two numbers&quot;})
+print(result.keys())
+print(result[&quot;code&quot;][:300])</code></pre></div>
+<p><code>result</code> is a dictionary with three keys: <code>name</code>, which you supplied, and <code>code</code> and <code>explanation</code>, which the two steps added. A later step can use any of them: a third prompt could contain both <code>{name}</code> and <code>{code}</code>.</p>
+<h3 id="the-same-chains-in-the-2024-notation">The same chains in the 2024 notation</h3>
+<p>This is the script from the course, shortened. On the current libraries it stops at its first line.</p>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-python"># 2024 (course slides)
+from langchain.llms import OpenAI                       # ModuleNotFoundError today
+from langchain.chains import LLMChain                   # ModuleNotFoundError today
+from langchain.chains import SimpleSequentialChain      # ModuleNotFoundError today
+
+llm = OpenAI(temperature=.7)
+html_chain = LLMChain(llm=llm, prompt=html_prompt)
+python_chain = LLMChain(llm=llm, prompt=python_prompt)
+overall_chain = SimpleSequentialChain(chains=[html_chain, python_chain], verbose=True)
+python_code = overall_chain.run(&quot;add two numbers&quot;)</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>2024</th>
+<th>Current</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>from langchain.llms import OpenAI</code></td>
+<td>A chat model from a provider package, or <code>init_chat_model(...)</code></td>
+</tr>
+<tr>
+<td><code>LLMChain(llm=llm, prompt=prompt)</code></td>
+<td><code>prompt | llm | StrOutputParser()</code></td>
+</tr>
+<tr>
+<td><code>SimpleSequentialChain(chains=[a, b])</code></td>
+<td><code>{"code": a} | b</code></td>
+</tr>
+<tr>
+<td><code>SequentialChain(...)</code> with <code>output_key</code> and <code>input_variables</code></td>
+<td><code>RunnablePassthrough.assign(code=a) | RunnablePassthrough.assign(explanation=b)</code></td>
+</tr>
+<tr>
+<td><code>chain.run("add two numbers")</code></td>
+<td><code>chain.invoke({"name": "add two numbers"})</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="7-routing">7. Routing</h2>
+<p>Sometimes one prompt cannot serve every input. A physics question is answered best by a prompt that speaks as a physics teacher, and a history question by another. <strong>Routing</strong> means sending each input to the chain that suits it. The slides build this with a class named <code>RouterChain</code>, in nine steps.</p>
+<figure class="fig wide"><img src="../assets/img/router-chain.svg" alt="A question enters a router chain, which replies with one subject. Arrows lead to five prompts: physics, math, history, computer science and a default. All five lead to the chat model, which writes the answer"><figcaption>Routing. The model is called twice: once to name the subject, and once to answer with the prompt chosen for that subject.</figcaption></figure>
+
+<p>The current form needs three pieces: the destination prompts, a small chain that names the subject, and a function that picks the prompt.</p>
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-026" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>teacher = {
+    &quot;physics&quot;: &quot;You are a physics professor. Explain concisely and name the law or principle involved.&quot;,
+    &quot;math&quot;: &quot;You are a mathematician. Break the problem into steps and solve them in order.&quot;,
+    &quot;history&quot;: &quot;You are a historian. Give dates and causes, and say how certain the evidence is.&quot;,
+    &quot;computer science&quot;: &quot;You are a computer scientist. Explain the idea, then give its time and space cost.&quot;,
+}
+subject_prompts = {
+    subject: ChatPromptTemplate.from_messages([(&quot;system&quot;, instruction), (&quot;human&quot;, &quot;{input}&quot;)])
+    for subject, instruction in teacher.items()
+}
+default_prompt = ChatPromptTemplate.from_messages([(&quot;human&quot;, &quot;{input}&quot;)])
+
+router_prompt = ChatPromptTemplate.from_template(
+    &quot;Which subject does this question belong to? Choose one of: physics, math, history, &quot;
+    &quot;computer science, other. Reply with the subject only.\n\nQuestion: {input}&quot;
+)
+router_chain = router_prompt | llm | StrOutputParser()
+
+print(router_chain.invoke({&quot;input&quot;: &quot;What is black body radiation?&quot;}))</textarea><pre><code class="language-python">teacher = {
+    &quot;physics&quot;: &quot;You are a physics professor. Explain concisely and name the law or principle involved.&quot;,
+    &quot;math&quot;: &quot;You are a mathematician. Break the problem into steps and solve them in order.&quot;,
+    &quot;history&quot;: &quot;You are a historian. Give dates and causes, and say how certain the evidence is.&quot;,
+    &quot;computer science&quot;: &quot;You are a computer scientist. Explain the idea, then give its time and space cost.&quot;,
+}
+subject_prompts = {
+    subject: ChatPromptTemplate.from_messages([(&quot;system&quot;, instruction), (&quot;human&quot;, &quot;{input}&quot;)])
+    for subject, instruction in teacher.items()
+}
+default_prompt = ChatPromptTemplate.from_messages([(&quot;human&quot;, &quot;{input}&quot;)])
+
+router_prompt = ChatPromptTemplate.from_template(
+    &quot;Which subject does this question belong to? Choose one of: physics, math, history, &quot;
+    &quot;computer science, other. Reply with the subject only.\n\nQuestion: {input}&quot;
+)
+router_chain = router_prompt | llm | StrOutputParser()
+
+print(router_chain.invoke({&quot;input&quot;: &quot;What is black body radiation?&quot;}))</code></pre></div>
+<p>The last line tests the router alone. It should print one subject. Now the function that turns that word into a prompt, and the whole chain:</p>
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-027" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core" title="Needs langchain_core — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langchain_core.runnables import RunnableLambda
+
+def pick_prompt(info):
+    subject = info[&quot;subject&quot;].strip().lower()
+    for name, prompt in subject_prompts.items():
+        if name in subject:
+            return prompt
+    return default_prompt                      # no subject matched
+
+routed_chain = (
+    RunnablePassthrough.assign(subject=router_chain)
+    | RunnableLambda(pick_prompt)
+    | llm
+    | StrOutputParser()
+)
+
+for question in [&quot;What is black body radiation?&quot;,
+                 &quot;What are greedy algorithms?&quot;,
+                 &quot;What should I cook for dinner?&quot;]:
+    print(&quot;Q:&quot;, question)
+    print(&quot;A:&quot;, routed_chain.invoke({&quot;input&quot;: question}), &quot;\n&quot;)</textarea><pre><code class="language-python">from langchain_core.runnables import RunnableLambda
+
+def pick_prompt(info):
+    subject = info[&quot;subject&quot;].strip().lower()
+    for name, prompt in subject_prompts.items():
+        if name in subject:
+            return prompt
+    return default_prompt                      # no subject matched
+
+routed_chain = (
+    RunnablePassthrough.assign(subject=router_chain)
+    | RunnableLambda(pick_prompt)
+    | llm
+    | StrOutputParser()
+)
+
+for question in [&quot;What is black body radiation?&quot;,
+                 &quot;What are greedy algorithms?&quot;,
+                 &quot;What should I cook for dinner?&quot;]:
+    print(&quot;Q:&quot;, question)
+    print(&quot;A:&quot;, routed_chain.invoke({&quot;input&quot;: question}), &quot;\n&quot;)</code></pre></div>
+<p>Follow one question through the chain. <code>assign</code> adds the key <code>subject</code> to the dictionary, using the router. <code>pick_prompt</code> receives the dictionary and returns one of the prompt templates. When a function inside a chain returns a Runnable, LangChain runs that Runnable on the same input, so the chosen prompt is filled with the question. The model then answers.</p>
+<blockquote class="box box-careful"><p><span class="box-tag">Common confusion</span><strong>The router's reply is text, and text is untidy.</strong> The model may reply <code>Physics</code>, <code>physics.</code> or <code>The subject is physics</code>. The function therefore lowers the case and tests whether a subject name occurs <em>in</em> the reply, where an exact comparison would fail. The third question matches no subject and falls through to the default prompt. Always give a router a default.</p></blockquote>
+<p>The nine steps of the slides map onto this code as follows.</p>
+<table>
+<thead>
+<tr>
+<th>Slides (2024)</th>
+<th>Current code</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Steps 1–2: prompt templates with a name and a description, then one <code>LLMChain</code> per template in <code>destination_chains</code></td>
+<td>The dictionary <code>subject_prompts</code></td>
+</tr>
+<tr>
+<td>Step 3: a default chain</td>
+<td><code>default_prompt</code></td>
+</tr>
+<tr>
+<td>Steps 4–5: <code>MULTI_PROMPT_ROUTER_TEMPLATE</code>, <code>RouterOutputParser</code>, <code>LLMRouterChain</code></td>
+<td><code>router_prompt</code> and <code>router_chain</code></td>
+</tr>
+<tr>
+<td>Steps 7–8: <code>MultiPromptChain(router_chain, destination_chains, default_chain)</code></td>
+<td><code>pick_prompt</code> and <code>routed_chain</code></td>
+</tr>
+<tr>
+<td>Step 9: <code>chain.run("What is greedy algorithms?")</code></td>
+<td><code>routed_chain.invoke({"input": ...})</code></td>
+</tr>
+</tbody>
+</table>
+<p>In Week 5 the same idea returns in LangGraph, where the function that chooses the next step is called a <em>conditional edge</em>.</p>
+<h2 id="8-from-the-lesson-to-your-project">8. From the Lesson to Your Project</h2>
+<p>The project milestone for this week asks for a prompt template for each agent. The patterns of this part are the ones you need: a system message that states the agent's role (Section 3), a Pydantic class wherever another agent or program must read the result (Section 5), and a router wherever the pipeline has to choose a path (Section 7). The requirements themselves are on the <a href="project.html">project page</a>.</p>
+<h2 id="9-check-your-understanding">9. Check Your Understanding</h2>
+<details>
+<summary>1. What are the three parts of the simplest chain, and what does each one receive and return?</summary>
+<p>A prompt template receives a dictionary and returns messages. A chat model receives messages and returns one message. An output parser receives that message and returns a Python value, in the simplest case a string.</p>
+</details>
+<details>
+<summary>2. A tutorial from 2023 begins with <code>from langchain.chains import LLMChain</code>. What happens when you run it today, and what are your two options?</summary>
+<p>It fails with <code>ModuleNotFoundError</code>, because that class was moved out of the <code>langchain</code> package. One option is to install <code>langchain-classic</code> and import the class from <code>langchain_classic.chains</code>. The other, which is the better one for new code, is to rewrite the chain as <code>prompt | llm | StrOutputParser()</code>.</p>
+</details>
+<details>
+<summary>3. Your template contains a JSON example, and filling it raises an error about a missing variable. Why?</summary>
+<p>The braces of the JSON example are read as placeholders. Literal braces in a template must be doubled: <code>{{</code> and <code>}}</code>.</p>
+</details>
+<details>
+<summary>4. What are the two jobs of <code>PydanticOutputParser</code>?</summary>
+<p>It writes the format instructions that are placed in the prompt, and it converts the model's reply into an object of the given class, raising an error if the reply does not fit.</p>
+</details>
+<details>
+<summary>5. The review chain raises <code>OutputParserException</code>. Is the code wrong? What do you do first?</summary>
+<p>Not necessarily. The exception means that the model's reply was not valid JSON for the class. Look at the raw reply first, by running the chain without the parser. Then make the instruction stricter, shorten the review, or use a stronger model.</p>
+</details>
+<details>
+<summary>6. What is the difference between <code>{"code": html_chain} | python_chain</code> and the version with <code>RunnablePassthrough.assign</code>?</summary>
+<p>Both run the two chains in order. The first returns only the final text. The second returns a dictionary that still contains the original input and every intermediate result.</p>
+</details>
+<details>
+<summary>7. How many times is the model called for one question in the routed chain, and why does the router need a default?</summary>
+<p>Twice: once to name the subject and once to answer. The default is needed because some questions belong to none of the listed subjects, and because the router's reply is free text that may match nothing.</p>
+</details>
+<h2 id="10-summary-and-further-reading">10. Summary and Further Reading</h2>
+<p><strong>What you learned:</strong> LangChain gives prompts, models and parsers one interface, so that they can be joined with <code>|</code> and exchanged for one another. A prompt template separates the fixed instruction from the values that arrive at run time. An output parser turns free text into a checked object. Chains can be placed in sequence, can carry a dictionary that grows at each step, and can choose their next step from the model's own reply. The class names of 2024 have gone; the ideas behind them are unchanged.</p>
+<p><strong>Further reading</strong></p>
 <ul>
-<li><strong>LangSmith</strong> — Trace and evaluate your language model applications and intelligent agents to help you move from prototype to production. https://docs.smith.langchain.com/</li>
-<li><strong>LangGraph</strong> — Build stateful, multi-actor applications with LLMs. Integrates smoothly with LangChain, but can be used without it. https://langchain-ai.github.io/langgraph</li>
-<li><strong>Versions</strong> — See what changed in v0.3, learn how to migrate legacy code, read up on versioning policies, and more. https://python.langchain.com/docs/versions/v0_3/</li>
-<li><strong>Security</strong> — Read up on security best practices to make sure you're developing safely with LangChain. https://python.langchain.com/docs/security/</li>
-<li><strong>Integrations</strong> — LangChain is part of a rich ecosystem of tools that integrate with our framework and build on top of it. https://python.langchain.com/docs/integrations/providers/</li>
-<li><strong>Contributing</strong> — Check out the developer's guide for guidelines on contributing and help getting your dev environment set up. https://python.langchain.com/docs/contributing/</li>
+<li>LangChain documentation: https://docs.langchain.com/oss/python/langchain/overview</li>
+<li>LangChain v1 migration guide (what moved to <code>langchain-classic</code>): https://docs.langchain.com/oss/python/migrate/langchain-v1</li>
+<li>Chat models in LangChain: https://docs.langchain.com/oss/python/langchain/models</li>
+<li>Structured output: https://docs.langchain.com/oss/python/langchain/structured-output</li>
+<li>Hugging Face chat models in LangChain: https://docs.langchain.com/oss/python/integrations/chat/huggingface</li>
+<li>Qwen2.5-1.5B-Instruct, the model used in this lesson: https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct</li>
 </ul>
-<h2 id="quick-links">Quick Links</h2>
+<p><strong>Figure credits.</strong> The components figure and the three app screenshots come from Dr. Abdulkarim Albanna's course slides. The chain and routing diagrams were drawn for this lesson.</p>
+<h2 class="part" id="part-chat-with-your-documents-rag">Chat with Your Documents (RAG)</h2>
+<p><em>Give the model the right page before you ask the question.</em> Level: intermediate · about 90 minutes · LangChain 1.x, Sentence-Transformers. The concepts follow Tunstall, von Werra &amp; Wolf, <em>Natural Language Processing with Transformers</em> (Revised Edition, 2022), Chapter 7, "Question Answering", and the worked example uses the same customer reviews as that chapter.</p>
+<h2 id="what-youll-learn-in-this-part">What You'll Learn in This Part</h2>
+<p>By the end of this part you will be able to:</p>
 <ul>
-<li>LangChain docs: https://python.langchain.com/</li>
-<li>Tutorials: https://python.langchain.com/docs/tutorials/</li>
-<li>How-to guides: https://python.langchain.com/docs/how_to/</li>
-<li>Concepts: https://python.langchain.com/docs/concepts/</li>
-<li>API reference: https://python.langchain.com/api_reference/</li>
-<li>GitHub: https://github.com/langchain-ai/langchain</li>
+<li>Explain why a language model alone cannot answer questions about private or recent documents</li>
+<li>Describe the retriever-reader architecture, and how <abbr data-tip="Retrieval-Augmented Generation: finding relevant text first and giving it to the model with the question" tabindex="0">RAG</abbr> grew out of it</li>
+<li>Load documents, split them into chunks, embed the chunks and store them in a vector store</li>
+<li>Choose a chunk size with the limits of the embedding model in mind</li>
+<li>Build a chain that retrieves the relevant chunks and answers from them</li>
+<li>Measure a retriever with recall at <em>k</em>, as the textbook does</li>
+<li>Say when a fixed RAG chain is enough and when an agent is the better design</li>
 </ul>
+<p><strong>Goal:</strong> a working question-answering system over 56 real customer reviews, which you can question, measure and then point at your own documents.</p>
+<p><strong>Prerequisites:</strong> the first part of this week. The examples continue in the same notebook and use its <code>llm</code>, <code>ChatPromptTemplate</code>, <code>StrOutputParser</code> and <code>RunnablePassthrough</code>.</p>
+<h3 id="abbreviations-used-in-this-part">Abbreviations used in this part</h3>
+<table>
+<thead>
+<tr>
+<th>Abbreviation</th>
+<th>Stands for</th>
+<th>In one line</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RAG</td>
+<td>Retrieval-Augmented Generation</td>
+<td>Finding relevant text first and giving it to the model with the question</td>
+</tr>
+<tr>
+<td>QA</td>
+<td>Question Answering</td>
+<td>The task of answering a question from text</td>
+</tr>
+<tr>
+<td>BM25</td>
+<td>Best Match 25</td>
+<td>A classical search method that scores documents by the words they share with the query</td>
+</tr>
+<tr>
+<td>DPR</td>
+<td>Dense Passage Retrieval</td>
+<td>Retrieval with two BERT encoders, one for questions and one for passages</td>
+</tr>
+<tr>
+<td>ANN</td>
+<td>Approximate Nearest Neighbour</td>
+<td>A fast search for the vectors closest to a given vector, which accepts a small loss of accuracy</td>
+</tr>
+<tr>
+<td>PDF</td>
+<td>Portable Document Format</td>
+<td>The usual file format of reports and papers</td>
+</tr>
+</tbody>
+</table>
+<h2 id="1-why-a-model-alone-is-not-enough">1. Why a Model Alone Is Not Enough</h2>
+<p>Suppose a company wants a chatbot that answers questions about its own documents. The first idea is to send each question directly to a commercial model such as ChatGPT. The course slides give three reasons why this fails.</p>
+<ul>
+<li><strong>The model has not seen your documents.</strong> It was trained on text that was public at one moment in the past. Internal documents were never in that text, and documents written after that moment could not be.</li>
+<li><strong>The model knows a great deal that is irrelevant.</strong> Its training data contains far more unrelated context than context for your question.</li>
+<li><strong>The model fills gaps with invention.</strong> Asked about something it has not seen, a language model can produce a fluent answer that is false. This is called <em>hallucination</em>.</li>
+</ul>
+<p>The second idea is to put the documents into the prompt: write the question, paste the whole knowledge base beside it, and instruct the model to answer from that text only. This works for one short document. For a real knowledge base it meets a limit: every model has a <strong>context window</strong>, a maximum number of tokens that it can read at once.</p>
+<blockquote class="box box-note"><p><span class="box-tag">Note</span><strong>The numbers on the slides have changed, and the argument has not.</strong> The slides, written in January 2024, give context windows of about 4,000 to 33,000 tokens, with 1,000 tokens equal to roughly 750 words. Windows have grown since then: the small model of this lesson accepts 32,768 tokens, and large hosted models accept far more. Three costs remain. A company's documents are still larger than any window. Every token in the prompt costs time and, with a hosted model, money, on every single question. And a model answers less accurately when the passage it needs is buried in a long, mostly irrelevant prompt. The textbook makes the same point with a calculation: if a product has 30 reviews and each takes 100 milliseconds to process, reading all of them costs 3 seconds for every question.</p></blockquote>
+<p>The solution is to send the model only the few passages that bear on the question. Finding those passages is called <strong>retrieval</strong>, and the whole method is <strong>retrieval-augmented generation</strong>: the model's generation is augmented with retrieved text. RAG gives a model new knowledge without training it again, which is why the slides call it cost-efficient: the same model serves new data as soon as the data is indexed.</p>
+<h2 id="2-from-retriever-reader-to-rag">2. From Retriever-Reader to RAG</h2>
+<p>RAG did not appear from nowhere. Chapter 7 of the textbook builds a question-answering system over product reviews and arrives at RAG in its last section. The path it takes explains the design.</p>
+<p>The starting point is the <strong>retriever-reader architecture</strong>. A <strong>retriever</strong> selects, from all documents, the few that are relevant to the question. A <strong>reader</strong> then extracts the answer from those few.</p>
+<figure class="fig"><img src="../assets/img/retriever-reader.png" alt="A question goes to a retriever, which selects relevant documents from a large collection. The documents go to a reader, which produces the answer 1903 to the question When did Marie Curie win her first Nobel Prize"><figcaption>The retriever-reader architecture. Figure from the companion repository of Tunstall et al. (2022), Apache 2.0 licence.</figcaption></figure>
+
+<p>Retrievers come in two kinds.</p>
+<ul>
+<li>A <strong>sparse retriever</strong> represents each document by the words it contains and scores documents by the words they share with the query. <abbr data-tip="Best Match 25: a classical search method that scores documents by the words they share with the query" tabindex="0">BM25</abbr> is the standard example. It is fast and needs no training, but it finds nothing when the question and the answer use different words.</li>
+<li>A <strong>dense retriever</strong> turns the query and each document into an embedding, a vector that encodes meaning, and scores documents by the similarity of the vectors. It can match <em>"Is it good for reading?"</em> with a review that says <em>"I use it for books every night"</em>, although the two share almost no words.</li>
+</ul>
+<p>The textbook's dense retriever is <abbr data-tip="Dense Passage Retrieval: retrieval with two BERT encoders, one for questions and one for passages" tabindex="0">DPR</abbr>, which uses two BERT encoders: one for questions and one for passages.</p>
+<figure class="fig"><img src="../assets/img/dpr-bi-encoder.png" alt="Two towers. A question encoder turns the question Why is the camera of poor quality into a question vector, and a passage encoder turns review passages into passage vectors. The dot product of the two vectors is the document score"><figcaption>The bi-encoder of Dense Passage Retrieval: the question and the passage are encoded separately, and their dot product is the relevance score. Figure from the companion repository of Tunstall et al. (2022), Apache 2.0 licence.</figcaption></figure>
+
+<blockquote class="box box-note"><p><span class="box-tag">Note</span><strong>Dense is not automatically better.</strong> In the textbook's experiment, BM25 reached almost perfect recall once it returned ten documents, and DPR gave no improvement in recall over it. Dense retrieval helps most when users phrase things differently from the documents. Many production systems combine both kinds.</p></blockquote>
+<p>The reader of the textbook is <em>extractive</em>: it marks a span of words inside a retrieved document, as the NER model of Week 3 marked entities. Its answer can therefore only be a phrase that already stands in one document. <strong>RAG</strong>, introduced by Lewis et al. (2020), replaces the reader with a <em>generator</em>: a language model that writes the answer in its own words, and can combine evidence from several passages.</p>
+<figure class="fig"><img src="../assets/img/rag-architecture.png" alt="A query encoder and a document index form the retriever. The retrieved documents and the query go to a generator, which produces the answer. A dashed arrow shows training passing back through both parts"><figcaption>The RAG architecture of Lewis et al. (2020), in which retriever and generator are fine-tuned together. Figure courtesy of Ethan Perez, from the companion repository of Tunstall et al. (2022), Apache 2.0 licence.</figcaption></figure>
+
+<blockquote class="box box-careful"><p><span class="box-tag">Common confusion</span><strong>"RAG" names two different things.</strong> In the original paper, and in this figure, the retriever and the generator are <em>trained together</em>: the dashed arrow is the training signal flowing through both. What industry calls RAG today, and what you build in this lesson, has <strong>no training at all</strong>. A ready-made embedding model retrieves, a ready-made chat model generates, and a prompt joins them. The idea is the same; the engineering is far simpler.</p></blockquote>
+<h2 id="3-the-pipeline-index-once-answer-many-times">3. The Pipeline: Index Once, Answer Many Times</h2>
+<p>A RAG system works in two phases. <strong>Indexing</strong> happens once, before any question is asked: the documents are loaded, split, embedded and stored. <strong>Retrieval and generation</strong> happen for every question.</p>
+<figure class="fig"><img src="../assets/img/rag-indexing.png" alt="Four stages in a row: load, split, embed, store. Files become documents, documents become chunks, chunks become vectors, and the vectors go into a store"><figcaption>Phase one, indexing: load, split, embed, store. Figure from the LangChain documentation, MIT licence.</figcaption></figure>
+
+<figure class="fig"><img src="../assets/img/rag-retrieval-generation.png" alt="A question is used to retrieve the most similar chunks from the store. The chunks and the question form a prompt, which goes to the LLM, which returns the answer"><figcaption>Phase two, for every question: retrieve, build the prompt, generate. Figure from the LangChain documentation, MIT licence.</figcaption></figure>
+
+<p>The course slides list the same pipeline as nine steps.</p>
+<p><em>Indexing</em></p>
+<ol>
+<li><strong>Split</strong> the text of the whole knowledge base into chunks. A chunk is one piece of context that can be retrieved.</li>
+<li><strong>Embed</strong> each chunk: an embedding model turns it into a vector.</li>
+<li><strong>Store</strong> all the vectors in a vector database.</li>
+<li><strong>Save</strong> the text of each chunk with a pointer to its vector.</li>
+</ol>
+<p><em>Answering a question</em></p>
+<ol start="5">
+<li><strong>Embed</strong> the question with the <em>same</em> embedding model.</li>
+<li><strong>Query</strong> the vector database with the question's vector.</li>
+<li>The database performs an <strong>approximate nearest neighbour</strong> (<abbr data-tip="Approximate Nearest Neighbour: a fast search for the vectors closest to a given vector, which accepts a small loss of accuracy" tabindex="0">ANN</abbr>) search and returns the closest vectors.</li>
+<li><strong>Map</strong> the returned vectors back to the text chunks they stand for.</li>
+<li><strong>Pass</strong> the question and the retrieved chunks to the model in one prompt.</li>
+</ol>
+<figure class="fig"><img src="../assets/img/rag-document-chunks-vectorstore.png" alt="A document is split into nine document chunks, which are stored in a vector store"><figcaption>Indexing in one picture: document, chunks, vector store. Figure from Dr. Albanna's course slides.</figcaption></figure>
+
+<figure class="fig"><img src="../assets/img/rag-question-flow.png" alt="A question goes to a similarity search over the vector store, which returns relevant information. The question and the relevant information go to the model, which produces an answer or an action"><figcaption>Answering in one picture: the question triggers a similarity search, and the model receives the question together with what was found. Figure from Dr. Albanna's course slides.</figcaption></figure>
+
+<p>Before writing the code, watch the whole pipeline once in the animation:</p>
+<div class="sim-inline"><button class="sim-chip" data-display="rag"><span class="sim-chip-kind">LangChain</span>▶ Display: RAG pipeline</button></div>
+
+<p>The following sections build each stage in turn. The data is the one the textbook uses: <strong>SubjQA</strong>, a collection of customer reviews with questions about them. From its electronics part we take the reviews of a single product, a tablet computer, and ask the textbook's own question: <em>"Is it good for reading?"</em></p>
+<h2 id="4-step-1-load">4. Step 1: Load</h2>
+<p>A <strong>document loader</strong> reads data from a source and returns it in one standard form. Whatever the source is (a PDF, a web page, a spreadsheet, a chat export), the result is a list of <strong><code>Document</code></strong> objects. A <code>Document</code> has two parts: <code>page_content</code>, the text, and <code>metadata</code>, a dictionary that records where the text came from.</p>
+<figure class="fig wide"><img src="../assets/img/document-loader-sources.png" alt="A grid of logos of data sources, divided into public and proprietary, and into unstructured and structured: video sites, encyclopedias, PDF and text files, office documents, messaging apps, spreadsheets and databases"><figcaption>The kinds of source for which LangChain has document loaders: public or proprietary, unstructured or structured. Figure from Dr. Albanna's course slides; originally from the DeepLearning.AI short course "LangChain: Chat with Your Data".</figcaption></figure>
+
+<p>The reviews are in a CSV file, so pandas reads them, and each review becomes a <code>Document</code>.</p>
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-029" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core" title="Needs langchain_core — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>import pandas as pd
+from langchain_core.documents import Document
+
+BASE = &quot;https://raw.githubusercontent.com/megagonlabs/SubjQA/master/SubjQA/electronics/splits/&quot;
+subjqa = pd.concat([pd.read_csv(BASE + f&quot;{split}.csv&quot;) for split in (&quot;train&quot;, &quot;dev&quot;, &quot;test&quot;)])
+
+tablet = subjqa[subjqa[&quot;item_id&quot;] == &quot;B0074BW614&quot;]          # the product used in the textbook
+reviews = tablet.drop_duplicates(&quot;review_id&quot;)
+
+docs = [
+    Document(page_content=row.review.replace(&quot;ANSWERNOTFOUND&quot;, &quot;&quot;).strip(),
+             metadata={&quot;review_id&quot;: row.review_id, &quot;item_id&quot;: row.item_id})
+    for row in reviews.itertuples()
+]
+
+print(&quot;Rows in the electronics data:&quot;, len(subjqa), &quot;| different reviews:&quot;, subjqa[&quot;review_id&quot;].nunique())
+print(&quot;Reviews of the tablet:&quot;, len(docs))
+print(docs[0].page_content[:300])
+print(docs[0].metadata)</textarea><pre><code class="language-python">import pandas as pd
+from langchain_core.documents import Document
+
+BASE = &quot;https://raw.githubusercontent.com/megagonlabs/SubjQA/master/SubjQA/electronics/splits/&quot;
+subjqa = pd.concat([pd.read_csv(BASE + f&quot;{split}.csv&quot;) for split in (&quot;train&quot;, &quot;dev&quot;, &quot;test&quot;)])
+
+tablet = subjqa[subjqa[&quot;item_id&quot;] == &quot;B0074BW614&quot;]          # the product used in the textbook
+reviews = tablet.drop_duplicates(&quot;review_id&quot;)
+
+docs = [
+    Document(page_content=row.review.replace(&quot;ANSWERNOTFOUND&quot;, &quot;&quot;).strip(),
+             metadata={&quot;review_id&quot;: row.review_id, &quot;item_id&quot;: row.item_id})
+    for row in reviews.itertuples()
+]
+
+print(&quot;Rows in the electronics data:&quot;, len(subjqa), &quot;| different reviews:&quot;, subjqa[&quot;review_id&quot;].nunique())
+print(&quot;Reviews of the tablet:&quot;, len(docs))
+print(docs[0].page_content[:300])
+print(docs[0].metadata)</code></pre></div>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">Rows in the electronics data: 3324 | different reviews: 1615
+Reviews of the tablet: 56</code></pre></div>
+<p>The data has one row for every question, and several questions can refer to the same review, so the duplicates are dropped. The 1,615 different reviews are the same count that the textbook reports after loading its document store. The marker <code>ANSWERNOTFOUND</code> at the end of each review belongs to the dataset's format, so it is removed.</p>
+<blockquote class="box box-tip"><p><span class="box-tag">Tip</span><strong>Always keep metadata.</strong> The <code>review_id</code> costs nothing to store. Without it you can never show a user where an answer came from, and you cannot measure the retriever (Section 9).</p></blockquote>
+<h3 id="loading-a-pdf-and-a-web-page">Loading a PDF and a web page</h3>
+<p>Your project's sources will mostly be PDF files and web pages. The slides name the loaders for both. Each returns the same <code>Document</code> objects, so everything after this step is unchanged.</p>
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-031" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_community" title="Needs langchain_community — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>import os
+os.environ.setdefault(&quot;USER_AGENT&quot;, &quot;606363-course-notebook&quot;)   # a web client should name itself
+from langchain_community.document_loaders import PyPDFLoader, WebBaseLoader
+
+# The RAG paper of Lewis et al. (2020), and this course&#x27;s syllabus page
+PDF_SOURCE = &quot;https://arxiv.org/pdf/2005.11401&quot;
+WEB_SOURCE = &quot;https://zmomani.github.io/ComputingSystemsDS-AI/lessons/syllabus.html&quot;
+
+pdf_pages = PyPDFLoader(PDF_SOURCE).load()                      # one Document per page
+first = pdf_pages[0]
+print(len(pdf_pages), &quot;pages |&quot;, first.metadata.get(&quot;source&quot;), &quot;| page&quot;, first.metadata.get(&quot;page&quot;))
+print(first.page_content[:200])
+
+web_docs = WebBaseLoader(WEB_SOURCE).load()                     # one Document for the whole page
+print(len(web_docs[0].page_content), &quot;characters from&quot;, web_docs[0].metadata.get(&quot;source&quot;))</textarea><pre><code class="language-python">import os
+os.environ.setdefault(&quot;USER_AGENT&quot;, &quot;606363-course-notebook&quot;)   # a web client should name itself
+from langchain_community.document_loaders import PyPDFLoader, WebBaseLoader
+
+# The RAG paper of Lewis et al. (2020), and this course&#x27;s syllabus page
+PDF_SOURCE = &quot;https://arxiv.org/pdf/2005.11401&quot;
+WEB_SOURCE = &quot;https://zmomani.github.io/ComputingSystemsDS-AI/lessons/syllabus.html&quot;
+
+pdf_pages = PyPDFLoader(PDF_SOURCE).load()                      # one Document per page
+first = pdf_pages[0]
+print(len(pdf_pages), &quot;pages |&quot;, first.metadata.get(&quot;source&quot;), &quot;| page&quot;, first.metadata.get(&quot;page&quot;))
+print(first.page_content[:200])
+
+web_docs = WebBaseLoader(WEB_SOURCE).load()                     # one Document for the whole page
+print(len(web_docs[0].page_content), &quot;characters from&quot;, web_docs[0].metadata.get(&quot;source&quot;))</code></pre></div>
+<p><code>PyPDFLoader</code> also accepts the path of a file that you have uploaded to Colab. The slides mention a third loader, for YouTube videos. It first transcribes the audio with a speech model, which takes minutes and a further download, so it is not run here.</p>
+<h2 id="5-step-2-split">5. Step 2: Split</h2>
+<p>A review can be thousands of characters long, and a report can be hundreds of pages. Retrieval works on smaller pieces, called <strong>chunks</strong>, for two reasons. A small chunk about one topic matches a question more precisely than a long text about ten. And the embedding model of the next step can only read a limited length.</p>
+<p>Splitting is, in the words of the slides, important and tricky: the pieces must stay meaningful. Two splitters are compared there.</p>
+<ul>
+<li><strong><code>CharacterTextSplitter</code></strong> splits at one separator, by default a blank line, and then joins the pieces into chunks.</li>
+<li><strong><code>RecursiveCharacterTextSplitter</code></strong> tries a list of separators in order: paragraphs first, then lines, then words, then single characters. It moves to a finer separator only when a piece is still too large.</li>
+</ul>
+<p>Both have two settings. <strong><code>chunk_size</code></strong> is the maximum length of a chunk in characters. <strong><code>chunk_overlap</code></strong> is the number of characters that the end of one chunk shares with the start of the next, so that a sentence cut at a border still appears whole in one of the two.</p>
+<figure class="fig wide"><img src="../assets/img/chunk-overlap.svg" alt="A document as a long bar, and three chunks beneath it. Each chunk has the length chunk_size, and neighbouring chunks share a strip of length chunk_overlap"><figcaption>Chunk size and chunk overlap. The shaded strips belong to two chunks.</figcaption></figure>
+
+<p>The slides demonstrate the settings with very small numbers, so that the effect can be read off directly.</p>
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-033" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_text_splitters" title="Needs langchain_text_splitters — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langchain_text_splitters import CharacterTextSplitter, RecursiveCharacterTextSplitter
+
+r_splitter = RecursiveCharacterTextSplitter(chunk_size=26, chunk_overlap=4)
+c_splitter = CharacterTextSplitter(chunk_size=26, chunk_overlap=4)
+
+text1 = &quot;abcdefghijklmnopqrstuvwxyz&quot;                                   # 26 characters
+text2 = &quot;abcdefghijklmnopqrstuvwxyzabcdefg&quot;                            # 33 characters
+text3 = &quot;a b c d e f g h i j k l m n o p q r s t u v w x y z&quot;          # 26 letters with spaces
+
+print(r_splitter.split_text(text1))
+print(r_splitter.split_text(text2))
+print(r_splitter.split_text(text3))
+print(c_splitter.split_text(text3))</textarea><pre><code class="language-python">from langchain_text_splitters import CharacterTextSplitter, RecursiveCharacterTextSplitter
+
+r_splitter = RecursiveCharacterTextSplitter(chunk_size=26, chunk_overlap=4)
+c_splitter = CharacterTextSplitter(chunk_size=26, chunk_overlap=4)
+
+text1 = &quot;abcdefghijklmnopqrstuvwxyz&quot;                                   # 26 characters
+text2 = &quot;abcdefghijklmnopqrstuvwxyzabcdefg&quot;                            # 33 characters
+text3 = &quot;a b c d e f g h i j k l m n o p q r s t u v w x y z&quot;          # 26 letters with spaces
+
+print(r_splitter.split_text(text1))
+print(r_splitter.split_text(text2))
+print(r_splitter.split_text(text3))
+print(c_splitter.split_text(text3))</code></pre></div>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">[&#x27;abcdefghijklmnopqrstuvwxyz&#x27;]
+[&#x27;abcdefghijklmnopqrstuvwxyz&#x27;, &#x27;wxyzabcdefg&#x27;]
+[&#x27;a b c d e f g h i j k l m&#x27;, &#x27;l m n o p q r s t u v w x&#x27;, &#x27;w x y z&#x27;]
+[&#x27;a b c d e f g h i j k l m n o p q r s t u v w x y z&#x27;]</code></pre></div>
+<p>Read the four lines in order. The first text fits into one chunk exactly. The second is seven characters too long; its second chunk begins with <code>wxyz</code>, the four characters of overlap. The third text is split at spaces, and each chunk repeats the end of the one before: <code>l m</code>, then <code>w x</code>. In the fourth line the character splitter returns the whole text as one chunk of 51 characters, well over the limit of 26. Its only separator is a blank line, the text contains none, and so it cannot split at all.</p>
+<blockquote class="box box-careful"><p><span class="box-tag">Common confusion</span><strong><code>chunk_size</code> is a target, and only the recursive splitter can always meet it.</strong> <code>CharacterTextSplitter</code> never cuts inside a piece. When a piece between two separators is longer than <code>chunk_size</code>, it is kept whole and a warning is printed. For ordinary text, use <code>RecursiveCharacterTextSplitter</code>.</p></blockquote>
+<p>Now split the reviews. <code>split_documents</code> copies each review's metadata to all of its chunks, and <code>add_start_index=True</code> also records where in the review each chunk begins.</p>
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-034" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>splitter = RecursiveCharacterTextSplitter(chunk_size=400, chunk_overlap=50, add_start_index=True)
+chunks = splitter.split_documents(docs)
+
+print(len(docs), &quot;reviews -&gt;&quot;, len(chunks), &quot;chunks&quot;)
+print(chunks[0].metadata)
+print(chunks[0].page_content)</textarea><pre><code class="language-python">splitter = RecursiveCharacterTextSplitter(chunk_size=400, chunk_overlap=50, add_start_index=True)
+chunks = splitter.split_documents(docs)
+
+print(len(docs), &quot;reviews -&gt;&quot;, len(chunks), &quot;chunks&quot;)
+print(chunks[0].metadata)
+print(chunks[0].page_content)</code></pre></div>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-plaintext">56 reviews -&gt; 363 chunks</code></pre></div>
+<blockquote class="box box-careful"><p><span class="box-tag">Common confusion</span><strong>Three different limits are easily confused.</strong> <strong>Chunk size</strong> is your choice, measured in characters. The <strong>maximum sequence length of the embedding model</strong> is fixed by the model and measured in tokens: the model of the next step reads 128 tokens, and silently ignores whatever comes after them. The <strong>context window of the chat model</strong> is the largest of the three, and limits how many chunks you can place in one prompt. The chunk size of 400 characters is chosen with the second limit in mind: 400 characters of English are roughly 100 tokens, so almost every chunk is embedded whole. A chunk of 2,000 characters would be stored whole, but found only by its first quarter.</p></blockquote>
+<h2 id="6-step-3-embed">6. Step 3: Embed</h2>
+<p>An <strong>embedding model</strong> turns a text into a vector, a list of numbers, such that texts with similar meaning receive vectors that point in similar directions. In Week 2 you used the hidden state of a transformer as the features of a text. An embedding model is trained for exactly this purpose: one vector that represents the meaning of a whole text. Here the model is <code>paraphrase-multilingual-MiniLM-L12-v2</code>, a small open model trained on about 50 languages. It runs inside Colab, without a key.</p>
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-036" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_huggingface" title="Needs langchain_huggingface — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langchain_huggingface import HuggingFaceEmbeddings
+
+EMBEDDING_ID = &quot;sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2&quot;
+embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_ID, encode_kwargs={&quot;normalize_embeddings&quot;: True})
+
+vector = embeddings.embed_query(&quot;Is it good for reading?&quot;)
+print(len(vector), &quot;numbers; the first five:&quot;, [round(x, 3) for x in vector[:5]])</textarea><pre><code class="language-python">from langchain_huggingface import HuggingFaceEmbeddings
+
+EMBEDDING_ID = &quot;sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2&quot;
+embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_ID, encode_kwargs={&quot;normalize_embeddings&quot;: True})
+
+vector = embeddings.embed_query(&quot;Is it good for reading?&quot;)
+print(len(vector), &quot;numbers; the first five:&quot;, [round(x, 3) for x in vector[:5]])</code></pre></div>
+<p>With this model the vector has 384 numbers. <code>normalize_embeddings=True</code> scales every vector to length 1, so that the dot product of two vectors equals their cosine similarity. The animation shows this geometry in two dimensions:</p>
+<div class="sim-inline"><button class="sim-chip" data-display="vectors"><span class="sim-chip-kind">Linear algebra</span>▶ Display: Vectors, dot product &amp; cosine similarity</button></div>
+
+<blockquote class="box box-careful"><p><span class="box-tag">Common confusion</span><strong>The embedding model and the chat model are two different models.</strong> The embedding model only reads: text in, one vector out. It cannot write a word. The chat model reads and writes, but plays no part in the search. A RAG system needs both, and they are chosen separately. The question must be embedded with the <em>same</em> embedding model as the chunks (step 5 of the slides), because vectors from two different models are not comparable.</p></blockquote>
+<h2 id="7-step-4-store">7. Step 4: Store</h2>
+<p>A <strong>vector store</strong> keeps the vectors together with their texts and metadata, and answers one kind of request: <em>given this vector, return the stored ones closest to it</em>. This lesson uses <code>InMemoryVectorStore</code>, which keeps everything in the memory of the notebook. It needs no installation and no account, and for a few hundred chunks it is fast.</p>
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-038" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core" title="Needs langchain_core — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langchain_core.vectorstores import InMemoryVectorStore
+
+vector_store = InMemoryVectorStore(embeddings)
+ids = vector_store.add_documents(chunks)             # embeds every chunk and stores it
+print(len(ids), &quot;chunks stored&quot;)
+
+question = &quot;Is it good for reading?&quot;
+for doc, score in vector_store.similarity_search_with_score(question, k=4):
+    print(f&quot;{score:.3f} | {doc.metadata[&#x27;review_id&#x27;][:8]} | {doc.page_content[:110]!r}&quot;)</textarea><pre><code class="language-python">from langchain_core.vectorstores import InMemoryVectorStore
+
+vector_store = InMemoryVectorStore(embeddings)
+ids = vector_store.add_documents(chunks)             # embeds every chunk and stores it
+print(len(ids), &quot;chunks stored&quot;)
+
+question = &quot;Is it good for reading?&quot;
+for doc, score in vector_store.similarity_search_with_score(question, k=4):
+    print(f&quot;{score:.3f} | {doc.metadata[&#x27;review_id&#x27;][:8]} | {doc.page_content[:110]!r}&quot;)</code></pre></div>
+<p>The second half is a complete search: the question is embedded, compared with all 363 stored vectors, and the four closest chunks are returned with their scores. The score is the cosine similarity, so a higher score means a closer match. Read the four chunks. Do they talk about reading? Retrieval is the stage where a RAG system most often goes wrong, and looking at what was retrieved is the first thing to do when an answer is poor.</p>
+<blockquote class="box box-note"><p><span class="box-tag">Note</span><strong>Where is the approximate search of step 7?</strong> <code>InMemoryVectorStore</code> compares the question with <em>every</em> stored vector. That is exact, and for 363 chunks it is instant. A vector database for millions of chunks cannot afford it, so it builds an index that finds <em>nearly</em> the closest vectors after looking at a small fraction of them. That is the approximate nearest neighbour search of the slides. The interface you call stays the same.</p></blockquote>
+<h3 id="other-vector-stores-chroma-and-pinecone">Other vector stores: Chroma and Pinecone</h3>
+<p>The in-memory store disappears when the notebook closes. For your project the milestone names <strong>Chroma</strong>, which saves its data in a folder. The script of the course slides uses <strong>Pinecone</strong>, a hosted database that needs an account and a key. Because every vector store in LangChain has the same interface, only the lines that create the store change.</p>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-python"># Chroma: stored in a local folder.   pip install langchain-chroma
+from langchain_chroma import Chroma
+
+vector_store = Chroma(collection_name=&quot;tablet_reviews&quot;, embedding_function=embeddings,
+                      persist_directory=&quot;./chroma_db&quot;)
+vector_store.add_documents(chunks)
+
+# Pinecone: a hosted service (account and API key needed).   pip install langchain-pinecone
+# The index must already exist, with dimension 384 for this embedding model.
+from langchain_pinecone import PineconeVectorStore
+
+vector_store = PineconeVectorStore.from_documents(chunks, embeddings, index_name=&quot;test&quot;)</code></pre></div>
+<blockquote class="box box-note"><p><span class="box-tag">Note</span><strong>The Pinecone lines of the 2024 script no longer run.</strong> The script begins with <code>pinecone.init(api_key=..., environment=...)</code>. The current Pinecone library has removed that function and stops with an error that asks you to create a <code>Pinecone</code> object. The import <code>from langchain.vectorstores import Pinecone</code> has gone as well; the class is now <code>PineconeVectorStore</code> in the package <code>langchain-pinecone</code>. The Chroma lines above were run for this lesson. The Pinecone lines follow the current interface but were not run, because they need an account.</p></blockquote>
+<h2 id="8-step-5-retrieve-and-generate">8. Step 5: Retrieve and Generate</h2>
+<p>Everything is in place for the second phase. A <strong>retriever</strong> is the vector store seen as a chain component: it receives a question and returns documents. Because it is a Runnable, it can be joined with <code>|</code> like the components of the first part.</p>
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-040" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>retriever = vector_store.as_retriever(search_kwargs={&quot;k&quot;: 4})
+
+def format_docs(found):
+    return &quot;\n\n&quot;.join(f&quot;[{i}] {d.page_content}&quot; for i, d in enumerate(found, start=1))
+
+rag_prompt = ChatPromptTemplate.from_messages([
+    (&quot;system&quot;, &quot;Answer the question using only the customer reviews below. If the reviews do not &quot;
+               &quot;contain the answer, say that you do not know. Answer in at most three sentences.\n\n&quot;
+               &quot;Reviews:\n{context}&quot;),
+    (&quot;human&quot;, &quot;{question}&quot;),
+])
+
+rag_chain = (
+    {&quot;context&quot;: retriever | format_docs, &quot;question&quot;: RunnablePassthrough()}
+    | rag_prompt
+    | llm
+    | StrOutputParser()
+)
+
+print(rag_chain.invoke(&quot;Is it good for reading?&quot;))</textarea><pre><code class="language-python">retriever = vector_store.as_retriever(search_kwargs={&quot;k&quot;: 4})
+
+def format_docs(found):
+    return &quot;\n\n&quot;.join(f&quot;[{i}] {d.page_content}&quot; for i, d in enumerate(found, start=1))
+
+rag_prompt = ChatPromptTemplate.from_messages([
+    (&quot;system&quot;, &quot;Answer the question using only the customer reviews below. If the reviews do not &quot;
+               &quot;contain the answer, say that you do not know. Answer in at most three sentences.\n\n&quot;
+               &quot;Reviews:\n{context}&quot;),
+    (&quot;human&quot;, &quot;{question}&quot;),
+])
+
+rag_chain = (
+    {&quot;context&quot;: retriever | format_docs, &quot;question&quot;: RunnablePassthrough()}
+    | rag_prompt
+    | llm
+    | StrOutputParser()
+)
+
+print(rag_chain.invoke(&quot;Is it good for reading?&quot;))</code></pre></div>
+<p>The dictionary at the top of the chain is the pattern of Section 6 of the first part. The question enters twice. Under <code>context</code> it goes through the retriever and then through <code>format_docs</code>, which joins the four chunks into one numbered text. Under <code>question</code> it passes through unchanged. The prompt therefore receives both of its placeholders, and steps 5 to 9 of the slides are these few lines.</p>
+<p>Two parts of the system prompt do the work that makes this RAG and not ordinary chat. <em>"Using only the customer reviews below"</em> keeps the model to the retrieved text. <em>"Say that you do not know"</em> gives it a permitted way out, which reduces invention when retrieval finds nothing useful.</p>
+<h3 id="with-and-without-retrieval">With and without retrieval</h3>
+<p>Ask the same question with the model alone, and compare.</p>
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-042" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>question = &quot;Is it good for reading?&quot;
+print(&quot;WITHOUT retrieval:\n&quot;, llm.invoke(question).content, &quot;\n&quot;)
+print(&quot;WITH retrieval:\n&quot;, rag_chain.invoke(question))</textarea><pre><code class="language-python">question = &quot;Is it good for reading?&quot;
+print(&quot;WITHOUT retrieval:\n&quot;, llm.invoke(question).content, &quot;\n&quot;)
+print(&quot;WITH retrieval:\n&quot;, rag_chain.invoke(question))</code></pre></div>
+<p>Without retrieval the model cannot know what "it" is, so it can only ask or guess. With retrieval it answers about the tablet, from what its buyers wrote. Then ask something that the reviews cannot answer, and see whether the model keeps to its instruction:</p>
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-043" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>print(rag_chain.invoke(&quot;Who won the football World Cup in 2010?&quot;))</textarea><pre><code class="language-python">print(rag_chain.invoke(&quot;Who won the football World Cup in 2010?&quot;))</code></pre></div>
+<blockquote class="box box-careful"><p><span class="box-tag">Common confusion</span><strong>Retrieval always returns something.</strong> A similarity search returns the <em>k</em> closest chunks even when none of them is relevant: the closest of 363 irrelevant chunks is still the closest. For the football question the retriever hands the model four reviews of a tablet. Whether the answer is then "I do not know" depends entirely on the prompt and on the model. A small model keeps to such an instruction less reliably than a large one, so test this case with every model you use.</p></blockquote>
+<h3 id="returning-the-sources">Returning the sources</h3>
+<p>An answer is more useful when the user can check it. The <code>assign</code> pattern of the first part keeps the retrieved documents beside the answer.</p>
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-045" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>answer_chain = (
+    RunnablePassthrough.assign(context=lambda x: format_docs(x[&quot;documents&quot;]))
+    | rag_prompt | llm | StrOutputParser()
+)
+rag_with_sources = (
+    {&quot;documents&quot;: retriever, &quot;question&quot;: RunnablePassthrough()}
+    | RunnablePassthrough.assign(answer=answer_chain)
+)
+
+result = rag_with_sources.invoke(&quot;How is the battery life?&quot;)
+print(result[&quot;answer&quot;], &quot;\n&quot;)
+for d in result[&quot;documents&quot;]:
+    print(&quot;source:&quot;, d.metadata[&quot;review_id&quot;][:8], &quot;| starts at character&quot;, d.metadata[&quot;start_index&quot;])</textarea><pre><code class="language-python">answer_chain = (
+    RunnablePassthrough.assign(context=lambda x: format_docs(x[&quot;documents&quot;]))
+    | rag_prompt | llm | StrOutputParser()
+)
+rag_with_sources = (
+    {&quot;documents&quot;: retriever, &quot;question&quot;: RunnablePassthrough()}
+    | RunnablePassthrough.assign(answer=answer_chain)
+)
+
+result = rag_with_sources.invoke(&quot;How is the battery life?&quot;)
+print(result[&quot;answer&quot;], &quot;\n&quot;)
+for d in result[&quot;documents&quot;]:
+    print(&quot;source:&quot;, d.metadata[&quot;review_id&quot;][:8], &quot;| starts at character&quot;, d.metadata[&quot;start_index&quot;])</code></pre></div>
+<h2 id="9-measuring-the-retriever">9. Measuring the Retriever</h2>
+<p>The textbook does not trust a retriever by looking at one example. It measures <strong>recall at <em>k</em></strong>: for what share of the questions is the right document among the top <em>k</em> results? SubjQA makes this possible, because every question in it was written about one particular review. We can therefore ask each of the dataset's questions about the tablet, and check whether a chunk of <em>its</em> review comes back.</p>
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-047" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>test_questions = tablet[[&quot;question&quot;, &quot;review_id&quot;]].drop_duplicates()
+print(len(test_questions), &quot;question-review pairs&quot;)
+
+def recall_at(k):
+    hits = 0
+    for row in test_questions.itertuples():
+        found = vector_store.similarity_search(row.question, k=k)
+        hits += any(d.metadata[&quot;review_id&quot;] == row.review_id for d in found)
+    return hits / len(test_questions)
+
+for k in (1, 3, 5, 10):
+    print(f&quot;recall@{k}: {recall_at(k):.2f}&quot;)</textarea><pre><code class="language-python">test_questions = tablet[[&quot;question&quot;, &quot;review_id&quot;]].drop_duplicates()
+print(len(test_questions), &quot;question-review pairs&quot;)
+
+def recall_at(k):
+    hits = 0
+    for row in test_questions.itertuples():
+        found = vector_store.similarity_search(row.question, k=k)
+        hits += any(d.metadata[&quot;review_id&quot;] == row.review_id for d in found)
+    return hits / len(test_questions)
+
+for k in (1, 3, 5, 10):
+    print(f&quot;recall@{k}: {recall_at(k):.2f}&quot;)</code></pre></div>
+<p>Recall rises with <em>k</em>, as it does in the textbook: the more chunks are returned, the more likely the right one is among them. A larger <em>k</em> has a price, however. Every extra chunk makes the prompt longer, the answer slower, and the relevant passage harder for the model to find. Choosing <em>k</em> is a balance between these, and it should be made with numbers of this kind.</p>
+<blockquote class="box box-note"><p><span class="box-tag">Note</span><strong>Do not expect a recall near 1 here.</strong> Many SubjQA questions are short and subjective, such as <em>"How is the experience?"</em>, and could be about almost any of the 56 reviews. For such a question several reviews are reasonable results, but only one counts as correct. The measure is still useful for <em>comparison</em>: change the chunk size or the embedding model, run the cell again, and see whether the numbers go up or down.</p></blockquote>
+<h2 id="10-rag-chain-or-rag-agent">10. RAG Chain or RAG Agent?</h2>
+<p>The chain of Section 8 retrieves exactly once, for every input, before the model is called. This is called <strong>two-step RAG</strong>. It is simple, fast and predictable, and it is the right design when every question needs the documents.</p>
+<p>Its weakness is the same fixedness. It retrieves for <em>"hello"</em>. It cannot search a second time with better words when the first search fails, and it cannot break a question into two searches. In <strong>agentic RAG</strong> the search becomes a <em>tool</em>, and the model decides whether to call it, with what query, and how often.</p>
+<div class="codeblock"><button class="copy">Copy</button><pre><code class="language-python"># Needs a hosted chat model that supports tool calling (see the optional cell in the first part).
+from langchain.agents import create_agent
+from langchain_core.tools import tool
+
+@tool
+def search_reviews(query: str) -&gt; str:
+    &quot;&quot;&quot;Search the customer reviews of the tablet and return the most relevant passages.&quot;&quot;&quot;
+    return format_docs(vector_store.similarity_search(query, k=4))
+
+agent = create_agent(
+    model=llm,
+    tools=[search_reviews],
+    system_prompt=&quot;Answer questions about the tablet from its customer reviews. &quot;
+                  &quot;Search the reviews before you answer, and say so when they do not contain the answer.&quot;,
+)
+
+result = agent.invoke({&quot;messages&quot;: [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Is it good for reading, and how long does the battery last?&quot;}]})
+print(result[&quot;messages&quot;][-1].content)</code></pre></div>
+<blockquote class="box box-note"><p><span class="box-tag">Note</span><strong>Why this example is not in the notebook.</strong> An agent needs a model that can reliably request a tool in a fixed format, called <em>tool calling</em>. Large hosted models are trained for it; the small local model of this lesson is not dependable at it. The structure of the code was checked for this lesson with a scripted stand-in model. You will build agents of this kind, with their loop of thought, action and observation, in Weeks 5 and 9.</p></blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Two-step RAG chain</th>
+<th>RAG agent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Retrieval happens</td>
+<td>Always, once</td>
+<td>When the model decides, as often as it decides</td>
+</tr>
+<tr>
+<td>Model calls per question</td>
+<td>One</td>
+<td>Two or more</td>
+</tr>
+<tr>
+<td>Speed and cost</td>
+<td>Low and predictable</td>
+<td>Higher and variable</td>
+</tr>
+<tr>
+<td>Suits</td>
+<td>Questions that all need the documents</td>
+<td>Mixed conversation, and questions that need several searches</td>
+</tr>
+<tr>
+<td>Works with a small local model</td>
+<td>Yes</td>
+<td>Not reliably</td>
+</tr>
+</tbody>
+</table>
+<h2 id="11-from-the-lesson-to-your-project">11. From the Lesson to Your Project</h2>
+<p>The milestone for this week asks for document loaders, a Chroma store and a basic RAG chain. The code of this part is that chain, with three exchanges: your own sources in place of the reviews (Section 4), Chroma in place of the in-memory store (Section 7), and a system prompt written for your topic (Section 8). Measure your retriever on a handful of questions whose source you know before you build on it (Section 9). The requirements themselves are on the <a href="project.html">project page</a>.</p>
+<h2 id="12-check-your-understanding-rag">12. Check Your Understanding: RAG</h2>
+<details>
+<summary>1. Give two reasons why pasting the whole knowledge base into the prompt is not a solution.</summary>
+<p>A real knowledge base is larger than the context window of any model. Even where it fits, every token is paid for in time and money on every question, and a model answers less accurately when the relevant passage is buried among irrelevant text.</p>
+</details>
+<details>
+<summary>2. What is the difference between a sparse and a dense retriever, and when does each one fail?</summary>
+<p>A sparse retriever such as BM25 scores documents by shared words; it fails when the question and the document express the same thing in different words. A dense retriever compares embeddings, which encode meaning; it can miss exact rare terms such as product codes, and it depends on how well its embedding model fits the domain.</p>
+</details>
+<details>
+<summary>3. In the original RAG paper the retriever and the generator are trained together. What is trained in the system of this lesson?</summary>
+<p>Nothing. A ready-made embedding model retrieves, a ready-made chat model generates, and a prompt connects the two.</p>
+</details>
+<details>
+<summary>4. Which stages belong to indexing, and which are repeated for every question?</summary>
+<p>Indexing is done once: load, split, embed the chunks, store. For every question: embed the question, search the store, build the prompt from the retrieved chunks, and generate.</p>
+</details>
+<details>
+<summary>5. With <code>chunk_size=26</code> and <code>chunk_overlap=4</code>, the recursive splitter turns the 33-character text <code>abcdefghijklmnopqrstuvwxyzabcdefg</code> into two chunks. What is the second one, and why?</summary>
+<p><code>wxyzabcdefg</code>. The first chunk takes 26 characters. The second starts four characters before the end of the first, which is the overlap, and so begins with <code>wxyz</code>.</p>
+</details>
+<details>
+<summary>6. Your embedding model reads at most 128 tokens and your chunks are 2,000 characters long. What goes wrong, and will you see an error?</summary>
+<p>Only about the first quarter of each chunk is embedded; the remainder is ignored. There is no error. The chunk is stored whole and can be passed to the chat model whole, but it can only be <em>found</em> by the content of its beginning.</p>
+</details>
+<details>
+<summary>7. Why must the question be embedded with the same model as the chunks?</summary>
+<p>Each embedding model has its own vector space. Similarity between a vector from one model and a vector from another has no meaning, and the two may not even have the same number of dimensions.</p>
+</details>
+<details>
+<summary>8. A user asks the review chatbot about football, and it answers confidently from tablet reviews. Which part of the system failed?</summary>
+<p>The retriever did what it always does: it returned the closest chunks, although none was relevant. The failure is in generation: the model did not follow the instruction to say that it does not know. The remedies are a stricter prompt, a stronger model, or a threshold on the similarity score below which no chunk is passed on.</p>
+</details>
+<details>
+<summary>9. Recall at 10 is much higher than recall at 3. Why not simply always use <i>k</i> = 10?</summary>
+<p>Every additional chunk lengthens the prompt, which makes the answer slower and, with a hosted model, more expensive. More irrelevant chunks also make it harder for the model to use the relevant one. <em>k</em> is a balance between finding the right passage and overloading the model.</p>
+</details>
+<h2 id="13-summary-and-further-reading-rag">13. Summary and Further Reading: RAG</h2>
+<p><strong>What you learned:</strong> a language model alone cannot answer from documents it has not seen, and pasting everything into the prompt does not scale. RAG retrieves a few relevant chunks and gives them to the model with the question. It descends from the retriever-reader architecture of extractive question answering, with a generator in place of the reader. Indexing (load, split, embed, store) is done once; retrieval and generation are done for every question. Chunk size must respect the limit of the embedding model. A retriever should be measured, and recall at <em>k</em> is the simplest measure. A fixed chain is enough when every question needs the documents; an agent decides for itself when to search.</p>
+<p><strong>Further reading</strong></p>
+<ul>
+<li>Tunstall, von Werra &amp; Wolf, <em>Natural Language Processing with Transformers</em>, Revised Edition (O'Reilly, 2022), Chapter 7. Code and figures: https://github.com/nlp-with-transformers/notebooks</li>
+<li>Lewis et al. (2020), "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks": https://arxiv.org/abs/2005.11401</li>
+<li>Karpukhin et al. (2020), "Dense Passage Retrieval for Open-Domain Question Answering": https://arxiv.org/abs/2004.04906</li>
+<li>Bjerva et al. (2020), "SubjQA: A Dataset for Subjectivity and Review Comprehension": https://arxiv.org/abs/2004.14283 · data: https://github.com/megagonlabs/SubjQA</li>
+<li>LangChain documentation, retrieval: https://docs.langchain.com/oss/python/langchain/retrieval</li>
+<li>LangChain documentation, building a semantic search engine: https://docs.langchain.com/oss/python/langchain/knowledge-base</li>
+<li>LangChain documentation, building a RAG agent: https://docs.langchain.com/oss/python/langchain/rag</li>
+</ul>
+<p><strong>Figure credits.</strong> The three architecture figures come from the textbook's companion repository and are used under its Apache 2.0 licence. The indexing and retrieval figures come from the LangChain documentation and are used under its MIT licence. The two pipeline pictures and the data-sources figure come from Dr. Abdulkarim Albanna's course slides. The chunk-overlap diagram was drawn for this lesson.</p>
 <h2 class="part" id="part-chat-with-databases">Chat with Databases</h2>
 <h2 id="introduction">Introduction</h2>
 <p>LangChain provides powerful tools to interact with your databases using natural language. This application demonstrates how to create a chat interface that allows users to query databases in conversational language instead of writing SQL.</p>
@@ -393,7 +1419,7 @@ LIMIT 1;</code></pre></div>
 </table>
 <h2 id="implementation-code">Implementation Code</h2>
 <h3 id="setting-up-the-environment">Setting Up the Environment</h3>
-<div class="where-note"><div class="where-head">Where does this code run — and why?</div><p><b>▶ Try it</b> examples run inside this page, in your web browser — good for quick experiments with plain Python, NumPy, pandas, scikit-learn and matplotlib. From here on the examples need more:</p><ul><li><b>Everything else → Google Colab.</b> PyTorch, Transformers, LangChain and LangGraph need a full Python installation and large libraries, which a web page does not have. <b>▶ Run in Colab</b> opens this week's notebook in Google Colab, at the cell that holds the example. The notebook contains all of the lesson's code in order, and its first cell installs what is missing. Sign in with a Google account and run the cells from the top, because later examples reuse earlier ones.</li><li><b>API keys.</b> LangChain, OpenAI and agent examples call services on the internet with your own key. In Colab, add it once in the 🔑 <b>Secrets</b> panel (left bar) and switch on <i>Notebook access</i> — never type a key into your code.</li><li><b>Exception — programs that keep running.</b> Web apps and local servers (Django, Streamlit, Ollama, MCP servers, Playwright) are files and programs, not notebook steps. Those examples have <b>💻 Open in Codespaces</b>, a free cloud computer with a terminal, already set up for this course (<a href="https://github.com/zmomani/ComputingSystemsDS-AI/blob/main/CODESPACES.md" target="_blank" rel="noopener">guide</a>).</li></ul></div><div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-004" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_community, langchain_openai, langgraph" title="Needs langchain_community, langchain_openai, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># Install required packages (run in a terminal):
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-049" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_community, langchain_openai, langgraph" title="Needs langchain_community, langchain_openai, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># Install required packages (run in a terminal):
 #   pip install langchain langchain-community langchain-openai langgraph sqlalchemy requests
 
 # Import necessary modules
@@ -419,7 +1445,7 @@ from langgraph.prebuilt import create_react_agent
 # Set your OpenAI API key
 os.environ[&quot;OPENAI_API_KEY&quot;] = &quot;your-api-key-here&quot;</code></pre></div>
 <h3 id="database-connection">Database Connection</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-006" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="requests, sqlalchemy" title="Needs requests, sqlalchemy — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># Connect to an SQLite Database
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-051" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="requests, sqlalchemy" title="Needs requests, sqlalchemy — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># Connect to an SQLite Database
 from sqlalchemy import create_engine
 from sqlalchemy.pool import StaticPool
 
@@ -479,7 +1505,7 @@ def get_in_memory_db():
 engine = get_in_memory_db()
 db = SQLDatabase(engine)</code></pre></div>
 <h3 id="creating-the-langchain-agent">Creating the LangChain Agent</h3>
-<div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-008" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_community" title="Needs langchain_community — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># Initialize Language Model
+<div class="runnable local"><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-053" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_community" title="Needs langchain_community — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># Initialize Language Model
 llm = ChatOpenAI(model=&quot;gpt-4o&quot;, temperature=0)  # You can also use gpt-4o-mini for lower cost
 
 # Initialize SQL Database Toolkit
@@ -754,91 +1780,85 @@ def output_parser(text):
 def chain(topic):                     # LCEL equivalent: prompt | llm | parser
     return output_parser(fake_llm(prompt_template(topic)))
 
-print(chain(&quot;MCP&quot;))</code></pre></div><h3 id="test-code">Test code for the course environment</h3><div class="runnable local"><div class="code-title">Verify installation and call a chat model directly</div><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-019" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core, langchain_openai" title="Needs langchain_core, langchain_openai — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 1. Verify installation and call a chat model directly
-# pip install langchain langchain-core langchain-openai
-import os
-from langchain_openai import ChatOpenAI
-from langchain_core.messages import HumanMessage
-
-os.environ[&quot;OPENAI_API_KEY&quot;] = &quot;your-api-key-here&quot;
-
-llm = ChatOpenAI(model=&quot;gpt-4o-mini&quot;, temperature=0)
-print(llm.invoke([HumanMessage(content=&quot;In one sentence, what is LangChain?&quot;)]).content)</textarea><pre><code class="language-python"># 1. Verify installation and call a chat model directly
-# pip install langchain langchain-core langchain-openai
-import os
-from langchain_openai import ChatOpenAI
-from langchain_core.messages import HumanMessage
-
-os.environ[&quot;OPENAI_API_KEY&quot;] = &quot;your-api-key-here&quot;
-
-llm = ChatOpenAI(model=&quot;gpt-4o-mini&quot;, temperature=0)
-print(llm.invoke([HumanMessage(content=&quot;In one sentence, what is LangChain?&quot;)]).content)</code></pre></div><div class="runnable local"><div class="code-title">A minimal LCEL chain: prompt template -&gt; LLM -&gt; output parser</div><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-021" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core, langchain_openai" title="Needs langchain_core, langchain_openai — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 2. A minimal LCEL chain: prompt template -&gt; LLM -&gt; output parser
-from langchain_core.prompts import ChatPromptTemplate
+print(chain(&quot;MCP&quot;))</code></pre></div><h3 id="test-code">Test code for the course environment</h3><div class="runnable local"><div class="code-title">A chain without a model: see what each step produces</div><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-064" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core" title="Needs langchain_core — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.messages import AIMessage
+from langchain_core.runnables import RunnableLambda
 from langchain_core.output_parsers import StrOutputParser
-from langchain_openai import ChatOpenAI
-
-prompt = ChatPromptTemplate.from_messages([
-    (&quot;system&quot;, &quot;You are a concise tutor for a data-science course.&quot;),
-    (&quot;human&quot;, &quot;Explain {topic} in two sentences.&quot;),
-])
-chain = prompt | ChatOpenAI(model=&quot;gpt-4o-mini&quot;, temperature=0) | StrOutputParser()
-
-print(chain.invoke({&quot;topic&quot;: &quot;LangChain Expression Language&quot;}))</textarea><pre><code class="language-python"># 2. A minimal LCEL chain: prompt template -&gt; LLM -&gt; output parser
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
-from langchain_openai import ChatOpenAI
-
-prompt = ChatPromptTemplate.from_messages([
-    (&quot;system&quot;, &quot;You are a concise tutor for a data-science course.&quot;),
-    (&quot;human&quot;, &quot;Explain {topic} in two sentences.&quot;),
-])
-chain = prompt | ChatOpenAI(model=&quot;gpt-4o-mini&quot;, temperature=0) | StrOutputParser()
-
-print(chain.invoke({&quot;topic&quot;: &quot;LangChain Expression Language&quot;}))</code></pre></div><div class="runnable local"><div class="code-title">Inspect the pieces of a chain without an API key</div><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-023" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core" title="Needs langchain_core — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 3. Inspect the pieces of a chain without an API key
-from langchain_core.prompts import ChatPromptTemplate
 
 prompt = ChatPromptTemplate.from_messages([
     (&quot;system&quot;, &quot;You are a helpful assistant.&quot;),
     (&quot;human&quot;, &quot;Summarize {text} for a {audience}.&quot;),
 ])
-messages = prompt.format_messages(text=&quot;the LangChain stack&quot;, audience=&quot;first-year student&quot;)
-for m in messages:
-    print(f&quot;{m.type}: {m.content}&quot;)
-print(&quot;Input variables:&quot;, prompt.input_variables)</textarea><pre><code class="language-python"># 3. Inspect the pieces of a chain without an API key
-from langchain_core.prompts import ChatPromptTemplate
+echo_model = RunnableLambda(lambda p: AIMessage(content=f&quot;(the model received {len(p.to_messages())} messages)&quot;))
+
+chain = prompt | echo_model | StrOutputParser()
+print(prompt.input_variables)
+print(chain.invoke({&quot;text&quot;: &quot;the LangChain packages&quot;, &quot;audience&quot;: &quot;first-year student&quot;}))</textarea><pre><code class="language-python">from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.messages import AIMessage
+from langchain_core.runnables import RunnableLambda
+from langchain_core.output_parsers import StrOutputParser
 
 prompt = ChatPromptTemplate.from_messages([
     (&quot;system&quot;, &quot;You are a helpful assistant.&quot;),
     (&quot;human&quot;, &quot;Summarize {text} for a {audience}.&quot;),
 ])
-messages = prompt.format_messages(text=&quot;the LangChain stack&quot;, audience=&quot;first-year student&quot;)
-for m in messages:
-    print(f&quot;{m.type}: {m.content}&quot;)
-print(&quot;Input variables:&quot;, prompt.input_variables)</code></pre></div><div class="runnable local"><div class="code-title">Stream tokens from a chain (streaming is first-class in LCEL)</div><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-025" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core, langchain_openai" title="Needs langchain_core, langchain_openai — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 4. Stream tokens from a chain (streaming is first-class in LCEL)
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
-from langchain_openai import ChatOpenAI
+echo_model = RunnableLambda(lambda p: AIMessage(content=f&quot;(the model received {len(p.to_messages())} messages)&quot;))
 
-chain = (
-    ChatPromptTemplate.from_template(&quot;List three uses of {tool} as bullet points.&quot;)
-    | ChatOpenAI(model=&quot;gpt-4o-mini&quot;)
-    | StrOutputParser()
-)
-for chunk in chain.stream({&quot;tool&quot;: &quot;LangSmith&quot;}):
-    print(chunk, end=&quot;&quot;, flush=True)
-print()</textarea><pre><code class="language-python"># 4. Stream tokens from a chain (streaming is first-class in LCEL)
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
-from langchain_openai import ChatOpenAI
+chain = prompt | echo_model | StrOutputParser()
+print(prompt.input_variables)
+print(chain.invoke({&quot;text&quot;: &quot;the LangChain packages&quot;, &quot;audience&quot;: &quot;first-year student&quot;}))</code></pre></div><div class="runnable local"><div class="code-title">Parse a model&#x27;s JSON reply into a checked object</div><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-066" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core, pydantic" title="Needs langchain_core, pydantic — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from pydantic import BaseModel, Field
+from langchain_core.output_parsers import PydanticOutputParser
 
-chain = (
-    ChatPromptTemplate.from_template(&quot;List three uses of {tool} as bullet points.&quot;)
-    | ChatOpenAI(model=&quot;gpt-4o-mini&quot;)
-    | StrOutputParser()
-)
-for chunk in chain.stream({&quot;tool&quot;: &quot;LangSmith&quot;}):
-    print(chunk, end=&quot;&quot;, flush=True)
-print()</code></pre></div><div class="runnable local"><div class="code-title">Load Chinook into an in-memory SQLite DB and inspect it with SQLDatabase (no LLM needed)</div><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-027" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_community, requests, sqlalchemy" title="Needs langchain_community, requests, sqlalchemy — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 1. Load Chinook into an in-memory SQLite DB and inspect it with SQLDatabase (no LLM needed)
+class Source(BaseModel):
+    title: str = Field(description=&quot;Title of the source&quot;)
+    year: int = Field(description=&quot;Year of publication&quot;)
+    relevant: bool = Field(description=&quot;Is the source relevant to the research topic?&quot;)
+
+parser = PydanticOutputParser(pydantic_object=Source)
+print(parser.parse(&#x27;{&quot;title&quot;: &quot;Attention Is All You Need&quot;, &quot;year&quot;: 2017, &quot;relevant&quot;: true}&#x27;))</textarea><pre><code class="language-python">from pydantic import BaseModel, Field
+from langchain_core.output_parsers import PydanticOutputParser
+
+class Source(BaseModel):
+    title: str = Field(description=&quot;Title of the source&quot;)
+    year: int = Field(description=&quot;Year of publication&quot;)
+    relevant: bool = Field(description=&quot;Is the source relevant to the research topic?&quot;)
+
+parser = PydanticOutputParser(pydantic_object=Source)
+print(parser.parse(&#x27;{&quot;title&quot;: &quot;Attention Is All You Need&quot;, &quot;year&quot;: 2017, &quot;relevant&quot;: true}&#x27;))</code></pre></div><div class="runnable local"><div class="code-title">Split your own text and inspect the chunks</div><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-068" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_text_splitters" title="Needs langchain_text_splitters — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+text = (&quot;RAG has two stages. First the documents are indexed.\n\n&quot;
+        &quot;Then a question is answered: the retriever finds the chunks closest to the question, &quot;
+        &quot;and the model writes an answer from them.\n\n&quot;
+        &quot;A chunk that is too large is cut off by the embedding model. A chunk that is too small loses its context.&quot;)
+
+splitter = RecursiveCharacterTextSplitter(chunk_size=80, chunk_overlap=0)
+for chunk in splitter.split_text(text):
+    print(len(chunk), repr(chunk))</textarea><pre><code class="language-python">from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+text = (&quot;RAG has two stages. First the documents are indexed.\n\n&quot;
+        &quot;Then a question is answered: the retriever finds the chunks closest to the question, &quot;
+        &quot;and the model writes an answer from them.\n\n&quot;
+        &quot;A chunk that is too large is cut off by the embedding model. A chunk that is too small loses its context.&quot;)
+
+splitter = RecursiveCharacterTextSplitter(chunk_size=80, chunk_overlap=0)
+for chunk in splitter.split_text(text):
+    print(len(chunk), repr(chunk))</code></pre></div><div class="runnable local"><div class="code-title">A vector store in five lines, with a stand-in embedding model</div><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-070" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_core" title="Needs langchain_core — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden>from langchain_core.embeddings import DeterministicFakeEmbedding
+from langchain_core.vectorstores import InMemoryVectorStore
+
+store = InMemoryVectorStore(DeterministicFakeEmbedding(size=64))
+store.add_texts([&quot;Petra is a historical city in southern Jordan.&quot;,
+                 &quot;Amman is the capital of Jordan.&quot;,
+                 &quot;BERT is an encoder-only transformer.&quot;])
+for doc, score in store.similarity_search_with_score(&quot;Amman is the capital of Jordan.&quot;, k=2):
+    print(round(score, 3), &quot;|&quot;, doc.page_content)</textarea><pre><code class="language-python">from langchain_core.embeddings import DeterministicFakeEmbedding
+from langchain_core.vectorstores import InMemoryVectorStore
+
+store = InMemoryVectorStore(DeterministicFakeEmbedding(size=64))
+store.add_texts([&quot;Petra is a historical city in southern Jordan.&quot;,
+                 &quot;Amman is the capital of Jordan.&quot;,
+                 &quot;BERT is an encoder-only transformer.&quot;])
+for doc, score in store.similarity_search_with_score(&quot;Amman is the capital of Jordan.&quot;, k=2):
+    print(round(score, 3), &quot;|&quot;, doc.page_content)</code></pre></div><div class="runnable local"><div class="code-title">Load Chinook into an in-memory SQLite DB and inspect it with SQLDatabase (no LLM needed)</div><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-072" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_community, requests, sqlalchemy" title="Needs langchain_community, requests, sqlalchemy — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 1. Load Chinook into an in-memory SQLite DB and inspect it with SQLDatabase (no LLM needed)
 # pip install langchain-community sqlalchemy requests
 import sqlite3, requests
 from sqlalchemy import create_engine
@@ -870,7 +1890,7 @@ db = SQLDatabase(engine)
 
 print(db.dialect)
 print(db.get_usable_table_names())
-print(db.get_table_info([&quot;Customer&quot;, &quot;Invoice&quot;])[:800])</code></pre></div><div class="runnable local"><div class="code-title">Run the Process Flow SQL by hand and confirm the &quot;USA, 523.06&quot; result</div><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-029" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 2. Run the Process Flow SQL by hand and confirm the &quot;USA, 523.06&quot; result
+print(db.get_table_info([&quot;Customer&quot;, &quot;Invoice&quot;])[:800])</code></pre></div><div class="runnable local"><div class="code-title">Run the Process Flow SQL by hand and confirm the &quot;USA, 523.06&quot; result</div><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-074" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="code from the earlier examples in this lesson" title="Needs code from the earlier examples in this lesson — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 2. Run the Process Flow SQL by hand and confirm the &quot;USA, 523.06&quot; result
 sql = &quot;&quot;&quot;
 SELECT c.Country, SUM(i.Total) AS TotalSpent
 FROM Customer c
@@ -888,7 +1908,7 @@ GROUP BY c.Country
 ORDER BY TotalSpent DESC
 LIMIT 1;
 &quot;&quot;&quot;
-print(db.run(sql))</code></pre></div><div class="runnable local"><div class="code-title">Look at the four tools the SQLDatabaseToolkit exposes</div><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-031" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_community, langchain_openai" title="Needs langchain_community, langchain_openai — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 3. Look at the four tools the SQLDatabaseToolkit exposes
+print(db.run(sql))</code></pre></div><div class="runnable local"><div class="code-title">Look at the four tools the SQLDatabaseToolkit exposes</div><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-076" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_community, langchain_openai" title="Needs langchain_community, langchain_openai — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 3. Look at the four tools the SQLDatabaseToolkit exposes
 from langchain_openai import ChatOpenAI
 from langchain_community.agent_toolkits.sql.toolkit import SQLDatabaseToolkit
 
@@ -902,7 +1922,7 @@ from langchain_community.agent_toolkits.sql.toolkit import SQLDatabaseToolkit
 llm = ChatOpenAI(model=&quot;gpt-4o-mini&quot;, temperature=0)
 toolkit = SQLDatabaseToolkit(db=db, llm=llm)
 for t in toolkit.get_tools():
-    print(f&quot;{t.name}: {t.description[:90]}...&quot;)</code></pre></div><div class="runnable local"><div class="code-title">Ask the SQL agent a question and watch every intermediate step</div><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-033" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_community, langgraph" title="Needs langchain_community, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 4. Ask the SQL agent a question and watch every intermediate step
+    print(f&quot;{t.name}: {t.description[:90]}...&quot;)</code></pre></div><div class="runnable local"><div class="code-title">Ask the SQL agent a question and watch every intermediate step</div><span class="local-btns"><a class="try colab-try" href="https://colab.research.google.com/github/zmomani/ComputingSystemsDS-AI/blob/main/notebooks/week04-langchain.ipynb#scrollTo=week04-langc-078" target="_blank" rel="noopener" title="Opens this week's notebook in Google Colab, at this example">▶ Run in Colab</a><button class="try local" data-run="0" data-target="colab" data-needs="langchain_community, langgraph" title="Needs langchain_community, langgraph — opens in the editor">✎ Editor</button></span><button class="copy">Copy</button><textarea class="src" hidden># 4. Ask the SQL agent a question and watch every intermediate step
 from langchain_community.agent_toolkits.sql.prompt import SQL_PREFIX
 from langgraph.prebuilt import create_react_agent
 

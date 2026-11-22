@@ -42,9 +42,9 @@ WEEKS = [
        milestone='NER Agent extracting people, organisations, technologies, dates and locations; test on 5+ articles',
        files=['week03-ner.md'], sims=['bio-tagging', 'classifier', 'tokenizer', 'finetune']),
   dict(n=4, slug='week04-langchain', title='LangChain Fundamentals', ilo='K1, P1',
-       topics='LangChain chains, prompts, memory, loaders, splitters, vector stores, RAG',
+       topics='LangChain prompts, chains, structured output, routing; document loaders, splitters, embeddings, vector stores, RAG',
        milestone='Prompt templates for each agent, document loaders, ChromaDB store, basic RAG chain',
-       files=['week04-langchain.md', 'week04b-chat-with-databases.md'], sims=['rag', 'vectors']),
+       files=['week04-langchain.md', 'week04a-chat-with-documents.md', 'week04b-chat-with-databases.md'], sims=['rag', 'vectors']),
   dict(n=5, slug='week05-langgraph', title='LangGraph', ilo='I1, P2',
        topics='LangGraph: nodes, edges, state, routing, checkpointing, human-in-the-loop',
        milestone='StateGraph orchestrator with conditional routing, state checkpointing and 3+ connected agents',
@@ -262,14 +262,22 @@ def write_notebook(slug, title, page_html, res):
                 '**How to use this notebook in Google Colab**\n\n'
                 '1. Sign in with a Google account. Choose **File → Save a copy in Drive** if you want to keep your changes.\n'
                 + ('2. This lesson trains a model: choose **Runtime → Change runtime type → T4 GPU** before you run anything.\n' if gpu else
+                   '2. This lesson runs a small language model inside the notebook: choose **Runtime → Change runtime type → T4 GPU** '
+                   'before you run anything. Without a GPU the code still works, but each answer takes much longer.\n' if slug in GPU_HELPS else
                    '2. No GPU is needed for this lesson.\n') +
                 '3. Run the cells from the top with **Shift+Enter**, or **Runtime → Run all**. Later examples reuse variables from '
                 'earlier ones, so do not skip cells. The first time, Colab asks whether to run a notebook that comes from GitHub: '
                 'choose **Run anyway**.'
-                + ('\n4. Examples that call OpenAI or another service need your own key. Click the 🔑 **Secrets** icon in the left bar, add '
+                + ('\n4. The first two parts of this lesson need no API key. Only the optional hosted-model cell and the last part, '
+                   '*Chat with Databases*, call OpenAI with your own key: click the 🔑 **Secrets** icon in the left bar, add `OPENAI_API_KEY` '
+                   'and switch on *Notebook access*. Never type a key into a cell. With **Run all**, the cells of that last part stop with '
+                   'an error if no key was added; everything before them has already run.' if slug in GPU_HELPS else
+                   '\n4. Examples that call OpenAI or another service need your own key. Click the 🔑 **Secrets** icon in the left bar, add '
                    '`OPENAI_API_KEY` (and `TAVILY_API_KEY` where the lesson uses web search) and switch on *Notebook access*. '
                    'Never type a key into a cell.' if mods & API_MODS else ''))]
-    if pip: cells.append(code('# Libraries this lesson needs that Colab does not already have (takes about a minute)\n%pip install -q ' + ' '.join(pip)))
+    if slug in NB_PINS:
+        cells.append(code('# The library versions this lesson was tested with (takes a minute or two)\n%pip install -q ' + ' '.join(f'"{p}"' for p in NB_PINS[slug])))
+    elif pip: cells.append(code('# Libraries this lesson needs that Colab does not already have (takes about a minute)\n%pip install -q ' + ' '.join(pip)))
     if mods & API_MODS:
         cells.append(code('# Reads your API keys from the Colab Secrets panel (🔑 in the left bar), if you added any\n'
                           'import os\n'
@@ -335,6 +343,7 @@ def finalize(page_html, slug=None, title=None):
     has_nb = write_notebook(slug, title, page_html, res) if slug else False
     colab = colab_url(slug) if has_nb else ''
     gpu_tip = ' Choose <b>Runtime → Change runtime type → T4 GPU</b> first: this lesson trains a model.' if slug in GPU_WEEKS else ''
+    if slug in GPU_HELPS: gpu_tip = ' Choose <b>Runtime → Change runtime type → T4 GPU</b> first: this lesson runs a small language model, which is slow without a GPU.'
     page_html = page_html.replace('COLABLINKX', (f'<div class="colab-bar"><a class="btn colab" href="{colab}" target="_blank" rel="noopener">'
         '<span class="colab-logo">CO</span> Open this week\'s notebook in Colab</a>'
         f'<span class="muted small">All of this lesson\'s code, ready to run, with its installs in the first cell.{gpu_tip}</span></div>') if has_nb else '')
@@ -358,6 +367,12 @@ API_MODS = {'openai', 'anthropic', 'langchain', 'langchain_openai', 'langchain_c
 
 GPU_TRAIN = re.compile(r'trainer\.train\(|TrainingArguments\(|\bTrainer\(|def train_step|optimizer\.step\(|loss\.backward\(')
 GPU_WEEKS = {'week02-text-classification', 'week13-diffusion'}
+# Lessons that run a language model without training one: a GPU is recommended but not required.
+GPU_HELPS = {'week04-langchain'}
+# Exact versions for a lesson's install cell: the versions its code was tested with.
+NB_PINS = {'week04-langchain': ['langchain==1.5.2', 'langchain-core==1.8.4', 'langchain-community==0.4.2',
+                                'langchain-text-splitters==1.1.3', 'langchain-huggingface==1.2.3', 'langchain-openai==1.8.5',
+                                'langgraph==1.2.24', 'sentence-transformers', 'pypdf', 'beautifulsoup4']}
 CURRENT_SLUG = ['']
 
 def needs_gpu(code):
@@ -380,7 +395,13 @@ def where_note(blocks):
              'large libraries, which a web page does not have. <b>▶ Run in Colab</b> opens this week\'s notebook in Google Colab, at the cell '
              'that holds the example. The notebook contains all of the lesson\'s code in order, and its first cell installs what is missing. '
              'Sign in with a Google account and run the cells from the top, because later examples reuse earlier ones.</li>']
-    if mods & API_MODS:
+    if CURRENT_SLUG[0] in GPU_HELPS:
+        items.append('<li><b>A GPU makes this lesson fast.</b> The examples run a small language model inside the notebook. In Colab choose '
+                     '<b>Runtime → Change runtime type → T4 GPU</b> before running it. Without a GPU the code still works, but each answer takes much longer.</li>')
+        items.append('<li><b>API keys.</b> The first two parts of this lesson need no key and no registration. Only the optional hosted-model cell and '
+                     'the last part, <i>Chat with Databases</i>, call a service on the internet with your own key. In Colab, add it once in the 🔑 '
+                     '<b>Secrets</b> panel (left bar) and switch on <i>Notebook access</i> — never type a key into your code.</li>')
+    elif mods & API_MODS:
         items.append('<li><b>API keys.</b> LangChain, OpenAI and agent examples call services on the internet with your own key. In Colab, add it '
                      'once in the 🔑 <b>Secrets</b> panel (left bar) and switch on <i>Notebook access</i> — never type a key into your code.</li>')
     if gpu:
